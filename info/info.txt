@@ -1,0 +1,10 @@
+Volgende week idee:
+* graphics engine: LWGJL, 
+* physics engine: self made, opzoeken
+* class diagram
+* simulation heartbeat
+* beeld verwerking: niet zelf?
+
+Later:
+* GUI
+
