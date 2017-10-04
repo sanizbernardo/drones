@@ -3,23 +3,48 @@ import org.la4j.vector.dense.BasicVector;
 
 public class Drone {
 	private final int NbColumns = 0, NbRows = 0;
-	private final float wingX = (float) 2.5, tailSize = (float) 5.46, engineMass = (float) 70,
-			wingMass = (float) 150, tailMass = (float) 30, maxThrust = (float) -1,
-			maxAOA = (float) -1, wingLiftslope = (float) -1, horStabLiftSlope = (float) -1,
-			verStabLiftSlope = (float) -1, horizontalAngleOfView = (float) -1,
-			verticalAngleOfView = (float) -1;
+	private final float wingX = 2.5f, tailSize = 5.46f, engineMass = 70f,
+			wingMass = 150f, tailMass = 30f, maxThrust = -1f,
+			maxAOA = -1f, wingLiftslope = -1f, horStabLiftSlope = -1f,
+			verStabLiftSlope = -1f, horizontalAngleOfView = -1f,
+			verticalAngleOfView = -1;
 
-	private float xpos, ypos, zpos, xvel, yvel, zvel, xrot, yrot, zrot, yaw, pitch, roll;
+	private float xpos, ypos, zpos, xvel, yvel, zvel, xrot, yrot, zrot, yaw, pitch, roll,
+				thrust, leftWingInclination, rightWingInclination, horStabInclination, verStabInclination;
 	
-	public Drone(float x, float y, float z) {
+	public Drone(float x, float y, float z, float xvel, float yvel, float zvel) {
 		this.xpos = x;
 		this.ypos = y;
 		this.zpos = z;
+		this.xvel = xvel;
+		this.yvel = yvel;
+		this.zvel = zvel;
+		this.xrot = 0;
+		this.yrot = 0;
+		this.zrot = 0;
 		this.yaw = 0;
 		this.pitch = 0;
 		this.roll = 0;
+		this.thrust = 0;
+		this.leftWingInclination = 0;
+		this.rightWingInclination = 0;
+		this.horStabInclination = 0;
+		this.verStabInclination = 0;
 	}
 	
+	// position
+	float getX() {
+		return xpos;
+	}
+	
+    float getY() {
+    	return ypos;
+    }
+    
+    float getZ() {
+    	return zpos;
+    }
+    
 	public void setPos(float x, float y, float z) {
 		this.xpos = x;
 		this.ypos = y;
@@ -30,6 +55,28 @@ public class Drone {
 		setPos((float) pos.get(0), (float) pos.get(1), (float) pos.get(2));
 	}
 	
+    Vector getPos() {
+    	return new BasicVector(new double[] {xpos, ypos, zpos});
+    }
+    
+    
+    // velocity
+    float getXvel() {
+    	return xvel;
+    }
+    
+    float getYvel() {
+    	return yvel;
+    }
+    
+    float getZvel() {
+    	return zvel;
+    }
+    
+    Vector getVel() {
+    	return new BasicVector(new double[] {xvel, yvel, zvel});
+    }
+    
 	public void setVel(float xvel, float yvel, float zvel) {
 		this.xvel = xvel;
 		this.yvel = yvel;
@@ -40,6 +87,24 @@ public class Drone {
 		setPos((float) vel.get(0), (float) vel.get(1), (float) vel.get(2));
 	}
 	
+	
+	// rotation
+    float getXrot() {
+    	return xrot;
+    }
+    
+    float getYrot() {
+    	return yrot;
+    }
+    
+    float getZrot() {
+    	return zrot;
+    }
+    
+    Vector getRot() {
+    	return new BasicVector(new double[] {xrot, yrot, zrot});
+    }
+    
 	public void setRot(float xrot, float yrot, float zrot) {
 		this.xrot = xrot;
 		this.yrot = yrot;
@@ -49,7 +114,58 @@ public class Drone {
 	public void setRot(Vector rot) {
 		setRot((float) rot.get(0), (float) rot.get(1), (float) rot.get(2));
 	}
-
+	
+	
+	// thrust
+    float getThrust() {
+    	return thrust;
+    }
+    
+	public void setThrust(float thrust) {
+		if (thrust < maxThrust && thrust >= 0) 
+			this.thrust = thrust;
+	}
+	
+	public float getMaxThrust() {
+		return maxThrust;
+	}
+	
+	
+	// inclination
+    float getLeftWingInclination() {
+    	return leftWingInclination;
+    }
+    
+	public void setLeftWingInclination(float inclination) {
+		this.leftWingInclination = inclination;
+	}
+	
+	float getRightWingInclination() {
+    	return rightWingInclination;
+    }
+	
+	public void setRightWingInclination(float inclination) {
+		this.rightWingInclination = inclination;
+	}
+	
+	float getHorStabInclination() {
+    	return horStabInclination;
+    }
+	
+	public void setHorStabInclination(float inclination) {
+		this.horStabInclination = inclination;
+	}
+	
+	float getVerStabInclination() {
+    	return verStabInclination;
+    }
+	
+	public void setVerStabInclination(float inclination) {
+		this.verStabInclination = inclination;
+	}
+	
+	
+	// plane dimensions
 	public float getWingX() {
 		return wingX;
 	}
@@ -70,14 +186,14 @@ public class Drone {
 		return tailMass;
 	}
 
-	public float getMaxThrust() {
-		return maxThrust;
-	}
 
+	// max AOA
 	public float getMaxAOA() {
 		return maxAOA;
 	}
 
+	
+	// lift slopes
 	public float getWingLiftSlope() {
 		return wingLiftslope;
 	}
@@ -90,6 +206,8 @@ public class Drone {
 		return verStabLiftSlope;
 	}
 
+	
+	// camera stats
 	public float getHorizontalAngleOfView() {
 		return horizontalAngleOfView;
 	}
@@ -106,18 +224,8 @@ public class Drone {
 		return NbRows;
 	}
 	
-	float getX() {
-		return xpos;
-	}
 	
-    float getY() {
-    	return ypos;
-    }
-    
-    float getZ() {
-    	return zpos;
-    }
-    
+    // orientations
     float getHeading() {
     	return yaw;
     }
@@ -128,41 +236,5 @@ public class Drone {
     
     float getRoll() {
     	return roll;
-    }
-    
-    float getXvel() {
-    	return xvel;
-    }
-    
-    float getYvel() {
-    	return yvel;
-    }
-    
-    float getZvel() {
-    	return zvel;
-    }
-    
-    float getXrot() {
-    	return xrot;
-    }
-    
-    float getYrot() {
-    	return yrot;
-    }
-    
-    float getZrot() {
-    	return zrot;
-    }
-    
-    Vector getPos() {
-    	return new BasicVector(new double[] {xpos, ypos, zpos});
-    }
-    
-    Vector getVel() {
-    	return new BasicVector(new double[] {xvel, yvel, zvel});
-    }
-    
-    Vector getRot() {
-    	return new BasicVector(new double[] {xrot, yrot, zrot});
     }
 }

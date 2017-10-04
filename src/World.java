@@ -6,8 +6,14 @@ import org.la4j.Vector;
 
 public class World {
 	
-	private final float gravity = (float) 9.81;
+	private final float gravity;
+	private final Vector wind;
 	private Map<Vector,Cube> cubes;
+	
+	public World(float gravity, Vector wind) {
+		this.gravity = gravity;
+		this.wind = wind;
+	}
 	
 	public void addCube(Cube cube) {
 		cubes.put(cube.getCenter(), cube);
@@ -24,5 +30,9 @@ public class World {
 	
 	public float getGravity() {
 		return this.gravity;
+	}
+	
+	public Vector getWind() {
+		return this.wind;
 	}
 }
