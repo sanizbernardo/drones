@@ -1,4 +1,6 @@
-package p_en_o_cw_2017;
+import datatypes.AutopilotConfig;
+import datatypes.AutopilotInputs;
+import datatypes.AutopilotOutputs;
 
 public interface Autopilot {
     AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs);
