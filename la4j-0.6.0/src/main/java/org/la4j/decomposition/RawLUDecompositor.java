@@ -25,6 +25,7 @@ import org.la4j.Matrices;
 import org.la4j.Matrix;
 import org.la4j.matrix.SparseMatrix;
 
+@SuppressWarnings("serial")
 public class RawLUDecompositor extends AbstractDecompositor implements MatrixDecompositor {
 
     public RawLUDecompositor(Matrix matrix) {

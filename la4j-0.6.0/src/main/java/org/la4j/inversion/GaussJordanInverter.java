@@ -27,6 +27,7 @@ import org.la4j.Matrix;
 import org.la4j.Vector;
 import org.la4j.vector.DenseVector;
 
+@SuppressWarnings("serial")
 public class GaussJordanInverter implements MatrixInverter {
 
     private final Matrix matrix;

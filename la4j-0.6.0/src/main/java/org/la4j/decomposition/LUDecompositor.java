@@ -29,6 +29,7 @@ import org.la4j.Matrix;
  * <a href="http://mathworld.wolfram.com/LUDecomposition.html"> here.</a>
  * </p>
  */
+@SuppressWarnings("serial")
 public class LUDecompositor extends RawLUDecompositor implements MatrixDecompositor {
 
     public LUDecompositor(Matrix matrix) {

@@ -30,6 +30,7 @@ import org.la4j.Matrix;
  * <a href="http://mathworld.wolfram.com/CholeskyDecomposition.html"> here</a>
  * </p>
  */
+@SuppressWarnings("serial")
 public class CholeskyDecompositor extends AbstractDecompositor implements MatrixDecompositor {
 
     public CholeskyDecompositor(Matrix matrix) {

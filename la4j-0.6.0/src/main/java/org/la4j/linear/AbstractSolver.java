@@ -24,6 +24,7 @@ package org.la4j.linear;
 import org.la4j.Matrix;
 import org.la4j.Vector;
 
+@SuppressWarnings("serial")
 public abstract class AbstractSolver implements LinearSystemSolver {
 
     // TODO: rename a to matrix

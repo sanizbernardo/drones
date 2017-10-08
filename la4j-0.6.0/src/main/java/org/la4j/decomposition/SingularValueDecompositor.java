@@ -32,6 +32,7 @@ import org.la4j.vector.DenseVector;
  * <p><a href="http://mathworld.wolfram.com/SingularValueDecomposition.html">
  * here.</a> </p>
  */
+@SuppressWarnings("serial")
 public class SingularValueDecompositor extends AbstractDecompositor implements MatrixDecompositor {
 
     public SingularValueDecompositor(Matrix matrix) {

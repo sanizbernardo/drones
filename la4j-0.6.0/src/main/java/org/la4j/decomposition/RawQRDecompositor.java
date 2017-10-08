@@ -24,6 +24,7 @@ package org.la4j.decomposition;
 import org.la4j.Matrices;
 import org.la4j.Matrix;
 
+@SuppressWarnings("serial")
 public class RawQRDecompositor extends AbstractDecompositor implements MatrixDecompositor {
 
     public RawQRDecompositor(Matrix matrix) {

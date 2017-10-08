@@ -31,7 +31,7 @@ import java.lang.reflect.ParameterizedType;
  */
 public abstract class MatrixFactory<T extends Matrix> {
 
-    @SuppressWarnings("unchecked cast")
+    @SuppressWarnings("unchecked")
     public final Class<T> outputClass = (Class<T>) ((ParameterizedType)
         getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 

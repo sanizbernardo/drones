@@ -23,6 +23,7 @@ package org.la4j.inversion;
 
 import org.la4j.Matrix;
 
+@SuppressWarnings("serial")
 public class NoPivotGaussInverter implements MatrixInverter {
 
     private final Matrix matrix;

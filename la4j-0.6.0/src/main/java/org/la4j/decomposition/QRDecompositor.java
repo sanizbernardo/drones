@@ -30,6 +30,7 @@ import org.la4j.Matrix;
  * <a href="http://mathworld.wolfram.com/QRDecomposition.html"> here.</a>
  * </p>
  */
+@SuppressWarnings("serial")
 public class QRDecompositor extends RawQRDecompositor implements MatrixDecompositor {
 
     public QRDecompositor(Matrix matrix) {

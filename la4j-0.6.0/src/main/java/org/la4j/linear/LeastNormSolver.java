@@ -34,6 +34,7 @@ import org.la4j.Vector;
  * </p>
  */
 
+@SuppressWarnings("serial")
 public class LeastNormSolver extends AbstractSolver implements LinearSystemSolver {
 
     protected LeastNormSolver(Matrix a) {

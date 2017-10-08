@@ -23,6 +23,7 @@ package org.la4j.decomposition;
 
 import org.la4j.Matrix;
 
+@SuppressWarnings("serial")
 public abstract class AbstractDecompositor implements MatrixDecompositor {
 
     protected Matrix matrix;
