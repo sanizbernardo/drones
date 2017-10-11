@@ -52,18 +52,18 @@ public class PhysicsEngine {
 		
 		Vector weightVectorD = transMat.multiply(weightVector),
 				thrustVectorD = new BasicVector(new double[] {0, 0, -drone.getThrust()}),
-				relVelD = transMat.multiply(oldVel),
+				relVelD = transMat.multiply(oldVel.multiply(-1)),
 				leftWingAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) leftWingInclination), -Math.cos((double) leftWingInclination)}),
 				rightWingAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) rightWingInclination), -Math.cos((double) rightWingInclination)}),
 				horStabAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) horStabInclination), -Math.cos((double) horStabInclination)}),
 				verStabAttackVectorD = new BasicVector(new double[] {-Math.sin((double) verStabInclination), 0, -Math.cos((double) verStabInclination)}),
-				leftWingNormalVectorD = new BasicVector(new double[] {0, -Math.cos((double) leftWingInclination), -Math.sin((double) leftWingInclination)}),
-				rightWingNormalVectorD = new BasicVector(new double[] {0, -Math.cos((double) rightWingInclination), -Math.sin((double) rightWingInclination),}),
-				horStabNormalVectorD = new BasicVector(new double[] {0, -Math.cos((double) horStabInclination), -Math.sin((double) horStabInclination),}),
-				verStabNormalVectorD = new BasicVector(new double[] {Math.cos((double) verStabInclination), 0, -Math.sin((double) verStabInclination)});
+				leftWingNormalVectorD = new BasicVector(new double[] {0, Math.cos((double) leftWingInclination), Math.sin((double) leftWingInclination)}),
+				rightWingNormalVectorD = new BasicVector(new double[] {0, Math.cos((double) rightWingInclination), Math.sin((double) rightWingInclination),}),
+				horStabNormalVectorD = new BasicVector(new double[] {0, Math.cos((double) horStabInclination), Math.sin((double) horStabInclination),}),
+				verStabNormalVectorD = new BasicVector(new double[] {-Math.cos((double) verStabInclination), 0, Math.sin((double) verStabInclination)});
 		
-		Vector horProjVelD = new BasicVector(new double[] {relVelD.get(0), relVelD.get(1),0}),
-				verProjVelD = new BasicVector(new double[] {relVelD.get(0), relVelD.get(1),0});
+		Vector horProjVelD = new BasicVector(new double[] {0, relVelD.get(1), relVelD.get(2)}),
+				verProjVelD = new BasicVector(new double[] {relVelD.get(0),0, relVelD.get(2)});
 
 		float leftWingAOA = (float) -Math.atan2(horProjVelD.innerProduct(leftWingNormalVectorD), horProjVelD.innerProduct(leftWingAttackVectorD)),
 				rightWingAOA = (float) -Math.atan2(horProjVelD.innerProduct(rightWingNormalVectorD), horProjVelD.innerProduct(rightWingAttackVectorD)),
