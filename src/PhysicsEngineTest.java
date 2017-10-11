@@ -13,9 +13,9 @@ public class PhysicsEngineTest {
 	
 	private static final float EPSILON = 0.001f;
 	
-	private static AutopilotConfig configNoWings, config1;
-	private static PhysicsEngine physicsEngineNoWings, physicsEngine1;
-	private Drone droneNoWings, drone1;
+	private static AutopilotConfig configNoWings, configNoHorStab;
+	private static PhysicsEngine physicsEngineNoWings, physicsNoHorStab;
+	private Drone droneNoWings, droneNoHorStab;
 	
 	
 	@BeforeClass
@@ -27,7 +27,7 @@ public class PhysicsEngineTest {
 			public float getEngineMass() {return 70f;}
 			public float getWingMass() {return 25f;}
 			public float getTailMass() {return 30f;}
-			public float getMaxThrust() {return 5000f;}
+			public float getMaxThrust() {return -1f;}
 			public float getMaxAOA() {return -1f;}
 			public float getWingLiftSlope() {return 0f;}
 			public float getHorStabLiftSlope() {return 0f;}
@@ -39,30 +39,30 @@ public class PhysicsEngineTest {
 		};
 		physicsEngineNoWings = new PhysicsEngine(configNoWings);
 		
-		config1 = new AutopilotConfig(){
+		configNoHorStab = new AutopilotConfig(){
 			public float getGravity() {return 10f;}
 			public float getWingX() {return 2.5f;}
 			public float getTailSize() {return 5f;}
 			public float getEngineMass() {return 70f;}
 			public float getWingMass() {return 25f;}
 			public float getTailMass() {return 30f;}
-			public float getMaxThrust() {return 5000f;}
+			public float getMaxThrust() {return -1f;}
 			public float getMaxAOA() {return -1f;}
-			public float getWingLiftSlope() {return 0.1f;}
-			public float getHorStabLiftSlope() {return 0.1f;}
-			public float getVerStabLiftSlope() {return 0.1f;}
+			public float getWingLiftSlope() {return 0.11f;}
+			public float getHorStabLiftSlope() {return 0f;}
+			public float getVerStabLiftSlope() {return 0.11f;}
 			public float getHorizontalAngleOfView() {return -1f;}
 			public float getVerticalAngleOfView() {return -1f;}
 			public int getNbColumns() {return -1;}
 			public int getNbRows() {return -1;}			
 		};
-		physicsEngine1 = new PhysicsEngine(config1);
+		physicsNoHorStab = new PhysicsEngine(configNoHorStab);
 	}
 
 	@Before
 	public void setUp() throws Exception {
 		droneNoWings = new Drone(configNoWings);
-		drone1 = new Drone(config1);
+		droneNoHorStab = new Drone(configNoHorStab);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class PhysicsEngineTest {
 	 * Thrust test, no wings, starting from (0,2000,0) with no initial speed with no thrust for 5 seconds and a thrust of 2000 for 15 seconds.
 	 */
 	@Test
-	public void testThrustNoWingsNoWeight() {
+	public void testThrustNoWings() {
 		droneNoWings.setPosition(new BasicVector(new double[]{0,2000,0}));
 		
 		IntToDoubleFunction posFuncY = i -> 2000.0 - 10.0*i*i/2.0;
@@ -139,26 +139,44 @@ public class PhysicsEngineTest {
 	}
 	
 	/**
-	 * Wings falling test, starting from (0,2000,0) with no initial speed and no thrust, for 20 seconds 
+	 * Wings (no hor stab) falling test, starting from (0,2000,0) with no initial speed and no thrust, for 20 seconds 
 	 */
 	@Test
 	public void testWingsFalling1() {
 		float dt = 1f;
 		
-		drone1.setPosition(new BasicVector(new double[]{0,2000,0}));
-		drone1.setVelocity(new BasicVector(new double[]{0,0,0}));
+		droneNoHorStab.setPosition(new BasicVector(new double[]{0,2000,0}));		
 		
+		float vy = 0f, y = 2000f;
+				
 		for (int i = 1; i <= 20/dt; i++) {
-			physicsEngine1.update(dt, drone1);
-			System.out.println(drone1.getPosition().toCSV() + " | " + drone1.getVelocity().toCSV() + " | " + drone1.getOrientation());
-//			assertEquals(0, drone1.getPosition().get(0), EPSILON);
-//			assertEquals(posFuncY.applyAsDouble(i), drone1.getPosition().get(1), EPSILON);
-//			assertEquals(0, drone1.getPosition().get(2), EPSILON);
-//			assertEquals(0, drone1.getVelocity().get(0), EPSILON);
-//			assertEquals(velFuncY.applyAsDouble(i), drone1.getVelocity().get(1), EPSILON);
-//			assertEquals(0, drone1.getVelocity().get(2), EPSILON);
-		}	
-		
+			physicsNoHorStab.update(dt, droneNoHorStab);
+			y += vy + (-10 + 0.11/150.0 * Math.PI * vy * vy)/2.0;
+			vy += -10 + 0.11/150.0 * Math.PI * vy * vy;	
+			
+			assertEquals(0, droneNoHorStab.getPosition().get(0), EPSILON);
+			assertEquals(y, droneNoHorStab.getPosition().get(1), EPSILON);
+			assertEquals(0, droneNoHorStab.getPosition().get(2), EPSILON);
+			assertEquals(0, droneNoHorStab.getVelocity().get(0), EPSILON);
+			assertEquals(vy, droneNoHorStab.getVelocity().get(1), EPSILON);
+			assertEquals(0, droneNoHorStab.getVelocity().get(2), EPSILON);
+		}		
 	}
 	
+//	/**
+//	 * Cruise test
+//	 */
+//	@Test
+//	public void testCruise() {
+//		
+//		droneNoHorStab.setPosition(new BasicVector(new double[]{0,2000,0}));
+//		droneNoHorStab.setOrientation(new BasicVector(new double[]{0, 0, 0.78}));
+//		droneNoHorStab.setVelocity(new BasicVector(new double[]{0, 0, -150}));
+//		
+//		for (int i = 1; i <= 200; i++) {
+//			physicsNoHorStab.update(0.1f, droneNoHorStab);
+//			System.out.println(droneNoHorStab.getPosition() + " | " + droneNoHorStab.getVelocity() + " | " + droneNoHorStab.getOrientation());
+//		}
+//	}
+
 }

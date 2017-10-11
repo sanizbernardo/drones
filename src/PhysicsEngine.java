@@ -33,7 +33,6 @@ public class PhysicsEngine {
 				1/inertiaX, 0, 						0, 
 				0, 			1/(inertiaX+inertiaZ),  0,
 				0, 			0,						1/inertiaZ});
-		
 	}
 	
 	
@@ -41,7 +40,7 @@ public class PhysicsEngine {
 	 * wing inclinations are already updated
 	 */
 	public void update(float dt, Drone drone) {
-		Matrix transMat = buildTransformMatrix(drone.getRoll(), drone.getHeading(), drone.getPitch());
+		Matrix transMat = buildTransformMatrix(drone.getPitch(), drone.getHeading(), drone.getRoll());
 		Matrix transMatInv = (new GaussJordanInverter(transMat)).inverse();
 		
 		// acceleration calculation
@@ -52,7 +51,7 @@ public class PhysicsEngine {
 		
 		Vector weightVectorD = transMat.multiply(weightVector),
 				thrustVectorD = new BasicVector(new double[] {0, 0, -drone.getThrust()}),
-				relVelD = transMat.multiply(oldVel.multiply(-1)),
+				relVelD = transMat.multiply(oldVel),
 				leftWingAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) leftWingInclination), -Math.cos((double) leftWingInclination)}),
 				rightWingAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) rightWingInclination), -Math.cos((double) rightWingInclination)}),
 				horStabAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) horStabInclination), -Math.cos((double) horStabInclination)}),
@@ -64,7 +63,7 @@ public class PhysicsEngine {
 		
 		Vector horProjVelD = new BasicVector(new double[] {0, relVelD.get(1), relVelD.get(2)}),
 				verProjVelD = new BasicVector(new double[] {relVelD.get(0),0, relVelD.get(2)});
-
+		
 		float leftWingAOA = (float) -Math.atan2(horProjVelD.innerProduct(leftWingNormalVectorD), horProjVelD.innerProduct(leftWingAttackVectorD)),
 				rightWingAOA = (float) -Math.atan2(horProjVelD.innerProduct(rightWingNormalVectorD), horProjVelD.innerProduct(rightWingAttackVectorD)),
 				horStabAOA = (float) -Math.atan2(horProjVelD.innerProduct(horStabNormalVectorD), horProjVelD.innerProduct(horStabAttackVectorD)),
@@ -83,6 +82,7 @@ public class PhysicsEngine {
 		
 		Vector wingForce = rightWingLiftD.subtract(leftWingLiftD),
 				tailForce = horStabLiftD.add(verStabLiftD);
+		
 		Vector wingTorque = new BasicVector(new double[]{0, wingX * wingForce.get(2), -wingX * wingForce.get(1)}),
 				tailTorque = crossProduct(new BasicVector(new double[]{0, 0, tailSize}), tailForce);
 		
@@ -117,7 +117,7 @@ public class PhysicsEngine {
 				Math.sin(zAngle), Math.cos(zAngle),  0,
 				0, 				  0, 				 1});
 		
-		return zRot.multiply(yRot).multiply(xRot);
+		return yRot.multiply(xRot).multiply(zRot);
 	}
 	
 	
