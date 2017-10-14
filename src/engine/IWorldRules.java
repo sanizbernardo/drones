@@ -1,5 +1,8 @@
 package engine;
 
+/**
+ * Set of functions every world object needs
+ */
 public interface IWorldRules {
 
     void init() throws Exception;

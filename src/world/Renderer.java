@@ -13,10 +13,20 @@ import utils.Utils;
 
 public class Renderer {
 
+    /**
+     * The VBO of the program. A VBO is a high speed memory buffer in the GPU. Contains vectors for positions,
+     * colors, etc.
+     */
     private int vboId;
 
+    /**
+     * The VAO of the program. This contain multiple VBO objects.
+     */
     private int vaoId;
 
+    /**
+     * Holds the ShaderProgram
+     */
     private ShaderProgram shaderProgram;
 
     public Renderer() {
@@ -24,10 +34,15 @@ public class Renderer {
 
     public void init() throws Exception {
         shaderProgram = new ShaderProgram();
+
+        //can be used to modify properties of the vertex such as position, color, and texture coordinates.
         shaderProgram.createVertexShader(Utils.loadResource("/vertex.vs"));
+        //is used for calculating individual fragment colors.
         shaderProgram.createFragmentShader(Utils.loadResource("/fragment.fs"));
+
         shaderProgram.link();
 
+        //The vertices passed to be put in a VBO
         float[] vertices = new float[]{
                 0.0f, 0.5f, 0.0f,
                 -0.5f, -0.5f, 0.0f,
@@ -43,7 +58,7 @@ public class Renderer {
             vaoId = glGenVertexArrays();
             glBindVertexArray(vaoId);
 
-            // Create the VBO and bint to it
+            // Create the VBO and bind to it
             vboId = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);

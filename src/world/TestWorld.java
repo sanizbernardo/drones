@@ -65,6 +65,9 @@ public class TestWorld implements IWorldRules {
         renderer.render(window);
     }
 
+    /**
+     * Delete VBO VAO
+     */
     @Override
     public void cleanup() {
         renderer.cleanup();

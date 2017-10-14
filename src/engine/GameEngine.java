@@ -2,6 +2,9 @@ package engine;
 
 import utils.Timer;
 
+/**
+ * An engine to be added to a world
+ */
 public class GameEngine implements Runnable {
 
     public static final int TARGET_FPS = 75;
@@ -63,6 +66,11 @@ public class GameEngine implements Runnable {
         }
     }
 
+    /**
+     * Initialize all programs used in this world
+     * @throws Exception
+     *         If something goes wrong
+     */
     protected void init() throws Exception {
         window.init();
         timer.init();
