@@ -2,6 +2,7 @@ package world;
 
 import engine.IWorldRules;
 import engine.Window;
+import engine.graph.Mesh;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
@@ -13,6 +14,8 @@ public class TestWorld implements IWorldRules {
     private float color = 0.0f;
 
     private final Renderer renderer;
+
+    private Mesh mesh;
 
     /**
      * Create the renderer of this world
@@ -27,6 +30,14 @@ public class TestWorld implements IWorldRules {
      */
     public void init() throws Exception {
         renderer.init();
+        float[] positions = new float[]{
+            -0.5f, 0.5f, 0.0f,
+            -0.5f, -0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            0.5f, 0.5f, 0.0f,};
+        int[] indices = new int[]{
+            0, 1, 3, 3, 1, 2,};
+        mesh = new Mesh(positions, indices);
     }
     
     @Override
@@ -62,7 +73,7 @@ public class TestWorld implements IWorldRules {
      */
     public void render(Window window) {
         window.setClearColor(color, color, color, 0.0f);
-        renderer.render(window);
+        renderer.render(window, mesh);
     }
 
     /**
@@ -71,5 +82,6 @@ public class TestWorld implements IWorldRules {
     @Override
     public void cleanup() {
         renderer.cleanup();
+        mesh.cleanUp();
     }
 }

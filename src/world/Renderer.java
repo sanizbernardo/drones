@@ -7,6 +7,7 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
 import engine.Window;
+import engine.graph.Mesh;
 import engine.graph.ShaderProgram;
 import org.lwjgl.system.MemoryUtil;
 import utils.Utils;
@@ -81,7 +82,7 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window) {
+    public void render(Window window, Mesh mesh) {
         clear();
 
         if (window.isResized()) {
@@ -91,12 +92,10 @@ public class Renderer {
 
         shaderProgram.bind();
 
-        // Bind to the VAO
-        glBindVertexArray(vaoId);
+        // Draw the mesh
+        glBindVertexArray(mesh.getVaoId());
         glEnableVertexAttribArray(0);
-
-        // Draw the vertices
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
 
         // Restore state
         glDisableVertexAttribArray(0);
