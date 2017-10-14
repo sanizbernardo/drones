@@ -31,13 +31,21 @@ public class TestWorld implements IWorldRules {
     public void init() throws Exception {
         renderer.init();
         float[] positions = new float[]{
-            -0.5f, 0.5f, 0.0f,
+            -0.5f,  0.5f, 0.0f,
             -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.5f, 0.5f, 0.0f,};
+             0.5f, -0.5f, 0.0f,
+             0.5f,  0.5f, 0.0f,
+        };
+        float[] colours = new float[]{
+            0.5f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f,
+            0.0f, 0.0f, 0.5f,
+            0.0f, 0.5f, 0.5f,
+        };
         int[] indices = new int[]{
-            0, 1, 3, 3, 1, 2,};
-        mesh = new Mesh(positions, indices);
+            0, 1, 3, 3, 1, 2,
+        };
+        mesh = new Mesh(positions, colours, indices);
     }
     
     @Override

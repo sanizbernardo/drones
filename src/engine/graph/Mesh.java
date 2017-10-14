@@ -14,6 +14,8 @@ public class Mesh {
 
     private final int posVboId;
 
+    private final int colourVboId;
+
     private final int idxVboId;
 
     private final int vertexCount;
@@ -27,8 +29,9 @@ public class Mesh {
      *        List of the indices of the vertices. Can be used to save space by referencing two overlapping
      *        vertices with just one index. Also wrapped into a index VBO
      */
-    public Mesh(float[] positions, int[] indices) {
+    public Mesh(float[] positions, float[] colours, int[] indices) {
         FloatBuffer posBuffer = null;
+        FloatBuffer colourBuffer = null;
         IntBuffer indicesBuffer = null;
         try {
             vertexCount = indices.length;
@@ -44,6 +47,14 @@ public class Mesh {
             glBufferData(GL_ARRAY_BUFFER, posBuffer, GL_STATIC_DRAW);
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
+            // Colour VBO, this contains the colors for the edges
+            colourVboId = glGenBuffers();
+            colourBuffer = MemoryUtil.memAllocFloat(colours.length);
+            colourBuffer.put(colours).flip();
+            glBindBuffer(GL_ARRAY_BUFFER, colourVboId);
+            glBufferData(GL_ARRAY_BUFFER, colourBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+
             // Index VBO
             idxVboId = glGenBuffers();
             indicesBuffer = MemoryUtil.memAllocInt(indices.length);
@@ -56,6 +67,9 @@ public class Mesh {
         } finally {
             if (posBuffer != null) {
                 MemoryUtil.memFree(posBuffer);
+            }
+            if (colourBuffer != null) {
+                MemoryUtil.memFree(colourBuffer);
             }
             if (indicesBuffer != null) {
                 MemoryUtil.memFree(indicesBuffer);
@@ -77,6 +91,7 @@ public class Mesh {
         // Delete the VBOs
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDeleteBuffers(posVboId);
+        glDeleteBuffers(colourVboId);
         glDeleteBuffers(idxVboId);
 
         // Delete the VAO
