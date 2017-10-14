@@ -1,29 +1,19 @@
 package world;
 
-import java.nio.FloatBuffer;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
 import engine.Window;
 import engine.graph.Mesh;
 import engine.graph.ShaderProgram;
-import org.lwjgl.system.MemoryUtil;
+import org.joml.Matrix4f;
+import utils.Constants;
 import utils.Utils;
 
 public class Renderer {
 
-    /**
-     * The VBO of the program. A VBO is a high speed memory buffer in the GPU. Contains vectors for positions,
-     * colors, etc.
-     */
-    private int vboId;
-
-    /**
-     * The VAO of the program. This contain multiple VBO objects.
-     */
-    private int vaoId;
+    private Matrix4f projectionMatrix;
 
     /**
      * Holds the ShaderProgram
@@ -33,7 +23,7 @@ public class Renderer {
     public Renderer() {
     }
 
-    public void init() throws Exception {
+    public void init(Window window) throws Exception {
         shaderProgram = new ShaderProgram();
 
         //can be used to modify properties of the vertex such as position, color, and texture coordinates.
@@ -43,39 +33,10 @@ public class Renderer {
 
         shaderProgram.link();
 
-        //The vertices passed to be put in a VBO
-        float[] vertices = new float[]{
-                0.0f, 0.5f, 0.0f,
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f
-        };
-
-        FloatBuffer verticesBuffer = null;
-        try {
-            verticesBuffer = MemoryUtil.memAllocFloat(vertices.length);
-            verticesBuffer.put(vertices).flip();
-
-            // Create the VAO and bind to it
-            vaoId = glGenVertexArrays();
-            glBindVertexArray(vaoId);
-
-            // Create the VBO and bind to it
-            vboId = glGenBuffers();
-            glBindBuffer(GL_ARRAY_BUFFER, vboId);
-            glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
-            // Define structure of the data
-            glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-
-            // Unbind the VBO
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-            // Unbind the VAO
-            glBindVertexArray(0);
-        } finally {
-            if (verticesBuffer != null) {
-                MemoryUtil.memFree(verticesBuffer);
-            }
-        }
+        // Create projection matrix, removed all rest working with uniforms
+        float aspectRatio = (float) window.getWidth() / window.getHeight();
+        projectionMatrix = new Matrix4f().perspective(Constants.FOV, aspectRatio, Constants.Z_NEAR, Constants.Z_FAR);
+        shaderProgram.createUniform("projectionMatrix");
     }
 
     public void clear() {
@@ -91,6 +52,7 @@ public class Renderer {
         }
 
         shaderProgram.bind();
+        shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
         // Draw the mesh
         glBindVertexArray(mesh.getVaoId());
@@ -112,15 +74,5 @@ public class Renderer {
         if (shaderProgram != null) {
             shaderProgram.cleanup();
         }
-
-        glDisableVertexAttribArray(0);
-
-        // Delete the VBO
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDeleteBuffers(vboId);
-
-        // Delete the VAO
-        glBindVertexArray(0);
-        glDeleteVertexArrays(vaoId);
     }
 }
