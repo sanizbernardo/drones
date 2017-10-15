@@ -8,13 +8,12 @@ import engine.graph.Mesh;
 import engine.graph.Texture;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import utils.Constants;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
 public class TestWorld implements IWorldRules {
-
-    private static final float MOUSE_SENSITIVITY = 0.2f;
 
     private final Vector3f cameraInc;
 
@@ -23,8 +22,6 @@ public class TestWorld implements IWorldRules {
     private final Camera camera;
 
     private GameItem[] gameItems;
-
-    private static final float CAMERA_POS_STEP = 0.05f;
 
     /**
      * Create the renderer of this world
@@ -182,12 +179,12 @@ public class TestWorld implements IWorldRules {
     @Override
     public void update(float interval, MouseInput mouseInput) {
         // Update camera position
-        camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
+        camera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
 
         // Update camera based on mouse
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
-            camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
+            camera.moveRotation(rotVec.x * Constants.MOUSE_SENSITIVITY, rotVec.y * Constants.MOUSE_SENSITIVITY, 0);
         }
     }
 

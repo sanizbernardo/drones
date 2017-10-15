@@ -1,16 +1,13 @@
 package engine;
 
 import IO.MouseInput;
+import utils.Constants;
 import utils.Timer;
 
 /**
  * An engine to be added to a world
  */
 public class GameEngine implements Runnable {
-
-    public static final int TARGET_FPS = 75;
-
-    public static final int TARGET_UPS = 30;
 
     private final Window window;
 
@@ -95,7 +92,7 @@ public class GameEngine implements Runnable {
     protected void gameLoop() {
         float elapsedTime;
         float accumulator = 0f;
-        float interval = 1f / TARGET_UPS;
+        float interval = 1f / Constants.TARGET_UPS;
 
         while (!window.windowShouldClose()) {
             elapsedTime = timer.getElapsedTime();
@@ -124,7 +121,7 @@ public class GameEngine implements Runnable {
      * If vsync is disabled we'll do it ourselves
      */
     private void sync() {
-        float loopSlot = 1f / TARGET_FPS;
+        float loopSlot = 1f / Constants.TARGET_FPS;
         double endTime = timer.getLastLoopTime() + loopSlot;
         while (timer.getTime() < endTime) {
             try {
