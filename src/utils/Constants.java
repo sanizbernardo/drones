@@ -32,7 +32,7 @@ public class Constants {
     /**
      * World constants
      */
-    public static final float MOUSE_SENSITIVITY = 0.2f;
+    public static final float MOUSE_SENSITIVITY = 0.4f;
 
     public static final float CAMERA_POS_STEP = 0.05f;
 }
