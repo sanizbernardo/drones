@@ -21,9 +21,6 @@ public class Mesh {
     private final List<Integer> vboIdList;
 
     private final int vertexCount;
-
-    private final Texture texture;
-
     /**
      * Creates the VBO and VAO objects loaded into the graphics card. Pretty much the base model
      * that can be passed to a gameObject that describes its shape.
@@ -33,12 +30,11 @@ public class Mesh {
      *        List of the indices of the vertices. Can be used to save space by referencing two overlapping
      *        vertices with just one index. Also wrapped into a index VBO
      */
-    public Mesh(float[] positions, float[] textCoords, int[] indices, Texture texture) {
+    public Mesh(float[] positions, float[] colours, int[] indices) {
         FloatBuffer posBuffer = null;
-        FloatBuffer textCoordsBuffer = null;
+        FloatBuffer colourBuffer = null;
         IntBuffer indicesBuffer = null;
         try {
-            this.texture = texture;
             vertexCount = indices.length;
             vboIdList = new ArrayList();
 
@@ -54,14 +50,14 @@ public class Mesh {
             glBufferData(GL_ARRAY_BUFFER, posBuffer, GL_STATIC_DRAW);
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
-            // Texture coordinates VBO
+            // Colour VBO
             vboId = glGenBuffers();
             vboIdList.add(vboId);
-            textCoordsBuffer = MemoryUtil.memAllocFloat(textCoords.length);
-            textCoordsBuffer.put(textCoords).flip();
+            colourBuffer = MemoryUtil.memAllocFloat(colours.length);
+            colourBuffer.put(colours).flip();
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
-            glBufferData(GL_ARRAY_BUFFER, textCoordsBuffer, GL_STATIC_DRAW);
-            glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+            glBufferData(GL_ARRAY_BUFFER, colourBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
 
             // Index VBO
             vboId = glGenBuffers();
@@ -77,8 +73,8 @@ public class Mesh {
             if (posBuffer != null) {
                 MemoryUtil.memFree(posBuffer);
             }
-            if (textCoordsBuffer != null) {
-                MemoryUtil.memFree(textCoordsBuffer);
+            if (colourBuffer != null) {
+                MemoryUtil.memFree(colourBuffer);
             }
             if (indicesBuffer != null) {
                 MemoryUtil.memFree(indicesBuffer);
@@ -95,11 +91,6 @@ public class Mesh {
     }
 
     public void render() {
-        // Activate firs texture bank
-        glActiveTexture(GL_TEXTURE0);
-        // Bind the texture
-        glBindTexture(GL_TEXTURE_2D, texture.getId());
-
         // Draw the mesh
         glBindVertexArray(getVaoId());
         glEnableVertexAttribArray(0);
@@ -121,9 +112,6 @@ public class Mesh {
         for (int vboId : vboIdList) {
             glDeleteBuffers(vboId);
         }
-
-        // Delete the texture
-        texture.cleanup();
 
         // Delete the VAO
         glBindVertexArray(0);

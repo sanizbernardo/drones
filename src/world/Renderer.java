@@ -34,7 +34,6 @@ public class Renderer {
 
         shaderProgram.createUniform("projectionMatrix");
         shaderProgram.createUniform("modelViewMatrix");
-        shaderProgram.createUniform("texture_sampler");
     }
 
     public void clear() {
@@ -65,7 +64,6 @@ public class Renderer {
         // Update view Matrix
         Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
-        shaderProgram.setUniform("texture_sampler", 0);
         // Render each gameItem
         for(GameItem gameItem : gameItems) {
             // Set model view matrix for this item

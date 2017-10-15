@@ -5,7 +5,6 @@ import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
 import engine.graph.Mesh;
-import engine.graph.Texture;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import utils.Constants;
@@ -13,14 +12,31 @@ import utils.Constants;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
+/**
+ * Place where all the GameItem are to be placed in
+ */
 public class TestWorld implements IWorldRules {
 
+    /**
+     * The angle of the camera in the current world
+     */
     private final Vector3f cameraInc;
 
+    /**
+     * The renderer that is rendering this world
+     */
     private final Renderer renderer;
 
+    /**
+     * A camera that defines what we see. An OpenGL camera cannot move on its own, so we move
+     * the world itself around. When the camera "goes up" we just shift all world objects
+     * downward. Same goes for all other translations and rotations.
+     */
     private final Camera camera;
 
+    /**
+     * A list of all the GameItems.
+     */
     private GameItem[] gameItems;
 
     /**
@@ -38,102 +54,40 @@ public class TestWorld implements IWorldRules {
     @Override
     public void init(Window window) throws Exception {
         renderer.init(window);
-        float[] positions = new float[] {
-            // V0
-            -0.5f, 0.5f, 0.5f,
-            // V1
-            -0.5f, -0.5f, 0.5f,
-            // V2
-            0.5f, -0.5f, 0.5f,
-            // V3
-            0.5f, 0.5f, 0.5f,
-            // V4
-            -0.5f, 0.5f, -0.5f,
-            // V5
-            0.5f, 0.5f, -0.5f,
-            // V6
-            -0.5f, -0.5f, -0.5f,
-            // V7
-            0.5f, -0.5f, -0.5f,
+        float[] positions = new float[]{
+//                // V0
+//                -0.5f, 0.5f, 0.5f,
+//                // V1
+//                -0.5f, -0.5f, 0.5f,
+//                // V2
+//                0.5f, -0.5f, 0.5f,
+//                // V3
+//                0.5f, 0.5f, 0.5f,
+//                // V4
+//                -0.5f, 0.5f, -0.5f,
+//                // V5
+//                0.5f, 0.5f, -0.5f,
+//                // V6
+//                -0.5f, -0.5f, -0.5f,
+//                // V7
+//                0.5f, -0.5f, -0.5f,
 
-            // For text coords in top face
-            // V8: V4 repeated
-            -0.5f, 0.5f, -0.5f,
-            // V9: V5 repeated
-            0.5f, 0.5f, -0.5f,
-            // V10: V0 repeated
-            -0.5f, 0.5f, 0.5f,
-            // V11: V3 repeated
-            0.5f, 0.5f, 0.5f,
-
-            // For text coords in right face
-            // V12: V3 repeated
-            0.5f, 0.5f, 0.5f,
-            // V13: V2 repeated
-            0.5f, -0.5f, 0.5f,
-
-            // For text coords in left face
-            // V14: V0 repeated
-            -0.5f, 0.5f, 0.5f,
-            // V15: V1 repeated
-            -0.5f, -0.5f, 0.5f,
-
-            // For text coords in bottom face
-            // V16: V6 repeated
-            -0.5f, -0.5f, -0.5f,
-            // V17: V7 repeated
-            0.5f, -0.5f, -0.5f,
-            // V18: V1 repeated
-            -0.5f, -0.5f, 0.5f,
-            // V19: V2 repeated
-            0.5f, -0.5f, 0.5f,
+                -0.5f, 0.5f, 0.5f, //V0
+                -0.5f, -0.5f, 0.5f, //V1
+                0.5f, -0.5f, 0.5f, //V2
+                0.5f, 0.5f, 0.5f, //V3
         };
-        float[] textCoords = new float[]{
-            0.0f, 0.0f,
-            0.0f, 0.5f,
-            0.5f, 0.5f,
-            0.5f, 0.0f,
-
-            0.0f, 0.0f,
-            0.5f, 0.0f,
-            0.0f, 0.5f,
-            0.5f, 0.5f,
-
-            // For text coords in top face
-            0.0f, 0.5f,
-            0.5f, 0.5f,
-            0.0f, 1.0f,
-            0.5f, 1.0f,
-
-            // For text coords in right face
-            0.0f, 0.0f,
-            0.0f, 0.5f,
-
-            // For text coords in left face
-            0.5f, 0.0f,
-            0.5f, 0.5f,
-
-            // For text coords in bottom face
-            0.5f, 0.0f,
-            1.0f, 0.0f,
-            0.5f, 0.5f,
-            1.0f, 0.5f,
+        float[] colours = new float[]{
+                0.5f, 0.0f, 0.0f,
+                0.0f, 0.5f, 0.0f,
+                0.0f, 0.0f, 0.5f,
+                0.0f, 0.5f, 0.5f,
         };
         int[] indices = new int[]{
             // Front face
-            0, 1, 3, 3, 1, 2,
-            // Top Face
-            8, 10, 11, 9, 8, 11,
-            // Right face
-            12, 13, 7, 5, 12, 7,
-            // Left face
-            14, 15, 6, 4, 14, 6,
-            // Bottom face
-            16, 18, 19, 17, 16, 19,
-            // Back face
-            4, 6, 7, 5, 4, 7,};
-        Texture texture = new Texture("/textures/grassblock.png");
-        Mesh mesh = new Mesh(positions, textCoords, indices, texture);
+            1, 0, 2, 3, 2, 0,
+        };
+        Mesh mesh = new Mesh(positions, colours, indices);
         GameItem gameItem1 = new GameItem(mesh);
         gameItem1.setScale(0.5f);
         gameItem1.setPosition(0, 0, -2);
