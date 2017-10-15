@@ -1,11 +1,8 @@
 package world;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
 
 import engine.Window;
-import engine.graph.Mesh;
 import engine.graph.ShaderProgram;
 import engine.graph.Transformation;
 import org.joml.Matrix4f;
@@ -47,6 +44,13 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
+    /**
+     * Render all the gameObjects
+     * @param window
+     *        The window in which to render
+     * @param gameItems
+     *        All game items that need rendering
+     */
     public void render(Window window, GameItem[] gameItems) {
         clear();
 
@@ -69,13 +73,16 @@ public class Renderer {
                     gameItem.getRotation(),
                     gameItem.getScale());
             shaderProgram.setUniform("worldMatrix", worldMatrix);
-            // Render the mes for this game item
+            // Render the mesh for this game item
             gameItem.getMesh().render();
         }
 
         shaderProgram.unbind();
     }
 
+    /**
+     * Remove the shader program
+     */
     public void cleanup() {
         if (shaderProgram != null) {
             shaderProgram.cleanup();

@@ -29,10 +29,10 @@ public class TestWorld implements IWorldRules {
         renderer = new Renderer();
     }
     
-    @Override
     /**
      * Init
      */
+    @Override
     public void init(Window window) throws Exception {
         renderer.init(window);
         float[] positions = new float[]{
@@ -56,10 +56,11 @@ public class TestWorld implements IWorldRules {
         gameItems = new GameItem[] { gameItem };
     }
     
-    @Override
+
     /**
      * Handle input, should be in seperate class
      */
+    @Override
     public void input(Window window) {
         displyInc = 0;
         displxInc = 0;
@@ -84,10 +85,10 @@ public class TestWorld implements IWorldRules {
         }
     }
 
-    @Override
     /**
      * Handle the game objects internally
      */
+    @Override
     public void update(float interval) {
         for (GameItem gameItem : gameItems) {
             // Update position
@@ -114,10 +115,10 @@ public class TestWorld implements IWorldRules {
         }
     }
 
-    @Override
     /**
      * Draw to the screen
      */
+    @Override
     public void render(Window window) {
         renderer.render(window, gameItems);
     }

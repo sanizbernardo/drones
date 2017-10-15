@@ -22,7 +22,7 @@ public class ShaderProgram {
     /**
      * Create an openGL shader program
      * @throws Exception
-     *         If something goes wrong
+     *         If something goes wrong with the shader creation
      */
     public ShaderProgram() throws Exception {
         programId = glCreateProgram();
@@ -32,6 +32,13 @@ public class ShaderProgram {
         uniforms = new HashMap<>();
     }
 
+    /**
+     * Add Uniforms to the vertexShader
+     * @param uniformName
+     *        Name param added to the shader
+     * @throws Exception
+     *         If we can't find the name of the uniform
+     */
     public void createUniform(String uniformName) throws Exception {
         int uniformLocation = glGetUniformLocation(programId, uniformName);
         if (uniformLocation < 0) {
@@ -40,6 +47,13 @@ public class ShaderProgram {
         uniforms.put(uniformName, uniformLocation);
     }
 
+    /**
+     * Set the uniforms of the vertex shaders
+     * @param uniformName
+     *        Name param added to the shader
+     * @param value
+     *        The value to be set to the uniform
+     */
     public void setUniform(String uniformName, Matrix4f value) {
         // Dump the matrix into a float buffer
         try (MemoryStack stack = MemoryStack.stackPush()) {
