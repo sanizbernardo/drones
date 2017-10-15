@@ -1,5 +1,6 @@
 package engine;
 
+import IO.MouseInput;
 import utils.Timer;
 
 /**
@@ -19,6 +20,8 @@ public class GameEngine implements Runnable {
 
     private final IWorldRules worldRules;
 
+    private final MouseInput mouseInput;
+
     /**
      * Engine constructor
      * @param windowTitle
@@ -37,6 +40,7 @@ public class GameEngine implements Runnable {
     public GameEngine(String windowTitle, int width, int height, boolean vSync, IWorldRules worldRules) throws Exception {
         gameLoopThread = new Thread(this, "GAME_LOOP_THREAD");
         window = new Window(windowTitle, width, height, vSync);
+        mouseInput = new MouseInput();
         this.worldRules = worldRules;
         timer = new Timer();
     }
@@ -74,6 +78,7 @@ public class GameEngine implements Runnable {
     protected void init() throws Exception {
         window.init();
         timer.init();
+        mouseInput.init(window);
         worldRules.init(window);
     }
 
@@ -135,7 +140,8 @@ public class GameEngine implements Runnable {
      * Handle the input in the window
      */
     protected void input() {
-        worldRules.input(window);
+        mouseInput.input(window);
+        worldRules.input(window, mouseInput);
     }
 
     /**
@@ -144,7 +150,7 @@ public class GameEngine implements Runnable {
      *        How big the delta is
      */
     protected void update(float interval) {
-        worldRules.update(interval);
+        worldRules.update(interval, mouseInput);
     }
 
     /**
