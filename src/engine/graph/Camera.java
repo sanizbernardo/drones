@@ -4,15 +4,32 @@ import org.joml.Vector3f;
 
 public class Camera {
 
+    /**
+     * The position of the camera
+     * The camera itself will never move so we will move the entire world infront of the camera.
+     */
     private final Vector3f position;
 
+    /**
+     * Camera rotation
+     */
     private final Vector3f rotation;
 
+    /**
+     * Initialize a camera with basic rotation and location
+     */
     public Camera() {
         position = new Vector3f(0, 0, 0);
         rotation = new Vector3f(0, 0, 0);
     }
 
+    /**
+     * Init with given pos en rotation
+     * @param position
+     *        Given pos
+     * @param rotation
+     *        Given rot
+     */
     public Camera(Vector3f position, Vector3f rotation) {
         this.position = position;
         this.rotation = rotation;

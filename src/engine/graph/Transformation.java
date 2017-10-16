@@ -34,12 +34,20 @@ public class Transformation {
         return projectionMatrix;
     }
 
+    /**
+     * This returns the view matrix of the camera. This will apply transformations to the game world/ game objects
+     * so that they are viewed properly through the camera perspective. (as we can't move the camera itself around)
+     * @param camera
+     *        The camera we are using
+     * @return
+     *        The new viewMatrix to which potential new camera changes have been applied.
+     */
     public Matrix4f getViewMatrix(Camera camera) {
         Vector3f cameraPos = camera.getPosition();
         Vector3f rotation = camera.getRotation();
 
         viewMatrix.identity();
-        // First do the rotation so camera rotates over its position
+        // First do the rotation so camera rotates over to its position
         viewMatrix.rotate((float)Math.toRadians(rotation.x), new Vector3f(1, 0, 0))
                 .rotate((float)Math.toRadians(rotation.y), new Vector3f(0, 1, 0));
         // Then do the translation
@@ -47,6 +55,18 @@ public class Transformation {
         return viewMatrix;
     }
 
+    /**
+     * As we're changing the position of the objects depening on our camera location we need a common
+     * world space to place our object references in. The modelViewMatrix merges the view matrix and the
+     * model's matrix so we can see the objects are kept up to date with the camera 'movement' and the
+     * object's own rotation and movement.
+     * @param gameItem
+     *        The item we're updating
+     * @param viewMatrix
+     *        The view matrix (takes note of the current camera angles)
+     * @return
+     *        The modelViewMatrix
+     */
     public Matrix4f getModelViewMatrix(GameItem gameItem, Matrix4f viewMatrix) {
         Vector3f rotation = gameItem.getRotation();
         modelViewMatrix.identity().translate(gameItem.getPosition()).

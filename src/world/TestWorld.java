@@ -4,7 +4,6 @@ import IO.MouseInput;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
-import engine.graph.Mesh;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import utils.Constants;
