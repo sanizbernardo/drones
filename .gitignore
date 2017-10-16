@@ -3,6 +3,8 @@
 
 # Mac specific stuff
 .DS_Store
+.idea/
+pno.iml
 
 # User-specific stuff:
 .idea/**/workspace.xml
