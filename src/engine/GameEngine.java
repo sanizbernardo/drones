@@ -1,6 +1,7 @@
 package engine;
 
 import IO.MouseInput;
+import image.ImageCreator;
 import utils.Constants;
 import utils.Timer;
 
@@ -93,6 +94,7 @@ public class GameEngine implements Runnable {
         float elapsedTime;
         float accumulator = 0f;
         float interval = 1f / Constants.TARGET_UPS;
+
 
         while (!window.windowShouldClose()) {
             elapsedTime = timer.getElapsedTime();

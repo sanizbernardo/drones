@@ -4,6 +4,7 @@ import IO.MouseInput;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
+import image.ImageCreator;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import utils.Constants;
@@ -66,7 +67,6 @@ public class TestWorld implements IWorldRules {
 
         gameItems = new GameItem[]{cube1, cube2};
     }
-    
 
     /**
      * Handle input, should be in seperate class
@@ -74,6 +74,10 @@ public class TestWorld implements IWorldRules {
     @Override
     public void input(Window window, MouseInput mouseInput) {
         cameraInc.set(0, 0, 0);
+        if (window.isKeyPressed(GLFW_KEY_C)) {
+            ImageCreator img = new ImageCreator();
+            img.screenShot();
+        }
         if (window.isKeyPressed(GLFW_KEY_W)) {
             cameraInc.z = -1;
         } else if (window.isKeyPressed(GLFW_KEY_S)) {
