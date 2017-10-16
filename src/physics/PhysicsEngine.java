@@ -1,3 +1,5 @@
+package physics;
+
 import org.la4j.Matrix;
 import org.la4j.Vector;
 import org.la4j.inversion.GaussJordanInverter;
@@ -89,7 +91,7 @@ public class PhysicsEngine {
 		Vector rotAcceleration = inertiaInv.multiply(wingTorque.add(tailTorque));		
 
 		// position/orientation update
-		// newx = a/2*t² + v*t + x
+		// newx = a/2*tï¿½ + v*t + x
 		
 		drone.setPosition(drone.getPosition().add(oldVel.multiply(dt)).add(acceleration.multiply(dt*dt/2)));
 		drone.setOrientation(drone.getOrientation().add(drone.getRotation().multiply(dt)).add(rotAcceleration.multiply(dt*dt/2)));

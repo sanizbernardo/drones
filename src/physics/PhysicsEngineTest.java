@@ -1,3 +1,5 @@
+package physics;
+
 import static org.junit.Assert.*;
 
 import java.util.function.IntToDoubleFunction;
