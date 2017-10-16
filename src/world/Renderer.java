@@ -19,6 +19,9 @@ public class Renderer {
      */
     private ShaderProgram shaderProgram;
 
+    /**
+     * Holds the basic functionalities for the
+     */
     public Renderer() {
         transformation = new Transformation();
     }
