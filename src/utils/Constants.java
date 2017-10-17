@@ -4,7 +4,7 @@ public class Constants {
     /**
      * Window constants
      */
-    public static final String TITLE = "PnO physics.Drone Simulation";
+    public static final String TITLE = "PnO Drone Simulation";
     public static final boolean VSYNC = true;
     //only for initialization!
     public static final int WIDTH = 600;

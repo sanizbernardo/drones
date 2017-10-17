@@ -8,7 +8,7 @@ import utils.Timer;
 /**
  * An engine to be added to a world
  */
-public class GameEngine implements Runnable {
+public class Engine implements Runnable {
 
     private final Window window;
 
@@ -35,7 +35,7 @@ public class GameEngine implements Runnable {
      * @throws Exception
      *         If something goes wrong
      */
-    public GameEngine(String windowTitle, int width, int height, boolean vSync, IWorldRules worldRules) throws Exception {
+    public Engine(String windowTitle, int width, int height, boolean vSync, IWorldRules worldRules) throws Exception {
         gameLoopThread = new Thread(this, "GAME_LOOP_THREAD");
         window = new Window(windowTitle, width, height, vSync);
         mouseInput = new MouseInput();
