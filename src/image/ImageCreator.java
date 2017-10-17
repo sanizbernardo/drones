@@ -1,6 +1,9 @@
 package image;
 
 import javax.imageio.ImageIO;
+
+import utils.Constants;
+
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -16,16 +19,16 @@ import static org.lwjgl.opengl.GL11.glReadPixels;
  */
 public class ImageCreator {
 
-    private int WIDTH = 20, HEIGHT = 20;
+    private int WIDTH = Constants.WIDTH, HEIGHT = Constants.HEIGHT;
 
     //=========================getScreenImage==================================//
-    public void screenShot(){
+    public void screenShotOld(){
         //Creating an rbg array of total pixels
         int[] pixels = new int[WIDTH * HEIGHT];
         int bindex;
         // allocate space for RBG pixels
         ByteBuffer fb = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 3);
-
+        
         // grab a copy of the current frame contents as RGB
         glReadPixels(0, 0, WIDTH, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, fb);
 
@@ -62,4 +65,36 @@ public class ImageCreator {
             System.out.println("ScreenShot() exception: " +e);
         }
     }
+    
+    
+    public byte[] screenShot(){
+    	byte[] pixels = new byte[WIDTH * HEIGHT * 3];
+
+        ByteBuffer fb = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 3);
+        
+        glReadPixels(0, 0, WIDTH, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, fb);
+
+        for (int i=0; i < HEIGHT; i++) {
+        	for (int j=0; j < WIDTH; j++) {
+        		pixels[(i*WIDTH+j)*3] = fb.get(((HEIGHT-i-1)*WIDTH+j)*3);
+                pixels[(i*WIDTH+j)*3+1] = fb.get(((HEIGHT-i-1)*WIDTH+j)*3+1);
+                pixels[(i*WIDTH+j)*3+2] = fb.get(((HEIGHT-i-1)*WIDTH+j)*3+2);
+        	}
+        }
+        
+        return pixels;
+        
+//		for exporting image.
+//        BufferedImage imageOut = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
+//		imageOut.getRaster().setDataElements(0, 0, WIDTH, HEIGHT, pixels);
+//        
+//        try {
+//            ImageIO.write(imageOut, "png" , new File("ss.png"));
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//        	System.out.println("ScreenShot() exception: " +e);
+//        }
+    }
+    
 }

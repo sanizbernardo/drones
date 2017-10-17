@@ -60,10 +60,10 @@ public class Cube {
     public void setColours() {
         this.colours = new float[]{
             //Face 1 (front)
-            0.15f, 0.0f, 0.0f,
-            0.15f, 0.0f, 0.0f,
-            0.15f, 0.0f, 0.0f,
-            0.15f, 0.0f, 0.0f,
+            0.0f, 0.15f, 0.0f,
+            0.0f, 0.15f, 0.0f,
+            0.0f, 0.15f, 0.0f,
+            0.0f, 0.15f, 0.0f,
 
 
             //Face 2 (top)
@@ -86,10 +86,10 @@ public class Cube {
 
 
             //Face 5 (left)
-            0.75f, 0.0f, 0.0f,
-            0.75f, 0.0f, 0.0f,
-            0.75f, 0.0f, 0.0f,
-            0.75f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.75f,
+            0.0f, 0.0f, 0.75f,
+            0.0f, 0.0f, 0.75f,
+            0.0f, 0.0f, 0.75f,
 
             //Face 6 (right)
             1.0f, 0.0f, 0.0f,
