@@ -18,42 +18,34 @@ public class ImageCreator {
 
     private int WIDTH = Constants.WIDTH, HEIGHT = Constants.HEIGHT;
 
-    //=========================getScreenImage==================================//
+    /**
+     * macOs run with this VM option -Djava.awt.headless=true
+     */
     public void screenShot(){
         //Creating an rbg array of total pixels
         int[] pixels = new int[WIDTH * HEIGHT];
         int bindex;
         // allocate space for RBG pixels
         ByteBuffer fb = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 3);
-        
+
         // grab a copy of the current frame contents as RGB
         glReadPixels(0, 0, WIDTH, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, fb);
 
+        BufferedImage imageIn = new BufferedImage(WIDTH, HEIGHT,BufferedImage.TYPE_INT_RGB);
         // convert RGB data in ByteBuffer to integer array
         for (int i=0; i < pixels.length; i++) {
             bindex = i * 3;
             pixels[i] =
                     ((fb.get(bindex) << 16))  +
                             ((fb.get(bindex+1) << 8))  +
-                            ((fb.get(bindex + 2)));
+                            ((fb.get(bindex+2) << 0));
         }
         //Allocate colored pixel to buffered Image
-        BufferedImage imageIn = null;
-        try{
-            System.out.println("hallo");
-            imageIn = new BufferedImage(WIDTH, HEIGHT,BufferedImage.TYPE_INT_RGB);
-            System.out.println("hey");
-            imageIn.setRGB(0, 0, WIDTH, HEIGHT, pixels, 0 , WIDTH);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        imageIn.setRGB(0, 0, WIDTH, HEIGHT, pixels, 0 , WIDTH);
 
         //Creating the transformation direction (horizontal)
         AffineTransform at =  AffineTransform.getScaleInstance(1, -1);
-        if (imageIn != null) {
-            at.translate(0, -imageIn.getHeight(null));
-        }
+        at.translate(0, -imageIn.getHeight(null));
 
         //Applying transformation
         AffineTransformOp opRotated = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
@@ -66,13 +58,13 @@ public class ImageCreator {
             System.out.println("ScreenShot() exception: " +e);
         }
     }
-    
-    
+
+
     public byte[] screenShotaze(){
     	byte[] pixels = new byte[WIDTH * HEIGHT * 3];
 
         ByteBuffer fb = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 3);
-        
+
         glReadPixels(0, 0, WIDTH, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, fb);
 
         for (int i=0; i < HEIGHT; i++) {
@@ -82,13 +74,13 @@ public class ImageCreator {
                 pixels[(i*WIDTH+j)*3+2] = fb.get(((HEIGHT-i-1)*WIDTH+j)*3+2);
         	}
         }
-        
+
         return pixels;
-        
+
 //		for exporting image.
 //        BufferedImage imageOut = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
 //		imageOut.getRaster().setDataElements(0, 0, WIDTH, HEIGHT, pixels);
-//        
+//
 //        try {
 //            ImageIO.write(imageOut, "png" , new File("ss.png"));
 //        }
