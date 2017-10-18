@@ -61,11 +61,11 @@ public class TestWorld implements IWorldRules {
 
         GameItem cube1= new GameItem(redCube.getMesh());
         cube1.setScale(0.5f);
-        cube1.setPosition(0, 0, -2);
+        cube1.setPosition(0, 0, -25);
 
         GameItem cube2 = new GameItem(redCube.getMesh());
         cube2.setScale(0.5f);
-        cube2.setPosition(0, 0, -10);
+        cube2.setPosition(0, 0, -50);
 
         Drone drone = new Drone(new AutopilotConfig() {
             public float getGravity() {return 10f;}
@@ -86,9 +86,9 @@ public class TestWorld implements IWorldRules {
         DroneMesh droneMesh = new DroneMesh(drone);
         GameItem left = new GameItem(droneMesh.getLeft());
         GameItem right = new GameItem(droneMesh.getRight());
+        GameItem body = new GameItem(droneMesh.getBody());
 
-
-        gameItems = new GameItem[]{cube1, cube2, left, right};
+        gameItems = new GameItem[]{cube1, cube2, left, right, body};
     }
     
 

@@ -14,7 +14,9 @@ public class Drone {
 	private Vector position, velocity, orientation, rotation;
 	
 	private float thrust, leftWingInclination, rightWingInclination, horStabInclination, verStabInclination;
-	
+
+	private float engineZ;
+
 	public Drone(AutopilotConfig config) {
 		this.setPosition(new BasicVector(new double[]{0,0,0}));		
 		this.setVelocity(new BasicVector(new double[]{0,0,0}));
@@ -23,7 +25,9 @@ public class Drone {
 
 		this.wingX = config.getWingX();
 		this.tailSize = config.getTailSize();
-		
+
+		engineZ = config.getTailMass() / config.getEngineMass() * tailSize;
+
 		this.thrust = 0;
 		this.leftWingInclination = 0;
 		this.rightWingInclination = 0;
@@ -41,6 +45,9 @@ public class Drone {
 
 		this.wingX = config.getWingX();
 		this.tailSize = config.getTailSize();
+
+		engineZ = config.getTailMass() / config.getEngineMass() * tailSize;
+
 
 		this.thrust = 0;
 		this.leftWingInclination = 0;
@@ -155,5 +162,9 @@ public class Drone {
 
 	public float getTailSize() {
 		return tailSize;
+	}
+
+	public float getEngineZ() {
+		return engineZ;
 	}
 }
