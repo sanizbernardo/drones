@@ -6,6 +6,8 @@
 .idea/
 pno.iml
 
+# Project specific
+ss.png
 # User-specific stuff:
 .idea/**/workspace.xml
 .idea/**/tasks.xml
