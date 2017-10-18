@@ -4,8 +4,6 @@ import engine.Engine;
 import engine.IWorldRules;
 import utils.Constants;
 
-import java.awt.image.BufferedImage;
-
 public class Main {
 
     public static void main(String[] args) {

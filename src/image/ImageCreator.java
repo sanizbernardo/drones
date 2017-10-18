@@ -1,9 +1,8 @@
 package image;
 
-import javax.imageio.ImageIO;
-
 import utils.Constants;
 
+import javax.imageio.ImageIO;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -16,22 +15,19 @@ import static org.lwjgl.opengl.GL11.glReadPixels;
 
 public class ImageCreator {
 
-    private int WIDTH = Constants.WIDTH, HEIGHT = Constants.HEIGHT;
-
     /**
-     * macOs run with this VM option -Djava.awt.headless=true
+     * Based on
      */
     public void screenShot(){
         //Creating an rbg array of total pixels
-        int[] pixels = new int[WIDTH * HEIGHT];
+        int[] pixels = new int[Constants.WIDTH * Constants.HEIGHT];
         int bindex;
         // allocate space for RBG pixels
-        ByteBuffer fb = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 3);
+        ByteBuffer fb = ByteBuffer.allocateDirect(Constants.WIDTH * Constants.HEIGHT * 3);
 
         // grab a copy of the current frame contents as RGB
-        glReadPixels(0, 0, WIDTH, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, fb);
+        glReadPixels(0, 0, Constants.WIDTH, Constants.HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, fb);
 
-        BufferedImage imageIn = new BufferedImage(WIDTH, HEIGHT,BufferedImage.TYPE_INT_RGB);
         // convert RGB data in ByteBuffer to integer array
         for (int i=0; i < pixels.length; i++) {
             bindex = i * 3;
@@ -41,7 +37,14 @@ public class ImageCreator {
                             ((fb.get(bindex+2) << 0));
         }
         //Allocate colored pixel to buffered Image
-        imageIn.setRGB(0, 0, WIDTH, HEIGHT, pixels, 0 , WIDTH);
+        BufferedImage imageIn = null;
+        try{
+            imageIn = new BufferedImage(Constants.WIDTH, Constants.HEIGHT,BufferedImage.TYPE_INT_RGB);
+            imageIn.setRGB(0, 0, Constants.WIDTH, Constants.HEIGHT, pixels, 0 , Constants.WIDTH);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         //Creating the transformation direction (horizontal)
         AffineTransform at =  AffineTransform.getScaleInstance(1, -1);
@@ -58,36 +61,4 @@ public class ImageCreator {
             System.out.println("ScreenShot() exception: " +e);
         }
     }
-
-
-    public byte[] screenShotaze(){
-    	byte[] pixels = new byte[WIDTH * HEIGHT * 3];
-
-        ByteBuffer fb = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 3);
-
-        glReadPixels(0, 0, WIDTH, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, fb);
-
-        for (int i=0; i < HEIGHT; i++) {
-        	for (int j=0; j < WIDTH; j++) {
-        		pixels[(i*WIDTH+j)*3] = fb.get(((HEIGHT-i-1)*WIDTH+j)*3);
-                pixels[(i*WIDTH+j)*3+1] = fb.get(((HEIGHT-i-1)*WIDTH+j)*3+1);
-                pixels[(i*WIDTH+j)*3+2] = fb.get(((HEIGHT-i-1)*WIDTH+j)*3+2);
-        	}
-        }
-
-        return pixels;
-
-//		for exporting image.
-//        BufferedImage imageOut = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
-//		imageOut.getRaster().setDataElements(0, 0, WIDTH, HEIGHT, pixels);
-//
-//        try {
-//            ImageIO.write(imageOut, "png" , new File("ss.png"));
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        	System.out.println("ScreenShot() exception: " +e);
-//        }
-    }
-    
 }
