@@ -18,7 +18,7 @@ public class ImageCreator {
     /**
      * Based on
      */
-    public byte[] screenShot(){
+    public byte[] screenShotOld(){
         int multiplier;
         String osName = System.getProperty("os.name");
         if ( osName.contains("Mac") ) {
@@ -56,34 +56,43 @@ public class ImageCreator {
         AffineTransformOp opRotated = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
         BufferedImage imageOut = opRotated.filter(imageIn, null);
         
-        try {//Try to screate image, else show exception.
+        try {//Try to create image, else show exception.
             ImageIO.write(imageOut, "png" , new File("ss.png"));
         }
         catch (Exception e) {
             System.out.println("ScreenShot() exception: " +e);
         }
         
-        return (byte[]) imageOut.getData().getDataElements(0, 0, Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier, new byte[Constants.WIDTH * multiplier * Constants.HEIGHT * multiplier * 3]);
+        return null;
     }
     
-    public byte[] screenShotAlt(){
-    	byte[] pixels = new byte[Constants.WIDTH * Constants.HEIGHT * 3];
+    
+    public byte[] screenShot(){
+    	int multiplier;
+        String osName = System.getProperty("os.name");
+        if ( osName.contains("Mac") ) {
+            multiplier = 2;
+        } else {
+            multiplier = 1;
+        }
+    	
+    	byte[] pixels = new byte[Constants.WIDTH * multiplier * Constants.HEIGHT * multiplier * 3];
 
-        ByteBuffer fb = ByteBuffer.allocateDirect(Constants.WIDTH * Constants.HEIGHT * 3);
+        ByteBuffer fb = ByteBuffer.allocateDirect(Constants.WIDTH * multiplier * Constants.HEIGHT  * multiplier * 3);
         
-        glReadPixels(0, 0, Constants.WIDTH, Constants.HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, fb);
+        glReadPixels(0, 0, Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier, GL_RGB, GL_UNSIGNED_BYTE, fb);
 
-        for (int i=0; i < Constants.HEIGHT; i++) {
-        	for (int j=0; j < Constants.WIDTH; j++) {
-        		pixels[(i*Constants.WIDTH+j)*3] = fb.get(((Constants.HEIGHT-i-1)*Constants.WIDTH+j)*3);
-                pixels[(i*Constants.WIDTH+j)*3+1] = fb.get(((Constants.HEIGHT-i-1)*Constants.WIDTH+j)*3+1);
-                pixels[(i*Constants.WIDTH+j)*3+2] = fb.get(((Constants.HEIGHT-i-1)*Constants.WIDTH+j)*3+2);
+        for (int i=0; i < Constants.HEIGHT * multiplier; i++) {
+        	for (int j=0; j < Constants.WIDTH * multiplier; j++) {
+        		pixels[(i*Constants.WIDTH * multiplier+j)*3] = fb.get(((Constants.HEIGHT * multiplier-i-1)*Constants.WIDTH * multiplier+j)*3);
+                pixels[(i*Constants.WIDTH * multiplier+j)*3+1] = fb.get(((Constants.HEIGHT * multiplier-i-1)*Constants.WIDTH * multiplier+j)*3+1);
+                pixels[(i*Constants.WIDTH * multiplier+j)*3+2] = fb.get(((Constants.HEIGHT * multiplier-i-1)*Constants.WIDTH * multiplier+j)*3+2);
         	}
         }
         
 //		for exporting image.
-        BufferedImage imageOut = new BufferedImage(Constants.WIDTH, Constants.HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
-		imageOut.getRaster().setDataElements(0, 0, Constants.WIDTH, Constants.HEIGHT, pixels);
+        BufferedImage imageOut = new BufferedImage(Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier, BufferedImage.TYPE_3BYTE_BGR);
+		imageOut.getRaster().setDataElements(0, 0, Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier, pixels);
         
         try {
             ImageIO.write(imageOut, "png" , new File("ss.png"));
@@ -92,6 +101,7 @@ public class ImageCreator {
             e.printStackTrace();
         	System.out.println("ScreenShot() exception: " +e);
         }
+        
         return pixels;
     }
     
