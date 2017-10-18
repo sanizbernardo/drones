@@ -19,14 +19,24 @@ public class ImageCreator {
      * Based on
      */
     public void screenShot(){
+        int multiplier;
+        String osName = System.getProperty("os.name");
+        if ( osName.contains("Mac") ) {
+            multiplier = 2;
+        } else {
+            multiplier = 1;
+        }
+
+
+
         //Creating an rbg array of total pixels
-        int[] pixels = new int[Constants.WIDTH * Constants.HEIGHT];
+        int[] pixels = new int[Constants.WIDTH * Constants.HEIGHT * multiplier * multiplier];
         int bindex;
         // allocate space for RBG pixels
-        ByteBuffer fb = ByteBuffer.allocateDirect(Constants.WIDTH * Constants.HEIGHT * 3);
+        ByteBuffer fb = ByteBuffer.allocateDirect(Constants.WIDTH * Constants.HEIGHT * 3 * multiplier * multiplier);
 
         // grab a copy of the current frame contents as RGB
-        glReadPixels(0, 0, Constants.WIDTH, Constants.HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, fb);
+        glReadPixels(0, 0, Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier, GL_RGB, GL_UNSIGNED_BYTE, fb);
 
         // convert RGB data in ByteBuffer to integer array
         for (int i=0; i < pixels.length; i++) {
@@ -39,8 +49,8 @@ public class ImageCreator {
         //Allocate colored pixel to buffered Image
         BufferedImage imageIn = null;
         try{
-            imageIn = new BufferedImage(Constants.WIDTH, Constants.HEIGHT,BufferedImage.TYPE_INT_RGB);
-            imageIn.setRGB(0, 0, Constants.WIDTH, Constants.HEIGHT, pixels, 0 , Constants.WIDTH);
+            imageIn = new BufferedImage(Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier,BufferedImage.TYPE_INT_RGB);
+            imageIn.setRGB(0, 0, Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier, pixels, 0 , Constants.WIDTH * multiplier);
         } catch (Exception e) {
             e.printStackTrace();
         }
