@@ -1,12 +1,15 @@
 package world;
 
 import IO.MouseInput;
+import datatypes.AutopilotConfig;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import physics.Drone;
 import utils.Constants;
+import world.drone.DroneMesh;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
@@ -64,7 +67,28 @@ public class TestWorld implements IWorldRules {
         cube2.setScale(0.5f);
         cube2.setPosition(0, 0, -10);
 
-        gameItems = new GameItem[]{cube1, cube2};
+        Drone drone = new Drone(new AutopilotConfig() {
+            public float getGravity() {return 10f;}
+            public float getWingX() {return 2.5f;}
+            public float getTailSize() {return 5f;}
+            public float getEngineMass() {return 70f;}
+            public float getWingMass() {return 25f;}
+            public float getTailMass() {return 30f;}
+            public float getMaxThrust() {return -1f;}
+            public float getMaxAOA() {return -1f;}
+            public float getWingLiftSlope() {return 0.11f;}
+            public float getHorStabLiftSlope() {return 0f;}
+            public float getVerStabLiftSlope() {return 0.11f;}
+            public float getHorizontalAngleOfView() {return -1f;}
+            public float getVerticalAngleOfView() {return -1f;}
+            public int getNbColumns() {return -1;}
+            public int getNbRows() {return -1;}});
+        DroneMesh droneMesh = new DroneMesh(drone);
+        GameItem left = new GameItem(droneMesh.getLeft());
+        GameItem right = new GameItem(droneMesh.getRight());
+
+
+        gameItems = new GameItem[]{cube1, cube2, left, right};
     }
     
 
