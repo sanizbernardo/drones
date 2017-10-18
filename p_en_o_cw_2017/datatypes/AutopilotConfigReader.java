@@ -1,11 +1,6 @@
 package datatypes;
 public class AutopilotConfigReader {
-    private static byte[] readByteArray(java.io.DataInputStream stream) throws java.io.IOException {
-        int length = stream.readInt();
-        byte[] array = new byte[length];
-        stream.readFully(array);
-        return array;
-    }
+
     public static AutopilotConfig read(java.io.DataInputStream stream) throws java.io.IOException {
         float gravity = stream.readFloat();
         float wingX = stream.readFloat();

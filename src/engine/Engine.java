@@ -1,7 +1,6 @@
 package engine;
 
 import IO.MouseInput;
-import image.ImageCreator;
 import utils.Constants;
 import utils.Timer;
 
