@@ -1,29 +1,14 @@
 package world.drone;
 
-import engine.graph.Mesh;
 import physics.Drone;
 
-public class LeftWing {
-    Drone drone;
+public class LeftWing extends DroneComponent{
 
-
-    private float[] positions, colours;
-
-    private int[] indices;
-
-    private Mesh mesh;
-
-    public LeftWing(Drone drone){
-        this.drone = drone;
-        setPositions();
-        setColours();
-        setIndices();
-        this.mesh = new Mesh(this.getPositions(), this.getColours(), this.getIndices());
-
+    public LeftWing(Drone drone) {
+        super(drone);
     }
 
-
-    private void setPositions() {
+    protected void setPositions() {
         this.positions = new float[]{
                 //left wing
                 0f                  , 0f, -0.5f, //#0
@@ -33,7 +18,7 @@ public class LeftWing {
         };
     }
 
-    private void setColours() {
+    protected void setColours() {
         this.colours = new float[]{
                 //Face 1 (front)
                 1f, 0f, 0.0f,
@@ -43,26 +28,11 @@ public class LeftWing {
         };
     }
 
-    private void setIndices(){
+    protected void setIndices(){
         this.indices = new int[]{
                 // Front face
                 1, 2, 0, 3, 2, 0,
         };
     }
 
-    public float[] getPositions() {
-        return positions;
-    }
-
-    public float[] getColours() {
-        return colours;
-    }
-
-    public int[] getIndices() {
-        return indices;
-    }
-
-    public Mesh getMesh() {
-        return mesh;
-    }
 }
