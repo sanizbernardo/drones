@@ -10,7 +10,6 @@ public class Body extends DroneComponent {
 
     @Override
     public void setPositions() {
-        System.out.println(drone.getEngineZ());
         this.positions = new float[]{
                 0.5f, 0f, drone.getTailSize(), //#0
                 -0.5f, 0f, drone.getTailSize(), //#1
