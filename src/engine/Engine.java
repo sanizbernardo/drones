@@ -1,13 +1,14 @@
 package engine;
 
 import IO.MouseInput;
+import image.ImageCreator;
 import utils.Constants;
 import utils.Timer;
 
 /**
  * An engine to be added to a world
  */
-public class GameEngine implements Runnable {
+public class Engine implements Runnable {
 
     private final Window window;
 
@@ -34,7 +35,7 @@ public class GameEngine implements Runnable {
      * @throws Exception
      *         If something goes wrong
      */
-    public GameEngine(String windowTitle, int width, int height, boolean vSync, IWorldRules worldRules) throws Exception {
+    public Engine(String windowTitle, int width, int height, boolean vSync, IWorldRules worldRules) throws Exception {
         gameLoopThread = new Thread(this, "GAME_LOOP_THREAD");
         window = new Window(windowTitle, width, height, vSync);
         mouseInput = new MouseInput();
@@ -93,6 +94,7 @@ public class GameEngine implements Runnable {
         float elapsedTime;
         float accumulator = 0f;
         float interval = 1f / Constants.TARGET_UPS;
+
 
         while (!window.windowShouldClose()) {
             elapsedTime = timer.getElapsedTime();
