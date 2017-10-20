@@ -128,13 +128,17 @@ public class TestWorld implements IWorldRules {
         // fake testbed inputs
         for (int i = 2; i < 5; i++) {
             GameItem item = gameItems[i];
-            item.setPosition(item.getPosition().x,item.getPosition().y - 0.01f,item.getPosition().z -0.05f);
+            item.setPosition(item.getPosition().x,item.getPosition().y - 0,item.getPosition().z -0);
+            item.setRotation(0,0,0);
             if(i==2) {
-                item.setRotation(-40,0,0);
+                //TODO: if plane is rotating and then wings rotate we need to calcualte
+                //TODO: it a bit differently. Should be an easy forumula
+                item.setRotation(-20,0,0);
             }
             if(i==3) {
-                item.setRotation(40,0,0);
+                item.setRotation(20,0,0);
             }
+
         }
 
         // Update camera based on mouse
