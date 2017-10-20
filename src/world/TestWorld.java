@@ -49,7 +49,9 @@ public class TestWorld implements IWorldRules {
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
     }
-    
+
+    private Drone drone;
+
     /**
      * Init
      */
@@ -67,7 +69,7 @@ public class TestWorld implements IWorldRules {
         cube2.setScale(0.5f);
         cube2.setPosition(0, 0, -50);
 
-        Drone drone = new Drone(new AutopilotConfig() {
+        drone = new Drone(new AutopilotConfig() {
             public float getGravity() {return 10f;}
             public float getWingX() {return 2.5f;}
             public float getTailSize() {return 5f;}
@@ -122,6 +124,18 @@ public class TestWorld implements IWorldRules {
     public void update(float interval, MouseInput mouseInput) {
         // Update camera position
         camera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
+
+        // fake testbed inputs
+        for (int i = 2; i < 5; i++) {
+            GameItem item = gameItems[i];
+            item.setPosition(item.getPosition().x,item.getPosition().y - 0.01f,item.getPosition().z -0.05f);
+            if(i==2) {
+                item.setRotation(-40,0,0);
+            }
+            if(i==3) {
+                item.setRotation(40,0,0);
+            }
+        }
 
         // Update camera based on mouse
         if (mouseInput.isRightButtonPressed()) {
