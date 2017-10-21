@@ -63,7 +63,7 @@ public class Drone {
 		this.position = pos;
 	}
 	
-    Vector getPosition() {
+    public Vector getPosition() {
     	return position;
     }
     

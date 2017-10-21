@@ -8,6 +8,7 @@ import engine.graph.Camera;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import physics.Drone;
+import physics.PhysicsEngine;
 import utils.Constants;
 import world.drone.DroneMesh;
 
@@ -50,6 +51,7 @@ public class TestWorld implements IWorldRules {
         cameraInc = new Vector3f(0, 0, 0);
     }
 
+    private PhysicsEngine physicsEngine;
     private Drone drone;
 
     /**
@@ -69,7 +71,7 @@ public class TestWorld implements IWorldRules {
         cube2.setScale(0.5f);
         cube2.setPosition(0, 0, -50);
 
-        drone = new Drone(new AutopilotConfig() {
+        AutopilotConfig config = new AutopilotConfig() {
             public float getGravity() {return 10f;}
             public float getWingX() {return 2.5f;}
             public float getTailSize() {return 5f;}
@@ -84,7 +86,12 @@ public class TestWorld implements IWorldRules {
             public float getHorizontalAngleOfView() {return -1f;}
             public float getVerticalAngleOfView() {return -1f;}
             public int getNbColumns() {return -1;}
-            public int getNbRows() {return -1;}});
+            public int getNbRows() {return -1;}};
+
+        physicsEngine = new PhysicsEngine(config);
+
+        drone = new Drone(config);
+
         DroneMesh droneMesh = new DroneMesh(drone);
         GameItem left = new GameItem(droneMesh.getLeft());
         GameItem right = new GameItem(droneMesh.getRight());
@@ -125,20 +132,13 @@ public class TestWorld implements IWorldRules {
         // Update camera position
         camera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
 
-        // fake testbed inputs
-        for (int i = 2; i < 5; i++) {
-            GameItem item = gameItems[i];
-            item.setPosition(item.getPosition().x,item.getPosition().y - 0,item.getPosition().z -0);
-            item.setRotation(0,0,0);
-            if(i==2) {
-                //TODO: if plane is rotating and then wings rotate we need to calcualte
-                //TODO: it a bit differently. Should be an easy forumula
-                item.setRotation(-20,0,0);
-            }
-            if(i==3) {
-                item.setRotation(20,0,0);
-            }
+        drone.setThrust(2000000f);
+        physicsEngine.update(interval, drone);
 
+
+
+        for (int i = 2; i < 5; i++) {
+            gameItems[i].setPosition((float)drone.getPosition().get(0),(float)drone.getPosition().get(1),(float)drone.getPosition().get(2));
         }
 
         // Update camera based on mouse
