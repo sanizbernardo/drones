@@ -8,17 +8,26 @@ import datatypes.AutopilotConfig;
 public class Drone {
 	
 	private final float maxThrust;
-	
+
+	private final float wingX, tailSize;
+
 	private Vector position, velocity, orientation, rotation;
 	
 	private float thrust, leftWingInclination, rightWingInclination, horStabInclination, verStabInclination;
-	
+
+	private float engineZ;
+
 	public Drone(AutopilotConfig config) {
 		this.setPosition(new BasicVector(new double[]{0,0,0}));		
 		this.setVelocity(new BasicVector(new double[]{0,0,0}));
 		this.setOrientation(new BasicVector(new double[]{0,0,0}));
 		this.setRotation(new BasicVector(new double[]{0, 0, 0}));
-		
+
+		this.wingX = config.getWingX();
+		this.tailSize = config.getTailSize();
+
+		engineZ = config.getTailMass() / config.getEngineMass() * tailSize;
+
 		this.thrust = 0;
 		this.leftWingInclination = 0;
 		this.rightWingInclination = 0;
@@ -33,7 +42,13 @@ public class Drone {
 		this.setVelocity(velocity);
 		this.setOrientation(orientation);
 		this.setRotation(new BasicVector(new double[]{0, 0, 0}));
-		
+
+		this.wingX = config.getWingX();
+		this.tailSize = config.getTailSize();
+
+		engineZ = config.getTailMass() / config.getEngineMass() * tailSize;
+
+
 		this.thrust = 0;
 		this.leftWingInclination = 0;
 		this.rightWingInclination = 0;
@@ -48,7 +63,7 @@ public class Drone {
 		this.position = pos;
 	}
 	
-    Vector getPosition() {
+    public Vector getPosition() {
     	return position;
     }
     
@@ -138,4 +153,18 @@ public class Drone {
     public void setOrientation(Vector orientation) {
     	this.orientation = orientation;
     }
+
+    // sizes
+
+	public float getWingX() {
+		return wingX;
+	}
+
+	public float getTailSize() {
+		return tailSize;
+	}
+
+	public float getEngineZ() {
+		return engineZ;
+	}
 }

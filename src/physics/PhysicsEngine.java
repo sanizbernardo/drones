@@ -13,7 +13,7 @@ public class PhysicsEngine {
 	private final float gravity, weight, wingLiftSlope, horStabLiftSlope, verStabLiftSlope, tailSize, wingX;
 	private final Vector weightVector;
 	private final Matrix inertiaInv;
-	
+
 	public PhysicsEngine(AutopilotConfig config) {
 		this.gravity = config.getGravity();
 		this.wingLiftSlope = config.getWingLiftSlope();
@@ -129,6 +129,5 @@ public class PhysicsEngine {
 				z = v1.get(0)*v2.get(1) - v1.get(1)*v2.get(0);
 		return new BasicVector(new double[]{x, y, z});
 	}
-	
-	
+
 }
