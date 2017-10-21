@@ -79,7 +79,7 @@ public class TestWorld implements IWorldRules {
             public float getEngineMass() {return 70f;}
             public float getWingMass() {return 25f;}
             public float getTailMass() {return 30f;}
-            public float getMaxThrust() {return -1f;}
+            public float getMaxThrust() {return 5000f;}
             public float getMaxAOA() {return -1f;}
             public float getWingLiftSlope() {return 0.11f;}
             public float getHorStabLiftSlope() {return 0f;}
@@ -136,7 +136,7 @@ public class TestWorld implements IWorldRules {
         // Update camera position
         camera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
 
-        drone.setThrust(2000000f);
+        drone.setThrust(2000f);
         physicsEngine.update(interval, drone);
 
 

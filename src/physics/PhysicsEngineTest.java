@@ -29,7 +29,7 @@ public class PhysicsEngineTest {
 			public float getEngineMass() {return 70f;}
 			public float getWingMass() {return 25f;}
 			public float getTailMass() {return 30f;}
-			public float getMaxThrust() {return -1f;}
+			public float getMaxThrust() {return 5000f;}
 			public float getMaxAOA() {return -1f;}
 			public float getWingLiftSlope() {return 0f;}
 			public float getHorStabLiftSlope() {return 0f;}
