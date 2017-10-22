@@ -1,9 +1,16 @@
 import java.util.ArrayList;
 
 /** Opmerkingen / TODO:
- * 	nog niet getest.
- * 	achter iedere byte vgl staat  & 0xFF , niet 100% zeker dat het zo moet.
+ * 	nog niet mooi getest, maar met print statements, die geven wel verwachte waarden
+ * 	gaat foutmelding geven als er geen rode pixel aanwezig is -> voorlopig eenvoudige oplossing, 
+ * 		control moet eerst checken of atLeastOneRed() true geeft.
  * 	 */
+
+/**
+* A class that analyzes the images with functions that return useful information for the autopilot.
+*
+* @author  Tomas Geens
+*/
 public class ImageRecognition {
 	
 	private final byte[]image;
@@ -12,6 +19,9 @@ public class ImageRecognition {
 	private final float horizontalAngleOfView;
 	private final float verticalAngleOfView;
 	private ArrayList<int[]> corners = new ArrayList<int[]>();
+	private final double[] center;
+	private final int surface;
+	private boolean atLeastOneRed = false;
 	
 	public ImageRecognition(byte[] image, int nbRows, int nbColums, float horizontalAngleOfView, float verticalAngleOfView){
 		this.image = image;
@@ -24,15 +34,21 @@ public class ImageRecognition {
 		
 		for (int i=0; i<this.nbRows; i++){
 			if (this.corners.size() > 0) break;
-			for (int j=0; j<nbColumns; j++){
-				if ((image[(nbColumns*j+i)*3] & 0xFF) != 0){
-					int[] coods = {i, j};
+			for (int j=0; j<this.nbColumns; j++){
+				if ((image[(this.nbColumns*i+j)*3] & 0xFF) != 0){
+					int[] coods = {j, i};
 					this.corners.add(coods);
 					break;
 				}
 			}
 			
 		}
+		if (this.corners.isEmpty()){
+			this.atLeastOneRed = false;
+			this.surface = 0;
+			this.center = null;
+		}
+		else{
 		int currentX = this.corners.get(0)[0];
 		int currentY = this.corners.get(0)[1];
 		
@@ -159,7 +175,27 @@ public class ImageRecognition {
 				else currentX +=1;
 			}
 		}
-		
+
+		int sumX = 0;
+		int sumY = 0;
+		int counter = 0;
+		for (int i=0; i<this.nbRows; i++){
+			for (int j=0; j<nbColumns; j++){
+				if ((image[(nbColumns*i+j)*3] & 0xFF) != 0){
+					int[] coods = {j, i};
+					sumX += coods[0];
+					sumY += coods[1];
+					counter++;
+				}
+			}	
+		}
+		double X = (double)sumX/(double)counter;
+		double Y = (double)sumY/(double)counter;
+		System.out.println(X + "   " + Y);
+		double[] center = {X-(double)this.nbColumns/2,-(Y-(double)this.nbRows/2)};
+		this.center = center;
+		this.surface = counter;
+		}
 	}
 
 	
@@ -181,23 +217,22 @@ public class ImageRecognition {
 	}
 	
 	public double[] getCenter(){
-		int sumX = 0;
-		int sumY = 0;
-		for(int[] i : this.corners){
-			sumX += i[0];
-			sumY += i[1];
-		}
-		double X = sumX/this.corners.size();
-		double Y = sumY/this.corners.size();
-		double[] result = {X-this.nbRows/2,-(Y-this.nbColumns/2)};
-		return result;
+		return this.center;
 	}
 	
 	public int getSurface(){
-		int counter=0;
-		for(int i = 0; i<this.nbColumns*this.nbRows*3;i+=3){
-			if ((image[i] & 0xFF) != 0) counter++; 
-		}
-		return counter;
+		return this.surface;
 	}
+	
+	public boolean middleIsRed(){
+		if(this.image[((this.nbRows/2)*this.nbColumns+this.nbColumns/2)*3] != 0){
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean atLeastOneRed(){
+		return this.atLeastOneRed;
+	}
+	
 }
