@@ -134,12 +134,13 @@ public class Drone {
 	
 	
     // orientations
-    public float getHeading() {
-    	return (float) orientation.get(1);
-    }
-    
+
     public float getPitch() {
     	return (float) orientation.get(0);
+    }
+    
+    public float getYaw() {
+    	return (float) orientation.get(1);
     }
     
     public float getRoll() {
