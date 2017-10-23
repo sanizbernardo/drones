@@ -8,6 +8,9 @@ import engine.graph.Camera;
 import image.ImageCreator;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+
+import com.sun.xml.internal.bind.v2.model.util.ArrayInfoUtil;
+
 import physics.Drone;
 import physics.PhysicsEngine;
 import utils.Constants;
@@ -15,6 +18,8 @@ import world.drone.DroneMesh;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
+
+import java.util.Arrays;
 
 /**
  * Place where all the GameItem are to be placed in
@@ -36,7 +41,7 @@ public class TestWorld implements IWorldRules {
      * the world itself around. When the camera "goes up" we just shift all world objects
      * downward. Same goes for all other translations and rotations.
      */
-    private final Camera camera;
+    private final Camera freeCamera, droneCamera;
 
     /**
      * A list of all the GameItems.
@@ -48,12 +53,14 @@ public class TestWorld implements IWorldRules {
      */
     public TestWorld() {
         renderer = new Renderer();
-        camera = new Camera();
+        freeCamera = new Camera();
+        droneCamera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
     }
 
     private PhysicsEngine physicsEngine;
     private Drone drone;
+    private Vector3f oldDronePos;
 
     /**
      * Init
@@ -63,14 +70,15 @@ public class TestWorld implements IWorldRules {
         renderer.init(window);
 
         Cube redCube = new Cube();
-
-        GameItem cube1= new GameItem(redCube.getMesh());
-        cube1.setScale(0.5f);
-        cube1.setPosition(0, 0, -25);
-
-        GameItem cube2 = new GameItem(redCube.getMesh());
-        cube2.setScale(0.5f);
-        cube2.setPosition(0, 0, -50);
+        gameItems = new GameItem[23];
+        
+        for (int i = 0; i < 20; i++) {
+        	GameItem cube2 = new GameItem(redCube.getMesh());
+            cube2.setScale(0.5f);
+            cube2.setPosition(0, -i*2, -10);
+            gameItems[i] = cube2;
+		}
+        
 
         AutopilotConfig config = new AutopilotConfig() {
             public float getGravity() {return 10f;}
@@ -82,7 +90,7 @@ public class TestWorld implements IWorldRules {
             public float getMaxThrust() {return 5000f;}
             public float getMaxAOA() {return -1f;}
             public float getWingLiftSlope() {return 0.11f;}
-            public float getHorStabLiftSlope() {return 0f;}
+            public float getHorStabLiftSlope() {return 0.11f;}
             public float getVerStabLiftSlope() {return 0.11f;}
             public float getHorizontalAngleOfView() {return -1f;}
             public float getVerticalAngleOfView() {return -1f;}
@@ -92,13 +100,19 @@ public class TestWorld implements IWorldRules {
         physicsEngine = new PhysicsEngine(config);
 
         drone = new Drone(config);
-
+        drone.setThrust(2000f);
+        
+        oldDronePos = new Vector3f(0,0,0); // should be get initial position
+        
         DroneMesh droneMesh = new DroneMesh(drone);
         GameItem left = new GameItem(droneMesh.getLeft());
         GameItem right = new GameItem(droneMesh.getRight());
         GameItem body = new GameItem(droneMesh.getBody());
 
-        gameItems = new GameItem[]{cube1, cube2, left, right, body};
+        gameItems[20] = left;
+        gameItems[21] = right;
+        gameItems[22] = body;
+        
     }
 
     /**
@@ -133,22 +147,27 @@ public class TestWorld implements IWorldRules {
      */
     @Override
     public void update(float interval, MouseInput mouseInput) {
-        // Update camera position
-        camera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
-
-        drone.setThrust(2000f);
-        physicsEngine.update(interval, drone);
-
-
-
-        for (int i = 2; i < 5; i++) {
+//    	physicsEngine.update(interval/10, drone);
+    	
+    	Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
+    	
+    	Vector3f deltaPos = newDronePos.sub(oldDronePos);
+    	
+    	oldDronePos = new Vector3f(newDronePos);
+    	
+    	// Update camera position
+        freeCamera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
+        droneCamera.movePosition(deltaPos.x, deltaPos.y, deltaPos.z);
+        
+        
+        for (int i = 20; i < 23; i++) {
             gameItems[i].setPosition((float)drone.getPosition().get(0),(float)drone.getPosition().get(1),(float)drone.getPosition().get(2));
         }
 
         // Update camera based on mouse
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
-            camera.moveRotation(rotVec.x * Constants.MOUSE_SENSITIVITY, rotVec.y * Constants.MOUSE_SENSITIVITY, 0);
+            freeCamera.moveRotation(rotVec.x * Constants.MOUSE_SENSITIVITY, rotVec.y * Constants.MOUSE_SENSITIVITY, 0);
         }
     }
 
@@ -157,7 +176,7 @@ public class TestWorld implements IWorldRules {
      */
     @Override
     public void render(Window window) {
-        renderer.render(window, camera, gameItems);
+        renderer.render(window, freeCamera, droneCamera, gameItems);
     }
 
     /**

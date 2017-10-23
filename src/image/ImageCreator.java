@@ -28,13 +28,13 @@ public class ImageCreator {
         }
 
         //Creating an rbg array of total pixels
-        int[] pixels = new int[Constants.WIDTH * Constants.HEIGHT * multiplier * multiplier];
+        int[] pixels = new int[200 * 200 * multiplier * multiplier];
         int bindex;
         // allocate space for RBG pixels
-        ByteBuffer fb = ByteBuffer.allocateDirect(Constants.WIDTH * Constants.HEIGHT * 3 * multiplier * multiplier);
+        ByteBuffer fb = ByteBuffer.allocateDirect(200 * 200 * 3 * multiplier * multiplier);
 
         // grab a copy of the current frame contents as RGB
-        glReadPixels(0, 0, Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier, GL_RGB, GL_UNSIGNED_BYTE, fb);
+        glReadPixels(0, 0, 200 * multiplier, 200 * multiplier, GL_RGB, GL_UNSIGNED_BYTE, fb);
 
         // convert RGB data in ByteBuffer to integer array
         for (int i=0; i < pixels.length; i++) {
@@ -45,8 +45,8 @@ public class ImageCreator {
                             (fb.get(bindex+2)& 0xFF);
         }
         //Allocate colored pixel to buffered Image
-        BufferedImage imageIn = new BufferedImage(Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier,BufferedImage.TYPE_INT_RGB);
-        imageIn.setRGB(0, 0, Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier, pixels, 0 , Constants.WIDTH * multiplier);
+        BufferedImage imageIn = new BufferedImage(200* multiplier, 200 * multiplier,BufferedImage.TYPE_INT_RGB);
+        imageIn.setRGB(0, 0, 200 * multiplier, 200 * multiplier, pixels, 0 , 200 * multiplier);
 
         //Creating the transformation direction (horizontal)
         AffineTransform at =  AffineTransform.getScaleInstance(1, -1);
@@ -76,23 +76,23 @@ public class ImageCreator {
             multiplier = 1;
         }
     	
-    	byte[] pixels = new byte[Constants.WIDTH * multiplier * Constants.HEIGHT * multiplier * 3];
+    	byte[] pixels = new byte[200 * multiplier * 200 * multiplier * 3];
 
-        ByteBuffer fb = ByteBuffer.allocateDirect(Constants.WIDTH * multiplier * Constants.HEIGHT  * multiplier * 3);
+        ByteBuffer fb = ByteBuffer.allocateDirect(200 * multiplier * 200  * multiplier * 3);
         
-        glReadPixels(0, 0, Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier, GL_RGB, GL_UNSIGNED_BYTE, fb);
+        glReadPixels(0, 0, 200 * multiplier, 200 * multiplier, GL_RGB, GL_UNSIGNED_BYTE, fb);
 
-        for (int i=0; i < Constants.HEIGHT * multiplier; i++) {
-        	for (int j=0; j < Constants.WIDTH * multiplier; j++) {
-        		pixels[(i*Constants.WIDTH * multiplier+j)*3] = fb.get(((Constants.HEIGHT * multiplier-i-1)*Constants.WIDTH * multiplier+j)*3);
-                pixels[(i*Constants.WIDTH * multiplier+j)*3+1] = fb.get(((Constants.HEIGHT * multiplier-i-1)*Constants.WIDTH * multiplier+j)*3+1);
-                pixels[(i*Constants.WIDTH * multiplier+j)*3+2] = fb.get(((Constants.HEIGHT * multiplier-i-1)*Constants.WIDTH * multiplier+j)*3+2);
+        for (int i=0; i < 200 * multiplier; i++) {
+        	for (int j=0; j < 200 * multiplier; j++) {
+        		pixels[(i*200 * multiplier+j)*3] = fb.get(((200 * multiplier-i-1)*200 * multiplier+j)*3);
+                pixels[(i*200 * multiplier+j)*3+1] = fb.get(((200 * multiplier-i-1)*200 * multiplier+j)*3+1);
+                pixels[(i*200 * multiplier+j)*3+2] = fb.get(((200 * multiplier-i-1)*200 * multiplier+j)*3+2);
         	}
         }
         
 //		for exporting image.
-        BufferedImage imageOut = new BufferedImage(Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier, BufferedImage.TYPE_3BYTE_BGR);
-		imageOut.getRaster().setDataElements(0, 0, Constants.WIDTH * multiplier, Constants.HEIGHT * multiplier, pixels);
+        BufferedImage imageOut = new BufferedImage(200 * multiplier, 200 * multiplier, BufferedImage.TYPE_3BYTE_BGR);
+		imageOut.getRaster().setDataElements(0, 0, 200 * multiplier, 200 * multiplier, pixels);
         
         try {
             ImageIO.write(imageOut, "png" , new File("ss.png"));

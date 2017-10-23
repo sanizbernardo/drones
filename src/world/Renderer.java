@@ -50,14 +50,16 @@ public class Renderer {
      * @param gameItems
      *        All game items that need rendering
      */
-    public void render(Window window, Camera camera, GameItem[] gameItems) {
+    public void render(Window window, Camera freeCamera, Camera droneCamera, GameItem[] gameItems) {
         clear();
 
-        if (window.isResized()) {
-            glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResized(false);
-        }
-
+//        if (window.isResized()) {
+//            glViewport(200, 0, window.getWidth(), window.getHeight());
+//            window.setResized(false);
+//        }
+        
+        glViewport(200, 0, window.getWidth(), window.getHeight());
+        
         shaderProgram.bind();
 
         // Update projection Matrix
@@ -65,7 +67,7 @@ public class Renderer {
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
         // Update view Matrix
-        Matrix4f viewMatrix = transformation.getViewMatrix(camera);
+        Matrix4f viewMatrix = transformation.getViewMatrix(freeCamera);
 
         // Render each gameItem
         for(GameItem gameItem : gameItems) {
@@ -77,6 +79,33 @@ public class Renderer {
         }
 
         shaderProgram.unbind();
+        
+        
+        
+        
+        glViewport(0,0,200,200);
+                
+        shaderProgram.bind();
+
+        // Update projection Matrix
+        projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, 200, 200, Constants.Z_NEAR, Constants.Z_FAR);
+        shaderProgram.setUniform("projectionMatrix", projectionMatrix);
+
+        // Update view Matrix
+        viewMatrix = transformation.getViewMatrix(droneCamera);
+
+        // Render each gameItem
+        for(GameItem gameItem : gameItems) {
+            // Set model view matrix for this item
+            Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
+            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+            // Render the mes for this game item
+            gameItem.getMesh().render();
+        }
+
+        shaderProgram.unbind();
+        
+        
     }
 
     /**
