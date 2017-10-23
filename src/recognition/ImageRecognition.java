@@ -1,3 +1,5 @@
+package recognition;
+
 import java.util.ArrayList;
 
 /** Opmerkingen / TODO:

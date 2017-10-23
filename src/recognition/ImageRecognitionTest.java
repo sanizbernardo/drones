@@ -1,10 +1,13 @@
-import java.util.Random;
+package recognition;
+
 import static org.junit.Assert.*;
+
+import recognition.ImageRecognition;
 import org.junit.Test;
 
 
 
-public class testClass {
+public class ImageRecognitionTest {
 	public static void main(String[] args){
 // 		random testjes
 //		byte random = 0;
