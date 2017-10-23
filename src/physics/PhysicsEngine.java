@@ -141,81 +141,59 @@ public class PhysicsEngine {
 	}
 	
 	public Vector posRW(Drone drone) {
-		double  x = drone.getPosition().get(0) + wingX,
-				y = drone.getPosition().get(1),
-				z = drone.getPosition().get(2);
-		return new BasicVector(new double[]{x, y, z});
+		return drone.getPosition().add(transMat(drone).multiply(relPosRW(drone)));
 	}
 	
 	public Vector posLW(Drone drone) {
-		double  x = drone.getPosition().get(0) - wingX,
-				y = drone.getPosition().get(1),
-				z = drone.getPosition().get(2);
-		return new BasicVector(new double[]{x, y, z});
+		return drone.getPosition().add(transMat(drone).multiply(relPosLW(drone)));
 	}
 	
 	public Vector posE(Drone drone) {
-		double  x = drone.getPosition().get(0),
-				y = drone.getPosition().get(1),
-				z = drone.getPosition().get(2) - engineZ;
-		return new BasicVector(new double[]{x, y, z});
+		return drone.getPosition().add(transMat(drone).multiply(relPosE(drone)));
 	}
 	
 	public Vector posT(Drone drone) {
-		double  x = drone.getPosition().get(0),
-				y = drone.getPosition().get(1),
-				z = drone.getPosition().get(2) + tailSize;
-		return new BasicVector(new double[]{x, y, z});
+		return drone.getPosition().add(transMat(drone).multiply(relPosT(drone)));
 	}
 	
 	public Vector relPosRW(Drone drone) {
-		double  x = wingX,
-				y = 0,
-				z = 0;
-		return new BasicVector(new double[]{x, y, z});
+		double  x = wingX;
+		return new BasicVector(new double[]{x, 0, 0});
 	}
 	
 	public Vector relPosLW(Drone drone) {
-		double  x = -wingX,
-				y = 0,
-				z = 0;
-		return new BasicVector(new double[]{x, y, z});
+		double  x = -wingX;
+		return new BasicVector(new double[]{x, 0, 0});
 	}
 	
 	public Vector relPosE(Drone drone) {
-		double  x = 0,
-				y = 0,
-				z = -engineZ;
-		return new BasicVector(new double[]{x, y, z});
+		double 	z = -engineZ;
+		return new BasicVector(new double[]{0, 0, z});
 	}
 	
 	public Vector relPosT(Drone drone) {
-		double  x = 0,
-				y = 0,
-				z = tailSize;
-		return new BasicVector(new double[]{x, y, z});
+		double  z = tailSize;
+		return new BasicVector(new double[]{0, 0, z});
 	}
 	
-	public Vector angularVelocity(Drone drone) {
-		Vector numerator = crossProduct(drone.getPosition(),drone.getVelocity());
-		double denominator = drone.getPosition().innerProduct(drone.getPosition());
-		return numerator.multiply(1/denominator);
+	public Vector angularVelocity(float dt, Drone drone) {
+		return angularAcceleration(drone).multiply(dt);
 	}
 	
-	public Vector velRW(Drone drone) {
-		return drone.getVelocity().add(crossProduct(this.angularVelocity(drone), this.relPosRW(drone)));
+	public Vector velRW(float dt, Drone drone) {
+		return drone.getVelocity().add(crossProduct(this.angularVelocity(dt, drone), this.relPosRW(drone)));
 	}
 	
-	public Vector velLW(Drone drone) {
-		return drone.getVelocity().add(crossProduct(this.angularVelocity(drone), this.relPosLW(drone)));
+	public Vector velLW(float dt, Drone drone) {
+		return drone.getVelocity().add(crossProduct(this.angularVelocity(dt, drone), this.relPosLW(drone)));
 	}
 	
-	public Vector velE(Drone drone) {
-		return drone.getVelocity().add(crossProduct(this.angularVelocity(drone), this.relPosE(drone)));
+	public Vector velE(float dt, Drone drone) {
+		return drone.getVelocity().add(crossProduct(this.angularVelocity(dt, drone), this.relPosE(drone)));
 	}
 	
-	public Vector velT(Drone drone) {
-		return drone.getVelocity().add(crossProduct(this.angularVelocity(drone), this.relPosT(drone)));
+	public Vector velT(float dt, Drone drone) {
+		return drone.getVelocity().add(crossProduct(this.angularVelocity(dt, drone), this.relPosT(drone)));
 	}
 	
 	public float radius(Drone drone) {
@@ -261,7 +239,7 @@ public class PhysicsEngine {
 		Vector numerator = drone.getVelocity();
 		double denominator = Math.sqrt(drone.getVelocity().innerProduct(drone.getVelocity()));
 		Vector normVel = numerator.multiply(1/denominator);
-		return crossProduct(accelerationD(drone), normVel);
+		return normVel.multiply(accelerationD(drone).innerProduct(normVel));
 	}
 	
 	public Vector angularAcceleration(Drone drone) {
@@ -274,23 +252,23 @@ public class PhysicsEngine {
 		return transMatInv(drone).multiply(accelerationD(drone));
 	}
 
-	public Vector accRW(Drone drone) {
-		return acceleration(drone).add(crossProduct(angularVelocity(drone), crossProduct(angularVelocity(drone), relPosRW(drone)))
+	public Vector accRW(float dt, Drone drone) {
+		return acceleration(drone).add(crossProduct(angularVelocity(dt, drone), crossProduct(angularVelocity(dt, drone), relPosRW(drone)))
 				.add(crossProduct(angularAcceleration(drone), relPosLW(drone))));
 	}
 	
-	public Vector accLW(Drone drone) {
-		return acceleration(drone).add(crossProduct(angularVelocity(drone), crossProduct(angularVelocity(drone), relPosRW(drone)))
+	public Vector accLW(float dt, Drone drone) {
+		return acceleration(drone).add(crossProduct(angularVelocity(dt, drone), crossProduct(angularVelocity(dt, drone), relPosRW(drone)))
 				.add(crossProduct(angularAcceleration(drone), relPosLW(drone))));
 	}
 	
-	public Vector accE(Drone drone) {
-		return acceleration(drone).add(crossProduct(angularVelocity(drone), crossProduct(angularVelocity(drone), relPosRW(drone)))
+	public Vector accE(float dt, Drone drone) {
+		return acceleration(drone).add(crossProduct(angularVelocity(dt, drone), crossProduct(angularVelocity(dt, drone), relPosRW(drone)))
 				.add(crossProduct(angularAcceleration(drone), relPosLW(drone))));
 	}
 	
-	public Vector accT(Drone drone) {
-		return acceleration(drone).add(crossProduct(angularVelocity(drone), crossProduct(angularVelocity(drone), relPosRW(drone)))
+	public Vector accT(float dt, Drone drone) {
+		return acceleration(drone).add(crossProduct(angularVelocity(dt, drone), crossProduct(angularVelocity(dt, drone), relPosRW(drone)))
 				.add(crossProduct(angularAcceleration(drone), relPosLW(drone))));
 	}
 	
