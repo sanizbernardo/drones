@@ -20,6 +20,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Place where all the GameItem are to be placed in
@@ -70,14 +71,19 @@ public class TestWorld implements IWorldRules {
         renderer.init(window);
 
         Cube redCube = new Cube();
-        gameItems = new GameItem[23];
-        
-        for (int i = 0; i < 20; i++) {
-        	GameItem cube2 = new GameItem(redCube.getMesh());
+        gameItems = new GameItem[17000];
+
+        Random rand = new Random();
+
+        for(int i = 0; i<gameItems.length; i++) {
+            GameItem cube2 = new GameItem(redCube.getMesh());
             cube2.setScale(0.5f);
-            cube2.setPosition(0, -i*2, -10);
+            int x =  (rand.nextInt(100) - 50);
+            int y = (rand.nextInt(100) - 50);
+            int z = (rand.nextInt(100) - 50);
+            cube2.setPosition(x, y, z);
             gameItems[i] = cube2;
-		}
+        }
         
 
         AutopilotConfig config = new AutopilotConfig() {
@@ -109,9 +115,9 @@ public class TestWorld implements IWorldRules {
         GameItem right = new GameItem(droneMesh.getRight());
         GameItem body = new GameItem(droneMesh.getBody());
 
-        gameItems[20] = left;
-        gameItems[21] = right;
-        gameItems[22] = body;
+        gameItems[gameItems.length-3] = left;
+        gameItems[gameItems.length-2] = right;
+        gameItems[gameItems.length-1] = body;
         
     }
 
@@ -159,7 +165,7 @@ public class TestWorld implements IWorldRules {
         freeCamera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
         droneCamera.setPosition(newDronePos.x*2, newDronePos.y*2, newDronePos.z*2);
         
-        for (int i = 20; i < 23; i++) {
+        for (int i = gameItems.length - 3; i < gameItems.length; i++) {
             gameItems[i].setPosition((float)drone.getPosition().get(0),(float)drone.getPosition().get(1),(float)drone.getPosition().get(2));
         }
 
