@@ -57,13 +57,22 @@ public class Renderer {
 //            glViewport(200, 0, window.getWidth(), window.getHeight());
 //            window.setResized(false);
 //        }
-        
-        glViewport(200, 0, window.getWidth(), window.getHeight());
+
+        int multiplier;
+        String osName = System.getProperty("os.name");
+        if ( osName.contains("Mac") ) {
+            multiplier = 2;
+        } else {
+            multiplier = 1;
+        }
+
+
+        glViewport(200 * multiplier, 0, window.getWidth() * multiplier, window.getHeight() * multiplier);
         
         shaderProgram.bind();
 
         // Update projection Matrix
-        Matrix4f projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, window.getWidth(), window.getHeight(), Constants.Z_NEAR, Constants.Z_FAR);
+        Matrix4f projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, window.getWidth() * multiplier, window.getHeight() * multiplier, Constants.Z_NEAR, Constants.Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
         // Update view Matrix
@@ -83,12 +92,12 @@ public class Renderer {
         
         
         
-        glViewport(0,0,200,200);
+        glViewport(0,0,200 * multiplier,200 * multiplier);
                 
         shaderProgram.bind();
 
         // Update projection Matrix
-        projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, 200, 200, Constants.Z_NEAR, Constants.Z_FAR);
+        projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, 200 * multiplier , 200 * multiplier, Constants.Z_NEAR, Constants.Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
         // Update view Matrix
