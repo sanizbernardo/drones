@@ -10,8 +10,8 @@ import datatypes.*;
 
 public class PhysicsEngine {
 			
-	private final float gravity, weight, wingLiftSlope, horStabLiftSlope, verStabLiftSlope, tailSize, wingX;
-	private final Vector weightVector;
+	private final float gravity, weight, wingLiftSlope, horStabLiftSlope, verStabLiftSlope, tailSize, wingX, engineZ;
+	private final Vector weightVector; //posRW, posLW, posE, posT, velRW, velLW, velE, velT, accRW, accLW, accE, accT;
 	private final Matrix inertiaInv;
 	
 	public PhysicsEngine(AutopilotConfig config) {
@@ -24,7 +24,7 @@ public class PhysicsEngine {
 		
 		float tailMass = config.getTailMass(), engineMass = config.getEngineMass(), wingMass = config.getWingMass();
 		
-		float engineZ = tailMass / engineMass * tailSize;
+		this.engineZ = tailMass / engineMass * tailSize;
 		
 		this.weight = wingMass*2 + engineMass + tailMass;
 		this.weightVector = new BasicVector(new double[] {0, -gravity * weight, 0});
@@ -37,13 +37,23 @@ public class PhysicsEngine {
 				0, 			0,						1/inertiaZ});
 	}
 	
+	float getEngineZ() {
+		return this.engineZ;
+	}
+	
+	public Matrix transMat(Drone drone) {
+		return buildTransformMatrix(drone.getPitch(), drone.getYaw(), drone.getRoll());
+	}
+	
+	public Matrix transMatInv(Drone drone) {
+		return new GaussJordanInverter(transMat(drone)).inverse();
+	}
 	
 	/**
 	 * wing inclinations are already updated
 	 */
 	public void update(float dt, Drone drone) {
-		Matrix transMat = buildTransformMatrix(drone.getPitch(), drone.getHeading(), drone.getRoll());
-		Matrix transMatInv = (new GaussJordanInverter(transMat)).inverse();
+		
 		
 		// acceleration calculation
 		
@@ -51,9 +61,9 @@ public class PhysicsEngine {
 				horStabInclination = drone.getHorStabInclination(), verStabInclination = drone.getVerStabInclination();
 		Vector oldVel = drone.getVelocity();
 		
-		Vector weightVectorD = transMat.multiply(weightVector),
+		Vector weightVectorD = transMat(drone).multiply(weightVector),
 				thrustVectorD = new BasicVector(new double[] {0, 0, -drone.getThrust()}),
-				relVelD = transMat.multiply(oldVel),
+				relVelD = transMat(drone).multiply(oldVel),
 				leftWingAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) leftWingInclination), -Math.cos((double) leftWingInclination)}),
 				rightWingAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) rightWingInclination), -Math.cos((double) rightWingInclination)}),
 				horStabAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) horStabInclination), -Math.cos((double) horStabInclination)}),
@@ -78,7 +88,7 @@ public class PhysicsEngine {
 				verStabLiftD = verStabNormalVectorD.multiply(verStabLiftSlope * verProjVelD.innerProduct(verProjVelD) * verStabAOA);
 		
 		Vector accelerationD = weightVectorD.add(thrustVectorD).add(leftWingLiftD).add(rightWingLiftD).add(horStabLiftD).add(verStabLiftD).divide(weight);
-		Vector acceleration = transMatInv.multiply(accelerationD);
+		Vector acceleration = transMatInv(drone).multiply(accelerationD);
 		
 		// rotation calculation
 		
@@ -130,5 +140,158 @@ public class PhysicsEngine {
 		return new BasicVector(new double[]{x, y, z});
 	}
 	
+	public Vector posRW(Drone drone) {
+		double  x = drone.getPosition().get(0) + wingX,
+				y = drone.getPosition().get(1),
+				z = drone.getPosition().get(2);
+		return new BasicVector(new double[]{x, y, z});
+	}
+	
+	public Vector posLW(Drone drone) {
+		double  x = drone.getPosition().get(0) - wingX,
+				y = drone.getPosition().get(1),
+				z = drone.getPosition().get(2);
+		return new BasicVector(new double[]{x, y, z});
+	}
+	
+	public Vector posE(Drone drone) {
+		double  x = drone.getPosition().get(0),
+				y = drone.getPosition().get(1),
+				z = drone.getPosition().get(2) - engineZ;
+		return new BasicVector(new double[]{x, y, z});
+	}
+	
+	public Vector posT(Drone drone) {
+		double  x = drone.getPosition().get(0),
+				y = drone.getPosition().get(1),
+				z = drone.getPosition().get(2) + tailSize;
+		return new BasicVector(new double[]{x, y, z});
+	}
+	
+	public Vector relPosRW(Drone drone) {
+		double  x = wingX,
+				y = 0,
+				z = 0;
+		return new BasicVector(new double[]{x, y, z});
+	}
+	
+	public Vector relPosLW(Drone drone) {
+		double  x = -wingX,
+				y = 0,
+				z = 0;
+		return new BasicVector(new double[]{x, y, z});
+	}
+	
+	public Vector relPosE(Drone drone) {
+		double  x = 0,
+				y = 0,
+				z = -engineZ;
+		return new BasicVector(new double[]{x, y, z});
+	}
+	
+	public Vector relPosT(Drone drone) {
+		double  x = 0,
+				y = 0,
+				z = tailSize;
+		return new BasicVector(new double[]{x, y, z});
+	}
+	
+	public Vector angularVelocity(Drone drone) {
+		Vector numerator = crossProduct(drone.getPosition(),drone.getVelocity());
+		double denominator = drone.getPosition().innerProduct(drone.getPosition());
+		return numerator.multiply(1/denominator);
+	}
+	
+	public Vector velRW(Drone drone) {
+		return drone.getVelocity().add(crossProduct(this.angularVelocity(drone), this.relPosRW(drone)));
+	}
+	
+	public Vector velLW(Drone drone) {
+		return drone.getVelocity().add(crossProduct(this.angularVelocity(drone), this.relPosLW(drone)));
+	}
+	
+	public Vector velE(Drone drone) {
+		return drone.getVelocity().add(crossProduct(this.angularVelocity(drone), this.relPosE(drone)));
+	}
+	
+	public Vector velT(Drone drone) {
+		return drone.getVelocity().add(crossProduct(this.angularVelocity(drone), this.relPosT(drone)));
+	}
+	
+	public float radius(Drone drone) {
+		return (float) Math.sqrt(Math.pow(drone.getPosition().get(0), 2 )+Math.pow(drone.getPosition().get(1), 2 )
+		+Math.pow(drone.getPosition().get(2), 2 ));
+	}
+	
+	public Vector accelerationD(Drone drone) {
+		float leftWingInclination = drone.getLeftWingInclination(), rightWingInclination = drone.getRightWingInclination(),
+				horStabInclination = drone.getHorStabInclination(), verStabInclination = drone.getVerStabInclination();
+		Vector oldVel = drone.getVelocity();
+		
+		Vector weightVectorD = transMat(drone).multiply(weightVector),
+				thrustVectorD = new BasicVector(new double[] {0, 0, -drone.getThrust()}),
+				relVelD = transMat(drone).multiply(oldVel),
+				leftWingAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) leftWingInclination), -Math.cos((double) leftWingInclination)}),
+				rightWingAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) rightWingInclination), -Math.cos((double) rightWingInclination)}),
+				horStabAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) horStabInclination), -Math.cos((double) horStabInclination)}),
+				verStabAttackVectorD = new BasicVector(new double[] {-Math.sin((double) verStabInclination), 0, -Math.cos((double) verStabInclination)}),
+				leftWingNormalVectorD = new BasicVector(new double[] {0, Math.cos((double) leftWingInclination), Math.sin((double) leftWingInclination)}),
+				rightWingNormalVectorD = new BasicVector(new double[] {0, Math.cos((double) rightWingInclination), Math.sin((double) rightWingInclination),}),
+				horStabNormalVectorD = new BasicVector(new double[] {0, Math.cos((double) horStabInclination), Math.sin((double) horStabInclination),}),
+				verStabNormalVectorD = new BasicVector(new double[] {-Math.cos((double) verStabInclination), 0, Math.sin((double) verStabInclination)});
+		
+		Vector horProjVelD = new BasicVector(new double[] {0, relVelD.get(1), relVelD.get(2)}),
+				verProjVelD = new BasicVector(new double[] {relVelD.get(0),0, relVelD.get(2)});
+		
+		float leftWingAOA = (float) -Math.atan2(horProjVelD.innerProduct(leftWingNormalVectorD), horProjVelD.innerProduct(leftWingAttackVectorD)),
+				rightWingAOA = (float) -Math.atan2(horProjVelD.innerProduct(rightWingNormalVectorD), horProjVelD.innerProduct(rightWingAttackVectorD)),
+				horStabAOA = (float) -Math.atan2(horProjVelD.innerProduct(horStabNormalVectorD), horProjVelD.innerProduct(horStabAttackVectorD)),
+				verStabAOA = (float) -Math.atan2(verProjVelD.innerProduct(verStabNormalVectorD), verProjVelD.innerProduct(verStabAttackVectorD));
+		
+		
+		Vector leftWingLiftD = leftWingNormalVectorD.multiply(wingLiftSlope * horProjVelD.innerProduct(horProjVelD) * leftWingAOA),
+				rightWingLiftD = rightWingNormalVectorD.multiply(wingLiftSlope * horProjVelD.innerProduct(horProjVelD) * rightWingAOA),
+				horStabLiftD = horStabNormalVectorD.multiply(horStabLiftSlope * horProjVelD.innerProduct(horProjVelD) * horStabAOA),
+				verStabLiftD = verStabNormalVectorD.multiply(verStabLiftSlope * verProjVelD.innerProduct(verProjVelD) * verStabAOA);
+		
+		return weightVectorD.add(thrustVectorD).add(leftWingLiftD).add(rightWingLiftD).add(horStabLiftD).add(verStabLiftD).divide(weight);
+	}
+	
+	public Vector tanAcc(Drone drone) {
+		Vector numerator = drone.getVelocity();
+		double denominator = Math.sqrt(drone.getVelocity().innerProduct(drone.getVelocity()));
+		Vector normVel = numerator.multiply(1/denominator);
+		return crossProduct(accelerationD(drone), normVel);
+	}
+	
+	public Vector angularAcceleration(Drone drone) {
+		Vector numerator = tanAcc(drone);
+		double denominator = radius(drone);
+		return numerator.multiply(1/denominator);
+	}
+	
+	public Vector acceleration(Drone drone) {
+		return transMatInv(drone).multiply(accelerationD(drone));
+	}
+
+	public Vector accRW(Drone drone) {
+		return acceleration(drone).add(crossProduct(angularVelocity(drone), crossProduct(angularVelocity(drone), relPosRW(drone)))
+				.add(crossProduct(angularAcceleration(drone), relPosLW(drone))));
+	}
+	
+	public Vector accLW(Drone drone) {
+		return acceleration(drone).add(crossProduct(angularVelocity(drone), crossProduct(angularVelocity(drone), relPosRW(drone)))
+				.add(crossProduct(angularAcceleration(drone), relPosLW(drone))));
+	}
+	
+	public Vector accE(Drone drone) {
+		return acceleration(drone).add(crossProduct(angularVelocity(drone), crossProduct(angularVelocity(drone), relPosRW(drone)))
+				.add(crossProduct(angularAcceleration(drone), relPosLW(drone))));
+	}
+	
+	public Vector accT(Drone drone) {
+		return acceleration(drone).add(crossProduct(angularVelocity(drone), crossProduct(angularVelocity(drone), relPosRW(drone)))
+				.add(crossProduct(angularAcceleration(drone), relPosLW(drone))));
+	}
 	
 }
