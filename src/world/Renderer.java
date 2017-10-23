@@ -104,8 +104,8 @@ public class Renderer {
         viewMatrix = transformation.getViewMatrix(droneCamera);
 
         // Render each gameItem
-        for(GameItem gameItem : gameItems) {
-            // Set model view matrix for this item
+        for (int i = 0; i < gameItems.length - 3; i++) {
+            GameItem gameItem = gameItems[i];
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
             // Render the mes for this game item
