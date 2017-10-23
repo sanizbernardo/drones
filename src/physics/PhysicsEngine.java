@@ -54,63 +54,29 @@ public class PhysicsEngine {
 	 */
 	public void update(float dt, Drone drone) {
 		
-		
-		// acceleration calculation
-		
-		float leftWingInclination = drone.getLeftWingInclination(), rightWingInclination = drone.getRightWingInclination(),
-				horStabInclination = drone.getHorStabInclination(), verStabInclination = drone.getVerStabInclination();
 		Vector oldVel = drone.getVelocity();
-		
-		Vector weightVectorD = transMat(drone).multiply(weightVector),
-				thrustVectorD = new BasicVector(new double[] {0, 0, -drone.getThrust()}),
-				relVelD = transMat(drone).multiply(oldVel),
-				leftWingAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) leftWingInclination), -Math.cos((double) leftWingInclination)}),
-				rightWingAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) rightWingInclination), -Math.cos((double) rightWingInclination)}),
-				horStabAttackVectorD = new BasicVector(new double[] {0, Math.sin((double) horStabInclination), -Math.cos((double) horStabInclination)}),
-				verStabAttackVectorD = new BasicVector(new double[] {-Math.sin((double) verStabInclination), 0, -Math.cos((double) verStabInclination)}),
-				leftWingNormalVectorD = new BasicVector(new double[] {0, Math.cos((double) leftWingInclination), Math.sin((double) leftWingInclination)}),
-				rightWingNormalVectorD = new BasicVector(new double[] {0, Math.cos((double) rightWingInclination), Math.sin((double) rightWingInclination),}),
-				horStabNormalVectorD = new BasicVector(new double[] {0, Math.cos((double) horStabInclination), Math.sin((double) horStabInclination),}),
-				verStabNormalVectorD = new BasicVector(new double[] {-Math.cos((double) verStabInclination), 0, Math.sin((double) verStabInclination)});
-		
-		Vector horProjVelD = new BasicVector(new double[] {0, relVelD.get(1), relVelD.get(2)}),
-				verProjVelD = new BasicVector(new double[] {relVelD.get(0),0, relVelD.get(2)});
-		
-		float leftWingAOA = (float) -Math.atan2(horProjVelD.innerProduct(leftWingNormalVectorD), horProjVelD.innerProduct(leftWingAttackVectorD)),
-				rightWingAOA = (float) -Math.atan2(horProjVelD.innerProduct(rightWingNormalVectorD), horProjVelD.innerProduct(rightWingAttackVectorD)),
-				horStabAOA = (float) -Math.atan2(horProjVelD.innerProduct(horStabNormalVectorD), horProjVelD.innerProduct(horStabAttackVectorD)),
-				verStabAOA = (float) -Math.atan2(verProjVelD.innerProduct(verStabNormalVectorD), verProjVelD.innerProduct(verStabAttackVectorD));
-		
-		
-		Vector leftWingLiftD = leftWingNormalVectorD.multiply(wingLiftSlope * horProjVelD.innerProduct(horProjVelD) * leftWingAOA),
-				rightWingLiftD = rightWingNormalVectorD.multiply(wingLiftSlope * horProjVelD.innerProduct(horProjVelD) * rightWingAOA),
-				horStabLiftD = horStabNormalVectorD.multiply(horStabLiftSlope * horProjVelD.innerProduct(horProjVelD) * horStabAOA),
-				verStabLiftD = verStabNormalVectorD.multiply(verStabLiftSlope * verProjVelD.innerProduct(verProjVelD) * verStabAOA);
-		
-		Vector accelerationD = weightVectorD.add(thrustVectorD).add(leftWingLiftD).add(rightWingLiftD).add(horStabLiftD).add(verStabLiftD).divide(weight);
-		Vector acceleration = transMatInv(drone).multiply(accelerationD);
 		
 		// rotation calculation
 		
-		Vector wingForce = rightWingLiftD.subtract(leftWingLiftD),
-				tailForce = horStabLiftD.add(verStabLiftD);
-		
-		Vector wingTorque = new BasicVector(new double[]{0, wingX * wingForce.get(2), -wingX * wingForce.get(1)}),
-				tailTorque = crossProduct(new BasicVector(new double[]{0, 0, tailSize}), tailForce);
-		
-		Vector rotAcceleration = inertiaInv.multiply(wingTorque.add(tailTorque));		
+//		Vector wingForce = rightWingLiftD.subtract(leftWingLiftD),
+//				tailForce = horStabLiftD.add(verStabLiftD);
+//		
+//		Vector wingTorque = new BasicVector(new double[]{0, wingX * wingForce.get(2), -wingX * wingForce.get(1)}),
+//				tailTorque = crossProduct(new BasicVector(new double[]{0, 0, tailSize}), tailForce);
+//		
+//		Vector rotAcceleration = inertiaInv.multiply(wingTorque.add(tailTorque));		
 
 		// position/orientation update
 		// newx = a/2*t� + v*t + x
 		
-		drone.setPosition(drone.getPosition().add(oldVel.multiply(dt)).add(acceleration.multiply(dt*dt/2)));
-		drone.setOrientation(drone.getOrientation().add(drone.getRotation().multiply(dt)).add(rotAcceleration.multiply(dt*dt/2)));
+		drone.setPosition(drone.getPosition().add(oldVel.multiply(dt)).add(acceleration(drone).multiply(dt*dt/2)));
+		drone.setOrientation(drone.getOrientation().add(drone.getRotation().multiply(dt)).add(angularAcceleration(drone).multiply(dt*dt/2)));
 		
 		// velocity/rotation update
 		// newv = a*t + v
 		
-		drone.setVelocity(oldVel.add(acceleration.multiply(dt)));
-		drone.setRotation(drone.getRotation().add(rotAcceleration.multiply(dt)));
+		drone.setVelocity(oldVel.add(acceleration(drone).multiply(dt)));
+		drone.setRotation(drone.getRotation().add(angularAcceleration(drone).multiply(dt)));
 	}
 	
 	public static Matrix buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
