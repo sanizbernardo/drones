@@ -147,7 +147,7 @@ public class TestWorld implements IWorldRules {
      */
     @Override
     public void update(float interval, MouseInput mouseInput) {
-//    	physicsEngine.update(interval/10, drone);
+    	physicsEngine.update(interval/10, drone);
     	
     	Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
     	
@@ -157,8 +157,7 @@ public class TestWorld implements IWorldRules {
     	
     	// Update camera position
         freeCamera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
-        droneCamera.movePosition(deltaPos.x, deltaPos.y, deltaPos.z);
-        
+        droneCamera.setPosition(newDronePos.x*2, newDronePos.y*2, newDronePos.z*2);
         
         for (int i = 20; i < 23; i++) {
             gameItems[i].setPosition((float)drone.getPosition().get(0),(float)drone.getPosition().get(1),(float)drone.getPosition().get(2));
