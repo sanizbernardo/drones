@@ -139,6 +139,10 @@ public class Drone {
     	return (float) orientation.get(0);
     }
     
+    public float getHeading() {
+    	return 0f;
+    }
+    
     public float getYaw() {
     	return (float) orientation.get(1);
     }
