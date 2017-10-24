@@ -127,24 +127,28 @@ public class TestWorld implements IWorldRules {
     @Override
     public void input(Window window, MouseInput mouseInput) {
         cameraInc.set(0, 0, 0);
+        int mult = 1;
+        if(window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+            mult = 5;
+        }
         if (window.isKeyPressed(GLFW_KEY_C)) {
             ImageCreator img = new ImageCreator();
             img.screenShot();
         }
         if (window.isKeyPressed(GLFW_KEY_W)) {
-            cameraInc.z = -1;
+            cameraInc.z = -1 * mult;
         } else if (window.isKeyPressed(GLFW_KEY_S)) {
-            cameraInc.z = 1;
+            cameraInc.z = 1 * mult;
         }
         if (window.isKeyPressed(GLFW_KEY_A)) {
-            cameraInc.x = -1;
+            cameraInc.x = -1 * mult;
         } else if (window.isKeyPressed(GLFW_KEY_D)) {
-            cameraInc.x = 1;
+            cameraInc.x = 1 * 5;
         }
         if (window.isKeyPressed(GLFW_KEY_Z)) {
-            cameraInc.y = -1;
+            cameraInc.y = -1 * mult;
         } else if (window.isKeyPressed(GLFW_KEY_X)) {
-            cameraInc.y = 1;
+            cameraInc.y = 1 * mult;
         }
     }
 
@@ -153,7 +157,7 @@ public class TestWorld implements IWorldRules {
      */
     @Override
     public void update(float interval, MouseInput mouseInput) {
-    	physicsEngine.update(interval/10, drone);
+    	physicsEngine.update(interval, drone);
     	
     	Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
     	
