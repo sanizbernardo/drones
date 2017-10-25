@@ -59,43 +59,42 @@ public class Cube {
 
     public void setColours() {
         this.colours = new float[]{
-            //Face 1 (front)
-            0.0f, 0.15f, 0.0f,
-            0.0f, 0.15f, 0.0f,
-            0.0f, 0.15f, 0.0f,
-            0.0f, 0.15f, 0.0f,
+            //Face 1 (front) pos Z
+            0.7f, 0.0f, 0.0f,
+            0.7f, 0.0f, 0.0f,
+            0.7f, 0.0f, 0.0f,
+            0.7f, 0.0f, 0.0f,
 
+            //Face 2 (top) pos Y
+            1f,0f,0f,
+            1f,0f,0f,
+            1f,0f,0f,
+            1f,0f,0f,
 
-            //Face 2 (top)
-            0.3f, 0.0f, 0.0f,
-            0.3f, 0.0f, 0.0f,
-            0.3f, 0.0f, 0.0f,
-            0.3f, 0.0f, 0.0f,
-
-            //Face 3 (back)
+            //Face 3 (back) neg Z
             0.45f, 0.0f, 0.0f,
             0.45f, 0.0f, 0.0f,
             0.45f, 0.0f, 0.0f,
             0.45f, 0.0f, 0.0f,
 
-            //Face 4 (bottom)
-            0.6f, 0.0f, 0.0f,
-            0.6f, 0.0f, 0.0f,
-            0.6f, 0.0f, 0.0f,
-            0.6f, 0.0f, 0.0f,
+            //Face 4 (bottom) neg Y
+            0.15f, 0.0f, 0.0f,
+            0.15f, 0.0f, 0.0f,
+            0.15f, 0.0f, 0.0f,
+            0.15f, 0.0f, 0.0f,
 
 
-            //Face 5 (left)
-            0.0f, 0.0f, 0.75f,
-            0.0f, 0.0f, 0.75f,
-            0.0f, 0.0f, 0.75f,
-            0.0f, 0.0f, 0.75f,
+            //Face 5 (left) neg X
+            0.3f, 0.0f, 0.0f,
+            0.3f, 0.0f, 0.0f,
+            0.3f, 0.0f, 0.0f,
+            0.3f, 0.0f, 0.0f,
 
-            //Face 6 (right)
-            1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
+            //Face 6 (right) pos X
+            0.854f, 0.0f, 0.0f,
+            0.854f, 0.0f, 0.0f,
+            0.854f, 0.0f, 0.0f,
+            0.854f, 0.0f, 0.0f,
         };
     }
 
