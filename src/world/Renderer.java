@@ -16,7 +16,7 @@ public class Renderer {
     
     private final int droneCamWidth, droneCamHeight;
     private final float droneCamFOV;
-    
+    private final int multiplier;
     /**
      * Holds the ShaderProgram
      */
@@ -30,6 +30,14 @@ public class Renderer {
         this.droneCamWidth = config.getNbColumns();
         this.droneCamHeight = config.getNbRows();
         this.droneCamFOV = config.getHorizontalAngleOfView();
+
+        String osName = System.getProperty("os.name");
+        if ( osName.contains("Mac") ) {
+            multiplier = 2;
+        } else {
+            multiplier = 1;
+        }
+
     }
 
     public void init(Window window) throws Exception {
@@ -50,13 +58,13 @@ public class Renderer {
     	
     	
     	// background for droneCam
-    	glScissor(0, 0, droneCamWidth, droneCamHeight);
+    	glScissor(0, 0, droneCamWidth * multiplier, droneCamHeight * multiplier);
     	glClearColor(0f, 0f, 0f, 0f);
     	
     	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     	
     	// background for free camera
-    	glScissor(droneCamWidth, 0, window.getWidth(), window.getHeight());
+    	glScissor(droneCamWidth * multiplier, 0, window.getWidth() * multiplier, window.getHeight() * multiplier);
     	glClearColor(.41f, .4f, .4f, 1f);
     	
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -81,14 +89,6 @@ public class Renderer {
     public void render(Window window, Camera freeCamera, Camera droneCamera, GameItem[] gameItems, GameItem[] droneItems) {
         clear(window);
 
-        // Mac magic
-        int multiplier;
-        String osName = System.getProperty("os.name");
-        if ( osName.contains("Mac") ) {
-            multiplier = 2;
-        } else {
-            multiplier = 1;
-        }
 
         // The free camera window
         glViewport(droneCamWidth * multiplier, 0, window.getWidth() * multiplier, window.getHeight() * multiplier);

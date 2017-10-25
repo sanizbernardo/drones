@@ -86,10 +86,27 @@ public class TestWorld implements IWorldRules {
         }
         
         
-        ConfigSetupGUI configSetup = new ConfigSetupGUI();
-        AutopilotConfig config = configSetup.showDialog();
+//        ConfigSetupGUI configSetup = new ConfigSetupGUI();
+//        AutopilotConfig config = configSetup.showDialog();
 
-        
+        AutopilotConfig config = new AutopilotConfig() {
+            public float getGravity() {return 10f;}
+            public float getWingX() {return 2.5f;}
+            public float getTailSize() {return 5f;}
+            public float getEngineMass() {return 70f;}
+            public float getWingMass() {return 25f;}
+            public float getTailMass() {return 30f;}
+            public float getMaxThrust() {return 5000f;}
+            public float getMaxAOA() {return -1f;}
+            public float getWingLiftSlope() {return 0.11f;}
+            public float getHorStabLiftSlope() {return 0.11f;}
+            public float getVerStabLiftSlope() {return 0.11f;}
+            public float getHorizontalAngleOfView() {return (float) Math.toRadians(120f);}
+            public float getVerticalAngleOfView() {return (float) Math.toRadians(120f);}
+            public int getNbColumns() {return 200;}
+            public int getNbRows() {return 200;}};
+
+
         physicsEngine = new PhysicsEngine(config);
         renderer = new Renderer(config);
         renderer.init(window);
