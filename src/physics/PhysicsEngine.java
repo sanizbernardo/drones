@@ -79,7 +79,7 @@ public class PhysicsEngine {
 		// newv = a*t + v
 		
 		drone.setVelocity(oldVel.add(acceleration(drone).multiply(dt)));
-		drone.setRotation(drone.getRotation().add(angularAcceleration(dt, drone).multiply(dt)));
+		drone.setRotation(drone.getRotation().add(angularVelocity(dt, drone)));
 	}
 	
 	public static Matrix buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
@@ -224,7 +224,7 @@ public class PhysicsEngine {
 //	}
 	
 	public Vector angularAcceleration(float dt, Drone drone) {
-		return inertiaInv.multiply(torque(drone).subtract(crossProduct(angularVelocity(dt, drone), inertia.multiply(angularVelocity(dt, drone)))));
+		return inertiaInv.multiply(torque(drone).subtract(crossProduct(drone.getRotation(), inertia.multiply(drone.getRotation()))));
 	}
 	
 	public Vector torque(Drone drone) {
