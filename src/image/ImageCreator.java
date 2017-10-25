@@ -1,7 +1,5 @@
 package image;
 
-import utils.Constants;
-
 import javax.imageio.ImageIO;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -9,12 +7,23 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.ByteBuffer;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_RGB;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glReadPixels;
 
 public class ImageCreator {
-
+	
+	private final int width, height;
+	
+	public ImageCreator(int width, int height) {
+		this.width = width;
+		this.height = height;
+	}
+	
     /**
      * Based on
      */
@@ -76,23 +85,23 @@ public class ImageCreator {
             multiplier = 1;
         }
     	
-    	byte[] pixels = new byte[200 * multiplier * 200 * multiplier * 3];
+    	byte[] pixels = new byte[width * multiplier * height * multiplier * 3];
 
-        ByteBuffer fb = ByteBuffer.allocateDirect(200 * multiplier * 200  * multiplier * 3);
+        ByteBuffer fb = ByteBuffer.allocateDirect(width * multiplier * height  * multiplier * 3);
         
-        glReadPixels(0, 0, 200 * multiplier, 200 * multiplier, GL_RGB, GL_UNSIGNED_BYTE, fb);
+        glReadPixels(0, 0, width * multiplier, height * multiplier, GL_RGB, GL_UNSIGNED_BYTE, fb);
 
-        for (int i=0; i < 200 * multiplier; i++) {
-        	for (int j=0; j < 200 * multiplier; j++) {
-        		pixels[(i*200 * multiplier+j)*3] = fb.get(((200 * multiplier-i-1)*200 * multiplier+j)*3);
-                pixels[(i*200 * multiplier+j)*3+1] = fb.get(((200 * multiplier-i-1)*200 * multiplier+j)*3+1);
-                pixels[(i*200 * multiplier+j)*3+2] = fb.get(((200 * multiplier-i-1)*200 * multiplier+j)*3+2);
+        for (int i=0; i < height * multiplier; i++) {
+        	for (int j=0; j < width * multiplier; j++) {
+        		pixels[(i*height * multiplier+j)*3] = fb.get(((height * multiplier - i - 1)* height * multiplier+j)*3);
+                pixels[(i*height * multiplier+j)*3+1] = fb.get(((height * multiplier - i - 1)* height * multiplier+j)*3+1);
+                pixels[(i*height * multiplier+j)*3+2] = fb.get(((height * multiplier - i - 1)* height * multiplier+j)*3+2);
         	}
         }
         
 //		for exporting image.
-        BufferedImage imageOut = new BufferedImage(200 * multiplier, 200 * multiplier, BufferedImage.TYPE_3BYTE_BGR);
-		imageOut.getRaster().setDataElements(0, 0, 200 * multiplier, 200 * multiplier, pixels);
+        BufferedImage imageOut = new BufferedImage(width * multiplier, height * multiplier, BufferedImage.TYPE_3BYTE_BGR);
+		imageOut.getRaster().setDataElements(0, 0, width * multiplier, height * multiplier, pixels);
         
         try {
             ImageIO.write(imageOut, "png" , new File("ss.png"));

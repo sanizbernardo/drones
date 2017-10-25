@@ -96,7 +96,7 @@ public class ConfigSetupGUI extends JDialog {
 			}
 			
 			public float getVerticalAngleOfView() {
-				return (float) (Math.PI * (int) verFOVSpinner.getValue() / 180d);
+				return (float) (Math.toRadians((int) verFOVSpinner.getValue()));
 			}
 			
 			public float getVerStabLiftSlope() {
@@ -124,11 +124,11 @@ public class ConfigSetupGUI extends JDialog {
 			}
 			
 			public float getMaxAOA() {
-				return (float) (Math.PI * (int) maxAOASpinner.getValue() / 180d);
+				return (float) (Math.toRadians((int) maxAOASpinner.getValue()));
 			}
 			
 			public float getHorizontalAngleOfView() {
-				return (float) (Math.PI * (int) horFOVSpinner.getValue() / 180d);
+				return (float) (Math.toRadians((int) horFOVSpinner.getValue()));
 			}
 			
 			public float getHorStabLiftSlope() {

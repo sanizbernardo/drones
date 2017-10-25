@@ -3,27 +3,33 @@ package world;
 import static org.lwjgl.opengl.GL11.*;
 
 import engine.Window;
-import engine.graph.Camera;
-import engine.graph.ShaderProgram;
-import engine.graph.Transformation;
+import engine.graph.*;
 import org.joml.Matrix4f;
-import utils.Constants;
-import utils.Utils;
+
+import datatypes.AutopilotConfig;
+import utils.*;
 
 public class Renderer {
 
     private final Transformation transformation;
 
+    
+    private final int droneCamWidth, droneCamHeight;
+    private final float droneCamFOV;
+    
     /**
      * Holds the ShaderProgram
      */
     private ShaderProgram shaderProgram;
-
+    
     /**
      * Holds the basic functionalities for the
      */
-    public Renderer() {
-        transformation = new Transformation();
+    public Renderer(AutopilotConfig config) {
+        this.transformation = new Transformation();
+        this.droneCamWidth = config.getNbColumns();
+        this.droneCamHeight = config.getNbRows();
+        this.droneCamFOV = config.getHorizontalAngleOfView();
     }
 
     public void init(Window window) throws Exception {
@@ -39,25 +45,43 @@ public class Renderer {
         shaderProgram.createUniform("modelViewMatrix");
     }
 
-    public void clear() {
+    public void clear(Window window) {
+    	glEnable(GL_SCISSOR_TEST);
+    	
+    	
+    	// background for droneCam
+    	glScissor(0, 0, droneCamWidth, droneCamHeight);
+    	glClearColor(0f, 0f, 0f, 0f);
+    	
+    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    	
+    	// background for free camera
+    	glScissor(droneCamWidth, 0, window.getWidth(), window.getHeight());
+    	glClearColor(.41f, .4f, .4f, 1f);
+    	
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        glDisable(GL_SCISSOR_TEST);
     }
 
     /**
      * Render all the gameObjects
      * @param window
      *        The window in which to render
+     * @param freeCamera
+     * 		  The free moving camera
+     * @param droneCamera
+     * 		  The camera attached to the drone
      * @param gameItems
-     *        All game items that need rendering
+     *        All game items that need rendering that are not a part of the drone
+     * @param droneItems
+     * 		  The game items that are part of the drone
+     * 		  (wich will not be rendered on the droneCam view)
      */
-    public void render(Window window, Camera freeCamera, Camera droneCamera, GameItem[] gameItems) {
-        clear();
+    public void render(Window window, Camera freeCamera, Camera droneCamera, GameItem[] gameItems, GameItem[] droneItems) {
+        clear(window);
 
-//        if (window.isResized()) {
-//            glViewport(200, 0, window.getWidth(), window.getHeight());
-//            window.setResized(false);
-//        }
-
+        // Mac magic
         int multiplier;
         String osName = System.getProperty("os.name");
         if ( osName.contains("Mac") ) {
@@ -66,13 +90,13 @@ public class Renderer {
             multiplier = 1;
         }
 
-
-        glViewport(200 * multiplier, 0, window.getWidth() * multiplier, window.getHeight() * multiplier);
+        // The free camera window
+        glViewport(droneCamWidth * multiplier, 0, window.getWidth() * multiplier, window.getHeight() * multiplier);
         
         shaderProgram.bind();
 
         // Update projection Matrix
-        Matrix4f projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, window.getWidth() * multiplier, window.getHeight() * multiplier, Constants.Z_NEAR, Constants.Z_FAR);
+        Matrix4f projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, (droneCamWidth - window.getWidth()) * multiplier, window.getHeight() * multiplier, Constants.Z_NEAR, Constants.Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
         // Update view Matrix
@@ -83,32 +107,40 @@ public class Renderer {
             // Set model view matrix for this item
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
-            // Render the mes for this game item
+            // Render the mesh for this game item
             gameItem.getMesh().render();
         }
+        
+        // Render each droneItem
+        for(GameItem droneItem: droneItems) {
+        	// Set model view matrix for this item
+        	Matrix4f modelViewMatrix = transformation.getModelViewMatrix(droneItem, viewMatrix);
+            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+            // Render the mesh for this game item
+            droneItem.getMesh().render();
+		}
 
         shaderProgram.unbind();
         
         
         
-        
-        glViewport(0,0,200 * multiplier,200 * multiplier);
+        // The droneCam window
+        glViewport(0,0,droneCamWidth * multiplier,droneCamHeight * multiplier);
                 
         shaderProgram.bind();
 
         // Update projection Matrix
-        projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, 200 * multiplier , 200 * multiplier, Constants.Z_NEAR, Constants.Z_FAR);
+        projectionMatrix = transformation.getProjectionMatrix(droneCamFOV, droneCamWidth * multiplier , droneCamHeight * multiplier, Constants.Z_NEAR, Constants.Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
         // Update view Matrix
         viewMatrix = transformation.getViewMatrix(droneCamera);
 
         // Render each gameItem
-        for (int i = 0; i < gameItems.length - 3; i++) {
-            GameItem gameItem = gameItems[i];
+        for (GameItem gameItem : gameItems) {
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
-            // Render the mes for this game item
+            // Render the mesh for this game item
             gameItem.getMesh().render();
         }
 

@@ -5,11 +5,10 @@ import datatypes.AutopilotConfig;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
+import gui.ConfigSetupGUI;
 import image.ImageCreator;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-
-import com.sun.xml.internal.bind.v2.model.util.ArrayInfoUtil;
 
 import physics.Drone;
 import physics.PhysicsEngine;
@@ -19,7 +18,6 @@ import world.drone.DroneMesh;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -35,7 +33,7 @@ public class TestWorld implements IWorldRules {
     /**
      * The renderer that is rendering this world
      */
-    private final Renderer renderer;
+    private Renderer renderer;
 
     /**
      * A camera that defines what we see. An OpenGL camera cannot move on its own, so we move
@@ -47,13 +45,12 @@ public class TestWorld implements IWorldRules {
     /**
      * A list of all the GameItems.
      */
-    private GameItem[] gameItems;
+    private GameItem[] gameItems, droneItems;
 
     /**
      * Create the renderer of this world
      */
     public TestWorld() {
-        renderer = new Renderer();
         freeCamera = new Camera();
         droneCamera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
@@ -61,63 +58,53 @@ public class TestWorld implements IWorldRules {
 
     private PhysicsEngine physicsEngine;
     private Drone drone;
-    private Vector3f oldDronePos;
+    
+    
+    private ImageCreator imageCreator;
 
+    
     /**
      * Init
      */
     @Override
     public void init(Window window) throws Exception {
-        renderer.init(window);
-
+    	
         Cube redCube = new Cube();
-        gameItems = new GameItem[17000];
+        gameItems = new GameItem[10000];
 
         Random rand = new Random();
 
         for(int i = 0; i<gameItems.length; i++) {
-            GameItem cube2 = new GameItem(redCube.getMesh());
-            cube2.setScale(0.5f);
-            int x =  (rand.nextInt(100) - 50);
-            int y = (rand.nextInt(100) - 50);
-            int z = (rand.nextInt(100) - 50);
-            cube2.setPosition(x, y, z);
-            gameItems[i] = cube2;
+            GameItem cube = new GameItem(redCube.getMesh());
+            cube.setScale(0.5f);
+            int x = rand.nextInt(200)-100,
+            		y = rand.nextInt(200)-100,
+            		z = rand.nextInt(200)-100;
+            
+            cube.setPosition(x, y, z);
+            gameItems[i] = cube;
         }
         
+        
+        ConfigSetupGUI configSetup = new ConfigSetupGUI();
+        AutopilotConfig config = configSetup.showDialog();
 
-        AutopilotConfig config = new AutopilotConfig() {
-            public float getGravity() {return 10f;}
-            public float getWingX() {return 2.5f;}
-            public float getTailSize() {return 5f;}
-            public float getEngineMass() {return 70f;}
-            public float getWingMass() {return 25f;}
-            public float getTailMass() {return 30f;}
-            public float getMaxThrust() {return 5000f;}
-            public float getMaxAOA() {return -1f;}
-            public float getWingLiftSlope() {return 0.11f;}
-            public float getHorStabLiftSlope() {return 0.11f;}
-            public float getVerStabLiftSlope() {return 0.11f;}
-            public float getHorizontalAngleOfView() {return -1f;}
-            public float getVerticalAngleOfView() {return -1f;}
-            public int getNbColumns() {return -1;}
-            public int getNbRows() {return -1;}};
-
+        
         physicsEngine = new PhysicsEngine(config);
+        renderer = new Renderer(config);
+        renderer.init(window);
+        
+        imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows());
 
         drone = new Drone(config);
         drone.setThrust(2000f);
-        
-        oldDronePos = new Vector3f(0,0,0); // should be get initial position
-        
+       
         DroneMesh droneMesh = new DroneMesh(drone);
         GameItem left = new GameItem(droneMesh.getLeft());
         GameItem right = new GameItem(droneMesh.getRight());
         GameItem body = new GameItem(droneMesh.getBody());
 
-        gameItems[gameItems.length-3] = left;
-        gameItems[gameItems.length-2] = right;
-        gameItems[gameItems.length-1] = body;
+        droneItems = new GameItem[]{left, right, body};
         
     }
 
@@ -132,8 +119,7 @@ public class TestWorld implements IWorldRules {
             mult = 5;
         }
         if (window.isKeyPressed(GLFW_KEY_C)) {
-            ImageCreator img = new ImageCreator();
-            img.screenShot();
+            imageCreator.screenShot();
         }
         if (window.isKeyPressed(GLFW_KEY_W)) {
             cameraInc.z = -1 * mult;
@@ -141,9 +127,9 @@ public class TestWorld implements IWorldRules {
             cameraInc.z = 1 * mult;
         }
         if (window.isKeyPressed(GLFW_KEY_A)) {
-            cameraInc.x = -1 * mult;
+            cameraInc.x = 1 * mult;
         } else if (window.isKeyPressed(GLFW_KEY_D)) {
-            cameraInc.x = 1 * 5;
+            cameraInc.x = -1 * mult;
         }
         if (window.isKeyPressed(GLFW_KEY_Z)) {
             cameraInc.y = -1 * mult;
@@ -157,20 +143,17 @@ public class TestWorld implements IWorldRules {
      */
     @Override
     public void update(float interval, MouseInput mouseInput) {
-    	physicsEngine.update(interval, drone);
+//    	physicsEngine.update(interval, drone);
     	
     	Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
     	
-    	Vector3f deltaPos = newDronePos.sub(oldDronePos);
-    	
-    	oldDronePos = new Vector3f(newDronePos);
-    	
     	// Update camera position
         freeCamera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
-        droneCamera.setPosition(newDronePos.x*2, newDronePos.y*2, newDronePos.z*2);
+        droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
         
-        for (int i = gameItems.length - 3; i < gameItems.length; i++) {
-            gameItems[i].setPosition((float)drone.getPosition().get(0),(float)drone.getPosition().get(1),(float)drone.getPosition().get(2));
+        // Update the position of each drone item
+        for (GameItem droneItem : droneItems) {
+            droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
         }
 
         // Update camera based on mouse
@@ -185,7 +168,7 @@ public class TestWorld implements IWorldRules {
      */
     @Override
     public void render(Window window) {
-        renderer.render(window, freeCamera, droneCamera, gameItems);
+    	renderer.render(window, freeCamera, droneCamera, gameItems, droneItems);
     }
 
     /**
