@@ -32,7 +32,7 @@ public class ConfigSetupGUI extends JDialog {
 	 * Create the frame.
 	 */
 	public ConfigSetupGUI() {
-		Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();		
+		Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 		int screenWidth = (int) screen.getWidth();
 		int screenHeight = (int) screen.getHeight();
 		int windowWidth = 650; // => 650

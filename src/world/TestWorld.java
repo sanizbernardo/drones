@@ -80,12 +80,12 @@ public class TestWorld implements IWorldRules {
             int x = rand.nextInt(200)-100,
             		y = rand.nextInt(200)-100,
             		z = rand.nextInt(200)-100;
-            
+
             cube.setPosition(x, y, z);
             gameItems[i] = cube;
         }
         
-        
+          //Doesn't work on Mac for some reason
 //        ConfigSetupGUI configSetup = new ConfigSetupGUI();
 //        AutopilotConfig config = configSetup.showDialog();
 
@@ -114,8 +114,10 @@ public class TestWorld implements IWorldRules {
         imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows());
 
         drone = new Drone(config);
-        drone.setThrust(2000f);
-       
+        drone.setThrust(200f);
+        drone.setLeftWingInclination((float)Math.toRadians(0));
+
+
         DroneMesh droneMesh = new DroneMesh(drone);
         GameItem left = new GameItem(droneMesh.getLeft());
         GameItem right = new GameItem(droneMesh.getRight());
@@ -160,17 +162,20 @@ public class TestWorld implements IWorldRules {
      */
     @Override
     public void update(float interval, MouseInput mouseInput) {
-//    	physicsEngine.update(interval, drone);
+    	physicsEngine.update(interval, drone);
     	
     	Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
-    	
+
     	// Update camera position
         freeCamera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
         droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-        
+        droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
+
         // Update the position of each drone item
         for (GameItem droneItem : droneItems) {
             droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
+
+            droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
         }
 
         // Update camera based on mouse
