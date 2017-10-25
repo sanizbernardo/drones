@@ -204,14 +204,22 @@ public class PhysicsEngine {
 	public Vector tanAcc(Drone drone) {
 		Vector numerator = drone.getVelocity();
 		double denominator = Math.sqrt(drone.getVelocity().innerProduct(drone.getVelocity()));
-		Vector normVel = numerator.multiply(1/denominator);
-		return normVel.multiply(accelerationD(drone).innerProduct(normVel));
+		if (denominator != 0) {
+			Vector normVel = numerator.multiply(1/denominator);
+			return normVel.multiply(accelerationD(drone).innerProduct(normVel));
+		} else {
+			return numerator;
+		}
 	}
 	
 	public Vector angularAcceleration(Drone drone) {
 		Vector numerator = tanAcc(drone);
 		double denominator = radius(drone);
-		return numerator.multiply(1/denominator);
+		if (denominator != 0) {
+			return numerator.multiply(1/denominator);
+		} else {
+			return numerator; 
+		}
 	}
 	
 	public Vector acceleration(Drone drone) {
