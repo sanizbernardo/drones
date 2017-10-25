@@ -10,6 +10,8 @@ import image.ImageCreator;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import org.la4j.Vector;
+import org.la4j.vector.dense.BasicVector;
 import physics.Drone;
 import physics.PhysicsEngine;
 import utils.Constants;
@@ -70,21 +72,26 @@ public class TestWorld implements IWorldRules {
     public void init(Window window) throws Exception {
     	
         Cube redCube = new Cube();
-        gameItems = new GameItem[10000];
+        gameItems = new GameItem[1];
 
         Random rand = new Random();
 
-        for(int i = 0; i<gameItems.length; i++) {
-            GameItem cube = new GameItem(redCube.getMesh());
-            cube.setScale(0.5f);
-            int x = rand.nextInt(200)-100,
-            		y = rand.nextInt(200)-100,
-            		z = rand.nextInt(200)-100;
+//        for(int i = 0; i<gameItems.length; i++) {
+//            GameItem cube = new GameItem(redCube.getMesh());
+//            cube.setScale(0.5f);
+//            int x = rand.nextInt(200)-100,
+//            		y = rand.nextInt(200)-100,
+//            		z = rand.nextInt(200)-100;
+//
+//            cube.setPosition(x, y, z);
+//            gameItems[i] = cube;
+//        }
 
-            cube.setPosition(x, y, z);
-            gameItems[i] = cube;
-        }
-        
+
+        gameItems[0] = new GameItem(redCube.getMesh());
+        gameItems[0].setScale(0.5f);
+        gameItems[0].setPosition(0,0,-200);
+
           //Doesn't work on Mac for some reason
 //        ConfigSetupGUI configSetup = new ConfigSetupGUI();
 //        AutopilotConfig config = configSetup.showDialog();
@@ -115,7 +122,7 @@ public class TestWorld implements IWorldRules {
 
         drone = new Drone(config);
         drone.setThrust(200f);
-        drone.setLeftWingInclination((float)Math.toRadians(0));
+        drone.setLeftWingInclination((float)Math.toRadians(40));
 
 
         DroneMesh droneMesh = new DroneMesh(drone);
@@ -135,7 +142,7 @@ public class TestWorld implements IWorldRules {
         cameraInc.set(0, 0, 0);
         int mult = 1;
         if(window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
-            mult = 5;
+            mult = 20;
         }
         if (window.isKeyPressed(GLFW_KEY_C)) {
             imageCreator.screenShot();
@@ -162,7 +169,7 @@ public class TestWorld implements IWorldRules {
      */
     @Override
     public void update(float interval, MouseInput mouseInput) {
-    	physicsEngine.update(interval, drone);
+    	physicsEngine.update(interval/4, drone);
     	
     	Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
 
@@ -177,6 +184,10 @@ public class TestWorld implements IWorldRules {
 
             droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
         }
+
+        gameItems[0].setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
+        gameItems[0].setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
+
 
         // Update camera based on mouse
         if (mouseInput.isRightButtonPressed()) {
