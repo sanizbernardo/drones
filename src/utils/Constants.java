@@ -38,7 +38,7 @@ public class Constants {
     
     
     /**
-     * default setup settings
+     * default config settings
      */
     public static final float DEFAULT_GRAVITY = 9.81f;
     

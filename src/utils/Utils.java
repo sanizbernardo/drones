@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.io.InputStream;
 import java.util.Scanner;
 
+import org.joml.Vector3f;
+import datatypes.*;
+
 public class Utils {
 
     /**
@@ -40,8 +43,60 @@ public class Utils {
     	return new float[]{rgb.getRed()/255f, rgb.getGreen()/255f, rgb.getBlue()/255f};
     }
     
-    public static void main(String[] args) {
-    	
-	}
+    
+    public static AutopilotOutputs buildOutputs(float lwIncl, float rwIncl, float verStabIncl, float horStabIncl, float thrust) {
+    	return new AutopilotOutputs() {
+			public float getVerStabInclination() {
+				return verStabIncl;
+			}
+			public float getThrust() {
+				return thrust;
+			}
+			public float getRightWingInclination() {
+				return rwIncl;
+			}
+			public float getLeftWingInclination() {
+				return lwIncl;
+			}
+			public float getHorStabInclination() {
+				return horStabIncl;
+			}
+		};
+    }
+    
+    
+    public static AutopilotInputs buildInputs(byte[] image, float x, float y, float z, float yaw, float pitch, float roll, float dt) {
+    	return new AutopilotInputs() {
+			public float getZ() {
+				return z;
+			}
+			public float getY() {
+				return y;
+			}
+			public float getX() {
+				return x;
+			}
+			public float getRoll() {
+				return roll;
+			}
+			public float getPitch() {
+				return pitch;
+			}
+			public byte[] getImage() {
+				return image;
+			}
+			public float getHeading() {
+				return yaw;
+			}
+			public float getElapsedTime() {
+				return dt;
+			}
+		};
+    }
+    
+    
+    public static AutopilotInputs buildInputs(byte[] image, Vector3f pos, Vector3f orientation, float dt) {
+    	return buildInputs(image, pos.x, pos.y, pos.z, orientation.y, orientation.x, orientation.z, dt);
+    }
     
 }
