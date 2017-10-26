@@ -10,8 +10,6 @@ import image.ImageCreator;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import org.la4j.Vector;
-import org.la4j.vector.dense.BasicVector;
 import physics.Drone;
 import physics.PhysicsEngine;
 import utils.Constants;
@@ -71,27 +69,31 @@ public class TestWorld implements IWorldRules {
     @Override
     public void init(Window window) throws Exception {
     	
-        Cube redCube = new Cube();
-        gameItems = new GameItem[1];
-
+        Cube redCube = new Cube(0,1f);
+        Cube greenCube = new Cube(120,1f);
+        Cube blueCube = new Cube(240,1f);
+        
+        Cube[] cubes = new Cube[]{redCube, greenCube, blueCube};
+        gameItems = new GameItem[1000];
+        
         Random rand = new Random();
+        
+        for(int i = 0; i<gameItems.length; i++) {
+            GameItem cube = new GameItem(cubes[rand.nextInt(cubes.length)].getMesh());
+            cube.setScale(0.5f);
+            int x1 = rand.nextInt(100)-50,
+            		y = rand.nextInt(100)-50,
+            		z = rand.nextInt(100)-50;
 
-//        for(int i = 0; i<gameItems.length; i++) {
-//            GameItem cube = new GameItem(redCube.getMesh());
-//            cube.setScale(0.5f);
-//            int x = rand.nextInt(200)-100,
-//            		y = rand.nextInt(200)-100,
-//            		z = rand.nextInt(200)-100;
-//
-//            cube.setPosition(x, y, z);
-//            gameItems[i] = cube;
-//        }
-
-
-        gameItems[0] = new GameItem(redCube.getMesh());
-        gameItems[0].setScale(0.5f);
-        gameItems[0].setPosition(0,0,-200);
-
+            cube.setPosition(x1, y, z);
+            gameItems[i] = cube;
+        }
+        
+//        gameItems[0] = new GameItem(redCube.getMesh());
+//        gameItems[0].setScale(0.5f);
+//        gameItems[0].setPosition(0,0,0);
+        
+        
           //Doesn't work on Mac for some reason
 //        ConfigSetupGUI configSetup = new ConfigSetupGUI();
 //        AutopilotConfig config = configSetup.showDialog();
@@ -153,9 +155,9 @@ public class TestWorld implements IWorldRules {
             cameraInc.z = 1 * mult;
         }
         if (window.isKeyPressed(GLFW_KEY_A)) {
-            cameraInc.x = 1 * mult;
-        } else if (window.isKeyPressed(GLFW_KEY_D)) {
             cameraInc.x = -1 * mult;
+        } else if (window.isKeyPressed(GLFW_KEY_D)) {
+            cameraInc.x = 1 * mult;
         }
         if (window.isKeyPressed(GLFW_KEY_Z)) {
             cameraInc.y = -1 * mult;
@@ -173,34 +175,43 @@ public class TestWorld implements IWorldRules {
     public void update(float interval, MouseInput mouseInput) {
 //    	physicsEngine.update(interval/4, drone);
 
-        drone.setOrientation(new BasicVector(new double[]{0,0,i}));
-        i+=0.05f;
+//        drone.setOrientation(new BasicVector(new double[]{0,0,i}));
+//        i+=0.05f;
 
     	Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
 
-    	// Update camera position
+    	
+
+    	/*
+    	 *  Update camera positions
+    	 */
         freeCamera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
-
-        // Update the position of each drone item
-        for (GameItem droneItem : droneItems) {
-            droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-
-            droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
-        }
-
-        droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-        droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
-
-
-        gameItems[0].setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-        gameItems[0].setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
-
 
         // Update camera based on mouse
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
             freeCamera.moveRotation(rotVec.x * Constants.MOUSE_SENSITIVITY, rotVec.y * Constants.MOUSE_SENSITIVITY, 0);
         }
+        
+        droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
+        droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
+
+        
+        
+        
+        // Update the position of each drone item
+        for (GameItem droneItem : droneItems) {
+            droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
+            droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
+        }
+
+        
+
+//        gameItems[0].setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
+//        gameItems[0].setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
+
+
+
 
 //        Vector3f error = droneCamera.getRotation().min(new Vector3f((float)drone.getOrientation().get(0),(float)drone.getOrientation().get(1),(float)drone.getOrientation().get(2)));
 //        System.out.printf("X Error: %s  Y Error: %s     Z Error: %s \n", error.x,error.y,error.z);

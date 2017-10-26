@@ -9,14 +9,14 @@ public class Constants {
     //only for initialization!
     public static final int WIDTH = 1000;
     //only for initialization!
-    public static final int HEIGHT = 660;
+    public static final int HEIGHT = 500;
 
 
     /**
      * Renderer constants
      */
     //Field of View in Radians
-    public static final float FOV = (float) Math.toRadians(60.0f);
+    public static final float FOV = (float) Math.toRadians(90f);
 
     public static final float Z_NEAR = 0.01f;
 
