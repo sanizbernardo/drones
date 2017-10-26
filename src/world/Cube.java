@@ -1,6 +1,7 @@
 package world;
 
 import engine.graph.Mesh;
+import utils.Utils;
 
 public class Cube {
 
@@ -10,9 +11,9 @@ public class Cube {
     private int[] indices;
     private Mesh mesh;
 
-    public Cube(){
+    public Cube(int hue, float saturation){
         setPositions();
-        setColours();
+        setColours(hue, saturation);
         setIndices();
         this.mesh = new Mesh(this.getPositions(), this.getColours(), this.getIndices());
     }
@@ -57,44 +58,50 @@ public class Cube {
         };
     }
 
-    public void setColours() {
+    public void setColours(int hue, float saturation) {
+        float[] posY = Utils.toRGB(hue, saturation, 1.00f),
+        		negY = Utils.toRGB(hue, saturation, 0.15f),
+        		posX = Utils.toRGB(hue, saturation, 0.85f),
+        		negX = Utils.toRGB(hue, saturation, 0.30f),
+        		posZ = Utils.toRGB(hue, saturation, 0.70f),
+        		negZ = Utils.toRGB(hue, saturation, 0.45f);    	
+    	
         this.colours = new float[]{
             //Face 1 (front) pos Z
-            0.7f, 0.0f, 0.0f,
-            0.7f, 0.0f, 0.0f,
-            0.7f, 0.0f, 0.0f,
-            0.7f, 0.0f, 0.0f,
+            posZ[0], posZ[1], posZ[2],
+            posZ[0], posZ[1], posZ[2],
+            posZ[0], posZ[1], posZ[2],
+            posZ[0], posZ[1], posZ[2],
 
             //Face 2 (top) pos Y
-            1f,0f,0f,
-            1f,0f,0f,
-            1f,0f,0f,
-            1f,0f,0f,
+            posY[0], posY[1], posY[2],
+            posY[0], posY[1], posY[2],
+            posY[0], posY[1], posY[2],
+            posY[0], posY[1], posY[2],
 
             //Face 3 (back) neg Z
-            0.45f, 0.0f, 0.0f,
-            0.45f, 0.0f, 0.0f,
-            0.45f, 0.0f, 0.0f,
-            0.45f, 0.0f, 0.0f,
+            negZ[0], negZ[1], negZ[2],
+            negZ[0], negZ[1], negZ[2],
+            negZ[0], negZ[1], negZ[2],
+            negZ[0], negZ[1], negZ[2],
 
             //Face 4 (bottom) neg Y
-            0.15f, 0.0f, 0.0f,
-            0.15f, 0.0f, 0.0f,
-            0.15f, 0.0f, 0.0f,
-            0.15f, 0.0f, 0.0f,
-
+            negY[0], negY[1], negY[2],
+            negY[0], negY[1], negY[2],
+            negY[0], negY[1], negY[2],
+            negY[0], negY[1], negY[2],
 
             //Face 5 (left) neg X
-            0.3f, 0.0f, 0.0f,
-            0.3f, 0.0f, 0.0f,
-            0.3f, 0.0f, 0.0f,
-            0.3f, 0.0f, 0.0f,
+            negX[0], negX[1], negX[2],
+            negX[0], negX[1], negX[2],
+            negX[0], negX[1], negX[2],
+            negX[0], negX[1], negX[2],
 
             //Face 6 (right) pos X
-            0.854f, 0.0f, 0.0f,
-            0.854f, 0.0f, 0.0f,
-            0.854f, 0.0f, 0.0f,
-            0.854f, 0.0f, 0.0f,
+            posX[0], posX[1], posX[2],
+            posX[0], posX[1], posX[2],
+            posX[0], posX[1], posX[2],
+            posX[0], posX[1], posX[2],
         };
     }
 
