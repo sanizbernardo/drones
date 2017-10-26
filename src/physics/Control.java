@@ -1,28 +1,21 @@
 package physics;
 
-import datatypes.AutopilotConfig;
-import datatypes.AutopilotInputs;
-import datatypes.AutopilotOutputs;
-import autopilot.Autopilot;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class Control implements KeyListener, Autopilot {
+public class Control implements KeyListener {
 
     public Control(float thrust, Drone drone) {
         this.setDeltaThrust(thrust);
         this.setDrone(drone);
     }
 
-    private final float angle = (float)(Math.PI/12);
-
     private float deltathrust;
 
     private Drone drone;
 
     private float getAngle() {
-        return angle;
+        return (float) (Math.PI / 12);
     }
 
     private float getDeltaThrust() { return deltathrust; }
@@ -195,71 +188,4 @@ public class Control implements KeyListener, Autopilot {
             System.out.println("Thrust is now " + getDrone().getThrust());
         }
     }
-
-
-    /**
-     * Unsure how to connect to autopilot
-     */
-    @Override
-    public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
-        return new AutopilotOutputs() {
-            @Override
-            public float getThrust() { return 500f; }
-
-            @Override
-            public float getLeftWingInclination() { return 0; }
-
-            @Override
-            public float getRightWingInclination() {
-                return 0;
-            }
-
-            @Override
-            public float getHorStabInclination() {
-                return 0;
-            }
-
-            @Override
-            public float getVerStabInclination() {
-                return 0;
-            }
-        };
-    }
-
-    @Override
-    public AutopilotOutputs timePassed(AutopilotInputs inputs) {
-
-
-        return new AutopilotOutputs() {
-            @Override
-            public float getThrust() {
-                return getDrone().getThrust();
-            }
-
-            @Override
-            public float getLeftWingInclination() { return getDrone().getLeftWingInclination(); }
-
-            @Override
-            public float getRightWingInclination() {
-                return getDrone().getRightWingInclination();
-            }
-
-            @Override
-            public float getHorStabInclination() {
-                return getDrone().getHorStabInclination();
-            }
-
-            @Override
-            public float getVerStabInclination() {
-                return getDrone().getVerStabInclination();
-            }
-        };
-    }
-
-    @Override
-    public void simulationEnded() {
-        System.out.println("Simulation ended");
-    }
-
 }
-
