@@ -122,7 +122,7 @@ public class TestWorld implements IWorldRules {
 
         drone = new Drone(config);
         drone.setThrust(200f);
-        drone.setLeftWingInclination((float)Math.toRadians(40));
+//        drone.setLeftWingInclination((float)Math.toRadians(40));
 
 
         DroneMesh droneMesh = new DroneMesh(drone);
@@ -164,19 +164,22 @@ public class TestWorld implements IWorldRules {
         }
     }
 
+    float i = 0f;
+
     /**
      * Handle the game objects internally
      */
     @Override
     public void update(float interval, MouseInput mouseInput) {
-    	physicsEngine.update(interval/4, drone);
-    	
+//    	physicsEngine.update(interval/4, drone);
+
+        drone.setOrientation(new BasicVector(new double[]{0,0,i}));
+        i+=0.05f;
+
     	Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
 
     	// Update camera position
         freeCamera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
-        droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-        droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
 
         // Update the position of each drone item
         for (GameItem droneItem : droneItems) {
@@ -184,6 +187,10 @@ public class TestWorld implements IWorldRules {
 
             droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
         }
+
+        droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
+        droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
+
 
         gameItems[0].setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
         gameItems[0].setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
@@ -194,6 +201,10 @@ public class TestWorld implements IWorldRules {
             Vector2f rotVec = mouseInput.getDisplVec();
             freeCamera.moveRotation(rotVec.x * Constants.MOUSE_SENSITIVITY, rotVec.y * Constants.MOUSE_SENSITIVITY, 0);
         }
+
+//        Vector3f error = droneCamera.getRotation().min(new Vector3f((float)drone.getOrientation().get(0),(float)drone.getOrientation().get(1),(float)drone.getOrientation().get(2)));
+//        System.out.printf("X Error: %s  Y Error: %s     Z Error: %s \n", error.x,error.y,error.z);
+
     }
 
     /**
