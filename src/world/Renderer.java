@@ -66,9 +66,16 @@ public class Renderer {
     	// background for free camera
     	glScissor(droneCamWidth * multiplier, 0, window.getWidth() * multiplier, window.getHeight() * multiplier);
     	glClearColor(.41f, .4f, .4f, 1f);
-    	
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
+
+        // background for info
+        glScissor(0, droneCamHeight * multiplier,droneCamWidth * multiplier,(window.getHeight()-droneCamHeight) * multiplier);
+        glClearColor(.81f, .8f, .8f, 1f);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         glDisable(GL_SCISSOR_TEST);
     }
 
@@ -145,7 +152,9 @@ public class Renderer {
         }
 
         shaderProgram.unbind();
-        
+
+
+
         
     }
 
