@@ -209,8 +209,9 @@ public class ImageRecognition {
 					double horAngle = this.horizontalAngleOfView*(Math.abs(this.corners.get(i)[0] - this.corners.get(j)[0]))/this.nbRows;
 					double verAngle = this.verticalAngleOfView*(Math.abs(this.corners.get(i)[1] - this.corners.get(j)[1]))/this.nbColumns;
 					double angle = Math.sqrt(Math.pow(horAngle, 2)+Math.pow(verAngle, 2));
-					double angleR = angle/360*2*Math.PI;
-					if (angleR>currentMaxAngle) currentMaxAngle = angleR;
+					//use if angle is in grades
+					//double angleR = angle/360*2*Math.PI;
+					if (angle>currentMaxAngle) currentMaxAngle = angle;
 				}
 			}
 		}
