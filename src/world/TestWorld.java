@@ -10,6 +10,7 @@ import image.ImageCreator;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import org.la4j.vector.dense.BasicVector;
 import physics.Drone;
 import physics.PhysicsEngine;
 import utils.Constants;
@@ -125,6 +126,10 @@ public class TestWorld implements IWorldRules {
         drone = new Drone(config);
         drone.setThrust(200f);
 //        drone.setLeftWingInclination((float)Math.toRadians(40));
+        //X positive turns the tip upwards
+        //Y positive turns the left
+        //Z positive rotates left
+//        drone.setOrientation(new BasicVector(new double[]{Math.toRadians(40),Math.toRadians(40),Math.toRadians(0)}));
 
 
         DroneMesh droneMesh = new DroneMesh(drone);
