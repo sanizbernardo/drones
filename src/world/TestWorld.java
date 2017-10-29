@@ -97,9 +97,8 @@ public class TestWorld implements IWorldRules {
 //        }
 
         gameItems[0] = new GameItem(cubes[0].getMesh());
-        gameItems[0].setPosition(0f,0f,-10f);
-        gameItems[0].setScale(0.5f);
-        
+        gameItems[0].setPosition(0f,0f,-20f);
+
           //Doesn't work on Mac for some reason
 //        ConfigSetupGUI configSetup = new ConfigSetupGUI();
 //        AutopilotConfig config = configSetup.showDialog();
