@@ -97,7 +97,7 @@ public class TestWorld implements IWorldRules {
 //        }
 
         gameItems[0] = new GameItem(cubes[0].getMesh());
-        gameItems[0].setPosition(0f,0f,-20f);
+        gameItems[0].setPosition(0f,10f,-30f);
 
           //Doesn't work on Mac for some reason
 //        ConfigSetupGUI configSetup = new ConfigSetupGUI();
