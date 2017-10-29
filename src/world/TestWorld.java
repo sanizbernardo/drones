@@ -97,13 +97,20 @@ public class TestWorld implements IWorldRules {
 //        }
 
         gameItems[0] = new GameItem(cubes[0].getMesh());
-        gameItems[0].setPosition(0,-40,-10);
+        gameItems[0].setPosition(0,0,-0.1f);
         gameItems[0].setScale(0.5f);
         
           //Doesn't work on Mac for some reason
 //        ConfigSetupGUI configSetup = new ConfigSetupGUI();
 //        AutopilotConfig config = configSetup.showDialog();
 
+        int multiplier;
+        String osName = System.getProperty("os.name");
+        if ( osName.contains("Mac") ) {
+            multiplier = 2;
+        } else {
+            multiplier = 1;
+        }
 
         //initialize the config
         AutopilotConfig config = new AutopilotConfig() {
@@ -197,7 +204,7 @@ public class TestWorld implements IWorldRules {
             mult = 20;
         }
         if (window.isKeyPressed(GLFW_KEY_C)) {
-            imageCreator.screenShot();
+            imageCreator.screenShotExport();
         }
         if (window.isKeyPressed(GLFW_KEY_W)) {
             cameraInc.z = -mult;
