@@ -193,7 +193,7 @@ public class ImageRecognition {
 		}
 		double X = (double)sumX/(double)counter;
 		double Y = (double)sumY/(double)counter;
-		System.out.println(X + "   " + Y);
+		System.out.println("Cube in sight, centering at: " + X + "   " + Y);
 		double[] center = {X-(double)this.nbColumns/2,-(Y-(double)this.nbRows/2)};
 		this.center = center;
 		this.surface = counter;

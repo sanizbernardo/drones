@@ -97,7 +97,7 @@ public class TestWorld implements IWorldRules {
 //        }
 
         gameItems[0] = new GameItem(cubes[0].getMesh());
-        gameItems[0].setPosition(0f,0f,-20f);
+        gameItems[0].setPosition(0f,0f,-50f);
 
           //Doesn't work on Mac for some reason
 //        ConfigSetupGUI configSetup = new ConfigSetupGUI();
@@ -223,7 +223,7 @@ public class TestWorld implements IWorldRules {
         /*
          * ---Section handled by testbed---
          */
-//        physicsEngine.update(interval/4, drone);
+        physicsEngine.update(interval/3, drone);
 
 
         Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
