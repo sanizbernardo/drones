@@ -4,6 +4,8 @@ import autopilot.Autopilot;
 import datatypes.AutopilotConfig;
 import datatypes.AutopilotInputs;
 import datatypes.AutopilotOutputs;
+import gui.AutopilotGUI;
+
 import org.la4j.Vector;
 import org.la4j.vector.dense.BasicVector;
 import recognition.ImageRecognition;
@@ -22,7 +24,8 @@ public class MotionPlanner implements Autopilot {
     private float verStabInclination;
     private float newThrust;
     private AutopilotConfig config;
-
+    
+    private AutopilotGUI gui;
 
     private float getAngle() {
         return (float) (Math.PI / 12);
@@ -185,7 +188,11 @@ public class MotionPlanner implements Autopilot {
     @Override
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
         setConfig(config);
-
+        
+        gui = new AutopilotGUI(config.getNbColumns(), config.getNbRows());
+        gui.updateImage(inputs.getImage());
+        gui.showGUI();
+        
         return new AutopilotOutputs() {
 
             @Override
@@ -213,7 +220,9 @@ public class MotionPlanner implements Autopilot {
 
     @Override
     public AutopilotOutputs timePassed(AutopilotInputs inputs) {
-
+    	
+    	gui.updateImage(inputs.getImage());
+    	
         ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
         double[] center = recog.getCenter();
 
