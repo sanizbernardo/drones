@@ -213,9 +213,15 @@ public class MotionPlanner implements Autopilot {
 
     @Override
     public AutopilotOutputs timePassed(AutopilotInputs inputs) {
+
         ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
         double[] center = recog.getCenter();
-        centerTarget(center, inputs);
+
+        if(center != null) {
+            centerTarget(center, inputs);
+        } else {
+//            System.out.println("Image recon ziet niets");
+        }
 
         return new AutopilotOutputs() {
             @Override
