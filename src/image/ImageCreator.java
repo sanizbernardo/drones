@@ -33,7 +33,6 @@ public class ImageCreator {
         	}
         }
 
-        System.out.println(pixels.length);
         return pixels;
     }
     

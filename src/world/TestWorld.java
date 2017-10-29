@@ -97,20 +97,12 @@ public class TestWorld implements IWorldRules {
 //        }
 
         gameItems[0] = new GameItem(cubes[0].getMesh());
-        gameItems[0].setPosition(0,0,-0.1f);
+        gameItems[0].setPosition(-10,-10f,-25f);
         gameItems[0].setScale(0.5f);
         
           //Doesn't work on Mac for some reason
 //        ConfigSetupGUI configSetup = new ConfigSetupGUI();
 //        AutopilotConfig config = configSetup.showDialog();
-
-        int multiplier;
-        String osName = System.getProperty("os.name");
-        if ( osName.contains("Mac") ) {
-            multiplier = 2;
-        } else {
-            multiplier = 1;
-        }
 
         //initialize the config
         AutopilotConfig config = new AutopilotConfig() {
@@ -309,6 +301,8 @@ public class TestWorld implements IWorldRules {
         drone.setLeftWingInclination(out.getLeftWingInclination());
         drone.setRightWingInclination(out.getRightWingInclination());
         drone.setThrust(out.getThrust());
+
+        System.out.printf("X diff = %s    Y diff = %s     Z diff = %s", newDronePos.x - gameItems[0].getPosition().x, newDronePos.y - gameItems[0].getPosition().y, newDronePos.z - gameItems[0].getPosition().z);
     }
 
     /**

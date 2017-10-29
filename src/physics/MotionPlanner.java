@@ -214,21 +214,13 @@ public class MotionPlanner implements Autopilot {
     @Override
     public AutopilotOutputs timePassed(AutopilotInputs inputs) {
 
-        int multiplier;
-        String osName = System.getProperty("os.name");
-        if ( osName.contains("Mac") ) {
-            multiplier = 2;
-        } else {
-            multiplier = 1;
-        }
-
         ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
         double[] center = recog.getCenter();
 
         if(center != null) {
             centerTarget(center, inputs);
         } else {
-            System.out.println("Image recon ziet niets");
+//            System.out.println("Image recon ziet niets");
         }
 
         return new AutopilotOutputs() {
