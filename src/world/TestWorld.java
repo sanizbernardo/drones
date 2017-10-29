@@ -106,11 +106,11 @@ public class TestWorld implements IWorldRules {
         //initialize the config
         AutopilotConfig config = new AutopilotConfig() {
             public float getGravity() {return 10f;}
-            public float getWingX() {return 2.5f;}
-            public float getTailSize() {return 5f;}
-            public float getEngineMass() {return 70f;}
-            public float getWingMass() {return 25f;}
-            public float getTailMass() {return 30f;}
+            public float getWingX() {return 0.25f;}
+            public float getTailSize() {return 0.5f;}
+            public float getEngineMass() {return 7f;}
+            public float getWingMass() {return 2.5f;}
+            public float getTailMass() {return 3f;}
             public float getMaxThrust() {return 5000f;}
             public float getMaxAOA() {return -1f;}
             public float getWingLiftSlope() {return 0.11f;}
@@ -129,7 +129,8 @@ public class TestWorld implements IWorldRules {
         imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows());
 
         drone = new Drone(config);
-        drone.setThrust(200f);
+        drone.setThrust(20f);
+        drone.setVelocity(new BasicVector(new double[]{0, 0, -4}));
 //        X positive turns the tip upwards, Y positive turns the left, Z positive rotates left
 
 
@@ -223,7 +224,7 @@ public class TestWorld implements IWorldRules {
         /*
          * ---Section handled by testbed---
          */
-//        physicsEngine.update(interval/4, drone);
+        physicsEngine.update(interval/8, drone);
 
 
         Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
