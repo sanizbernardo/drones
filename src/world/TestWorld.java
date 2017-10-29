@@ -97,7 +97,7 @@ public class TestWorld implements IWorldRules {
 //        }
 
         gameItems[0] = new GameItem(cubes[0].getMesh());
-        gameItems[0].setPosition(-10,-10f,-25f);
+        gameItems[0].setPosition(0f,0f,-10f);
         gameItems[0].setScale(0.5f);
         
           //Doesn't work on Mac for some reason
@@ -224,7 +224,7 @@ public class TestWorld implements IWorldRules {
         /*
          * ---Section handled by testbed---
          */
-        physicsEngine.update(interval/4, drone);
+//        physicsEngine.update(interval/4, drone);
 
 
         Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
@@ -302,7 +302,7 @@ public class TestWorld implements IWorldRules {
         drone.setRightWingInclination(out.getRightWingInclination());
         drone.setThrust(out.getThrust());
 
-        System.out.printf("X diff = %s    Y diff = %s     Z diff = %s", newDronePos.x - gameItems[0].getPosition().x, newDronePos.y - gameItems[0].getPosition().y, newDronePos.z - gameItems[0].getPosition().z);
+        System.out.printf("X diff = %s \t Y diff = %s \t Z diff = %s \n", newDronePos.x - gameItems[0].getPosition().x, newDronePos.y - gameItems[0].getPosition().y, newDronePos.z - gameItems[0].getPosition().z);
     }
 
     /**
