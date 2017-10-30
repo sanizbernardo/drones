@@ -1,2 +1,0 @@
-* http://www.codinglabs.net/article_world_view_projection_matrix.aspx
-* https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/

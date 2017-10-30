@@ -3,7 +3,11 @@
 
 # Mac specific stuff
 .DS_Store
+.idea/
+pno.iml
 
+# Project specific
+ss.png
 # User-specific stuff:
 .idea/**/workspace.xml
 .idea/**/tasks.xml
@@ -100,3 +104,7 @@ local.properties
 .cache-main
 .scala_dependencies
 .worksheet
+
+# Eclipse IDE
+.classpath
+.project

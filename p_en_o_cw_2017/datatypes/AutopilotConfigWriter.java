@@ -1,9 +1,6 @@
 package datatypes;
 public class AutopilotConfigWriter {
-    private static void writeByteArray(java.io.DataOutputStream stream, byte[] array) throws java.io.IOException {
-        stream.writeInt(array.length);
-        stream.write(array);
-    }
+
     public static void write(java.io.DataOutputStream stream, AutopilotConfig value) throws java.io.IOException {
         stream.writeFloat(value.getGravity());
         stream.writeFloat(value.getWingX());
