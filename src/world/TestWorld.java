@@ -1,4 +1,4 @@
-package world.content;
+package world;
 
 import IO.MouseInput;
 import datatypes.AutopilotConfig;
@@ -7,7 +7,7 @@ import datatypes.AutopilotOutputs;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
-import image.ImageCreator;
+import utils.image.ImageCreator;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -16,10 +16,10 @@ import physics.Drone;
 import physics.MotionPlanner;
 import physics.PhysicsEngine;
 import utils.Constants;
-import world.meshes.cube.Cube;
-import world.GameItem;
+import entities.meshes.cube.Cube;
+import entities.GameItem;
 import engine.graph.Renderer;
-import world.meshes.drone.DroneMesh;
+import entities.meshes.drone.DroneMesh;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;

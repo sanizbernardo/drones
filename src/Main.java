@@ -1,7 +1,7 @@
 import engine.Engine;
 import engine.IWorldRules;
 import utils.Constants;
-import world.content.StopWorld;
+import world.StopWorld;
 
 public class Main {
 

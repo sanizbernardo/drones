@@ -3,12 +3,11 @@ package engine.graph;
 import static org.lwjgl.opengl.GL11.*;
 
 import engine.Window;
-import engine.graph.*;
 import org.joml.Matrix4f;
 
 import datatypes.AutopilotConfig;
 import utils.*;
-import world.GameItem;
+import entities.GameItem;
 
 public class Renderer {
 

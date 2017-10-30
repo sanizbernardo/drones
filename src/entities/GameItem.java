@@ -1,6 +1,6 @@
-package world;
+package entities;
 
-import world.meshes.Mesh;
+import entities.meshes.Mesh;
 import org.joml.Vector3f;
 
 public class GameItem {

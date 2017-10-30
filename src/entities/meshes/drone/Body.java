@@ -1,4 +1,4 @@
-package world.meshes.drone;
+package entities.meshes.drone;
 
 import physics.Drone;
 

@@ -1,6 +1,6 @@
-package world.meshes.drone;
+package entities.meshes.drone;
 
-import world.meshes.Mesh;
+import entities.meshes.Mesh;
 import physics.Drone;
 
 public class DroneMesh {
