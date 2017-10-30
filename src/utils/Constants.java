@@ -7,9 +7,9 @@ public class Constants {
     public static final String TITLE = "PnO Drone Simulation";
     public static final boolean VSYNC = true;
     //only for initialization!
-    public static final int WIDTH = 1000;
+    public static final int WIDTH = 1500;
     //only for initialization!
-    public static final int HEIGHT = 500;
+    public static final int HEIGHT = 750;
 
 
     /**

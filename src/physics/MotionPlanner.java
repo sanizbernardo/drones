@@ -32,7 +32,7 @@ public class MotionPlanner implements Autopilot {
     }
 
     private float getDeltaThrust() {
-        return 500f; }
+        return 25f; }
 
     public float getX() { return x; }
 
