@@ -1,6 +1,5 @@
-package world.drone;
+package world.meshes.drone;
 
-import engine.graph.Mesh;
 import physics.Drone;
 
 public class RightWing extends DroneComponent {

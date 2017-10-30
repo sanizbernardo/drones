@@ -1,6 +1,6 @@
-package world;
+package world.meshes.cube;
 
-import engine.graph.Mesh;
+import world.meshes.Mesh;
 import utils.Utils;
 
 public class Cube {

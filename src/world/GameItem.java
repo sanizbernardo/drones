@@ -1,6 +1,6 @@
 package world;
 
-import engine.graph.Mesh;
+import world.meshes.Mesh;
 import org.joml.Vector3f;
 
 public class GameItem {

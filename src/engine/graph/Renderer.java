@@ -1,4 +1,4 @@
-package world;
+package engine.graph;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -8,6 +8,7 @@ import org.joml.Matrix4f;
 
 import datatypes.AutopilotConfig;
 import utils.*;
+import world.GameItem;
 
 public class Renderer {
 

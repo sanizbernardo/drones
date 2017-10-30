@@ -1,4 +1,4 @@
-package world;
+package world.content;
 
 import IO.MouseInput;
 import datatypes.AutopilotConfig;
@@ -7,7 +7,6 @@ import datatypes.AutopilotOutputs;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
-import gui.ConfigSetupGUI;
 import image.ImageCreator;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -17,17 +16,18 @@ import physics.Drone;
 import physics.MotionPlanner;
 import physics.PhysicsEngine;
 import utils.Constants;
-import world.drone.DroneMesh;
+import world.meshes.cube.Cube;
+import world.GameItem;
+import engine.graph.Renderer;
+import world.meshes.drone.DroneMesh;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
-import java.util.Random;
-
 /**
  * Place where all the GameItem are to be placed in
  */
-public class CubeWorld implements IWorldRules {
+public class TestWorld implements IWorldRules {
 
     /**
      * The angle of the camera in the current world
@@ -54,7 +54,7 @@ public class CubeWorld implements IWorldRules {
     /**
      * Create the renderer of this world
      */
-    public CubeWorld() {
+    public TestWorld() {
         freeCamera = new Camera();
         droneCamera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
@@ -62,8 +62,8 @@ public class CubeWorld implements IWorldRules {
 
     private PhysicsEngine physicsEngine;
     private Drone drone;
-
-
+    
+    
     private ImageCreator imageCreator;
 
     private final MotionPlanner planner = new MotionPlanner();
@@ -78,26 +78,28 @@ public class CubeWorld implements IWorldRules {
         Cube redCube = new Cube(0,1f);
         Cube greenCube = new Cube(120,1f);
         Cube blueCube = new Cube(240,1f);
-
+        
         Cube[] cubes = new Cube[]{redCube, greenCube, blueCube};
-        gameItems = new GameItem[7000];
+        gameItems = new GameItem[1];
+        
+//        Random rand = new Random();
 
-        Random rand = new Random();
+        //Add random cubes to the world
+//        for(int i = 0; i<gameItems.length; i++) {
+//            GameItem cube = new GameItem(cubes[rand.nextInt(cubes.length)].getMesh());
+//            cube.setScale(0.5f);
+//            int x1 = rand.nextInt(100)-50,
+//            		y = rand.nextInt(100)-50,
+//            		z = rand.nextInt(100)-50;
+//
+//            cube.setPosition(x1, y, z);
+//            gameItems[i] = cube;
+//        }
 
-//        Add random cubes to the world
-        for(int i = 0; i<gameItems.length; i++) {
-            GameItem cube = new GameItem(cubes[rand.nextInt(cubes.length)].getMesh());
-            cube.setScale(0.5f);
-            int x1 = rand.nextInt(100)-50,
-            		y = rand.nextInt(100)-50,
-            		z = rand.nextInt(100)-50;
+        gameItems[0] = new GameItem(cubes[0].getMesh());
+        gameItems[0].setPosition(0f,10f,-30f);
 
-            cube.setPosition(x1, y, z);
-            gameItems[i] = cube;
-        }
-
-
-        //Doesn't work on Mac for some reason
+          //Doesn't work on Mac for some reason
 //        ConfigSetupGUI configSetup = new ConfigSetupGUI();
 //        AutopilotConfig config = configSetup.showDialog();
 
@@ -116,21 +118,21 @@ public class CubeWorld implements IWorldRules {
             public float getVerStabLiftSlope() {return 0.11f;}
             public float getHorizontalAngleOfView() {return (float) Math.toRadians(120f);}
             public float getVerticalAngleOfView() {return (float) Math.toRadians(120f);}
-            public int getNbColumns() {return 400;}
-            public int getNbRows() {return 400;}};
+            public int getNbColumns() {return 200;}
+            public int getNbRows() {return 200;}};
 
 
         physicsEngine = new PhysicsEngine(config);
         renderer = new Renderer(config);
         renderer.init(window);
-
+        
         imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows());
 
         drone = new Drone(config);
         drone.setThrust(20f);
         drone.setVelocity(new BasicVector(new double[]{0, 0, -4}));
 //        X positive turns the tip upwards, Y positive turns the left, Z positive rotates left
-        drone.setLeftWingInclination(20f);
+
 
         //Make the drone, with all its items
         DroneMesh droneMesh = new DroneMesh(drone);
@@ -138,6 +140,49 @@ public class CubeWorld implements IWorldRules {
         GameItem right = new GameItem(droneMesh.getRight());
         GameItem body = new GameItem(droneMesh.getBody());
         droneItems = new GameItem[]{left, right, body};
+
+        //Init the simulation
+        planner.simulationStarted(config, new AutopilotInputs() {
+            @Override
+            public byte[] getImage() {
+                return imageCreator.screenShot();
+            }
+
+            @Override
+            public float getX() {
+                return 0;
+            }
+
+            @Override
+            public float getY() {
+                return 0;
+            }
+
+            @Override
+            public float getZ() {
+                return 0;
+            }
+
+            @Override
+            public float getHeading() {
+                return 0;
+            }
+
+            @Override
+            public float getPitch() {
+                return 0;
+            }
+
+            @Override
+            public float getRoll() {
+                return 0;
+            }
+
+            @Override
+            public float getElapsedTime() {
+                return 0;
+            }
+        });
     }
 
     /**
@@ -194,7 +239,7 @@ public class CubeWorld implements IWorldRules {
             Vector2f rotVec = mouseInput.getDisplVec();
             freeCamera.moveRotation(rotVec.x * Constants.MOUSE_SENSITIVITY, rotVec.y * Constants.MOUSE_SENSITIVITY, 0);
         }
-
+        
         droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
         droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
 
@@ -205,6 +250,59 @@ public class CubeWorld implements IWorldRules {
             droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
         }
 
+        /*
+         * ---Section handled by motion planner---
+         */
+
+        AutopilotOutputs out = planner.timePassed(new AutopilotInputs() {
+            @Override
+            public byte[] getImage() {
+                return imageCreator.screenShot();
+            }
+
+            @Override
+            public float getX() {
+                return newDronePos.x;
+            }
+
+            @Override
+            public float getY() {
+                return newDronePos.y;
+            }
+
+            @Override
+            public float getZ() {
+                return newDronePos.z;
+            }
+
+            @Override
+            public float getHeading() {
+                return drone.getHeading();
+            }
+
+            @Override
+            public float getPitch() {
+                return drone.getPitch();
+            }
+
+            @Override
+            public float getRoll() {
+                return drone.getRoll();
+            }
+
+            @Override
+            public float getElapsedTime() {
+                return interval;
+            }
+        });
+
+        drone.setHorStabInclination(out.getHorStabInclination());
+        drone.setVerStabInclination(out.getVerStabInclination());
+        drone.setLeftWingInclination(out.getLeftWingInclination());
+        drone.setRightWingInclination(out.getRightWingInclination());
+        drone.setThrust(out.getThrust());
+
+        System.out.printf("X diff = %s \t Y diff = %s \t Z diff = %s \n", newDronePos.x - gameItems[0].getPosition().x, newDronePos.y - gameItems[0].getPosition().y, newDronePos.z - gameItems[0].getPosition().z);
     }
 
     /**
@@ -212,7 +310,7 @@ public class CubeWorld implements IWorldRules {
      */
     @Override
     public void render(Window window) {
-        renderer.render(window, freeCamera, droneCamera, gameItems, droneItems);
+    	renderer.render(window, freeCamera, droneCamera, gameItems, droneItems);
     }
 
     /**

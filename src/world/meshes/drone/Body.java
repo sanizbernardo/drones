@@ -1,4 +1,4 @@
-package world.drone;
+package world.meshes.drone;
 
 import physics.Drone;
 

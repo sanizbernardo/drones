@@ -1,6 +1,6 @@
-package world.drone;
+package world.meshes.drone;
 
-import engine.graph.Mesh;
+import world.meshes.Mesh;
 import physics.Drone;
 
 public class DroneMesh {

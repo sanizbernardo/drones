@@ -1,8 +1,7 @@
-package world;
-
 import engine.Engine;
 import engine.IWorldRules;
 import utils.Constants;
+import world.content.StopWorld;
 
 public class Main {
 

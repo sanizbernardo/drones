@@ -1,4 +1,4 @@
-package engine.graph;
+package world.meshes;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
