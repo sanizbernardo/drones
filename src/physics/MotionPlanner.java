@@ -203,9 +203,9 @@ public class MotionPlanner implements Autopilot {
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
         setConfig(config);
         
-        gui = new AutopilotGUI(config.getNbColumns(), config.getNbRows());
-        gui.updateImage(inputs.getImage());
-        gui.showGUI();
+//        gui = new AutopilotGUI(config.getNbColumns(), config.getNbRows());
+//        gui.updateImage(inputs.getImage());
+//        gui.showGUI();
         
         return new AutopilotOutputs() {
 
@@ -235,7 +235,7 @@ public class MotionPlanner implements Autopilot {
     @Override
     public AutopilotOutputs timePassed(AutopilotInputs inputs) {
     	
-    	gui.updateImage(inputs.getImage());
+//    	gui.updateImage(inputs.getImage());
     	
         ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
         double[] center = recog.getCenter();
