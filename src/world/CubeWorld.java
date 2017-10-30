@@ -116,8 +116,8 @@ public class CubeWorld implements IWorldRules {
             public float getVerStabLiftSlope() {return 0.11f;}
             public float getHorizontalAngleOfView() {return (float) Math.toRadians(120f);}
             public float getVerticalAngleOfView() {return (float) Math.toRadians(120f);}
-            public int getNbColumns() {return 200;}
-            public int getNbRows() {return 200;}};
+            public int getNbColumns() {return 400;}
+            public int getNbRows() {return 400;}};
 
 
         physicsEngine = new PhysicsEngine(config);
