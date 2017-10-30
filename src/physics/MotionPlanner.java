@@ -114,9 +114,23 @@ public class MotionPlanner implements Autopilot {
 
     public void yawRight(float angle) { setVerStabInclination(-angle); }
 
-    private void thrustUp() { setNewThrust(getNewThrust() + getDeltaThrust());}
+    private void thrustUp() {
+        float newval = getNewThrust() + getDeltaThrust();
+        if (newval < config.getMaxThrust()){
+            setNewThrust(newval);
+        } else {
+            setNewThrust(config.getMaxThrust());
+        }
+    }
 
-    public void thrustUp(float thrust) { setNewThrust(getNewThrust() + thrust);}
+    public void thrustUp(float thrust) {
+        float newval = getNewThrust() + thrust;
+        if (newval < config.getMaxThrust()){
+            setNewThrust(newval);
+        } else {
+            setNewThrust(config.getMaxThrust());
+        }
+    }
 
     private void thrustDown() {setNewThrust(getNewThrust() - getDeltaThrust());}
 
@@ -136,7 +150,7 @@ public class MotionPlanner implements Autopilot {
         setX(x);
         setY(y);
         setZ(z);
-        return vel. norm();
+        return vel.norm();
     }
 
     private void adjustThrust(AutopilotInputs input) {

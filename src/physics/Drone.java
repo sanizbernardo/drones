@@ -77,6 +77,8 @@ public class Drone {
     float getThrust() {
     	return thrust;
     }
+
+    public float getMaxThrust() { return  maxThrust; }
     
 	public void setThrust(float thrust) {
 		if (thrust < maxThrust && thrust >= 0) 

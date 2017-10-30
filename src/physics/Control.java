@@ -5,12 +5,9 @@ import java.awt.event.KeyListener;
 
 public class Control implements KeyListener {
 
-    public Control(float thrust, Drone drone) {
-        this.setDeltaThrust(thrust);
+    public Control(Drone drone) {
         this.setDrone(drone);
     }
-
-    private float deltathrust;
 
     private Drone drone;
 
@@ -18,9 +15,8 @@ public class Control implements KeyListener {
         return (float) (Math.PI / 12);
     }
 
-    private float getDeltaThrust() { return deltathrust; }
-
-    private void setDeltaThrust(float value) { this.deltathrust = value; }
+    private float getDeltaThrust() {
+        return 500f; }
 
     private Drone getDrone(){
         return this.drone;
@@ -32,15 +28,10 @@ public class Control implements KeyListener {
 
 
     private boolean iPressed = false;
-
     private boolean jPressed = false;
-
     private boolean kPressed = false;
-
     private boolean lPressed = false;
-
     private boolean uPressed = false;
-
     private boolean oPressed = false;
 
 
@@ -77,7 +68,14 @@ public class Control implements KeyListener {
         this.getDrone().setVerStabInclination(this.getDrone().getVerStabInclination()-getAngle());
     }
 
-    private void thrustUpKey() { this.getDrone().setThrust(this.getDrone().getThrust() + getDeltaThrust());}
+    private void thrustUpKey() {
+        float newval = this.getDrone().getThrust() + getDeltaThrust();
+        if (newval < getDrone().getMaxThrust()){
+            this.getDrone().setThrust(newval);
+        } else {
+            this.getDrone().setThrust(getDrone().getMaxThrust());
+        }
+    }
 
     private void thrustDownKey() {this.getDrone().setThrust(this.getDrone().getThrust() - getDeltaThrust());}
 
