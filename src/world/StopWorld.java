@@ -27,7 +27,7 @@ import java.util.Random;
 /**
  * Place where all the GameItem are to be placed in
  */
-public class TestWorld implements IWorldRules {
+public class StopWorld implements IWorldRules {
 
     /**
      * The angle of the camera in the current world
@@ -54,7 +54,7 @@ public class TestWorld implements IWorldRules {
     /**
      * Create the renderer of this world
      */
-    public TestWorld() {
+    public StopWorld() {
         freeCamera = new Camera();
         droneCamera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
@@ -97,7 +97,7 @@ public class TestWorld implements IWorldRules {
 //        }
 
         gameItems[0] = new GameItem(cubes[0].getMesh());
-        gameItems[0].setPosition(0f,10f,-30f);
+        gameItems[0].setPosition(0f,0f,-10f);
 
           //Doesn't work on Mac for some reason
 //        ConfigSetupGUI configSetup = new ConfigSetupGUI();
@@ -224,7 +224,7 @@ public class TestWorld implements IWorldRules {
         /*
          * ---Section handled by testbed---
          */
-        physicsEngine.update(interval/8, drone);
+        physicsEngine.update(interval/25, drone);
 
 
         Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));

@@ -1,4 +1,4 @@
-package autpilot;
+package autopilot;
 import datatypes.AutopilotConfig;
 import datatypes.AutopilotInputs;
 import datatypes.AutopilotOutputs;

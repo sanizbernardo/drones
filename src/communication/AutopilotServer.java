@@ -4,7 +4,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import autpilot.Autopilot;
+import autopilot.Autopilot;
 import datatypes.*;
 
 public class AutopilotServer<T extends Autopilot> implements Runnable{
@@ -30,9 +30,6 @@ public class AutopilotServer<T extends Autopilot> implements Runnable{
 		try {
 			ServerSocket server = new ServerSocket(port);
 			
-			System.out.println("Autopilotserver for " + autopilot.getClass() +
-					" running on port: " + server.getLocalPort());
-			
 			int methodId;
 			AutopilotInputs inputs;
 			AutopilotConfig config;
@@ -40,14 +37,11 @@ public class AutopilotServer<T extends Autopilot> implements Runnable{
 			
 			while (true) {
 				Socket client = server.accept();
-				System.out.println("accepted connection from: " + client.getInetAddress());
 				
 				DataInputStream inputStream = new DataInputStream(client.getInputStream());
 				DataOutputStream outputStream = new DataOutputStream(client.getOutputStream()); 
 				
 				methodId = inputStream.read();
-				
-				System.out.println("executing method " + methodId);
 				
 				 switch (methodId) {
 				case SIMULATION_STARTED:
@@ -69,7 +63,6 @@ public class AutopilotServer<T extends Autopilot> implements Runnable{
 				
 				case SIMULATION_ENDED:
 					autopilot.simulationEnded();
-					System.out.println("closing server");
 					server.close();
 					return;
 					
@@ -81,18 +74,7 @@ public class AutopilotServer<T extends Autopilot> implements Runnable{
 				 
 				 config = null;
 				 inputs = null;
-				 outputs = null;
-				 
-				 
-//				 while (!client.isClosed()) {
-//					try {
-//						TimeUnit.NANOSECONDS.sleep(1);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//				}
-			System.out.println("connection closed");
-				 
+				 outputs = null;				 
 			}
 			
 			

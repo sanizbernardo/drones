@@ -25,7 +25,7 @@ public class ImageRecognitionTest {
 	
 		
 		byte array2[]={(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0xff,(byte)0xff,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0xff,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00};
-		ImageRecognition test = new ImageRecognition(array2, 3, 3, 100, 100);
+		ImageRecognition test = new ImageRecognition(array2, 3, 3, (float)(2*Math.PI/3), (float)(2*Math.PI/3));
 		System.out.println(test.getSurface());
 		double[] testCenter = test.getCenter();
 		System.out.println(testCenter[0]+"    " + testCenter[1]);
@@ -35,7 +35,7 @@ public class ImageRecognitionTest {
 		for(int i = 0;i < byteArray3.length; i++){
 			byteArray3[i] = (byte) array3[i];
 		}
-		test = new ImageRecognition(byteArray3, 10, 10, 120, 120);
+		test = new ImageRecognition(byteArray3, 10, 10, (float)(2*Math.PI/3), (float)(2*Math.PI/3));
 		double[] testCenter2 = test.getCenter();
 		System.out.println(testCenter2[0]+"    " + testCenter2[1]);
 		System.out.println(test.getDistApprox());
@@ -51,7 +51,7 @@ public class ImageRecognitionTest {
 		}
 		
 
-		test = new ImageRecognition(byteArray4, 20, 20, 120, 120);
+		test = new ImageRecognition(byteArray4, 20, 20, (float)(2*Math.PI/3), (float)(2*Math.PI/3));
 		double[] testCenter4 = test.getCenter();
 		System.out.println(testCenter4[0]+"    " + testCenter4[1]);
 		System.out.println(test.getDistApprox());
@@ -67,7 +67,7 @@ public class ImageRecognitionTest {
 			byteArray5[i] = (byte) array5[i];
 		}
 		
-		test = new ImageRecognition(byteArray5, 3, 3, 120, 120);
+		test = new ImageRecognition(byteArray5, 3, 3, (float)(2*Math.PI/3), (float)(2*Math.PI/3));
 		double[] testCenter5 = test.getCenter();
 		System.out.println(testCenter5[0]+"    " + testCenter5[1]);
 		System.out.println(test.getDistApprox());
@@ -80,7 +80,7 @@ public class ImageRecognitionTest {
 			byteArray6[i] = (byte) array6[i];
 		}
 		
-		test = new ImageRecognition(byteArray6, 3, 4, 120, 120);
+		test = new ImageRecognition(byteArray6, 3, 4, (float)(2*Math.PI/3), (float)(2*Math.PI/3));
 		double[] testCenter6 = test.getCenter();
 		System.out.println(testCenter6[0]+"    " + testCenter6[1]);
 		System.out.println(test.getDistApprox());
@@ -97,7 +97,7 @@ public class ImageRecognitionTest {
 			byteArray7[i] = (byte) array7[i];
 		}
 		
-		test = new ImageRecognition(byteArray7, 20, 20, 120, 120);
+		test = new ImageRecognition(byteArray7, 20, 20, (float)(2*Math.PI/3), (float)(2*Math.PI/3));
 		double[] testCenter7 = test.getCenter();
 		System.out.println(testCenter7[0]+"    " + testCenter7[1]);
 		System.out.println(test.getDistApprox());
@@ -112,7 +112,7 @@ public class ImageRecognitionTest {
 			byteArray8[i] = (byte) array8[i];
 		}
 	
-		test = new ImageRecognition(byteArray8, 4, 3, 120, 120);
+		test = new ImageRecognition(byteArray8, 4, 3, (float)(2*Math.PI/3), (float)(2*Math.PI/3));
 		double[] testCenter8 = test.getCenter();
 		System.out.println(testCenter8[0]+"    " + testCenter8[1]);
 		System.out.println(test.getDistApprox());

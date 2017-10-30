@@ -52,7 +52,7 @@ public class MouseInput {
             boolean rotateX = deltax != 0;
             boolean rotateY = deltay != 0;
             if (rotateX) {
-                displVec.y = (float) deltax;
+                displVec.y = -(float) deltax;
             }
             if (rotateY) {
                 displVec.x = (float) deltay;

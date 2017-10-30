@@ -1,5 +1,5 @@
 package communication;
-import autpilot.Autopilot;
+import autopilot.Autopilot;
 import datatypes.AutopilotConfig;
 import datatypes.AutopilotInputs;
 import datatypes.AutopilotOutputs;

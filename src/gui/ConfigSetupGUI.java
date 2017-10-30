@@ -1,3 +1,5 @@
+package gui;
+
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
@@ -30,7 +32,7 @@ public class ConfigSetupGUI extends JDialog {
 	 * Create the frame.
 	 */
 	public ConfigSetupGUI() {
-		Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();		
+		Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 		int screenWidth = (int) screen.getWidth();
 		int screenHeight = (int) screen.getHeight();
 		int windowWidth = 650; // => 650
@@ -94,7 +96,7 @@ public class ConfigSetupGUI extends JDialog {
 			}
 			
 			public float getVerticalAngleOfView() {
-				return (float) (Math.PI * (int) verFOVSpinner.getValue() / 180d);
+				return (float) (Math.toRadians((int) verFOVSpinner.getValue()));
 			}
 			
 			public float getVerStabLiftSlope() {
@@ -122,11 +124,11 @@ public class ConfigSetupGUI extends JDialog {
 			}
 			
 			public float getMaxAOA() {
-				return (float) (Math.PI * (int) maxAOASpinner.getValue() / 180d);
+				return (float) (Math.toRadians((int) maxAOASpinner.getValue()));
 			}
 			
 			public float getHorizontalAngleOfView() {
-				return (float) (Math.PI * (int) horFOVSpinner.getValue() / 180d);
+				return (float) (Math.toRadians((int) horFOVSpinner.getValue()));
 			}
 			
 			public float getHorStabLiftSlope() {

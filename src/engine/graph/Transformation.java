@@ -47,9 +47,11 @@ public class Transformation {
         Vector3f rotation = camera.getRotation();
 
         viewMatrix.identity();
-        // First do the rotation so camera rotates over to its position
-        viewMatrix.rotate((float)Math.toRadians(rotation.x), new Vector3f(1, 0, 0))
-                .rotate((float)Math.toRadians(rotation.y), new Vector3f(0, 1, 0));
+        // First do the rotation so camera rotates over to its position ORDER MUST BE Z Y X
+        viewMatrix.rotate((float)Math.toRadians(rotation.z), new Vector3f(0, 0, 1))
+                .rotate((float)Math.toRadians(rotation.y), new Vector3f(0, 1, 0))
+                .rotate((float)Math.toRadians(rotation.x), new Vector3f(1, 0, 0));
+//        viewMatrix.rotateXYZ((float)Math.toRadians(rotation.x),(float)Math.toRadians(rotation.y),(float)Math.toRadians(rotation.z));
         // Then do the translation
         viewMatrix.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
         return viewMatrix;

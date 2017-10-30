@@ -13,10 +13,10 @@ public class RightWing extends DroneComponent {
     protected void setPositions() {
         this.positions = new float[]{
                 //right wing
-                0f                  , 0f, -0.5f, //#0
-                drone.getWingX()*2f, 0f, -0.5f, //#1
-                drone.getWingX()*2f, 0f, 0.5f, //#2
-                0f                  , 0f, 0.5f, //#3
+                0f                  , 0f, -drone.getWingX()/4, //#0
+                drone.getWingX()*2f, 0f, -drone.getWingX()/4, //#1
+                drone.getWingX()*2f, 0f, drone.getWingX()/4, //#2
+                0f                  , 0f, drone.getWingX()/4, //#3
         };
     }
 

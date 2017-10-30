@@ -1,33 +1,22 @@
 package physics;
 
-import datatypes.AutopilotConfig;
-import datatypes.AutopilotInputs;
-import datatypes.AutopilotOutputs;
-import autopilot.Autopilot;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class Control implements KeyListener, Autopilot {
+public class Control implements KeyListener {
 
-    public Control(float thrust, Drone drone) {
-        this.setDeltaThrust(thrust);
+    public Control(Drone drone) {
         this.setDrone(drone);
     }
-
-    private final float angle = (float)(Math.PI/12);
-
-    private float deltathrust;
 
     private Drone drone;
 
     private float getAngle() {
-        return angle;
+        return (float) (Math.PI / 12);
     }
 
-    private float getDeltaThrust() { return deltathrust; }
-
-    private void setDeltaThrust(float value) { this.deltathrust = value; }
+    private float getDeltaThrust() {
+        return 500f; }
 
     private Drone getDrone(){
         return this.drone;
@@ -39,15 +28,10 @@ public class Control implements KeyListener, Autopilot {
 
 
     private boolean iPressed = false;
-
     private boolean jPressed = false;
-
     private boolean kPressed = false;
-
     private boolean lPressed = false;
-
     private boolean uPressed = false;
-
     private boolean oPressed = false;
 
 
@@ -84,7 +68,14 @@ public class Control implements KeyListener, Autopilot {
         this.getDrone().setVerStabInclination(this.getDrone().getVerStabInclination()-getAngle());
     }
 
-    private void thrustUpKey() { this.getDrone().setThrust(this.getDrone().getThrust() + getDeltaThrust());}
+    private void thrustUpKey() {
+        float newval = this.getDrone().getThrust() + getDeltaThrust();
+        if (newval < getDrone().getMaxThrust()){
+            this.getDrone().setThrust(newval);
+        } else {
+            this.getDrone().setThrust(getDrone().getMaxThrust());
+        }
+    }
 
     private void thrustDownKey() {this.getDrone().setThrust(this.getDrone().getThrust() - getDeltaThrust());}
 
@@ -195,71 +186,4 @@ public class Control implements KeyListener, Autopilot {
             System.out.println("Thrust is now " + getDrone().getThrust());
         }
     }
-
-
-    /**
-     * Unsure how to connect to autopilot
-     */
-    @Override
-    public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
-        return new AutopilotOutputs() {
-            @Override
-            public float getThrust() { return 500f; }
-
-            @Override
-            public float getLeftWingInclination() { return 0; }
-
-            @Override
-            public float getRightWingInclination() {
-                return 0;
-            }
-
-            @Override
-            public float getHorStabInclination() {
-                return 0;
-            }
-
-            @Override
-            public float getVerStabInclination() {
-                return 0;
-            }
-        };
-    }
-
-    @Override
-    public AutopilotOutputs timePassed(AutopilotInputs inputs) {
-
-
-        return new AutopilotOutputs() {
-            @Override
-            public float getThrust() {
-                return getDrone().getThrust();
-            }
-
-            @Override
-            public float getLeftWingInclination() { return getDrone().getLeftWingInclination(); }
-
-            @Override
-            public float getRightWingInclination() {
-                return getDrone().getRightWingInclination();
-            }
-
-            @Override
-            public float getHorStabInclination() {
-                return getDrone().getHorStabInclination();
-            }
-
-            @Override
-            public float getVerStabInclination() {
-                return getDrone().getVerStabInclination();
-            }
-        };
-    }
-
-    @Override
-    public void simulationEnded() {
-        System.out.println("Simulation ended");
-    }
-
 }
-

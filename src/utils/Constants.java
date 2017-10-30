@@ -7,16 +7,16 @@ public class Constants {
     public static final String TITLE = "PnO Drone Simulation";
     public static final boolean VSYNC = true;
     //only for initialization!
-    public static final int WIDTH = 600;
+    public static final int WIDTH = 1500;
     //only for initialization!
-    public static final int HEIGHT = 480;
+    public static final int HEIGHT = 750;
 
 
     /**
      * Renderer constants
      */
     //Field of View in Radians
-    public static final float FOV = (float) Math.toRadians(60.0f);
+    public static final float FOV = (float) Math.toRadians(90f);
 
     public static final float Z_NEAR = 0.01f;
 
@@ -38,7 +38,7 @@ public class Constants {
     
     
     /**
-     * default setup settings
+     * default config settings
      */
     public static final float DEFAULT_GRAVITY = 9.81f;
     
