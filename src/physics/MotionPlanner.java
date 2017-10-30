@@ -239,6 +239,10 @@ public class MotionPlanner implements Autopilot {
     	
         ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
         double[] center = recog.getCenter();
+        
+        if(recog.getDistApprox() < 4){
+        	System.exit(0);
+        }
 
         if(center != null) {
             centerTarget(center, inputs);
