@@ -2,6 +2,8 @@ package world;
 
 import IO.MouseInput;
 import datatypes.AutopilotConfig;
+import datatypes.AutopilotInputs;
+import datatypes.AutopilotOutputs;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
@@ -12,6 +14,7 @@ import org.joml.Vector3f;
 
 import org.la4j.vector.dense.BasicVector;
 import physics.Drone;
+import physics.MotionPlanner;
 import physics.PhysicsEngine;
 import utils.Constants;
 import world.drone.DroneMesh;
@@ -63,42 +66,44 @@ public class TestWorld implements IWorldRules {
     
     private ImageCreator imageCreator;
 
-    
+    private final MotionPlanner planner = new MotionPlanner();
+
     /**
      * Init
      */
     @Override
     public void init(Window window) throws Exception {
-    	
+
+        //Create the cubes to be added to the world
         Cube redCube = new Cube(0,1f);
         Cube greenCube = new Cube(120,1f);
         Cube blueCube = new Cube(240,1f);
         
         Cube[] cubes = new Cube[]{redCube, greenCube, blueCube};
-        gameItems = new GameItem[1000];
+        gameItems = new GameItem[1];
         
-        Random rand = new Random();
-        
-        for(int i = 0; i<gameItems.length; i++) {
-            GameItem cube = new GameItem(cubes[rand.nextInt(cubes.length)].getMesh());
-            cube.setScale(0.5f);
-            int x1 = rand.nextInt(100)-50,
-            		y = rand.nextInt(100)-50,
-            		z = rand.nextInt(100)-50;
+//        Random rand = new Random();
 
-            cube.setPosition(x1, y, z);
-            gameItems[i] = cube;
-        }
-        
-//        gameItems[0] = new GameItem(redCube.getMesh());
-//        gameItems[0].setScale(0.5f);
-//        gameItems[0].setPosition(0,0,0);
-        
-        
+        //Add random cubes to the world
+//        for(int i = 0; i<gameItems.length; i++) {
+//            GameItem cube = new GameItem(cubes[rand.nextInt(cubes.length)].getMesh());
+//            cube.setScale(0.5f);
+//            int x1 = rand.nextInt(100)-50,
+//            		y = rand.nextInt(100)-50,
+//            		z = rand.nextInt(100)-50;
+//
+//            cube.setPosition(x1, y, z);
+//            gameItems[i] = cube;
+//        }
+
+        gameItems[0] = new GameItem(cubes[0].getMesh());
+        gameItems[0].setPosition(0f,0f,-50f);
+
           //Doesn't work on Mac for some reason
 //        ConfigSetupGUI configSetup = new ConfigSetupGUI();
 //        AutopilotConfig config = configSetup.showDialog();
 
+        //initialize the config
         AutopilotConfig config = new AutopilotConfig() {
             public float getGravity() {return 10f;}
             public float getWingX() {return 2.5f;}
@@ -125,20 +130,58 @@ public class TestWorld implements IWorldRules {
 
         drone = new Drone(config);
         drone.setThrust(200f);
-//        drone.setLeftWingInclination((float)Math.toRadians(40));
-        //X positive turns the tip upwards
-        //Y positive turns the left
-        //Z positive rotates left
-//        drone.setOrientation(new BasicVector(new double[]{Math.toRadians(40),Math.toRadians(40),Math.toRadians(0)}));
+//        X positive turns the tip upwards, Y positive turns the left, Z positive rotates left
 
 
+        //Make the drone, with all its items
         DroneMesh droneMesh = new DroneMesh(drone);
         GameItem left = new GameItem(droneMesh.getLeft());
         GameItem right = new GameItem(droneMesh.getRight());
         GameItem body = new GameItem(droneMesh.getBody());
-
         droneItems = new GameItem[]{left, right, body};
-        
+
+        //Init the simulation
+        planner.simulationStarted(config, new AutopilotInputs() {
+            @Override
+            public byte[] getImage() {
+                return imageCreator.screenShot();
+            }
+
+            @Override
+            public float getX() {
+                return 0;
+            }
+
+            @Override
+            public float getY() {
+                return 0;
+            }
+
+            @Override
+            public float getZ() {
+                return 0;
+            }
+
+            @Override
+            public float getHeading() {
+                return 0;
+            }
+
+            @Override
+            public float getPitch() {
+                return 0;
+            }
+
+            @Override
+            public float getRoll() {
+                return 0;
+            }
+
+            @Override
+            public float getElapsedTime() {
+                return 0;
+            }
+        });
     }
 
     /**
@@ -152,40 +195,38 @@ public class TestWorld implements IWorldRules {
             mult = 20;
         }
         if (window.isKeyPressed(GLFW_KEY_C)) {
-            imageCreator.screenShot();
+            imageCreator.screenShotExport();
         }
         if (window.isKeyPressed(GLFW_KEY_W)) {
-            cameraInc.z = -1 * mult;
+            cameraInc.z = -mult;
         } else if (window.isKeyPressed(GLFW_KEY_S)) {
-            cameraInc.z = 1 * mult;
+            cameraInc.z = mult;
         }
         if (window.isKeyPressed(GLFW_KEY_A)) {
-            cameraInc.x = -1 * mult;
+            cameraInc.x = -mult;
         } else if (window.isKeyPressed(GLFW_KEY_D)) {
-            cameraInc.x = 1 * mult;
+            cameraInc.x = mult;
         }
         if (window.isKeyPressed(GLFW_KEY_Z)) {
-            cameraInc.y = -1 * mult;
+            cameraInc.y = -mult;
         } else if (window.isKeyPressed(GLFW_KEY_X)) {
-            cameraInc.y = 1 * mult;
+            cameraInc.y = mult;
         }
     }
-
-    float i = 0f;
 
     /**
      * Handle the game objects internally
      */
     @Override
     public void update(float interval, MouseInput mouseInput) {
-//    	physicsEngine.update(interval/4, drone);
 
-//        drone.setOrientation(new BasicVector(new double[]{0,0,i}));
-//        i+=0.05f;
+        /*
+         * ---Section handled by testbed---
+         */
+        physicsEngine.update(interval/3, drone);
 
-    	Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
 
-    	
+        Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
 
     	/*
     	 *  Update camera positions
@@ -201,26 +242,66 @@ public class TestWorld implements IWorldRules {
         droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
         droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
 
-        
-        
-        
+
         // Update the position of each drone item
         for (GameItem droneItem : droneItems) {
             droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
             droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
         }
 
-        
+        /*
+         * ---Section handled by motion planner---
+         */
 
-//        gameItems[0].setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-//        gameItems[0].setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
+        AutopilotOutputs out = planner.timePassed(new AutopilotInputs() {
+            @Override
+            public byte[] getImage() {
+                return imageCreator.screenShot();
+            }
 
+            @Override
+            public float getX() {
+                return newDronePos.x;
+            }
 
+            @Override
+            public float getY() {
+                return newDronePos.y;
+            }
 
+            @Override
+            public float getZ() {
+                return newDronePos.z;
+            }
 
-//        Vector3f error = droneCamera.getRotation().min(new Vector3f((float)drone.getOrientation().get(0),(float)drone.getOrientation().get(1),(float)drone.getOrientation().get(2)));
-//        System.out.printf("X Error: %s  Y Error: %s     Z Error: %s \n", error.x,error.y,error.z);
+            @Override
+            public float getHeading() {
+                return drone.getHeading();
+            }
 
+            @Override
+            public float getPitch() {
+                return drone.getPitch();
+            }
+
+            @Override
+            public float getRoll() {
+                return drone.getRoll();
+            }
+
+            @Override
+            public float getElapsedTime() {
+                return interval;
+            }
+        });
+
+        drone.setHorStabInclination(out.getHorStabInclination());
+        drone.setVerStabInclination(out.getVerStabInclination());
+        drone.setLeftWingInclination(out.getLeftWingInclination());
+        drone.setRightWingInclination(out.getRightWingInclination());
+        drone.setThrust(out.getThrust());
+
+        System.out.printf("X diff = %s \t Y diff = %s \t Z diff = %s \n", newDronePos.x - gameItems[0].getPosition().x, newDronePos.y - gameItems[0].getPosition().y, newDronePos.z - gameItems[0].getPosition().z);
     }
 
     /**

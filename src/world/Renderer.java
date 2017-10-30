@@ -58,20 +58,20 @@ public class Renderer {
     	
     	
     	// background for droneCam
-    	glScissor(0, 0, droneCamWidth * multiplier, droneCamHeight * multiplier);
+    	glScissor(0, 0, droneCamWidth, droneCamHeight);
     	glClearColor(0f, 0f, 0f, 0f);
     	
     	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     	
     	// background for free camera
-    	glScissor(droneCamWidth * multiplier, 0, window.getWidth() * multiplier, window.getHeight() * multiplier);
+    	glScissor(droneCamWidth, 0, window.getWidth() * multiplier, window.getHeight() * multiplier);
     	glClearColor(.41f, .4f, .4f, 1f);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
         // background for info
-        glScissor(0, droneCamHeight * multiplier,droneCamWidth * multiplier,(window.getHeight()-droneCamHeight) * multiplier);
+        glScissor(0, droneCamHeight,droneCamWidth,(window.getHeight()) * multiplier);
         glClearColor(.81f, .8f, .8f, 1f);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -98,12 +98,12 @@ public class Renderer {
 
 
         // The free camera window
-        glViewport(droneCamWidth * multiplier, 0, (window.getWidth() - droneCamWidth) * multiplier, window.getHeight() * multiplier);
+        glViewport(droneCamWidth, 0, (window.getWidth()) * multiplier, window.getHeight() * multiplier);
         
         shaderProgram.bind();
 
         // Update projection Matrix
-        Matrix4f projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, (window.getWidth() - droneCamWidth) * multiplier, window.getHeight() * multiplier, Constants.Z_NEAR, Constants.Z_FAR);
+        Matrix4f projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, (window.getWidth() * multiplier) - droneCamWidth, window.getHeight() * multiplier, Constants.Z_NEAR, Constants.Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
         // Update view Matrix
@@ -132,12 +132,12 @@ public class Renderer {
         
         
         // The droneCam window
-        glViewport(0,0,droneCamWidth * multiplier,droneCamHeight * multiplier);
+        glViewport(0,0,droneCamWidth,droneCamHeight);
                 
         shaderProgram.bind();
 
         // Update projection Matrix
-        projectionMatrix = transformation.getProjectionMatrix(droneCamFOV, droneCamWidth * multiplier , droneCamHeight * multiplier, Constants.Z_NEAR, Constants.Z_FAR);
+        projectionMatrix = transformation.getProjectionMatrix(droneCamFOV, droneCamWidth, droneCamHeight, Constants.Z_NEAR, Constants.Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
         // Update view Matrix
