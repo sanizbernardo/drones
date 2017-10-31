@@ -201,9 +201,12 @@ public class PhysicsEngine {
 				horStabLiftD = horStabNormalVectorD.multiply(horStabLiftSlope * horProjVelD.innerProduct(horProjVelD) * horStabAOA),
 				verStabLiftD = verStabNormalVectorD.multiply(verStabLiftSlope * verProjVelD.innerProduct(verProjVelD) * verStabAOA);
 		
+		float incl = (float) (2*(Math.atan((drone.getVelocity().get(2)-Math.sqrt(Math.pow(drone.getVelocity().get(1),2)+Math.pow(drone.getVelocity().get(2), 2))/drone.getVelocity().get(1)))));
+//		System.out.println("real" +":" + drone.getVelocity());
+//		System.out.println(verProjVelD);
+//		System.out.println("AOA" +":" + verStabAOA);
 		Vector wingForce = rightWingLiftD.subtract(leftWingLiftD),
-				tailForce = horStabLiftD.add(verStabLiftD);
-		
+				tailForce = horStabLiftD.add(verStabLiftD);		
 		this.wingTorque = new BasicVector(new double[]{0, wingX * wingForce.get(2), -wingX * wingForce.get(1)});
 		this.tailTorque = crossProduct(new BasicVector(new double[]{0, 0, tailSize}), tailForce);
 		
