@@ -244,11 +244,7 @@ public class MotionPlanner implements Autopilot {
         	System.exit(0);
         }
 
-        if(center != null) {
-            centerTarget(center, inputs);
-        } else {
-//            System.out.println("Image recon ziet niets");
-        }
+        if(center != null) { centerTarget(center, inputs); }
 
         return new AutopilotOutputs() {
             @Override
