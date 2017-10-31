@@ -12,7 +12,6 @@ import image.ImageCreator;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import org.la4j.vector.dense.BasicVector;
 import physics.Drone;
 import physics.MotionPlanner;
 import physics.PhysicsEngine;
@@ -130,7 +129,7 @@ public class TestWorld implements IWorldRules {
 
         drone = new Drone(config);
         drone.setThrust(20f);
-        drone.setVelocity(new BasicVector(new double[]{0, 0, -4}));
+        drone.setVelocity(new Vector3f(0f, 0f, -4f));
 //        X positive turns the tip upwards, Y positive turns the left, Z positive rotates left
 
 
@@ -227,7 +226,7 @@ public class TestWorld implements IWorldRules {
         physicsEngine.update(interval/8, drone);
 
 
-        Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));
+        Vector3f newDronePos = new Vector3f(drone.getPosition());
 
     	/*
     	 *  Update camera positions
