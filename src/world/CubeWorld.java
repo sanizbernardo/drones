@@ -128,7 +128,7 @@ public class CubeWorld implements IWorldRules {
 
         drone = new Drone(config);
         drone.setThrust(20f);
-        drone.setVelocity(new BasicVector(new double[]{0, 0, -4}));
+        drone.setVelocity(new Vector3f(0f, 0f, -4f));
 //        X positive turns the tip upwards, Y positive turns the left, Z positive rotates left
         drone.setLeftWingInclination(20f);
 

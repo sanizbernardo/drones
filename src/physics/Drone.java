@@ -1,7 +1,6 @@
 package physics;
 
-import org.la4j.Vector;
-import org.la4j.vector.dense.BasicVector;
+import org.joml.*;
 
 import datatypes.AutopilotConfig;
 
@@ -11,22 +10,22 @@ public class Drone {
 
 	private final float wingX, tailSize;
 
-	private Vector position, velocity, orientation, rotation;
+	private Vector3f position, velocity, orientation, rotation;
 	
 	private float thrust, leftWingInclination, rightWingInclination, horStabInclination, verStabInclination;
 
 	private float engineZ;
 
 	public Drone(AutopilotConfig config) {
-		this(new BasicVector(new double[]{0,0,0}), new BasicVector(new double[]{0,0,0}),
-				new BasicVector(new double[]{0,0,0}), config);
+		this(new Vector3f(0f, 0f, 0f), new Vector3f(0f, 0f, 0f),
+				new Vector3f(0f, 0f, 0f), config);
 	}
 	
-	public Drone(Vector position, Vector velocity, Vector orientation, AutopilotConfig config) {
+	public Drone(Vector3f position, Vector3f velocity, Vector3f orientation, AutopilotConfig config) {
 		this.setPosition(position);		
 		this.setVelocity(velocity);
 		this.setOrientation(orientation);
-		this.setRotation(new BasicVector(new double[]{0, 0, 0}));
+		this.setRotation(new Vector3f(0f, 0f, 0f));
 
 		this.wingX = config.getWingX();
 		this.tailSize = config.getTailSize();
@@ -44,31 +43,31 @@ public class Drone {
 	}
 	
 	// position
-	public void setPosition(Vector pos) {
+	public void setPosition(Vector3f pos) {
 		this.position = pos;
 	}
 	
-    public Vector getPosition() {
+    public Vector3f getPosition() {
     	return position;
     }
     
     
     // velocity    
-    Vector getVelocity() {
+    public Vector3f getVelocity() {
     	return velocity;
     }
 	
-	public void setVelocity(Vector vel) {
+	public void setVelocity(Vector3f vel) {
 		this.velocity = vel;
 	}
 	
 	
 	// rotation    
-    Vector getRotation() {
+    public Vector3f getRotation() {
     	return rotation;
     }
     	
-	public void setRotation(Vector rot) {
+	public void setRotation(Vector3f rot) {
 		this.rotation = rot;
 	}
 	
@@ -81,7 +80,7 @@ public class Drone {
     public float getMaxThrust() { return  maxThrust; }
     
 	public void setThrust(float thrust) {
-		if (thrust < maxThrust && thrust >= 0) 
+		if (thrust <= maxThrust && thrust >= 0) 
 			this.thrust = thrust;
 	}
 	
@@ -138,11 +137,11 @@ public class Drone {
     	return (float) orientation.get(2);
     }
     
-    public Vector getOrientation() {
+    public Vector3f getOrientation() {
     	return orientation;
     }
     
-    public void setOrientation(Vector orientation) {
+    public void setOrientation(Vector3f orientation) {
     	this.orientation = orientation;
     }
 
