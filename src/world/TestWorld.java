@@ -1,6 +1,6 @@
 package world;
 
-import IO.MouseInput;
+import utils.IO.MouseInput;
 import datatypes.AutopilotConfig;
 import datatypes.AutopilotInputs;
 import datatypes.AutopilotOutputs;
@@ -16,7 +16,7 @@ import physics.MotionPlanner;
 import physics.PhysicsEngine;
 import utils.Constants;
 import entities.meshes.cube.Cube;
-import entities.GameItem;
+import entities.WorldObject;
 import engine.graph.Renderer;
 import entities.meshes.drone.DroneMesh;
 
@@ -48,7 +48,7 @@ public class TestWorld implements IWorldRules {
     /**
      * A list of all the GameItems.
      */
-    private GameItem[] gameItems, droneItems;
+    private WorldObject[] gameItems, droneItems;
 
     /**
      * Create the renderer of this world
@@ -79,7 +79,7 @@ public class TestWorld implements IWorldRules {
         Cube blueCube = new Cube(240,1f);
         
         Cube[] cubes = new Cube[]{redCube, greenCube, blueCube};
-        gameItems = new GameItem[1];
+        gameItems = new WorldObject[1];
         
 //        Random rand = new Random();
 
@@ -95,7 +95,7 @@ public class TestWorld implements IWorldRules {
 //            gameItems[i] = cube;
 //        }
 
-        gameItems[0] = new GameItem(cubes[0].getMesh());
+        gameItems[0] = new WorldObject(cubes[0].getMesh());
         gameItems[0].setPosition(0f,10f,-30f);
 
           //Doesn't work on Mac for some reason
@@ -135,10 +135,10 @@ public class TestWorld implements IWorldRules {
 
         //Make the drone, with all its items
         DroneMesh droneMesh = new DroneMesh(drone);
-        GameItem left = new GameItem(droneMesh.getLeft());
-        GameItem right = new GameItem(droneMesh.getRight());
-        GameItem body = new GameItem(droneMesh.getBody());
-        droneItems = new GameItem[]{left, right, body};
+        WorldObject left = new WorldObject(droneMesh.getLeft());
+        WorldObject right = new WorldObject(droneMesh.getRight());
+        WorldObject body = new WorldObject(droneMesh.getBody());
+        droneItems = new WorldObject[]{left, right, body};
 
         //Init the simulation
         planner.simulationStarted(config, new AutopilotInputs() {
@@ -244,7 +244,7 @@ public class TestWorld implements IWorldRules {
 
 
         // Update the position of each drone item
-        for (GameItem droneItem : droneItems) {
+        for (WorldObject droneItem : droneItems) {
             droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
             droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
         }
@@ -318,7 +318,7 @@ public class TestWorld implements IWorldRules {
     @Override
     public void cleanup() {
         renderer.cleanup();
-        for (GameItem gameItem : gameItems) {
+        for (WorldObject gameItem : gameItems) {
             gameItem.getMesh().cleanUp();
         }
     }

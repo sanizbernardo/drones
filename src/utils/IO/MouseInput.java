@@ -1,4 +1,4 @@
-package IO;
+package utils.IO;
 
 import engine.Window;
 import org.joml.Vector2d;

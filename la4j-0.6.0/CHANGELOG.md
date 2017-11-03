@@ -107,7 +107,7 @@ la4j-0.4.0 `Jun 2013`
  * New method `slice()`
  * New matrix method `kronecker()` (contributed by Stefano Iannello)
  * Support map-reduce approach by method pair `transform()` and `fold()`
- * New matrices and vectors sources that handles IO streams
+ * New matrices and vectors sources that handles utils.IO streams
  * Support of building a constant matrix in factories (via `createConstantMatrix()`)
  * Matrices and vectors are immutable in terms of dimension
  * Sparse entities are self-clearing (no memory leaks)

@@ -1,6 +1,6 @@
 package engine;
 
-import IO.MouseInput;
+import utils.IO.MouseInput;
 
 /**
  * Set of functions every world object needs

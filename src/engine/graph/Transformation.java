@@ -2,7 +2,7 @@ package engine.graph;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import entities.GameItem;
+import entities.WorldObject;
 
 public class Transformation {
 
@@ -69,7 +69,7 @@ public class Transformation {
      * @return
      *        The modelViewMatrix
      */
-    public Matrix4f getModelViewMatrix(GameItem gameItem, Matrix4f viewMatrix) {
+    public Matrix4f getModelViewMatrix(WorldObject gameItem, Matrix4f viewMatrix) {
         Vector3f rotation = gameItem.getRotation();
         modelViewMatrix.identity().translate(gameItem.getPosition()).
                 rotateX((float)Math.toRadians(-rotation.x)).
