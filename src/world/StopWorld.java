@@ -1,48 +1,36 @@
 package world;
 
-import javafx.scene.paint.Stop;
 import utils.IO.MouseInput;
-import datatypes.AutopilotConfig;
 import datatypes.AutopilotInputs;
 import datatypes.AutopilotOutputs;
 import engine.IWorldRules;
-import engine.Window;
-import engine.graph.Camera;
-import utils.image.ImageCreator;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-
-import physics.Drone;
-import physics.MotionPlanner;
-import physics.PhysicsEngine;
 import utils.Constants;
-import entities.meshes.cube.Cube;
 import entities.WorldObject;
-import engine.graph.Renderer;
-import entities.meshes.drone.DroneMesh;
 
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
 /**
  * Place where all the GameItem are to be placed in
  */
 public class StopWorld extends World implements IWorldRules {
 
-    public StopWorld(Window window) {
-        super(window);
+    public StopWorld() {
+        super();
     }
 
     /**
      * Init
      */
     @Override
-    public void init(Window window) throws Exception {
+    public void setup() {
+        /* Init the objects and set them as you like */
         worldObjects = new WorldObject[1];
+        worldObjects[0] = new WorldObject(cubeMeshes[0].getMesh());
+        worldObjects[0].setPosition(0f,0f,-10f);
 
+        /* Give your drone some values */
         drone.setThrust(30);
-
-        startSimulation();
     }
 
 

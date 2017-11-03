@@ -44,17 +44,13 @@ public abstract class World implements IWorldRules {
 
     protected AutopilotConfig config;
 
-    public World(Window window) {
+    public World() {
         freeCamera = new Camera();
         droneCamera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
-        createCubes();
-        createConfig();
-        hooks(window);
-        addDrone();
     }
 
-    public void startSimulation() {
+    void startSimulation() {
         planner.simulationStarted(config, new AutopilotInputs() {
             @Override
             public byte[] getImage() {
@@ -142,7 +138,19 @@ public abstract class World implements IWorldRules {
      * Init
      */
     @Override
-    public abstract void init(Window window) throws Exception;
+    public void init(Window window) throws Exception {
+        createCubes();
+        createConfig();
+        hooks(window);
+        addDrone();
+        setup();
+        startSimulation();
+    }
+
+    /**
+     * World specific
+     */
+    public abstract void setup();
 
     /**
      * Handle input, should be in seperate class
