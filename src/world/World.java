@@ -44,7 +44,10 @@ public abstract class World implements IWorldRules {
 
     protected AutopilotConfig config;
 
-    public World() {
+    private int TIME_SLOWDOWN_MULTIPLIER;
+
+    public World(int tSM) {
+        TIME_SLOWDOWN_MULTIPLIER = tSM;
         freeCamera = new Camera();
         droneCamera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
@@ -188,10 +191,7 @@ public abstract class World implements IWorldRules {
     @Override
     public void update(float interval, MouseInput mouseInput) {
 
-        /*
-         * ---Section handled by testbed---
-         */
-        physicsEngine.update(interval/8, drone);
+        physicsEngine.update(interval/TIME_SLOWDOWN_MULTIPLIER, drone);
 
 
         Vector3f newDronePos = new Vector3f(drone.getPosition());
