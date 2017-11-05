@@ -1,4 +1,4 @@
-package engine.graph;
+package entities.meshes;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -34,7 +34,7 @@ public class Mesh {
         IntBuffer indicesBuffer = null;
         try {
             vertexCount = indices.length;
-            vboIdList = new ArrayList<Integer>();
+            vboIdList = new ArrayList<>();
 
             vaoId = glGenVertexArrays();
             glBindVertexArray(vaoId);

@@ -1,9 +1,9 @@
-package world;
+package entities;
 
-import engine.graph.Mesh;
+import entities.meshes.Mesh;
 import org.joml.Vector3f;
 
-public class GameItem {
+public class WorldObject {
 
     private final Mesh mesh;
 
@@ -13,7 +13,7 @@ public class GameItem {
 
     private final Vector3f rotation;
 
-    public GameItem(Mesh mesh) {
+    public WorldObject(Mesh mesh) {
         this.mesh = mesh;
         position = new Vector3f(0, 0, 0);
         scale = 1;

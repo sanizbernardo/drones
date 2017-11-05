@@ -442,7 +442,7 @@ public class ConfigSetupGUI extends JDialog {
 		gbc_nbColsPanel.gridy = 3;
 		centerPanel.add(nbColsPanel, gbc_nbColsPanel);
 		
-		JLabel lblNbCols = new JLabel("# columns in drone camera image");
+		JLabel lblNbCols = new JLabel("# columns in drone camera utils.image");
 		nbColsPanel.add(lblNbCols);
 		
 		nbColsSpinner = new JSpinner();
@@ -461,7 +461,7 @@ public class ConfigSetupGUI extends JDialog {
 		gbc_nbRowsPanel.gridy = 4;
 		centerPanel.add(nbRowsPanel, gbc_nbRowsPanel);
 		
-		JLabel lblNbRows = new JLabel("# rows in drone camera image");
+		JLabel lblNbRows = new JLabel("# rows in drone camera utils.image");
 		nbRowsPanel.add(lblNbRows);
 		
 		nbRowsSpinner = new JSpinner();

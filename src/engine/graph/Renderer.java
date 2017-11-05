@@ -1,13 +1,13 @@
-package world;
+package engine.graph;
 
 import static org.lwjgl.opengl.GL11.*;
 
 import engine.Window;
-import engine.graph.*;
 import org.joml.Matrix4f;
 
 import datatypes.AutopilotConfig;
 import utils.*;
+import entities.WorldObject;
 
 public class Renderer {
 
@@ -93,7 +93,7 @@ public class Renderer {
      * 		  The game items that are part of the drone
      * 		  (wich will not be rendered on the droneCam view)
      */
-    public void render(Window window, Camera freeCamera, Camera droneCamera, GameItem[] gameItems, GameItem[] droneItems) {
+    public void render(Window window, Camera freeCamera, Camera droneCamera, WorldObject[] gameItems, WorldObject[] droneItems) {
         clear(window);
 
 
@@ -110,7 +110,7 @@ public class Renderer {
         Matrix4f viewMatrix = transformation.getViewMatrix(freeCamera);
 
         // Render each gameItem
-        for(GameItem gameItem : gameItems) {
+        for(WorldObject gameItem : gameItems) {
             // Set model view matrix for this item
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
@@ -119,7 +119,7 @@ public class Renderer {
         }
         
         // Render each droneItem
-        for(GameItem droneItem: droneItems) {
+        for(WorldObject droneItem: droneItems) {
         	// Set model view matrix for this item
         	Matrix4f modelViewMatrix = transformation.getModelViewMatrix(droneItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
@@ -144,7 +144,7 @@ public class Renderer {
         viewMatrix = transformation.getViewMatrix(droneCamera);
 
         // Render each gameItem
-        for (GameItem gameItem : gameItems) {
+        for (WorldObject gameItem : gameItems) {
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
             // Render the mesh for this game item

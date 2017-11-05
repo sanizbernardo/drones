@@ -1,6 +1,6 @@
 package engine;
 
-import IO.MouseInput;
+import utils.IO.MouseInput;
 import utils.Constants;
 import utils.Timer;
 

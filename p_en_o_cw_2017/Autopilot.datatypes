@@ -82,16 +82,16 @@ public datatype AutopilotConfig {
     float horizontalAngleOfView;
     /** The vertical angle of view of the camera. */
     float verticalAngleOfView;
-    /** The number of columns of pixels in the camera image. */
+    /** The number of columns of pixels in the camera utils.image. */
     int nbColumns;
-    /** The number of rows of pixels in the camera image. */
+    /** The number of rows of pixels in the camera utils.image. */
     int nbRows;
 }
 
 public datatype AutopilotInputs {
-    /** The camera image, top row first. Within a row, leftmost pixel first.
+    /** The camera utils.image, top row first. Within a row, leftmost pixel first.
     Three bytes (R, G, B) per pixel. */
-    byte[] image;
+    byte[] utils.image;
     /** X coordinate of the drone's center of gravity in world coordinates. */
     float x;
     /** Y coordinate of the drone's center of gravity in world coordinates. */
