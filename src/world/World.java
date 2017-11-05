@@ -16,7 +16,9 @@ import physics.Drone;
 import physics.MotionPlanner;
 import physics.PhysicsEngine;
 import utils.Constants;
+import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
+import utils.Utils;
 import utils.image.ImageCreator;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -24,94 +26,54 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
 public abstract class World implements IWorldRules {
 
-    protected final Vector3f cameraInc;
+    private final Vector3f cameraInc;
+    private final Camera freeCamera, droneCamera;
+    private final MotionPlanner planner = new MotionPlanner();
 
-    protected Renderer renderer;
-
-    protected final Camera freeCamera, droneCamera;
-
-    protected WorldObject[] worldObjects, droneItems;
-
-    protected PhysicsEngine physicsEngine;
+    private Renderer renderer;
+    private WorldObject[] droneItems;
+    private PhysicsEngine physicsEngine;
+    private ImageCreator imageCreator;
+    private Cube[] cubeMeshes;
+    private int TIME_SLOWDOWN_MULTIPLIER;
+    private boolean wantPhysicsEngine, wantPlanner;
+    private KeyboardInput keyboardInput;
 
     protected Drone drone;
-
-    protected ImageCreator imageCreator;
-
-    protected final MotionPlanner planner = new MotionPlanner();
-
-    protected Cube[] cubeMeshes;
-
     protected AutopilotConfig config;
 
-    private int TIME_SLOWDOWN_MULTIPLIER;
+    /* These are to be directly called in the world classes*/
+    WorldObject[] worldObjects;
 
-    public World(int tSM) {
-        TIME_SLOWDOWN_MULTIPLIER = tSM;
-        freeCamera = new Camera();
-        droneCamera = new Camera();
-        cameraInc = new Vector3f(0, 0, 0);
+    World(int tSM, boolean wantPhysicsEngine, boolean wantPlanner) {
+        this.TIME_SLOWDOWN_MULTIPLIER = tSM;
+        this.wantPhysicsEngine = wantPhysicsEngine;
+        this.wantPlanner = wantPlanner;
+        this.keyboardInput = new KeyboardInput();
+        this.freeCamera = new Camera();
+        this.droneCamera = new Camera();
+        this.cameraInc = new Vector3f(0, 0, 0);
     }
 
-    void startSimulation() {
-        planner.simulationStarted(config, new AutopilotInputs() {
-            @Override
-            public byte[] getImage() {
-                return imageCreator.screenShot();
-            }
-            @Override
-            public float getX() {
-                return 0;
-            }
-            @Override
-            public float getY() {
-                return 0;
-            }
-            @Override
-            public float getZ() {
-                return 0;
-            }
-            @Override
-            public float getHeading() {
-                return 0;
-            }
-            @Override
-            public float getPitch() {
-                return 0;
-            }
-            @Override
-            public float getRoll() {
-                return 0;
-            }
-            @Override
-            public float getElapsedTime() {
-                return 0;
-            }
-        });
+    @Override
+    public void init(Window window) throws Exception {
+        createCubes();
+        createConfig();
+        hooks(window);
+        addDrone();
+        setup();
+        startSimulation();
     }
 
-    private void addDrone() {
-        DroneMesh droneMesh = new DroneMesh(drone);
-        WorldObject left = new WorldObject(droneMesh.getLeft());
-        WorldObject right = new WorldObject(droneMesh.getRight());
-        WorldObject body = new WorldObject(droneMesh.getBody());
-        droneItems = new WorldObject[]{left, right, body};
-    }
-
-    private void hooks(Window window) {
-        physicsEngine = new PhysicsEngine(config);
-        renderer = new Renderer(config);
-        try {
-            renderer.init(window);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows());
-        drone = new Drone(config);
+    private void createCubes() {
+        Cube redCube = new Cube(0,1f);
+        Cube greenCube = new Cube(120,1f);
+        Cube blueCube = new Cube(240,1f);
+        cubeMeshes = new Cube[]{redCube, greenCube, blueCube};
     }
 
     private void createConfig() {
+        /* TODO: place hook for the GUI florian made */
         config = new AutopilotConfig() {
             public float getGravity() {return 10f;}
             public float getWingX() {return 0.25f;}
@@ -130,59 +92,54 @@ public abstract class World implements IWorldRules {
             public int getNbRows() {return 200;}};
     }
 
-    private void createCubes() {
-        Cube redCube = new Cube(0,1f);
-        Cube greenCube = new Cube(120,1f);
-        Cube blueCube = new Cube(240,1f);
-        cubeMeshes = new Cube[]{redCube, greenCube, blueCube};
+    private void hooks(Window window) {
+        physicsEngine = new PhysicsEngine(config);
+        renderer = new Renderer(config);
+        try {
+            renderer.init(window);
+        } catch (Exception e) {
+            System.out.println("Abstract class World (render.init(window)) gave this error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows());
+        drone = new Drone(config);
+    }
+
+    private void addDrone() {
+        DroneMesh droneMesh = new DroneMesh(drone);
+        WorldObject left = new WorldObject(droneMesh.getLeft());
+        WorldObject right = new WorldObject(droneMesh.getRight());
+        WorldObject body = new WorldObject(droneMesh.getBody());
+        droneItems = new WorldObject[]{left, right, body};
+    }
+
+    private void startSimulation() {
+        planner.simulationStarted(config, Utils.buildInputs(imageCreator.screenShot(),
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            0));
+    }
+
+    public Cube[] getCubeMeshes() {
+        return cubeMeshes;
     }
 
     /**
-     * Init
-     */
-    @Override
-    public void init(Window window) throws Exception {
-        createCubes();
-        createConfig();
-        hooks(window);
-        addDrone();
-        setup();
-        startSimulation();
-    }
-
-    /**
-     * World specific
+     * World specific init
      */
     public abstract void setup();
 
     /**
-     * Handle input, should be in seperate class
+     * Handle input, should be in separate class
      */
     @Override
     public void input(Window window, MouseInput mouseInput) {
-        cameraInc.set(0, 0, 0);
-        int mult = 1;
-        if(window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
-            mult = 20;
-        }
-        if (window.isKeyPressed(GLFW_KEY_C)) {
-            imageCreator.screenShotExport();
-        }
-        if (window.isKeyPressed(GLFW_KEY_W)) {
-            cameraInc.z = -mult;
-        } else if (window.isKeyPressed(GLFW_KEY_S)) {
-            cameraInc.z = mult;
-        }
-        if (window.isKeyPressed(GLFW_KEY_A)) {
-            cameraInc.x = -mult;
-        } else if (window.isKeyPressed(GLFW_KEY_D)) {
-            cameraInc.x = mult;
-        }
-        if (window.isKeyPressed(GLFW_KEY_Z)) {
-            cameraInc.y = -mult;
-        } else if (window.isKeyPressed(GLFW_KEY_X)) {
-            cameraInc.y = mult;
-        }
+        keyboardInput.worldInput(cameraInc, window, imageCreator);
     }
 
     /**
@@ -191,17 +148,12 @@ public abstract class World implements IWorldRules {
     @Override
     public void update(float interval, MouseInput mouseInput) {
 
-        physicsEngine.update(interval/TIME_SLOWDOWN_MULTIPLIER, drone);
-
+        if(wantPhysicsEngine) physicsEngine.update(interval/TIME_SLOWDOWN_MULTIPLIER, drone);
 
         Vector3f newDronePos = new Vector3f(drone.getPosition());
 
-    	/*
-    	 *  Update camera positions
-    	 */
-        freeCamera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
-
         // Update camera based on mouse
+        freeCamera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
             freeCamera.moveRotation(rotVec.x * Constants.MOUSE_SENSITIVITY, rotVec.y * Constants.MOUSE_SENSITIVITY, 0);
@@ -210,78 +162,49 @@ public abstract class World implements IWorldRules {
         droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
         droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
 
-
         // Update the position of each drone item
         for (WorldObject droneItem : droneItems) {
             droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
             droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
         }
 
-        /*
-         * ---Section handled by motion planner---
-         */
+        if(wantPlanner) plannerUpdate(newDronePos, interval);
 
-        AutopilotOutputs out = planner.timePassed(new AutopilotInputs() {
-            @Override
-            public byte[] getImage() {
-                return imageCreator.screenShot();
-            }
+    }
 
-            @Override
-            public float getX() {
-                return newDronePos.x;
-            }
-
-            @Override
-            public float getY() {
-                return newDronePos.y;
-            }
-
-            @Override
-            public float getZ() {
-                return newDronePos.z;
-            }
-
-            @Override
-            public float getHeading() {
-                return drone.getHeading();
-            }
-
-            @Override
-            public float getPitch() {
-                return drone.getPitch();
-            }
-
-            @Override
-            public float getRoll() {
-                return drone.getRoll();
-            }
-
-            @Override
-            public float getElapsedTime() {
-                return interval;
-            }
-        });
+    /**
+     * This line is only triggered if the specified world does indeed want a motion planner
+     * @param newDronePos
+     *        The new position of the drone as per the physics engine
+     * @param interval
+     *        The passed time in this step
+     */
+    private void plannerUpdate(Vector3f newDronePos, float interval) {
+        AutopilotOutputs out = planner.timePassed(
+                Utils.buildInputs(imageCreator.screenShot(),
+                        newDronePos.x,
+                        newDronePos.y,
+                        newDronePos.z,
+                        drone.getHeading(),
+                        drone.getPitch(),
+                        drone.getRoll(),
+                        interval)
+        );
 
         drone.setHorStabInclination(out.getHorStabInclination());
         drone.setVerStabInclination(out.getVerStabInclination());
         drone.setLeftWingInclination(out.getLeftWingInclination());
         drone.setRightWingInclination(out.getRightWingInclination());
         drone.setThrust(out.getThrust());
-
-        System.out.printf("X diff = %s \t Y diff = %s \t Z diff = %s \n", newDronePos.x - worldObjects[0].getPosition().x, newDronePos.y - worldObjects[0].getPosition().y, newDronePos.z - worldObjects[0].getPosition().z);
     }
 
-    /**
-     * Draw to the screen
-     */
     @Override
     public void render(Window window) {
         renderer.render(window, freeCamera, droneCamera, worldObjects, droneItems);
     }
 
     /**
-     * Delete VBO VAO
+     * Delete VBO and VAO objects
      */
     @Override
     public void cleanup() {

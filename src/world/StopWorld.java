@@ -9,9 +9,9 @@ import entities.WorldObject;
  */
 public class StopWorld extends World implements IWorldRules {
 
-    StopWorld() {
+    public StopWorld() {
         //Geef de vertraging van je wereld mee
-        super(20);
+        super(20, true);
     }
 
     /**
@@ -24,7 +24,7 @@ public class StopWorld extends World implements IWorldRules {
         worldObjects = new WorldObject[AMOUNT_OF_CUBES];
 
         /* Do something with your new batch of objects */
-        worldObjects[0] = new WorldObject(cubeMeshes[0].getMesh());
+        worldObjects[0] = new WorldObject(getCubeMeshes()[0].getMesh());
         worldObjects[0].setPosition(0f,0f,-10f);
 
         /* Give your drone some values */
