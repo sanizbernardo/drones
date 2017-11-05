@@ -1,28 +1,8 @@
 package world;
 
-import org.junit.Test;
-import utils.IO.MouseInput;
-import datatypes.AutopilotConfig;
-import datatypes.AutopilotInputs;
-import datatypes.AutopilotOutputs;
 import engine.IWorldRules;
-import engine.Window;
-import engine.graph.Camera;
-import utils.image.ImageCreator;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
-
-import physics.Drone;
-import physics.MotionPlanner;
-import physics.PhysicsEngine;
-import utils.Constants;
-import entities.meshes.cube.Cube;
 import entities.WorldObject;
-import engine.graph.Renderer;
-import entities.meshes.drone.DroneMesh;
-
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
 /**
  * Place where all the GameItem are to be placed in
