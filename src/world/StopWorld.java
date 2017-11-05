@@ -11,7 +11,7 @@ public class StopWorld extends World implements IWorldRules {
 
     public StopWorld() {
         //Geef de vertraging van je wereld mee
-        super(20, true);
+        super(20, true, true);
     }
 
     /**
