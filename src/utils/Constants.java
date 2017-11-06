@@ -1,6 +1,12 @@
 package utils;
 
 public class Constants {
+
+    /**
+     * Mac
+     */
+    public static final boolean isMac = false;
+
     /**
      * Window constants
      */

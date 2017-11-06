@@ -9,6 +9,7 @@ import gui.AutopilotGUI;
 import org.la4j.Vector;
 import org.la4j.vector.dense.BasicVector;
 import recognition.ImageRecognition;
+import utils.Constants;
 
 public class MotionPlanner implements Autopilot {
 
@@ -202,11 +203,12 @@ public class MotionPlanner implements Autopilot {
     @Override
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
         setConfig(config);
-        
-//        gui = new AutopilotGUI(config.getNbColumns(), config.getNbRows());
-//        gui.updateImage(inputs.getImage());
-//        gui.showGUI();
-        
+
+        if(!Constants.isMac) {
+            gui = new AutopilotGUI(config.getNbColumns(), config.getNbRows());
+            gui.updateImage(inputs.getImage());
+            gui.showGUI();
+        }
         return new AutopilotOutputs() {
 
             @Override
@@ -235,7 +237,7 @@ public class MotionPlanner implements Autopilot {
     @Override
     public AutopilotOutputs timePassed(AutopilotInputs inputs) {
     	
-//    	gui.updateImage(inputs.getImage());
+    	if(!Constants.isMac) gui.updateImage(inputs.getImage());
     	
         ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
         double[] center = recog.getCenter();
