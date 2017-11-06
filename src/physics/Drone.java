@@ -53,7 +53,9 @@ public class Drone {
     
     
     // velocity    
+
     public Vector3f getVelocity() {
+
     	return velocity;
     }
 	
@@ -102,7 +104,7 @@ public class Drone {
 		this.rightWingInclination = inclination;
 	}
 	
-	float getHorStabInclination() {
+	public float getHorStabInclination() {
     	return horStabInclination;
     }
 	
