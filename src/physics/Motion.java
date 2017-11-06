@@ -6,8 +6,8 @@ import datatypes.AutopilotInputs;
 import datatypes.AutopilotOutputs;
 import gui.AutopilotGUI;
 
-import org.la4j.Vector;
-import org.la4j.vector.dense.BasicVector;
+import org.joml.Matrix3f;
+import org.joml.Vector3f;
 import recognition.ImageRecognition;
 
 public class Motion implements Autopilot {
@@ -23,7 +23,7 @@ public class Motion implements Autopilot {
     private float horStabInclination;
     private float verStabInclination;
     private float newThrust;
-    private Vector oldPos, newPos, approxVel = new BasicVector(new double[] {0,0,0});
+    private Vector3f oldPos, newPos, approxVel = new Vector3f(0,0,0);
     private AutopilotConfig config;
     
     private AutopilotGUI gui;
@@ -67,29 +67,45 @@ public class Motion implements Autopilot {
     
     private void setConfig(AutopilotConfig config){ this.config = config;}
     
-//    private Vector velocity(float x, float y, float z, float time) {
-//        if (Float.isNaN(getX())|| Float.isNaN(getY()) || Float.isNaN(getZ())){
-//            setX(x);
-//            setY(y);
-//            setZ(z);
-//            return new BasicVector(new double[]{ 0,0,0});
-//        }
-//        Vector dpos = new BasicVector(new double[]{ x-getX(), y-getY(), z-getZ()});
-//        Vector vel = dpos.multiply(1/time);
-//        setX(x);
-//        setY(y);
-//        setZ(z);
-//        return vel;
-//    }
     
-    public void flyStraight(AutopilotInputs inputn, Vector vel) {
+    public Matrix3f transMat(AutopilotInputs input) {
+		return buildTransformMatrix(input.getPitch(), input.getHeading(), input.getRoll());
+	}
+    
+    public Matrix3f transMatInv(AutopilotInputs input) {
+		Matrix3f result = new Matrix3f();
+		return transMat(input).invert(result);
+	}
+    
+    public static Matrix3f buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
+		// column major -> transposed
+		Matrix3f xRot = new Matrix3f(
+				1f, 					  0f,					    0f,
+				0f,  (float)Math.cos(xAngle),  (float)Math.sin(xAngle),
+				0f, (float)-Math.sin(xAngle), (float)Math.cos(xAngle)),
+				
+			   yRot = new Matrix3f(
+				(float)Math.cos(yAngle),  0f, (float)Math.sin(yAngle),
+									 0f,  1f, 						0f,
+				(float)-Math.sin(yAngle),  0f, (float)Math.cos(yAngle)),
+			   
+			   zRot = new Matrix3f(
+				 (float)Math.cos(zAngle), (float)Math.sin(zAngle), 0f,
+				(float)-Math.sin(zAngle), (float)Math.cos(zAngle), 0f,
+									  0f, 					   0f, 1f);
+		
+		return yRot.mul(xRot).mul(zRot);
+	}
+    
+    public void flyStraight(AutopilotInputs input, Vector3f vel) {
 //    	to fly straight AOA has to be 0;
 //    	AOA is -atan2(y,x) and -atan2(y,x) == 0 if y=0
 //    	y = horProjVelD * horStabNormalVectorD
 //    	==> y-vel * cos(inclination) + z-vel * sin(inclination) == 0
 //    	Vector vel = velocity(input.getX(), input.getY(), input.getZ(), input.getElapsedTime());
-    	float yVel = (float) vel.get(1);
-    	float zVel = (float) vel.get(2);
+    	Vector3f relVelD = transMat(input).transform(vel, new Vector3f());
+    	float yVel = (float) relVelD.y;
+    	float zVel = (float) relVelD.z;
     	float incl = 0;
     	if (yVel == 0) {
     		setHorStabInclination(0);
@@ -97,6 +113,7 @@ public class Motion implements Autopilot {
     	}else {
     		float n = 0f;
     		incl = (float) (2*(Math.PI*n + Math.atan((zVel-Math.sqrt(Math.pow(yVel,2)+Math.pow(zVel, 2))/yVel))));
+    		System.out.println(incl);
     		if (incl > Math.PI/2) {
     			n = -1/2f;
 //    			System.out.println("1");
@@ -164,10 +181,10 @@ public class Motion implements Autopilot {
     @Override
     public AutopilotOutputs timePassed(AutopilotInputs inputs) {
     	
-    	newPos = new BasicVector(new double[]{inputs.getX(),inputs.getY(),inputs.getZ()});
+    	newPos = new Vector3f(inputs.getX(),inputs.getY(),inputs.getZ());
     	if (oldPos != null)
-    		approxVel = newPos.subtract(oldPos).multiply(1/inputs.getElapsedTime());
-    	oldPos = newPos.copy();
+    		approxVel = newPos.sub(oldPos, new Vector3f()).mul(1/inputs.getElapsedTime(), new Vector3f());
+    	oldPos = new Vector3f(newPos);
     	
 //    	gui.updateImage(inputs.getImage());
     	
