@@ -16,6 +16,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalSliderUI;
 
+import com.sun.prism.paint.Color;
+
 import datatypes.AutopilotOutputs;
 
 import javax.swing.JLabel;
@@ -30,6 +32,7 @@ public class AutopilotGUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private final int imgWidth, imgHeight;
+	private final boolean isMac = false;
 	
 	private JLabel lblImage;
 	private JPanel topContentPanel;
@@ -37,7 +40,7 @@ public class AutopilotGUI extends JFrame {
 	private JPanel sliderPanel;
 	private SliderHandler lwSlider, horStabSlider, rwSlider, verStabSlider, thrustSlider;
 	private JPanel horSliderPanel;
-
+	
 
 	/**
 	 * Launch the application.
@@ -47,8 +50,10 @@ public class AutopilotGUI extends JFrame {
 			public void run() {
 				try {
 					AutopilotGUI frame = new AutopilotGUI(200,200,1000);
+					BufferedImage img = ImageIO.read(new File("ActualTest.png"));
+					System.out.println(img.getHeight() + " " + img.getWidth());
+					frame.lblImage.setIcon(new ImageIcon(addCrossHair(img, 100, 100, 13133055)));
 					frame.showGUI();
-					frame.lblImage.setIcon(new ImageIcon(ImageIO.read(new File("ss.png"))));;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -63,6 +68,7 @@ public class AutopilotGUI extends JFrame {
 	public AutopilotGUI(int imgWidth, int imgHeight, int maxThrust) {		
 		this.imgWidth = imgWidth;
 		this.imgHeight = imgHeight;
+				
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -142,10 +148,10 @@ public class AutopilotGUI extends JFrame {
 		setVisible(true);
 	}
 	
-	public void updateImage(byte[] image) {
+	public void updateImage(byte[] image, int x, int y) {
 		BufferedImage img = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR);
 		img.getRaster().setDataElements(0, 0, imgWidth, imgHeight, image);
-		lblImage.setIcon(new ImageIcon(img));
+		lblImage.setIcon(new ImageIcon(addCrossHair(img, x, y, 255)));
 	}
 	
 	public void updateOutputs(AutopilotOutputs output) {
@@ -157,7 +163,7 @@ public class AutopilotGUI extends JFrame {
 	}
 
 	
-	private static SliderHandler buildSlider(String title, int orientation, int min, int val, int max, int majorSpacing, int minorSpacing, Hashtable<Integer, JLabel> lblTable, boolean hasBar) {
+	private SliderHandler buildSlider(String title, int orientation, int min, int val, int max, int majorSpacing, int minorSpacing, Hashtable<Integer, JLabel> lblTable, boolean hasBar) {
 		JPanel panel = new JPanel();
 		GridBagLayout gbl = new GridBagLayout();
 		panel.setLayout(gbl);
@@ -171,7 +177,7 @@ public class AutopilotGUI extends JFrame {
 		slider.setMinorTickSpacing(minorSpacing);
 		slider.setLabelTable(lblTable);
 		slider.setPaintLabels(true);
-		if (!hasBar)
+		if (!hasBar && !isMac)
 			slider.setUI(new NoBarMetalSliderUI());
 		panel.add(slider, buildGBC(0, 1, GridBagConstraints.CENTER));
 		
@@ -195,6 +201,17 @@ public class AutopilotGUI extends JFrame {
 		GridBagConstraints gbc = buildGBC(gridx, gridy, anchor);
 		gbc.insets = insets;
 		return gbc;
+	}
+	
+	private static BufferedImage addCrossHair(BufferedImage img, int imgx, int imgy, int color) {
+		int[] xcoords = new int[] {0, 1, -1, 2, -2 ,3, -3, 1,  1, -1, -1};
+		int[] ycoords = new int[] {0, 0,  0, 0,  0, 0,  0, 1, -1,  1, -1};	
+		for (int i = 0; i < xcoords.length; i++) {
+			img.setRGB(imgx + xcoords[i], imgy + ycoords[i], color);
+			img.setRGB(imgx + ycoords[i], imgy + xcoords[i], color);
+		}		
+		img.flush();
+		return img;
 	}
 	
 	
@@ -234,7 +251,6 @@ public class AutopilotGUI extends JFrame {
 	 * shady workaround voor iets dat eigenlijk onnodig is.
 	 */
 	private static class NoBarMetalSliderUI extends MetalSliderUI {
-		
 		@Override
 		public void paintTrack(Graphics g) {
 			super.filledSlider = false;
