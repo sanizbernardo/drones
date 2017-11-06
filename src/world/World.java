@@ -13,7 +13,7 @@ import entities.meshes.drone.DroneMesh;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import physics.Drone;
-import physics.MotionPlanner;
+import physics.Motion;
 import physics.PhysicsEngine;
 import utils.Constants;
 import utils.IO.KeyboardInput;
@@ -28,7 +28,7 @@ public abstract class World implements IWorldRules {
 
     private final Vector3f cameraInc;
     private final Camera freeCamera, droneCamera;
-    private final MotionPlanner planner = new MotionPlanner();
+    private final Motion planner = new Motion();
 
     private Renderer renderer;
     private WorldObject[] droneItems;
@@ -83,7 +83,7 @@ public abstract class World implements IWorldRules {
             public float getTailMass() {return 3f;}
             public float getMaxThrust() {return 5000f;}
             public float getMaxAOA() {return -1f;}
-            public float getWingLiftSlope() {return 0.11f;}
+            public float getWingLiftSlope() {return 1.1f;}
             public float getHorStabLiftSlope() {return 0.11f;}
             public float getVerStabLiftSlope() {return 0.11f;}
             public float getHorizontalAngleOfView() {return (float) Math.toRadians(120f);}
