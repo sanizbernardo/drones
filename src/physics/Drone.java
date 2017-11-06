@@ -54,7 +54,7 @@ public class Drone {
     
     
     // velocity    
-    Vector getVelocity() {
+    public Vector getVelocity() {
     	return velocity;
     }
 	
@@ -103,7 +103,7 @@ public class Drone {
 		this.rightWingInclination = inclination;
 	}
 	
-	float getHorStabInclination() {
+	public float getHorStabInclination() {
     	return horStabInclination;
     }
 	

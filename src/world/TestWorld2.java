@@ -228,6 +228,7 @@ public class TestWorld2 implements IWorldRules {
          * ---Section handled by testbed---
          */
         physicsEngine.update(interval, drone);
+//		System.out.println("real" +":" + drone.getHorStabInclination());
 
 
         Vector3f newDronePos = new Vector3f((float)drone.getPosition().get(0), (float)drone.getPosition().get(1), (float)drone.getPosition().get(2));

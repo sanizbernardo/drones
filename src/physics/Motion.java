@@ -110,8 +110,8 @@ public class Motion implements Autopilot {
     		if (Math.abs(incl) < Math.PI/4) {
     			setHorStabInclination(incl);
     		}
-//    		System.out.println("motion" + ":" + zVel);
-//    		System.out.println(Math.toDegrees(this.horStabInclination));
+//    		System.out.println("motion" + ":" + vel);
+//    		System.out.println(incl);
     	}
     	
     }
