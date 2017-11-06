@@ -1,5 +1,7 @@
 package world;
 
+import org.joml.Vector3f;
+
 import engine.IWorldRules;
 import entities.WorldObject;
 
@@ -7,9 +9,9 @@ import entities.WorldObject;
 /**
  * Place where all the GameItem are to be placed in
  */
-public class TestWorldMotion extends World implements IWorldRules {
+public class TestWorldFlyStraight extends World implements IWorldRules {
 
-    public TestWorldMotion() {
+    public TestWorldFlyStraight() {
         //Geef de vertraging van je wereld mee
         super(20, true, true);
     }
@@ -25,10 +27,10 @@ public class TestWorldMotion extends World implements IWorldRules {
 
         /* Do something with your new batch of objects */
         worldObjects[0] = new WorldObject(getCubeMeshes()[0].getMesh());
-        worldObjects[0].setPosition(0f,0f,-10f);
+        worldObjects[0].setPosition(0f,0f,-100f);
 
         /* Give your drone some values */
-        drone.setThrust(30);
+        drone.setVelocity(new Vector3f(0f,0f,-15f));
     }
 
 }

@@ -113,7 +113,7 @@ public class Motion implements Autopilot {
     	}else {
     		float n = 0f;
     		incl = (float) (2*(Math.PI*n + Math.atan((zVel-Math.sqrt(Math.pow(yVel,2)+Math.pow(zVel, 2))/yVel))));
-    		System.out.println(incl);
+//    		System.out.println(incl);
     		if (incl > Math.PI/2) {
     			n = -1/2f;
 //    			System.out.println("1");
@@ -153,13 +153,21 @@ public class Motion implements Autopilot {
 //        gui.updateImage(inputs.getImage());
 //        gui.showGUI();
         
+        setLeftWingInclination(9.34f);
+        setRightWingInclination(9.34f);
+        setNewThrust(18f);
+        
         return new AutopilotOutputs() {
 
             @Override
-            public float getThrust() { return 0; }
+            public float getThrust() {
+            	return 0;
+            }
 
             @Override
-            public float getLeftWingInclination() { return 0; }
+            public float getLeftWingInclination() { 
+            	return 0;
+            }
 
             @Override
             public float getRightWingInclination() {
@@ -192,7 +200,7 @@ public class Motion implements Autopilot {
         double[] center = recog.getCenter();
         
         if(recog.getDistApprox() < 4){
-        	System.exit(0);
+//        	System.exit(0);
         }
 
 //        if(center != null) {
@@ -206,7 +214,9 @@ public class Motion implements Autopilot {
 //        oldPos = newPos;
         
         flyStraight(inputs, approxVel);
-
+        
+//        System.out.println(inputs.getPitch());
+        
         return new AutopilotOutputs() {
             @Override
             public float getThrust() {
@@ -214,7 +224,9 @@ public class Motion implements Autopilot {
             }
 
             @Override
-            public float getLeftWingInclination() { return leftWingInclination; }
+            public float getLeftWingInclination() { 
+            	return leftWingInclination;
+            }
 
             @Override
             public float getRightWingInclination() {

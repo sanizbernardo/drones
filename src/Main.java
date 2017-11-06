@@ -5,7 +5,7 @@ import utils.Constants;
 import world.CubeWorld;
 import world.StopWorld;
 import world.TestWorld;
-import world.TestWorldMotion;
+import world.TestWorldFlyStraight;
 
 public class Main {
 
@@ -13,7 +13,7 @@ public class Main {
         try {
             //create a world, this will hold the game objects
 
-            IWorldRules worldRules = new TestWorldMotion();
+            IWorldRules worldRules = new TestWorldFlyStraight();
 
             //create a game engine
             Engine gameEng = new Engine(Constants.TITLE, Constants.WIDTH, Constants.HEIGHT, Constants.VSYNC, worldRules);
