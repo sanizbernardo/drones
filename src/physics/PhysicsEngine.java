@@ -189,12 +189,17 @@ public class PhysicsEngine {
 				rightWingLiftD = rightWingNormalVectorD.mul(wingLiftSlope * horProjVelD.dot(horProjVelD) * rightWingAOA, new Vector3f()),
 				horStabLiftD = horStabNormalVectorD.mul(horStabLiftSlope * horProjVelD.dot(horProjVelD) * horStabAOA, new Vector3f()),
 				verStabLiftD = verStabNormalVectorD.mul(verStabLiftSlope * verProjVelD.dot(verProjVelD) * verStabAOA, new Vector3f());
-		
+	
 		Vector3f wingForce = rightWingLiftD.sub(leftWingLiftD, new Vector3f()),
 				tailForce = horStabLiftD.add(verStabLiftD, new Vector3f());
 		
 		this.wingTorque = new Vector3f(0f, wingX * wingForce.z, -wingX * wingForce.y);
 		this.tailTorque = (new Vector3f(0f, 0f, tailSize)).cross(tailForce, new Vector3f());
+
+		float incl = (float) (2*(Math.atan((drone.getVelocity().get(2)-Math.sqrt(Math.pow(drone.getVelocity().get(1),2)+Math.pow(drone.getVelocity().get(2), 2))/drone.getVelocity().get(1)))));
+		System.out.println("proj:" + horProjVelD);
+		System.out.println("old:" + oldVel);
+//		System.out.println("AOA" +":" + horStabAOA);
 		
 		return weightVectorD.add(thrustVectorD, new Vector3f()).add(leftWingLiftD, new Vector3f())
 							.add(rightWingLiftD, new Vector3f()).add(horStabLiftD, new Vector3f())
