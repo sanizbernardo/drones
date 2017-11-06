@@ -153,9 +153,11 @@ public class Motion implements Autopilot {
 //        gui.updateImage(inputs.getImage());
 //        gui.showGUI();
         
-        setLeftWingInclination(9.34f);
-        setRightWingInclination(9.34f);
-        setNewThrust(18f);
+        setLeftWingInclination(0.1721f);
+        setRightWingInclination(0.1721f);
+//        setLeftWingInclination(0.173038683372139f);
+//        setRightWingInclination(0.0001f);
+        setNewThrust(25.9357f);
         
         return new AutopilotOutputs() {
 

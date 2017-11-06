@@ -30,7 +30,7 @@ public class TestWorldFlyStraight extends World implements IWorldRules {
         worldObjects[0].setPosition(0f,0f,-100f);
 
         /* Give your drone some values */
-        drone.setVelocity(new Vector3f(0f,0f,-15f));
+        drone.setVelocity(new Vector3f(0f,0f,-20f));
     }
 
 }

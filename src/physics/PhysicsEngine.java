@@ -198,11 +198,11 @@ public class PhysicsEngine {
 
 		float incl = (float) (2*(Math.atan((drone.getVelocity().get(2)-Math.sqrt(Math.pow(drone.getVelocity().get(1),2)+Math.pow(drone.getVelocity().get(2), 2))/drone.getVelocity().get(1)))));
 //		System.out.println("proj:" + horProjVelD);
-//		System.out.println("pos:" + drone.getPosition());
+		System.out.println("pos:" + drone.getPosition());
 //		System.out.println("pitch" +":" + drone.getPitch());
-		System.out.println("gewicht:" + (weightVectorD.sub(leftWingLiftD.add(rightWingLiftD, new Vector3f()), new Vector3f())).y);
-		System.out.println("thrust:" + (thrustVectorD.sub(leftWingLiftD.add(rightWingLiftD, new Vector3f()), new Vector3f())).z);
-//		System.out.println("gewicht:" + leftWingInclination);
+//		System.out.println("gewicht:" + (weightVectorD.add(leftWingLiftD.add(rightWingLiftD, new Vector3f()), new Vector3f())).y);
+//		System.out.println("thrust:" + (thrustVectorD.sub(leftWingLiftD.add(rightWingLiftD, new Vector3f()), new Vector3f())).z);
+//		System.out.println("gewicht:" + weightVectorD);
 //		System.out.println("thrust:" + leftWingLiftD);
 		
 		return weightVectorD.add(thrustVectorD, new Vector3f()).add(leftWingLiftD, new Vector3f())
