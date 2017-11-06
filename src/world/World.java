@@ -168,7 +168,7 @@ public abstract class World implements IWorldRules {
             droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
         }
 
-        if(wantPlanner) plannerUpdate(newDronePos, interval);
+        if(wantPlanner) plannerUpdate(newDronePos, interval/TIME_SLOWDOWN_MULTIPLIER);
 
     }
 
