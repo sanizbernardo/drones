@@ -5,7 +5,7 @@ public class Constants {
     /**
      * Mac
      */
-    public static final boolean isMac = false;
+    public static final boolean isMac = System.getProperty("os.name").contains("mac");
 
     /**
      * Window constants

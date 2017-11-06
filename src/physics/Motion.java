@@ -9,6 +9,7 @@ import gui.AutopilotGUI;
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 import recognition.ImageRecognition;
+import utils.Constants;
 
 public class Motion implements Autopilot {
 
@@ -148,10 +149,13 @@ public class Motion implements Autopilot {
     @Override
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
         setConfig(config);
-        
-//        gui = new AutopilotGUI(config.getNbColumns(), config.getNbRows());
-//        gui.updateImage(inputs.getImage());
-//        gui.showGUI();
+
+        if(Constants.isMac) {
+            gui = new AutopilotGUI(config.getNbColumns(), config.getNbRows());
+            gui.updateImage(inputs.getImage());
+            gui.showGUI();
+        }
+
         
         setLeftWingInclination(0.1721f);
         setRightWingInclination(0.1721f);
@@ -196,7 +200,7 @@ public class Motion implements Autopilot {
     		approxVel = newPos.sub(oldPos, new Vector3f()).mul(1/inputs.getElapsedTime(), new Vector3f());
     	oldPos = new Vector3f(newPos);
     	
-//    	gui.updateImage(inputs.getImage());
+    	if(Constants.isMac) gui.updateImage(inputs.getImage());
     	
         ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
         double[] center = recog.getCenter();
