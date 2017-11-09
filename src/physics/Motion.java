@@ -150,8 +150,8 @@ public class Motion implements Autopilot {
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
         setConfig(config);
 
-        if(Constants.isMac) {
-            gui = new AutopilotGUI(config.getNbColumns(), config.getNbRows());
+        if(!Constants.isMac) {
+            gui = new AutopilotGUI(config.getNbColumns(), config.getNbRows(), (int)config.getMaxThrust());
             gui.updateImage(inputs.getImage());
             gui.showGUI();
         }
@@ -200,10 +200,12 @@ public class Motion implements Autopilot {
     		approxVel = newPos.sub(oldPos, new Vector3f()).mul(1/inputs.getElapsedTime(), new Vector3f());
     	oldPos = new Vector3f(newPos);
     	
-    	if(Constants.isMac) gui.updateImage(inputs.getImage());
-    	
-        ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
+    	ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
         double[] center = recog.getCenter();
+        
+        if(!Constants.isMac) {
+        	if (center != null) gui.updateImage(inputs.getImage(), (int)center[0], (int)center[1]);
+        }
         
         if(recog.getDistApprox() < 4){
 //        	System.exit(0);

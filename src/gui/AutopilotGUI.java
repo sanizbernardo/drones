@@ -154,6 +154,13 @@ public class AutopilotGUI extends JFrame {
 		lblImage.setIcon(new ImageIcon(addCrossHair(img, x, y, 255)));
 	}
 	
+	public void updateImage(byte[] image) {
+		BufferedImage img = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR);
+		img.getRaster().setDataElements(0, 0, imgWidth, imgHeight, image);
+		lblImage.setIcon(new ImageIcon(img));
+	}
+	
+	
 	public void updateOutputs(AutopilotOutputs output) {
 		lwSlider.setValue((int) Math.toDegrees(output.getLeftWingInclination()));
 		rwSlider.setValue((int) Math.toDegrees(output.getRightWingInclination()));
@@ -207,8 +214,10 @@ public class AutopilotGUI extends JFrame {
 		int[] xcoords = new int[] {0, 1, -1, 2, -2 ,3, -3, 1,  1, -1, -1};
 		int[] ycoords = new int[] {0, 0,  0, 0,  0, 0,  0, 1, -1,  1, -1};	
 		for (int i = 0; i < xcoords.length; i++) {
-			img.setRGB(imgx + xcoords[i], imgy + ycoords[i], color);
-			img.setRGB(imgx + ycoords[i], imgy + xcoords[i], color);
+			if (imgx+xcoords[i] >= 0 && imgx+xcoords[i] < img.getWidth() && imgy + ycoords[i] >= 0 && imgy + ycoords[i] < img.getHeight())
+				img.setRGB(imgx + xcoords[i], imgy + ycoords[i], color);
+			if (imgx+ycoords[i] >= 0 && imgx+ycoords[i] < img.getWidth() && imgy + xcoords[i] >= 0 && imgy + xcoords[i] < img.getHeight())
+				img.setRGB(imgx + ycoords[i], imgy + xcoords[i], color);
 		}		
 		img.flush();
 		return img;

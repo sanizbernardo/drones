@@ -13,7 +13,7 @@ public class TestWorldFlyStraight extends World implements IWorldRules {
 
     public TestWorldFlyStraight() {
         //Geef de vertraging van je wereld mee
-        super(20, true, true);
+        super(10, true, true);
     }
 
     /**
