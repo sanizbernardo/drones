@@ -12,6 +12,8 @@ import entities.meshes.cube.Cube;
 import entities.meshes.drone.DroneMesh;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+
+import autopilot.Autopilot;
 import physics.Drone;
 import physics.Motion;
 import physics.PhysicsEngine;
@@ -28,7 +30,7 @@ public abstract class World implements IWorldRules {
 
     private final Vector3f cameraInc;
     private final Camera freeCamera, droneCamera;
-    private final Motion planner = new Motion();
+    protected Autopilot planner = new Motion();
 
     private Renderer renderer;
     private WorldObject[] droneItems;
