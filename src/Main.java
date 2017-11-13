@@ -3,6 +3,7 @@ import engine.IWorldRules;
 import engine.Window;
 import utils.Constants;
 import world.CubeWorld;
+import world.ImgRecogWorld;
 import world.StopWorld;
 import world.TestWorld;
 import world.TestWorldFlyStraight;
@@ -13,7 +14,7 @@ public class Main {
         try {
             //create a world, this will hold the game objects
 
-            IWorldRules worldRules = new TestWorldFlyStraight();
+            IWorldRules worldRules = new ImgRecogWorld();
 
             //create a game engine
             Engine gameEng = new Engine(Constants.TITLE, Constants.WIDTH, Constants.HEIGHT, Constants.VSYNC, worldRules);
