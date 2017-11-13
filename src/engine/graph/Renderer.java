@@ -3,6 +3,7 @@ package engine.graph;
 import static org.lwjgl.opengl.GL11.*;
 
 import engine.Window;
+import gui.testbed.TestbedGui;
 import org.joml.Matrix4f;
 
 import datatypes.AutopilotConfig;
@@ -155,7 +156,13 @@ public class Renderer {
 
 
 
-        
+
+        glViewport(0, droneCamHeight,droneCamWidth,(window.getHeight()) * multiplier);
+        shaderProgram.bind();
+        TestbedGui.drawString("hello", 1, 1, 1f, 20);
+        shaderProgram.unbind();
+
+
     }
 
     /**
