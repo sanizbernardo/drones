@@ -10,6 +10,8 @@ import engine.graph.Renderer;
 import entities.WorldObject;
 import entities.meshes.cube.Cube;
 import entities.meshes.drone.DroneMesh;
+import gui.testbed.TestbedGui;
+
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import physics.Drone;
@@ -38,6 +40,7 @@ public abstract class World implements IWorldRules {
     private int TIME_SLOWDOWN_MULTIPLIER;
     private boolean wantPhysicsEngine, wantPlanner;
     private KeyboardInput keyboardInput;
+    private TestbedGui testbedGui;
 
     protected Drone drone;
     protected AutopilotConfig config;
@@ -53,6 +56,7 @@ public abstract class World implements IWorldRules {
         this.freeCamera = new Camera();
         this.droneCamera = new Camera();
         this.cameraInc = new Vector3f(0, 0, 0);
+        this.testbedGui = new TestbedGui();
     }
 
     @Override
@@ -63,6 +67,7 @@ public abstract class World implements IWorldRules {
         addDrone();
         setup();
         startSimulation();
+        testbedGui.showGUI();
     }
 
     private void createCubes() {
@@ -166,10 +171,12 @@ public abstract class World implements IWorldRules {
         for (WorldObject droneItem : droneItems) {
             droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
             droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
-        }
+        } 
 
         if(wantPlanner) plannerUpdate(newDronePos, interval/TIME_SLOWDOWN_MULTIPLIER);
 
+        testbedGui.update(drone.getVelocity(), newDronePos, drone.getOrientation());
+        
     }
 
     /**

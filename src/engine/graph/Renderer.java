@@ -3,7 +3,6 @@ package engine.graph;
 import static org.lwjgl.opengl.GL11.*;
 
 import engine.Window;
-import gui.testbed.TestbedGui;
 import org.joml.Matrix4f;
 
 import datatypes.AutopilotConfig;
