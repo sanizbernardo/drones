@@ -7,11 +7,20 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -19,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
@@ -215,10 +225,7 @@ premade {
 		});
 		GridBagConstraints gbc_listPanel = GuiUtils.buildGBC(0, 1, GridBagConstraints.NORTHEAST, new Insets(5, 5, 5, 5));
 		listPanel.add(worldList);
-		inputPanel.add(listPanel, gbc_listPanel);
-		
-		
-		
+		inputPanel.add(listPanel, gbc_listPanel);		
 		
 		return panel;
 	}
@@ -226,6 +233,110 @@ premade {
 	@Override
 	public World generateWorld() {
 		return worlds.get(worldList.getSelectedValue());
+	}
+	
+	
+	
+},
+
+loadFile {
+	
+	private JCheckBox planner, physics;
+	private JSpinner slowDownSpinner;
+	private JLabel lblCheckResult;
+	private JTextField fileTextField;
+	
+	@Override
+	public String getComboText() {
+		return "Load from file";
+	}
+
+	@Override
+	public Container getContent() {
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout(0, 0));
+		
+		JPanel inputPanel = buildBase(panel, "Load a world from a file containing the position of all cubes.", 3, 6);
+		
+		planner = GuiUtils.buildCheckBox(inputPanel, "Motion planner?", 1, true);		
+		physics = GuiUtils.buildCheckBox(inputPanel, "Physics engine?", 2, true);
+		
+		slowDownSpinner = GuiUtils.buildInputSpinner(inputPanel, "Time slowdown factor:", 3, 1, 100, 10, 1);
+
+		JLabel lblFileName = new JLabel("File path: ");
+		GridBagConstraints gbc_lblFileName = GuiUtils.buildGBC(0, 4, GridBagConstraints.NORTHEAST, new Insets(5,5,5,5));
+		inputPanel.add(lblFileName, gbc_lblFileName);
+		
+		fileTextField = new JTextField(20);
+		GridBagConstraints gbc_textField = GuiUtils.buildGBC(1, 4, GridBagConstraints.NORTHWEST, new Insets(5, 5, 5, 5));
+		inputPanel.add(fileTextField, gbc_textField);
+		
+		lblCheckResult = new JLabel();
+		GridBagConstraints gbc_lblCheckResult = GuiUtils.buildGBC(1, 5, GridBagConstraints.NORTHWEST, new Insets(5, 5, 5, 5));
+		gbc_lblCheckResult.gridwidth = 3;
+		inputPanel.add(lblCheckResult, gbc_lblCheckResult);
+		
+		JButton checkBtn = new JButton("Check file");
+		checkBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				validateFile(fileTextField.getText());
+			}
+		});
+		checkBtn.setPreferredSize(new Dimension((int)checkBtn.getPreferredSize().getWidth(), (int)fileTextField.getPreferredSize().getHeight()));
+		GridBagConstraints gbc_checkBtn = GuiUtils.buildGBC(2, 4, GridBagConstraints.NORTHWEST, new Insets(5, 5, 5, 5));
+		inputPanel.add(checkBtn, gbc_checkBtn);
+		
+		
+		
+		return panel;
+	}
+	
+	private void validateFile(String fileName) {
+		try {
+			File file = new File(fileName);
+			if (!file.exists()) {
+				lblCheckResult.setText("Error: File not found.");
+				return;
+			}
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				String[] coords = line.split(" ");
+				float x = Float.valueOf(coords[0]),
+						y = Float.valueOf(coords[1]),
+						z =	Float.valueOf(coords[2]);
+			}
+			reader.close();
+			
+		} catch (ArrayIndexOutOfBoundsException e) {
+			lblCheckResult.setText("Error: Not enough numbers on a line");
+			return;
+		} catch (NumberFormatException e) {
+			lblCheckResult.setText("Error: Wrong number format");
+			return;
+		} catch (IOException e) {
+			lblCheckResult.setText("Error: IO exception");
+			return;
+		} catch (Exception e) {
+			lblCheckResult.setText(e.getMessage());
+			return;
+		}
+		
+		lblCheckResult.setText("Valid file");
+		
+	}
+	
+	
+	@Override
+	public World generateWorld() {
+		boolean wantPlanner = planner.isSelected(),
+				wantPhysics = physics.isSelected();
+		
+		int tSM = (int) slowDownSpinner.getValue();
+		
+		
+		
+		return new WorldBuilder(tSM, wantPhysics, wantPlanner, new WorldObject[] {});
 	}
 	
 };
