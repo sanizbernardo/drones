@@ -16,8 +16,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalSliderUI;
 
-import com.sun.prism.paint.Color;
-
 import datatypes.AutopilotOutputs;
 
 import javax.swing.JLabel;
@@ -32,7 +30,6 @@ public class AutopilotGUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private final int imgWidth, imgHeight;
-	private final boolean isMac = false;
 	
 	private JLabel lblImage;
 	private JPanel topContentPanel;
@@ -184,7 +181,7 @@ public class AutopilotGUI extends JFrame {
 		slider.setMinorTickSpacing(minorSpacing);
 		slider.setLabelTable(lblTable);
 		slider.setPaintLabels(true);
-		if (!hasBar && !isMac)
+		if (!hasBar)
 			slider.setUI(new NoBarMetalSliderUI());
 		panel.add(slider, buildGBC(0, 1, GridBagConstraints.CENTER));
 		
