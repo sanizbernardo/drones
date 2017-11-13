@@ -112,6 +112,7 @@ public class Engine implements Runnable {
                 sync();
             }
         }
+        worldRules.endSimulation();
     }
 
     protected void cleanup() {

@@ -16,4 +16,6 @@ public interface IWorldRules {
     void render(Window window);
 
     void cleanup();
+
+	void endSimulation();
 }

@@ -215,4 +215,9 @@ public abstract class World implements IWorldRules {
             gameItem.getMesh().cleanUp();
         }
     }
+    
+    @Override
+    public void endSimulation() {
+    	planner.simulationEnded();
+    }
 }
