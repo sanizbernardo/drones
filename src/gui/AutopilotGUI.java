@@ -16,7 +16,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalSliderUI;
 
-import com.sun.prism.paint.Color;
+//import com.sun.prism.paint.Color;
 
 import datatypes.AutopilotOutputs;
 
