@@ -31,4 +31,10 @@ public class StopWorld extends World implements IWorldRules {
         drone.setThrust(30);
     }
 
+	@Override
+	public String getDescription() {
+		return "This world just generates a cube 10m in straight front of the drone, and lets the drone fly to it." +
+				" The purpose of this world is demonstrating the ability to exit the simulation based on the distance to the cube.";
+	}
+
 }

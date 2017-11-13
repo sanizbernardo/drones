@@ -35,8 +35,15 @@ public class CubeWorld extends World implements IWorldRules {
 
         drone.setThrust(20f);
         drone.setVelocity(new Vector3f(0f, 0f, -4f));
-        drone.setLeftWingInclination(40f);
+        drone.setLeftWingInclination((float)Math.toRadians(45));
         
     }
+
+	@Override
+	public String getDescription() {
+		return "Generates a world filled with 7000 cubes, randomly generated from -50 to 50 on all axes." +
+				" The drone has no autopilot attached, and is set up to start spinning around after a few seconds" +
+				"<br> This world is made for testing rendering";
+	}
 
 }

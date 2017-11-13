@@ -64,6 +64,8 @@ public abstract class World implements IWorldRules {
         setup();
         startSimulation();
     }
+    
+    public abstract String getDescription();
 
     private void createCubes() {
         Cube redCube = new Cube(0,1f);

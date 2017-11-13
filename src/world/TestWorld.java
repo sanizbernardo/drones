@@ -26,4 +26,9 @@ public class TestWorld extends World implements IWorldRules {
         drone.setVelocity(new Vector3f(0f, 0f, -4f));
 
     }
+
+	@Override
+	public String getDescription() {
+		return "World made for the first demonstration, serves nearly no purpose anymore.";
+	}
 }

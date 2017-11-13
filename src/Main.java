@@ -1,11 +1,7 @@
 import engine.Engine;
 import engine.IWorldRules;
-import engine.Window;
 import utils.Constants;
-import world.CubeWorld;
-import world.StopWorld;
-import world.TestWorld;
-import world.TestWorldFlyStraight;
+import world.*;
 
 public class Main {
 

@@ -33,4 +33,10 @@ public class TestWorldFlyStraight extends World implements IWorldRules {
         drone.setVelocity(new Vector3f(0f,0f,-20f));
     }
 
+	@Override
+	public String getDescription() {
+		return "Demonstrates the ability to fly straight and horizonatally of the autopilot. The drone starts with an initial velocity,"
+				+ " flying towards a cube located 100m infront of it.";
+	}
+
 }
