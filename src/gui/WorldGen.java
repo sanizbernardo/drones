@@ -295,37 +295,38 @@ loadFile {
 		try {
 			File file = new File(fileName);
 			if (!file.exists()) {
-				lblCheckResult.setText("Error: File not found.");
+				lblCheckResult.setText("<html><font color='red'>Error: File not found.</font></html>");
 				return;
 			}
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			String line;
 			while ((line = reader.readLine()) != null) {
 				String[] coords = line.split(" ");
-				float x = Float.valueOf(coords[0]),
-						y = Float.valueOf(coords[1]),
-						z =	Float.valueOf(coords[2]);
+				Float.valueOf(coords[0]);
+				Float.valueOf(coords[1]);
+				Float.valueOf(coords[2]);
 			}
 			reader.close();
 			
 		} catch (ArrayIndexOutOfBoundsException e) {
-			lblCheckResult.setText("Error: Not enough numbers on a line");
+			lblCheckResult.setText("<html><font color='red'>Error: Not enough numbers on a line</font></html>");
 			return;
 		} catch (NumberFormatException e) {
-			lblCheckResult.setText("Error: Wrong number format");
+			lblCheckResult.setText("<html><font color='red'>Error: Wrong number format</font></html>");
 			return;
 		} catch (IOException e) {
-			lblCheckResult.setText("Error: IO exception");
+			lblCheckResult.setText("<html><font color='red'>Error: IO exception</font></html>");
 			return;
 		} catch (Exception e) {
-			lblCheckResult.setText(e.getMessage());
+			lblCheckResult.setText("<html><font color='red'>" + e.getMessage() + "</font></html>");
 			return;
 		}
-		
-		lblCheckResult.setText("Valid file");
-		
+		lblCheckResult.setText("<html><font color='green'>Valid file</font></html>");
 	}
 	
+	private void readFile(String fileName) {
+		
+	}
 	
 	@Override
 	public World generateWorld() {
