@@ -2,6 +2,7 @@ package world;
 
 import entities.WorldObject;
 import entities.meshes.cube.Cube;
+import physics.Motion;
 import recognition.ImgRecogPlanner;
 import utils.IO.MouseInput;
 
@@ -29,7 +30,7 @@ public class ImgRecogWorld extends World {
 		float oldZ = worldObjects[0].getPosition().z;
 		
 		worldObjects[0].setPosition(0, 0, oldZ - 0.1f);
-		
+		System.out.println(worldObjects[0].getPosition());
 		super.update(interval, mouseInput);
 	}
 

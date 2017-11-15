@@ -5,6 +5,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -23,15 +26,36 @@ public class ImageProcessing {
 
     //constructor in case of a byte[]
     public ImageProcessing(byte[] imageByte){
-    	InputStream in = new ByteArrayInputStream(imageByte);
-    	BufferedImage bImageFromConvert = null;
-		try {
-			bImageFromConvert = ImageIO.read(in);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	this.image = bImageFromConvert;
+//    	InputStream in = new ByteArrayInputStream(imageByte);
+//    	System.out.println(in == null);
+//    	BufferedImage bImageFromConvert = null;
+//		try {
+//			bImageFromConvert = ImageIO.read(in);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		System.out.println(bImageFromConvert == null);
+//    	this.image = bImageFromConvert;
+    	
+//    	this.imageWidth = 200;
+//    	this.imageHeight = 200;
+//    	final int bytes_per_pixel = 3;
+//    	byte[] raw = new byte[this.imageWidth * this.imageHeight * bytes_per_pixel];
+//    	BufferedImage image = new BufferedImage(this.imageWidth, this.imageHeight, BufferedImage.TYPE_3BYTE_BGR);
+//    	IntBuffer intBuf
+//    	        = ByteBuffer.wrap(raw)
+//    	        .order(ByteOrder.LITTLE_ENDIAN)
+//    	        .asIntBuffer();
+//    	int[] array = new int[intBuf.remaining()];
+//    	intBuf.get(array);
+//    	image.setRGB(0, 0, this.imageWidth, this.imageHeight, array, 0, this.imageWidth);
+    	
+    	this.imageHeight = 200;
+    	this.imageWidth = 200;
+        BufferedImage imageOut = new BufferedImage(this.imageWidth, this.imageHeight, BufferedImage.TYPE_3BYTE_BGR);
+		imageOut.getRaster().setDataElements(0, 0, this.imageWidth, this.imageHeight, imageByte);
+		this.image = imageOut;
     }
 
     //constructor for local images (mainly testing purposes)
