@@ -74,14 +74,25 @@ public class TestbedGui extends JFrame {
 	}
 	
 	public void update(Vector3f velocity, Vector3f position, Vector3f orientation) {
-		String velocityVal = String.valueOf( Math.round(Math.sqrt(velocity.dot(velocity)) * 10000f) / 10000f );
+	    double precision = 2;
+	    double prec = Math.pow(10, precision);
+	    
+		String velocityVal = String.valueOf( precision(Math.sqrt(velocity.dot(velocity)), prec) );
 		velocityLbl.setText("Velocity: " + velocityVal);
 		
-		positionLbl.setText("Position:" + '\n' +  "x: " + position.x + "\n y:"+ position.y + "\n z:" +  position.z);
+		positionLbl.setText("<html>Position:" + '\n' +  " x: " + precision(position.x, prec)
+														+ "<br>" +"\n y:"+ precision(position.y, prec) 
+														+ "<br>" +  "\n z:" +  precision(position.z, prec) + "</html>");
 		
-		rollLbl.setText("Roll: " + Math.toDegrees(orientation.z));
-		yawLbl.setText("Yaw: " + Math.toDegrees(orientation.y));
-		pitchLbl.setText("Pitch: " + Math.toDegrees(orientation.x));
+		rollLbl.setText("Roll: " + precision( Math.toDegrees(orientation.z), prec) );
+		yawLbl.setText("Yaw: " + precision( Math.toDegrees(orientation.y), prec));
+		pitchLbl.setText("Pitch: " + precision(Math.toDegrees(orientation.x), prec));
 
 	}
+	
+	public double precision(double value, double precision) {
+		return Math.round(value * precision) / precision;
+	}
+	
+	
 }
