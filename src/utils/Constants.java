@@ -3,12 +3,6 @@ package utils;
 public class Constants {
 
     /**
-     * Has to be manually overridden every time the program is ran on a different OS. <br>
-     *     | default == false
-     */
-    public static final boolean isMac = false;
-
-    /**
      * Window constants
      */
     public static final String TITLE = "PnO Drone Simulation";
