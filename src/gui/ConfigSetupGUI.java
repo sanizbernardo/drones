@@ -5,8 +5,12 @@ import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.border.EmptyBorder;
 
+import org.joml.Vector3f;
+
 import datatypes.AutopilotConfig;
+import datatypes.TestBedConfig;
 import utils.Constants;
+import world.World;
 
 
 public class ConfigSetupGUI extends JDialog {
@@ -18,10 +22,11 @@ public class ConfigSetupGUI extends JDialog {
 						wingMassSpinner, tailMassSpinner, maxThrustSpinner, maxAOASpinner, 
 						wingLiftslopeSpinner, verStabLiftslopeSpinner, horStabLiftslopeSpinner,
 						verFOVSpinner, horFOVSpinner, nbColsSpinner, nbRowsSpinner;
-	private AutopilotConfig config;
+
+	private JComboBox<String> genComboBox;
 
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		ConfigSetupGUI dlg = new ConfigSetupGUI();
 		System.out.println(dlg.showDialog());
 	}
@@ -43,7 +48,7 @@ public class ConfigSetupGUI extends JDialog {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				generateConfig();
+				generateAutoPilotConfig();
 				setVisible(false);
 				dispose();
 			}
@@ -67,35 +72,18 @@ public class ConfigSetupGUI extends JDialog {
 		JButton btnStart = new JButton("Start simulation");
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				generateConfig();
+				generateAutoPilotConfig();
 				setVisible(false);
 				dispose();
 			}
 		});
 		btnPanel.add(btnStart);
 		
-		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
+
 		
-		
-		JPanel configPanel = new JPanel();
-		tabbedPane.addTab("Config", configPanel);
-		configPanel.setLayout(new BorderLayout(0, 0));
-		
-		JLabel lblConfig = new JLabel("Autopilot config settings");
-		lblConfig.setFont(new Font("Tahoma", Font.BOLD, 13));
-		configPanel.add(lblConfig, BorderLayout.NORTH);
-		
-		
-		spinnerPanel = new JPanel();
-		configPanel.add(spinnerPanel, BorderLayout.CENTER);
-		GridBagLayout gbl_fieldsPanel = new GridBagLayout();
-		gbl_fieldsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0};
-		spinnerPanel.setLayout(gbl_fieldsPanel);
-		
-		buildFieldsPanel();
-		
+		// create the worldgen tab
 		JPanel worldGenPanel = new JPanel();
 		tabbedPane.addTab("Worldgen", worldGenPanel);
 		worldGenPanel.setLayout(new BorderLayout(0, 0));
@@ -109,15 +97,13 @@ public class ConfigSetupGUI extends JDialog {
 		selectorPanel.setLayout(new BorderLayout(0, 0));
 		worldGenPanel.add(selectorPanel, BorderLayout.CENTER);
 		
-		
-		String[] genComboLbls = new String[WorldGen.values().length];
-		int i = 0;
-		
 		JPanel genCards = new JPanel();
 		CardLayout genCardLayout = new CardLayout(); 
 		genCards.setLayout(genCardLayout);
 		selectorPanel.add(genCards, BorderLayout.CENTER);
 		
+		String[] genComboLbls = new String[WorldGen.values().length];
+		int i = 0;
 		for (WorldGen gen: WorldGen.values()) {
 			genCards.add(gen.getContent(), gen.getComboText());
 			genComboLbls[i] = gen.getComboText();
@@ -133,7 +119,7 @@ public class ConfigSetupGUI extends JDialog {
 		JLabel selectorLbl = new JLabel("Select world generation method: ");
 		comboPanel.add(selectorLbl);
 		
-		JComboBox<String> genComboBox = new JComboBox<String>();
+		genComboBox = new JComboBox<String>();
 		DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>(genComboLbls);
 		genComboBox.setModel(comboBoxModel);
 		comboPanel.add(genComboBox);
@@ -146,18 +132,76 @@ public class ConfigSetupGUI extends JDialog {
 		});
 		genComboBox.setSelectedItem(WorldGen.premade.getComboText());
 		
+		
+		// create the config tab
+		JPanel configPanel = new JPanel();
+		tabbedPane.addTab("Config", configPanel);
+		configPanel.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblConfig = new JLabel("Autopilot config settings");
+		lblConfig.setFont(new Font("Tahoma", Font.BOLD, 13));
+		configPanel.add(lblConfig, BorderLayout.NORTH);
+		
+		
+		spinnerPanel = new JPanel();
+		configPanel.add(spinnerPanel, BorderLayout.CENTER);
+		GridBagLayout gbl_fieldsPanel = new GridBagLayout();
+		gbl_fieldsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0};
+		spinnerPanel.setLayout(gbl_fieldsPanel);
+		
+		buildSpinners();
+		
+		
+		// create the drone startup tap
+		JPanel dronePanel = new JPanel();
+		tabbedPane.addTab("Drone", dronePanel);
+		dronePanel.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblDrone = new JLabel("Drone starting position settings");
+		lblDrone.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lblDrone.setHorizontalAlignment(SwingConstants.LEFT);
+		dronePanel.add(lblDrone, BorderLayout.NORTH);
+		
+		JPanel 
+		
 	}
 	
-	public AutopilotConfig showDialog() {
+	public TestBedConfig showDialog() throws Exception {
 		this.setVisible(true);
-		return config;
+		
+		return prepareConfig();
 	}
 
-	/**
-	 * Creating the config to be returned.
-	 */
-	private void generateConfig() {
-		config = new AutopilotConfig() {
+	private TestBedConfig prepareConfig() throws Exception {
+		
+		World world = ((WorldGen)genComboBox.getSelectedItem()).generateWorld();
+		
+		return new TestBedConfig() {
+						
+			public Vector3f getDroneStartVelocity() {
+				return null;
+			}
+			
+			public Vector3f getDroneStartPos() {
+				return null;
+			}
+			
+			public Vector3f getDroneStartOrientation() {
+				return null;
+			}
+						
+			public AutopilotConfig getAutoPilotConfig() {
+				return generateAutoPilotConfig();
+			}
+			
+			public World getWorld() {
+				return world;
+			}
+		};
+	}
+	
+	private AutopilotConfig generateAutoPilotConfig() {
+		return new AutopilotConfig() {
 			public float getWingX() {return (float) wingSizeSpinner.getValue() / 4f;}
 			
 			public float getWingMass() {return (float) wingMassSpinner.getValue();}
@@ -191,7 +235,7 @@ public class ConfigSetupGUI extends JDialog {
 	}
 	
 	
-	private void buildFieldsPanel() {
+	private void buildSpinners() {
 		gravitySpinner = GuiUtils.buildSpinner(spinnerPanel, "Gravity", 0, 0, Constants.DEFAULT_GRAVITY, 0f, 30f, 0.01f);
 
 		wingSizeSpinner = GuiUtils.buildSpinner(spinnerPanel, "Wing size", 0, 1, Constants.DEFAULT_WINGX * 4, 0f, 50f, 0.1f);

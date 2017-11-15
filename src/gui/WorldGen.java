@@ -15,7 +15,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -324,20 +326,45 @@ loadFile {
 		lblCheckResult.setText("<html><font color='green'>Valid file</font></html>");
 	}
 	
-	private void readFile(String fileName) {
+	private List<float[]> readFile() throws Exception {
+		File file = new File(fileTextField.getText());
+		if (!file.exists()) {
+			throw new FileNotFoundException();
+		}
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+		String line;
+		List<float[]> cubes = new ArrayList<>();
+		while ((line = reader.readLine()) != null) {
+			String[] coords = line.split(" ");
+			float  	x = Float.valueOf(coords[0]),
+					y = Float.valueOf(coords[1]),
+					z = Float.valueOf(coords[2]);
+			cubes.add(new float[] {x,y,z});
+		}
+		reader.close();
 		
+		return cubes;
 	}
 	
 	@Override
-	public World generateWorld() {
+	public World generateWorld() throws Exception {
 		boolean wantPlanner = planner.isSelected(),
 				wantPhysics = physics.isSelected();
 		
 		int tSM = (int) slowDownSpinner.getValue();
 		
+		List<float[]> cubePositions = readFile();
 		
+		WorldObject[] cubes = new WorldObject[cubePositions.size()]; 
+		Random rand = new Random();
 		
-		return new WorldBuilder(tSM, wantPhysics, wantPlanner, new WorldObject[] {});
+		for (int i = 0; i < cubePositions.size(); i++) {
+			Cube cube = new Cube(rand.nextInt(360), rand.nextFloat()/0.8f);
+			cubes[i] = new WorldObject(cube.getMesh());
+			cubes[i].setPosition(cubePositions.get(i)[0], cubePositions.get(i)[0], cubePositions.get(i)[0]);
+		}
+		
+		return new WorldBuilder(tSM, wantPhysics, wantPlanner, cubes);
 	}
 	
 };
@@ -371,5 +398,5 @@ public abstract String getComboText();
 
 public abstract Container getContent();
 
-public abstract World generateWorld(); 
+public abstract World generateWorld() throws Exception; 
 }
