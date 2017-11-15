@@ -31,7 +31,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 public abstract class World implements IWorldRules {
 
     private final Vector3f cameraInc;
-    private final Camera freeCamera, droneCamera;
+    private final Camera freeCamera, droneCamera, chaseCamera;
     protected Autopilot planner = new Motion();
 
     private Renderer renderer;
@@ -57,6 +57,7 @@ public abstract class World implements IWorldRules {
         this.keyboardInput = new KeyboardInput();
         this.freeCamera = new Camera();
         this.droneCamera = new Camera();
+        this.chaseCamera = new Camera();
         this.cameraInc = new Vector3f(0, 0, 0);
         this.testbedGui = new TestbedGui();
     }
@@ -169,6 +170,11 @@ public abstract class World implements IWorldRules {
         droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
         droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
 
+        float offset = 2f;
+        chaseCamera.setPosition(newDronePos.x + offset * (float)Math.cos(drone.getHeading()), newDronePos.y, newDronePos.z + offset * (float)Math.sin(drone.getHeading()));
+        chaseCamera.setRotation(0,-(float)Math.toDegrees(drone.getYaw()),0);
+        
+        
         // Update the position of each drone item
         for (WorldObject droneItem : droneItems) {
             droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
@@ -209,7 +215,7 @@ public abstract class World implements IWorldRules {
 
     @Override
     public void render(Window window) {
-        renderer.render(window, freeCamera, droneCamera, worldObjects, droneItems);
+        renderer.render(window, freeCamera, droneCamera, chaseCamera, worldObjects, droneItems);
     }
 
     /**

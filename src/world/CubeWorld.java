@@ -34,8 +34,8 @@ public class CubeWorld extends World implements IWorldRules {
         }
 
         drone.setThrust(20f);
-        drone.setVelocity(new Vector3f(0f, 0f, -4f));
-        drone.setLeftWingInclination(40f);
+        drone.setVelocity(new Vector3f(0f, 0f, -10f));
+        drone.setLeftWingInclination((float)Math.toRadians(40f));
         
     }
 

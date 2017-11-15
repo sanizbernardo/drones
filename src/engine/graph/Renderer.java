@@ -4,10 +4,12 @@ import static org.lwjgl.opengl.GL11.*;
 
 import engine.Window;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import datatypes.AutopilotConfig;
 import utils.*;
 import entities.WorldObject;
+import sun.awt.datatransfer.DataTransferer.CharsetComparator;
 
 public class Renderer {
 
@@ -55,7 +57,7 @@ public class Renderer {
     	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     	
     	// background for free camera
-    	glScissor(droneCamWidth, 0, window.getWidth(), window.getHeight());
+    	glScissor(droneCamWidth, (int) (droneCamWidth * 1.25), window.getWidth(), window.getHeight());
     	glClearColor(.41f, .4f, .4f, 1f);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -67,6 +69,14 @@ public class Renderer {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        
+        // background for chase cam
+        glScissor(droneCamWidth,0,droneCamWidth + 100,(int) (droneCamWidth * 1.25));
+        glClearColor(.51f, .51f, .51f, 1f);
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //end
         glDisable(GL_SCISSOR_TEST);
     }
 
@@ -84,12 +94,12 @@ public class Renderer {
      * 		  The game items that are part of the drone
      * 		  (wich will not be rendered on the droneCam view)
      */
-    public void render(Window window, Camera freeCamera, Camera droneCamera, WorldObject[] gameItems, WorldObject[] droneItems) {
+    public void render(Window window, Camera freeCamera, Camera droneCamera, Camera chaseCamera, WorldObject[] gameItems, WorldObject[] droneItems) {
         clear(window);
 
 
         // The free camera window
-        glViewport(droneCamWidth, 0, window.getWidth(), window.getHeight());
+        glViewport(droneCamWidth, (int) (droneCamWidth * 1.25), window.getWidth(), window.getHeight());
         
         shaderProgram.bind();
 
@@ -143,6 +153,42 @@ public class Renderer {
         }
 
         shaderProgram.unbind();
+        
+        
+        
+        
+        
+        // The Chase camera
+        glViewport(droneCamWidth,0,droneCamWidth + 100,(int) (droneCamWidth * 1.25) );
+        
+        shaderProgram.bind();
+
+        // Update projection Matrix
+        projectionMatrix = transformation.getProjectionMatrix(droneCamFOV, droneCamWidth, droneCamHeight, Constants.Z_NEAR, Constants.Z_FAR);
+        shaderProgram.setUniform("projectionMatrix", projectionMatrix);
+        
+        // Update view Matrix
+        viewMatrix = transformation.getViewMatrixY(chaseCamera);
+
+        // Render each gameItem
+        for (WorldObject gameItem : gameItems) {
+            Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
+            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+            // Render the mesh for this game item
+            gameItem.getMesh().render();
+        }
+        
+        // Render each droneItem
+        for(WorldObject droneItem: droneItems) {
+        	// Set model view matrix for this item
+        	Matrix4f modelViewMatrix = transformation.getModelViewMatrix(droneItem, viewMatrix);
+            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+            // Render the mesh for this game item
+            droneItem.getMesh().render();
+		}
+
+        shaderProgram.unbind();
+        
 
     }
 
