@@ -12,6 +12,8 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import org.joml.Vector3f;
+
 public class GuiUtils {
 	
 	static BufferedImage addCrossHair(BufferedImage img, int imgx, int imgy, int color) {
@@ -143,7 +145,6 @@ public class GuiUtils {
 	}
 	
 	
-	
 	static JCheckBox buildCheckBox(JPanel parentPanel, String lblText, int ypos, boolean checked) {
 		JLabel lbl = new JLabel(lblText);
 		GridBagConstraints gbc_lbl = GuiUtils.buildGBC(0, ypos, GridBagConstraints.NORTHEAST, new Insets(5, 0, 5, 5));
@@ -157,6 +158,12 @@ public class GuiUtils {
 	}
 	
 	
+	static Vector3f buildVector(JSpinner[] spinners) {
+		float x = (float) ((int) spinners[0].getValue()),
+				y = (float) ((int) spinners[1].getValue()),
+				z = (float) ((int) spinners[2].getValue());
+		return new Vector3f(x, y, z);
+	}
 	
 	
 }

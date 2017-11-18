@@ -14,6 +14,8 @@ public class CubeWorld extends World implements IWorldRules {
 
     public CubeWorld() {
         super(3, true, false);
+        
+        this.config = createConfig();
     }
 
     @Override

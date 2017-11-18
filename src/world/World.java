@@ -58,7 +58,7 @@ public abstract class World implements IWorldRules {
     @Override
     public void init(Window window) throws Exception {
         createCubes();
-        createConfig();
+//        createConfig();
         hooks(window);
         addDrone();
         setup();
@@ -74,9 +74,8 @@ public abstract class World implements IWorldRules {
         cubeMeshes = new Cube[]{redCube, greenCube, blueCube};
     }
 
-    private void createConfig() {
-        /* TODO: place hook for the GUI florian made */
-        config = new AutopilotConfig() {
+    public AutopilotConfig createConfig() {
+        return new AutopilotConfig() {
             public float getGravity() {return 10f;}
             public float getWingX() {return 0.25f;}
             public float getTailSize() {return 0.5f;}

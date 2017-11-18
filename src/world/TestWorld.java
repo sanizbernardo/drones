@@ -11,6 +11,8 @@ public class TestWorld extends World implements IWorldRules {
 
     public TestWorld() {
         super(10, true, true);
+        
+        this.config = createConfig();
     }
 
     @Override

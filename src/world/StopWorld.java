@@ -1,5 +1,7 @@
 package world;
 
+import org.joml.Vector3f;
+
 import engine.IWorldRules;
 import entities.WorldObject;
 
@@ -10,8 +12,9 @@ import entities.WorldObject;
 public class StopWorld extends World implements IWorldRules {
 
     public StopWorld() {
-        //Geef de vertraging van je wereld mee
-        super(20, true, true);
+    	super(20, true, true);
+    	
+    	this.config = createConfig();
     }
 
     /**
@@ -28,6 +31,7 @@ public class StopWorld extends World implements IWorldRules {
         worldObjects[0].setPosition(0f,0f,-10f);
 
         /* Give your drone some values */
+        drone.setVelocity(new Vector3f(0,0,-20));
         drone.setThrust(30);
     }
 

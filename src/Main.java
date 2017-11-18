@@ -1,5 +1,6 @@
 import engine.Engine;
 import engine.IWorldRules;
+import gui.ConfigSetupGUI;
 import utils.Constants;
 import world.*;
 
@@ -7,10 +8,10 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            //create a world, this will hold the game objects
-
-            IWorldRules worldRules = new TestWorldFlyStraight();
-
+            
+        	ConfigSetupGUI gui = new ConfigSetupGUI();
+        	IWorldRules worldRules = gui.showDialog();
+        	
             //create a game engine
             Engine gameEng = new Engine(Constants.TITLE, Constants.WIDTH, Constants.HEIGHT, Constants.VSYNC, worldRules);
             //start the game loop

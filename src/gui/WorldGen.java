@@ -167,7 +167,9 @@ oneCube {
 		boolean wantPhysicsEngine = physics.isSelected();
 		boolean wantPlanner = planner.isSelected();
 		
-		WorldObject[] worldObjects = new WorldObject[] {new WorldObject((new Cube(hue, sat)).getMesh())};
+		Cube cube = new Cube(hue, sat);
+		WorldObject cubeObj = new WorldObject(cube.getMesh());
+		WorldObject[] worldObjects = new WorldObject[] {cubeObj};
 		worldObjects[0].setPosition(x, y, z);
 		
 		return new WorldBuilder(tSM, wantPhysicsEngine, wantPlanner, worldObjects);		

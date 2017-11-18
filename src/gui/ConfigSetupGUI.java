@@ -3,14 +3,18 @@ package gui;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.border.EmptyBorder;
 
 import org.joml.Vector3f;
 
 import datatypes.AutopilotConfig;
-import datatypes.TestBedConfig;
 import utils.Constants;
+import utils.Utils;
 import world.World;
+import world.WorldBuilder;
 
 
 public class ConfigSetupGUI extends JDialog {
@@ -24,6 +28,14 @@ public class ConfigSetupGUI extends JDialog {
 						verFOVSpinner, horFOVSpinner, nbColsSpinner, nbRowsSpinner;
 
 	private JComboBox<String> genComboBox;
+
+	private JSpinner[] orientationSpinners;
+
+	private JSpinner[] velSpinners;
+
+	private JSpinner[] posSpinners;
+
+	private Map<String, WorldGen> worldGens;
 
 	
 	public static void main(String[] args) throws Exception {
@@ -103,10 +115,12 @@ public class ConfigSetupGUI extends JDialog {
 		selectorPanel.add(genCards, BorderLayout.CENTER);
 		
 		String[] genComboLbls = new String[WorldGen.values().length];
+		worldGens = new HashMap<>();
 		int i = 0;
 		for (WorldGen gen: WorldGen.values()) {
 			genCards.add(gen.getContent(), gen.getComboText());
 			genComboLbls[i] = gen.getComboText();
+			worldGens.put(gen.getComboText(), gen);
 			i++;
 		}
 		
@@ -162,42 +176,64 @@ public class ConfigSetupGUI extends JDialog {
 		lblDrone.setHorizontalAlignment(SwingConstants.LEFT);
 		dronePanel.add(lblDrone, BorderLayout.NORTH);
 		
-		JPanel 
+		JPanel startupPanel = new JPanel();
+		GridBagLayout gbl_drone = new GridBagLayout();
+		gbl_drone.columnWidths = new int[] {150};
+		gbl_drone.columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+		gbl_drone.rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0};
+		startupPanel.setLayout(gbl_drone);
+		dronePanel.add(startupPanel, BorderLayout.CENTER);
+		
+		JLabel lblDroneDesc = new JLabel("<html>Set the starting position, velocity and orientation for the drone. "
+				+ "<br> Note that this will have no effect if you select a predefined world. </html>");
+		GridBagConstraints gbc_lblDroneDesc = GuiUtils.buildGBC(0, 0, GridBagConstraints.NORTHWEST, new Insets(5, 0, 5, 5));
+		gbc_lblDroneDesc.gridwidth = 7;
+		startupPanel.add(lblDroneDesc, gbc_lblDroneDesc);
+		
+		JSeparator separator = new JSeparator();
+		GridBagConstraints gbc_separator = GuiUtils.buildGBC(0, 1, GridBagConstraints.CENTER, new Insets(5, 0, 5, 0));
+		gbc_separator.fill = GridBagConstraints.BOTH;
+		gbc_separator.gridwidth = 7;
+		startupPanel.add(separator, gbc_separator);
+		
+		posSpinners = GuiUtils.buildTripleInputSpinner(startupPanel, "Starting position", "x: ", "y: ", "z: ", 2, 
+						Utils.buildIntArr(-1000, -1000, -1000), Utils.buildIntArr(1000, 1000, 1000), 
+						Utils.buildIntArr(0,0,0), Utils.buildIntArr(1,1,1,1));
+		
+		velSpinners = GuiUtils.buildTripleInputSpinner(startupPanel, "Starting velocity", "x: ", "y: ", "z: ", 3, 
+				Utils.buildIntArr(-1000, -1000, -1000), Utils.buildIntArr(1000, 1000, 1000), 
+				Utils.buildIntArr(0,0,0), Utils.buildIntArr(1,1,1,1));
+		
+		orientationSpinners = GuiUtils.buildTripleInputSpinner(startupPanel, "Starting orientation", "x: ", "y: ", "z: ", 4, 
+				Utils.buildIntArr(-1000, -1000, -1000), Utils.buildIntArr(1000, 1000, 1000), 
+				Utils.buildIntArr(0,0,0), Utils.buildIntArr(1,1,1,1));
 		
 	}
 	
-	public TestBedConfig showDialog() throws Exception {
+	public World showDialog() throws Exception {
 		this.setVisible(true);
 		
 		return prepareConfig();
 	}
 
-	private TestBedConfig prepareConfig() throws Exception {
+	private World prepareConfig() throws Exception {
 		
-		World world = ((WorldGen)genComboBox.getSelectedItem()).generateWorld();
+		World world = worldGens.get(genComboBox.getSelectedItem()).generateWorld();
 		
-		return new TestBedConfig() {
-						
-			public Vector3f getDroneStartVelocity() {
-				return null;
-			}
+		if (world == null)
+			throw new Exception("No worldgen selected");
+		
+		if (world instanceof WorldBuilder) {
+			Vector3f pos = GuiUtils.buildVector(posSpinners),
+					 vel = GuiUtils.buildVector(velSpinners),
+					 orientation = GuiUtils.buildVector(orientationSpinners);
 			
-			public Vector3f getDroneStartPos() {
-				return null;
-			}
+			((WorldBuilder) world).setupDrone(pos, vel, orientation);
 			
-			public Vector3f getDroneStartOrientation() {
-				return null;
-			}
-						
-			public AutopilotConfig getAutoPilotConfig() {
-				return generateAutoPilotConfig();
-			}
-			
-			public World getWorld() {
-				return world;
-			}
-		};
+			((WorldBuilder) world).setupConfig(generateAutoPilotConfig());
+		}
+		
+		return world; 
 	}
 	
 	private AutopilotConfig generateAutoPilotConfig() {
