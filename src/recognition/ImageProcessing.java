@@ -167,11 +167,12 @@ public class ImageProcessing {
         double estimateZ = (-1) * estimateDistance*Math.cos(estimateVerAngle)*Math.cos(estimateHorAngle);
         
         double[] approx = {estimateX, estimateY, estimateZ};
-        System.out.println("horAngle : " + Math.toDegrees(estimateHorAngle));
-        System.out.println("verAngle : " + Math.toDegrees(estimateVerAngle));
-        System.out.println("totAngle : " + Math.toDegrees(totalAngle));
-        System.out.println("distance : " + estimateDistance);
-        System.out.println("cubeCoords : " + Arrays.toString(approx));
+        //prints for testing:
+        //System.out.println("horAngle : " + Math.toDegrees(estimateHorAngle));
+        //System.out.println("verAngle : " + Math.toDegrees(estimateVerAngle));
+        //System.out.println("totAngle : " + Math.toDegrees(totalAngle));
+        //System.out.println("distance : " + estimateDistance);
+        //System.out.println("cubeCoords : " + Arrays.toString(approx));
         return approx;
     }
     
@@ -183,6 +184,8 @@ public class ImageProcessing {
     public double guessDistance(Cube cube){ //TODO check
         ArrayList<int[]> pixels = cube.getPixels();
         double currentMaxAngle = 0;
+        
+//        twee oudere methodes:
 //        double largestDistance = -1;
 //        int[] pixelOne = null;
 //        int[] pixelTwo =  null;
@@ -227,26 +230,17 @@ public class ImageProcessing {
         Collections.sort(diffColorsAmounts);
         Collections.reverse(diffColorsAmounts);
         double biggest = diffColorsAmounts.get(0);
-        System.out.println(biggest);
-        System.out.println("hier");
         System.out.println(cube.getNbPixels());
         double side = Math.sqrt(biggest);
-        System.out.println("side" + side);
     	double x = cube.getAveragePixel()[0];
-        System.out.println(Math.atan(((x - 99)/100)*Math.tan(Math.PI/3)));
         //side = side/Math.cos(Math.atan(((x - 99)/100)*Math.tan(Math.PI/3)));
-        System.out.println("side" + side);
         double angle = calculateAngle(side, cube.getAveragePixel());
         //double angle = side*getAnglePerPixel();
-        System.out.println(getAnglePerPixel());
-        System.out.println(angle);
         double dist = 0.5/Math.tan(angle/2);
         if(diffColorsAmounts.size() > 1){
         	double second = diffColorsAmounts.get(1);
         	double secondRatio = second/(biggest+second);
         	double secondAngle = secondRatio*Math.PI/2;
-        	System.out.println(secondAngle);
-        	System.out.println(dist);
         	dist = dist/Math.cos(secondAngle);
         }
         if(diffColorsAmounts.size() > 1){
@@ -260,12 +254,10 @@ public class ImageProcessing {
     }
     
     private double calculateAngle(double side, int[] averagePixel) {
-		//benadering TODO als er tijd over is.
     	double x = averagePixel[0];
     	x -= 99;
     	//double anglePerPixel = Math.atan(((x+1)/100)*Math.tan(Math.PI/3)) - Math.atan((x/100)*Math.tan(Math.PI/3));
     	double anglePerPixel = Math.atan(((0.0+1)/100)*Math.tan(Math.PI/3)) - Math.atan((0.0/100)*Math.tan(Math.PI/3));
-    	System.out.println("x: " + x);
     	System.out.println(anglePerPixel);
 		return side*anglePerPixel;
 	}
