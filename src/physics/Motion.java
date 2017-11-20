@@ -27,7 +27,7 @@ public class Motion implements Autopilot {
     private float newThrust;
     private Vector3f oldPos, newPos, approxVel = new Vector3f(0,0,0);
     private AutopilotConfig config;
-    private MiniPID pitchPID, thrustPID, inclPID;
+    private MiniPID pitchPID, thrustPID, inclPID, yawPID;
     private AutopilotGUI gui;
     
     private float getAngle() {
@@ -70,7 +70,7 @@ public class Motion implements Autopilot {
     private void setConfig(AutopilotConfig config){ this.config = config;}
     
     
-    public Matrix3f transMat(AutopilotInputs input) {
+    private Matrix3f transMat(AutopilotInputs input) {
 		return buildTransformMatrix(input.getPitch(), input.getHeading(), input.getRoll());
 	}
     
@@ -79,8 +79,7 @@ public class Motion implements Autopilot {
 		return transMat(input).invert(result);
 	}
     
-    public static Matrix3f buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
-		// column major -> transposed
+    private static Matrix3f buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
 		Matrix3f xRot = new Matrix3f(
 				1f, 					  0f,					    0f,
 				0f,  (float)Math.cos(xAngle),  (float)Math.sin(xAngle),
@@ -99,21 +98,78 @@ public class Motion implements Autopilot {
 		return yRot.mul(xRot).mul(zRot);
 	}
 
+    public float getMass() {
+        return config.getEngineMass() + config.getTailMass() + 2*config.getWingMass();
+    }
 
-    public void flyStablePID (AutopilotInputs input, float target) {
+    private Vector3f horProjVel(AutopilotInputs inputs) {
+        Vector3f relVelD = transMat(inputs).transform(approxVel, new Vector3f());
+        return new Vector3f(0, relVelD.y, relVelD.z);
+    }
+
+    private float wingAOA(AutopilotInputs inputs) {
+        Vector3f horProjVelD = horProjVel(inputs);
+        Vector3f WingNormalVectorD = new Vector3f(0f, (float)Math.cos((double) rightWingInclination), (float)Math.sin((double) rightWingInclination));
+        Vector3f WingAttackVectorD = new Vector3f(0f, (float)Math.sin((double) rightWingInclination), (float)-Math.cos((double) rightWingInclination));
+        return (float) -Math.atan2(horProjVelD.dot(WingNormalVectorD), horProjVelD.dot(WingAttackVectorD));
+    }
+
+    public float stabAOA(AutopilotInputs inputs) {
+        Vector3f horProjVelD = horProjVel(inputs);
+        Vector3f WingNormalVectorD = new Vector3f(0f, (float)Math.cos((double) horStabInclination), (float)Math.sin((double) horStabInclination));
+        Vector3f WingAttackVectorD = new Vector3f(0f, (float)Math.sin((double) horStabInclination), (float)-Math.cos((double) horStabInclination));
+        return (float) -Math.atan2(horProjVelD.dot(WingNormalVectorD), horProjVelD.dot(WingAttackVectorD));
+    }
+
+    private float stableInclination(AutopilotInputs inputs) {
+        float AOA = wingAOA(inputs);
+        float L = 2*config.getWingLiftSlope()*AOA*horProjVel(inputs).dot(horProjVel(inputs));
+        double incl = inputs.getPitch() + Math.toRadians(90) - Math.asin(-newThrust*Math.cos(inputs.getPitch())/L);
+        return (float)incl;
+    }
+
+    /**
+    public float climbthrust(AutopilotInputs inputs , float riseVel, Vector3f vel) {
+
+        float AOA = stabAOA(inputs, vel);
+        float L = 2*config.getWingLiftSlope()*AOA*horProjVel(inputs, vel).dot(horProjVel(inputs, vel));
+
+        float riseThrust = (float) ( (getMass()*(riseVel + config.getGravity()) - L*Math.sin(inputs.getPitch() + Math.toRadians(90) - leftWingInclination))/Math.sin(inputs.getPitch()) );
+        float advanceThrust = (float) ( -L*Math.cos(inputs.getPitch() + Math.toRadians(90) - leftWingInclination)/Math.sin(inputs.getPitch()) );
+
+        if (Float.isNaN(riseThrust) || Float.isNaN(advanceThrust)){
+            return 0f;
+        }
+
+        if (advanceThrust > config.getMaxThrust() || riseThrust > config.getMaxThrust()) {
+            return config.getMaxThrust();
+        } else if (advanceThrust < 0f && riseThrust < 0f) {
+            return 0f;
+        } else {
+            if (riseThrust >= advanceThrust) {
+                return riseThrust;
+            } else {
+                return advanceThrust;
+            }
+        }
+    }
+     */
+
+
+    private void adjustPitch(AutopilotInputs input, float target) {
         pitchPID.setSetpoint(target);
         float actual = input.getPitch();
         float output = (float)pitchPID.getOutput(actual);
         setHorStabInclination(-output);
     }
 
-    public void adjustInclination(AutopilotInputs inputs, float target) {
+    private void adjustInclination(AutopilotInputs inputs, float target) {
         inclPID.setSetpoint(target);
         float actual = approxVel.y();
         float output = (float)inclPID.getOutput(actual);
     }
 
-    public void adjustThrust(AutopilotInputs inputs, float target) {
+    private void adjustThrust(AutopilotInputs inputs, float target) {
         thrustPID.setSetpoint(target);
         float actual = approxVel.y();
         float output = (float)thrustPID.getOutput(actual);
@@ -125,37 +181,59 @@ public class Motion implements Autopilot {
         }
         if (thrust > config.getMaxThrust()) {
             setNewThrust(config.getMaxThrust());
+        } else if (thrust < 0f){
+            setNewThrust(0);
         } else {
             setNewThrust(thrust);
         }
     }
 
-    public void flyStraightPID(AutopilotInputs input, float target) {
-        flyStablePID(input, target);
-        adjustThrust(input, target);
+    private void flyStraightPID(AutopilotInputs input) {
+        adjustInclination(input, (float)Math.toRadians(0));
+        adjustPitch(input, 0f);
+        adjustThrust(input, 0f);
     }
 
-    public void climbPID(AutopilotInputs inputs, float target) {
-        if (inputs.getY() < target - 2f) {
-            adjustInclination(inputs, (float)Math.toRadians(15));
-            adjustThrust(inputs, 1f);
-        } else if (inputs.getY() > target + 2f) {
+    private void climbPID(AutopilotInputs inputs, float target) {
+        float climbAngle = (float)Math.toRadians(10);
+
+        if (inputs.getY() < target - 1f) {
+
+//            adjustPitch(inputs, climbAngle);
+
+            float incl = stableInclination(inputs);
+            if (!Float.isNaN(incl)){
+                setRightWingInclination(incl);
+                setLeftWingInclination(incl);
+            }
+
+            if (inputs.getPitch() < climbAngle + 0.05 && inputs.getPitch() > climbAngle - 0.05) {adjustThrust(inputs, 1f);}
+
+        } else if (inputs.getY() > target + 1f) {
             setNewThrust(0f);
         } else {
-            adjustInclination(inputs, (float)Math.toRadians(0));
-            flyStraightPID(inputs, target);
+            flyStraightPID(inputs);
         }
+    }
+
+    private void stableYawPID(AutopilotInputs input) {
+        pitchPID.setSetpoint(0f);
+        float actual = input.getHeading();
+        float output = (float)pitchPID.getOutput(actual);
+        setVerStabInclination(-output);
     }
     
 
     @Override
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
         pitchPID = new MiniPID(1.2, 0.15, 0.1);
-        pitchPID.setOutputLimits(Math.toRadians(45));
+        pitchPID.setOutputLimits(Math.toRadians(30));
         thrustPID = new MiniPID(1.2, 0.15, 0.1);
         thrustPID.setOutputLimits(config.getMaxThrust());
         inclPID = new MiniPID(1.2, 0.15, 0.1);
-        inclPID.setOutputLimits(Math.toRadians(45));
+        inclPID.setOutputLimits(Math.toRadians(30));
+        yawPID = new MiniPID(1.2, 0.15, 0.1);
+        yawPID.setOutputLimits(Math.toRadians(30));
         setConfig(config);
 
         if(!Constants.isMac) {
@@ -218,12 +296,11 @@ public class Motion implements Autopilot {
 //        	System.exit(0);
         }
 
-
-//        flyStraightPID(inputs, 0f);
-        climbPID(inputs,5f);
+        climbPID(inputs,0f);
+        stableYawPID(inputs);
 
         
-        System.out.printf("height = %s\t thrust = %s\t velocity = %s\t %s\t %s\t\n", inputs.getY(), newThrust, approxVel.x(), approxVel.y(), approxVel.z());
+        System.out.printf("height = %s\t pitch = %s\t thrust = %s\t y-velocity = %s\t \n", inputs.getY(), inputs.getPitch(), newThrust, approxVel.y());
 
         
         return new AutopilotOutputs() {
