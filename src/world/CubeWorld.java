@@ -4,6 +4,7 @@ package world;
 import engine.IWorldRules;
 import org.joml.Vector3f;
 import entities.WorldObject;
+import physics.Drone;
 
 import java.util.Random;
 
@@ -20,6 +21,7 @@ public class CubeWorld extends World implements IWorldRules {
 
     @Override
     public void setup() {
+    	
         Random rand = new Random();
 
         worldObjects = new WorldObject[7000];
@@ -34,6 +36,8 @@ public class CubeWorld extends World implements IWorldRules {
             cube.setPosition(x1, y, z);
             worldObjects[i] = cube;
         }
+
+        drone = new Drone(config);
 
         drone.setThrust(20f);
         drone.setVelocity(new Vector3f(0f, 0f, -4f));

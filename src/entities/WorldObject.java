@@ -7,7 +7,7 @@ public class WorldObject {
 
     private final Mesh mesh;
 
-    private final Vector3f position;
+    private Vector3f position;
 
     private float scale;
 
@@ -28,6 +28,10 @@ public class WorldObject {
         this.position.x = x;
         this.position.y = y;
         this.position.z = z;
+    }
+    
+    public void setPosition(Vector3f position) {
+    	this.position = position;
     }
 
     public float getScale() {

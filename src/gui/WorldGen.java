@@ -36,7 +36,10 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.joml.Vector3f;
+
 import entities.WorldObject;
+import entities.meshes.cube.BufferedCube;
 import entities.meshes.cube.Cube;
 import utils.Utils;
 import world.World;
@@ -99,23 +102,20 @@ public enum WorldGen {
 			boolean wantPhysicsEngine = physics.isSelected();
 			boolean wantPlanner = planner.isSelected();
 			
-			WorldObject[] worldObjects = new WorldObject[nbCubes];
+			Map<Vector3f, BufferedCube> worldObjects = new HashMap<>();
 			Random rand = new Random();
 			
-			Cube redCube = new Cube(0,1f), greenCube = new Cube(120,1f),
-					blueCube = new Cube(240,1f);
-	        Cube[] cubes = new Cube[]{redCube, greenCube, blueCube};
+			BufferedCube redCube = new BufferedCube(0,1f), greenCube = new BufferedCube(120,1f),
+					blueCube = new BufferedCube(240,1f);
+			BufferedCube[] cubes = new BufferedCube[]{redCube, greenCube, blueCube};
 	        
 			for (int i = 0; i < nbCubes; i++) {
-	            WorldObject cube = new WorldObject(cubes[rand.nextInt(cubes.length)].getMesh());
-	            cube.setScale(0.5f);
-	            int x = rand.nextInt(xMin + xMax)-xMin,
-	            		y = rand.nextInt(yMin + yMax)-yMin,
-	            		z = rand.nextInt(zMin + zMax)-zMin;
-
-	            cube.setPosition(x, y, z);
-	            worldObjects[i] = cube;				
+				int x = rand.nextInt(Math.abs(xMin - xMax))+xMin,
+	            		y = rand.nextInt(Math.abs(yMin - yMax))+yMin,
+	            		z = rand.nextInt(Math.abs(zMin - zMax))+zMin;
+				worldObjects.put(new Vector3f(x,y,z), cubes[rand.nextInt(cubes.length)]);
 			}
+			
 			
 			return new WorldBuilder(tSM, wantPhysicsEngine, wantPlanner, worldObjects);		
 		}
@@ -167,10 +167,9 @@ oneCube {
 		boolean wantPhysicsEngine = physics.isSelected();
 		boolean wantPlanner = planner.isSelected();
 		
-		Cube cube = new Cube(hue, sat);
-		WorldObject cubeObj = new WorldObject(cube.getMesh());
-		WorldObject[] worldObjects = new WorldObject[] {cubeObj};
-		worldObjects[0].setPosition(x, y, z);
+		BufferedCube cube = new BufferedCube(hue, sat);
+		Map<Vector3f, BufferedCube> worldObjects = new HashMap<>();
+		worldObjects.put(new Vector3f(x,y,z), cube);
 		
 		return new WorldBuilder(tSM, wantPhysicsEngine, wantPlanner, worldObjects);		
 	}
@@ -328,20 +327,20 @@ loadFile {
 		lblCheckResult.setText("<html><font color='green'>Valid file</font></html>");
 	}
 	
-	private List<float[]> readFile() throws Exception {
+	private List<Vector3f> readFile() throws Exception {
 		File file = new File(fileTextField.getText());
 		if (!file.exists()) {
 			throw new FileNotFoundException();
 		}
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 		String line;
-		List<float[]> cubes = new ArrayList<>();
+		List<Vector3f> cubes = new ArrayList<>();
 		while ((line = reader.readLine()) != null) {
 			String[] coords = line.split(" ");
 			float  	x = Float.valueOf(coords[0]),
 					y = Float.valueOf(coords[1]),
 					z = Float.valueOf(coords[2]);
-			cubes.add(new float[] {x,y,z});
+			cubes.add(new Vector3f(x, y ,z));
 		}
 		reader.close();
 		
@@ -355,15 +354,14 @@ loadFile {
 		
 		int tSM = (int) slowDownSpinner.getValue();
 		
-		List<float[]> cubePositions = readFile();
+		List<Vector3f> cubePositions = readFile();
 		
-		WorldObject[] cubes = new WorldObject[cubePositions.size()]; 
+		Map<Vector3f, BufferedCube> cubes = new HashMap<>(); 
 		Random rand = new Random();
 		
 		for (int i = 0; i < cubePositions.size(); i++) {
-			Cube cube = new Cube(rand.nextInt(360), rand.nextFloat()/0.8f);
-			cubes[i] = new WorldObject(cube.getMesh());
-			cubes[i].setPosition(cubePositions.get(i)[0], cubePositions.get(i)[0], cubePositions.get(i)[0]);
+			BufferedCube cube = new BufferedCube(rand.nextInt(360), rand.nextFloat()/0.8f);
+			cubes.put(cubePositions.get(i), cube);
 		}
 		
 		return new WorldBuilder(tSM, wantPhysics, wantPlanner, cubes);

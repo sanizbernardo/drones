@@ -60,8 +60,8 @@ public abstract class World implements IWorldRules {
         createCubes();
 //        createConfig();
         hooks(window);
-        addDrone();
         setup();
+        addDrone();
         startSimulation();
     }
     
@@ -104,7 +104,6 @@ public abstract class World implements IWorldRules {
         }
 
         imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows());
-        drone = new Drone(config);
     }
 
     private void addDrone() {

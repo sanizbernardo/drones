@@ -228,10 +228,8 @@ public class ConfigSetupGUI extends JDialog {
 					 vel = GuiUtils.buildVector(velSpinners),
 					 orientation = GuiUtils.buildVector(orientationSpinners);
 			
-			((WorldBuilder) world).setupDrone(pos, vel, orientation);
-			
-			((WorldBuilder) world).setupConfig(generateAutoPilotConfig());
-		}
+			((WorldBuilder) world).setupDrone(generateAutoPilotConfig(), pos, vel, orientation);
+	}
 		
 		return world; 
 	}
@@ -242,11 +240,11 @@ public class ConfigSetupGUI extends JDialog {
 			
 			public float getWingMass() {return (float) wingMassSpinner.getValue();}
 			
-			public float getWingLiftSlope() {return ((Double) wingLiftslopeSpinner.getValue()).floatValue();}
+			public float getWingLiftSlope() {return (float) wingLiftslopeSpinner.getValue();}
 			
 			public float getVerticalAngleOfView() {return (float) (Math.toRadians((int) verFOVSpinner.getValue()));}
 			
-			public float getVerStabLiftSlope() {return ((Double) verStabLiftslopeSpinner.getValue()).floatValue();}
+			public float getVerStabLiftSlope() {return (float) verStabLiftslopeSpinner.getValue();}
 			
 			public float getTailSize() {return (float) tailSizeSpinner.getValue();}
 			
@@ -262,9 +260,9 @@ public class ConfigSetupGUI extends JDialog {
 			
 			public float getHorizontalAngleOfView() {return (float) (Math.toRadians((int) horFOVSpinner.getValue()));}
 			
-			public float getHorStabLiftSlope() {return ((Double) horStabLiftslopeSpinner.getValue()).floatValue();}
+			public float getHorStabLiftSlope() {return (float) horStabLiftslopeSpinner.getValue();}
 			
-			public float getGravity() {return ((Double) gravitySpinner.getValue()).floatValue();}
+			public float getGravity() {return (float) gravitySpinner.getValue();}
 			
 			public float getEngineMass() {return (float) engineMassSpinner.getValue();}
 		};

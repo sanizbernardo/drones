@@ -1,22 +1,36 @@
 package world;
 
+import java.util.Map;
+
 import org.joml.Vector3f;
 
 import datatypes.AutopilotConfig;
 import engine.IWorldRules;
 import entities.WorldObject;
+import entities.meshes.cube.*;
+import physics.Drone;
 
 public class WorldBuilder extends World implements IWorldRules {
 		
-	public WorldBuilder(int tSM, boolean wantPhysicsEngine, boolean wantPlanner, WorldObject[] worldObjects) {
+	private Map<Vector3f, BufferedCube> cubes;
+	
+	public WorldBuilder(int tSM, boolean wantPhysicsEngine, boolean wantPlanner, Map<Vector3f, BufferedCube> cubes) {
 		super(tSM, wantPhysicsEngine, wantPlanner);
-		
-		this.config = config;
-		this.worldObjects = worldObjects;
+		this.cubes = cubes;
 	}
 
 	@Override
 	public void setup() {
+		this.worldObjects = new WorldObject[cubes.size()];
+		int i = 0;
+		
+		for (Vector3f pos: cubes.keySet()) {
+			Cube cube = cubes.get(pos).setup();
+			this.worldObjects[i] = new WorldObject(cube.getMesh());
+			this.worldObjects[i].setPosition(pos);
+			i++;
+		}
+		
 		
 	}
 
@@ -25,11 +39,10 @@ public class WorldBuilder extends World implements IWorldRules {
 		return "Internal hook for GUI world creation";
 	}
 	
-	public void setupConfig(AutopilotConfig config) {
-		this.config = config;
-	}
-	
-	public void setupDrone(Vector3f startPos, Vector3f startVel, Vector3f startOrientation) {
+	public void setupDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel, Vector3f startOrientation) {
+        this.config = config;
+		
+		this.drone = new Drone(config);
 		this.drone.setPosition(startPos);
 		this.drone.setVelocity(startVel);
 		this.drone.setOrientation(startOrientation);

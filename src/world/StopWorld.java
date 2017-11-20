@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 
 import engine.IWorldRules;
 import entities.WorldObject;
+import physics.Drone;
 
 
 /**
@@ -31,6 +32,8 @@ public class StopWorld extends World implements IWorldRules {
         worldObjects[0].setPosition(0f,0f,-10f);
 
         /* Give your drone some values */
+        drone = new Drone(config);
+        
         drone.setVelocity(new Vector3f(0,0,-20));
         drone.setThrust(30);
     }
