@@ -142,7 +142,7 @@ public class Drone {
 	
 	public Vector3f getR0() {
 		Vector3f heading = getH();
-		return heading.cross(right, new Vector3f());
+		return heading.cross(new Vector3f(), new Vector3f());
 	}
 	
 	public Vector3f getU0() {
@@ -164,10 +164,10 @@ public class Drone {
     	return (float) Math.atan2(y,x);
     }
     public float getRoll() {
-//    	float y = right.dot(getU0());
-//    	float x = right.dot(getR0());
-//    	return (float) Math.atan2(y,x);
-    	return 0f;
+    	float y = right.dot(getU0());
+    	float x = right.dot(getR0());
+    	return (float) Math.atan2(y,x);
+//    	return 0f;
     }
     
     public float getYaw() {
