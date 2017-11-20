@@ -71,13 +71,13 @@ public class PhysicsEngine {
 		// position/orientation update
 		// newx = a/2*t� + v*t + x
 
-		drone.setPosition(drone.getPosition().add(oldVel.mul(dt, new Vector3f())).add(acceleration(drone).mul(dt*dt/2, new Vector3f()), new Vector3f()));
+		drone.setPosition(drone.getPosition().add(oldVel.mul(dt, new Vector3f())).add(acceleration(dt, drone).mul(dt*dt/2, new Vector3f()), new Vector3f()));
 		drone.setOrientation(drone.getOrientation().add(drone.getRotation().mul(dt), new Vector3f()).add(angularAcceleration(dt, drone).mul(dt*dt/2, new Vector3f()), new Vector3f()));
 		
 		// velocity/rotation update
 		// newv = a*t + v
 		
-		drone.setVelocity(oldVel.add(acceleration(drone).mul(dt, new Vector3f()), new Vector3f()));
+		drone.setVelocity(oldVel.add(acceleration(dt, drone).mul(dt, new Vector3f()), new Vector3f()));
 		drone.setRotation(drone.getRotation().add(angularVelocity(dt, drone), new Vector3f()));
 	}
 	
@@ -159,14 +159,19 @@ public class PhysicsEngine {
 		+Math.pow(drone.getPosition().get(2), 2 ));
 	}
 	
-	public Vector3f accelerationD(Drone drone) {
+	public Vector3f accelerationD(float dt, Drone drone) {
 		float leftWingInclination = drone.getLeftWingInclination(), rightWingInclination = drone.getRightWingInclination(),
 				horStabInclination = drone.getHorStabInclination(), verStabInclination = drone.getVerStabInclination();
-		Vector3f oldVel = drone.getVelocity();
+		
+		Vector3f oldVelLW = velLW(dt,drone);
+		Vector3f oldVelRW = velRW(dt,drone);
+		Vector3f oldVelT = velT(dt,drone);
 		
 		Vector3f weightVectorD = transMat(drone).transform(weightVector, new Vector3f()),
 				thrustVectorD = new Vector3f(0f, 0f, -drone.getThrust()),
-				relVelD = transMat(drone).transform(oldVel, new Vector3f()),
+				relVelLW = transMat(drone).transform(oldVelLW, new Vector3f()),
+				relVelRW = transMat(drone).transform(oldVelRW, new Vector3f()),
+				relVelT = transMat(drone).transform(oldVelT, new Vector3f()),
 				leftWingAttackVectorD = new Vector3f(0f, (float)Math.sin((double) leftWingInclination), (float)-Math.cos((double) leftWingInclination)),
 				rightWingAttackVectorD = new Vector3f(0f, (float)Math.sin((double) rightWingInclination), (float)-Math.cos((double) rightWingInclination)),
 				horStabAttackVectorD = new Vector3f(0f, (float)Math.sin((double) horStabInclination), (float)-Math.cos((double) horStabInclination)),
@@ -176,19 +181,21 @@ public class PhysicsEngine {
 				horStabNormalVectorD = new Vector3f(0f, (float)Math.cos((double) horStabInclination), (float)Math.sin((double) horStabInclination)),
 				verStabNormalVectorD = new Vector3f((float)-Math.cos((double) verStabInclination), 0f, (float)Math.sin((double) verStabInclination));
 		
-		Vector3f horProjVelD = new Vector3f(0, relVelD.y, relVelD.z),
-				verProjVelD = new Vector3f(relVelD.x,0, relVelD.z);
+		Vector3f horProjVelLW = new Vector3f(0, relVelLW.y, relVelLW.z),
+				horProjVelRW = new Vector3f(0, relVelRW.y, relVelRW.z),
+				horProjVelT = new Vector3f(0, relVelT.y, relVelT.z),
+				verProjVelT = new Vector3f(relVelT.x,0, relVelT.z);
 		
-		float leftWingAOA = (float) -Math.atan2(horProjVelD.dot(leftWingNormalVectorD), horProjVelD.dot(leftWingAttackVectorD)),
-				rightWingAOA = (float) -Math.atan2(horProjVelD.dot(rightWingNormalVectorD), horProjVelD.dot(rightWingAttackVectorD)),
-				horStabAOA = (float) -Math.atan2(horProjVelD.dot(horStabNormalVectorD), horProjVelD.dot(horStabAttackVectorD)),
-				verStabAOA = (float) -Math.atan2(verProjVelD.dot(verStabNormalVectorD), verProjVelD.dot(verStabAttackVectorD));
+		float leftWingAOA = (float) -Math.atan2(horProjVelLW.dot(leftWingNormalVectorD), horProjVelLW.dot(leftWingAttackVectorD)),
+				rightWingAOA = (float) -Math.atan2(horProjVelRW.dot(rightWingNormalVectorD), horProjVelRW.dot(rightWingAttackVectorD)),
+				horStabAOA = (float) -Math.atan2(horProjVelT.dot(horStabNormalVectorD), horProjVelT.dot(horStabAttackVectorD)),
+				verStabAOA = (float) -Math.atan2(verProjVelT.dot(verStabNormalVectorD), verProjVelT.dot(verStabAttackVectorD));
 		
 		
-		Vector3f leftWingLiftD = leftWingNormalVectorD.mul(wingLiftSlope * horProjVelD.dot(horProjVelD) * leftWingAOA, new Vector3f()),
-				rightWingLiftD = rightWingNormalVectorD.mul(wingLiftSlope * horProjVelD.dot(horProjVelD) * rightWingAOA, new Vector3f()),
-				horStabLiftD = horStabNormalVectorD.mul(horStabLiftSlope * horProjVelD.dot(horProjVelD) * horStabAOA, new Vector3f()),
-				verStabLiftD = verStabNormalVectorD.mul(verStabLiftSlope * verProjVelD.dot(verProjVelD) * verStabAOA, new Vector3f());
+		Vector3f leftWingLiftD = leftWingNormalVectorD.mul(wingLiftSlope * horProjVelLW.dot(horProjVelLW) * leftWingAOA, new Vector3f()),
+				rightWingLiftD = rightWingNormalVectorD.mul(wingLiftSlope * horProjVelRW.dot(horProjVelRW) * rightWingAOA, new Vector3f()),
+				horStabLiftD = horStabNormalVectorD.mul(horStabLiftSlope * horProjVelT.dot(horProjVelT) * horStabAOA, new Vector3f()),
+				verStabLiftD = verStabNormalVectorD.mul(verStabLiftSlope * verProjVelT.dot(verProjVelT) * verStabAOA, new Vector3f());
 	
 		Vector3f wingForce = rightWingLiftD.sub(leftWingLiftD, new Vector3f()),
 				tailForce = horStabLiftD.add(verStabLiftD, new Vector3f());
@@ -196,9 +203,9 @@ public class PhysicsEngine {
 		this.wingTorque = new Vector3f(0f, wingX * wingForce.z, -wingX * wingForce.y);
 		this.tailTorque = (new Vector3f(0f, 0f, tailSize)).cross(tailForce, new Vector3f());
 
-		float incl = (float) (2*(Math.atan((drone.getVelocity().get(2)-Math.sqrt(Math.pow(drone.getVelocity().get(1),2)+Math.pow(drone.getVelocity().get(2), 2))/drone.getVelocity().get(1)))));
+		//float incl = (float) (2*(Math.atan((drone.getVelocity().get(2)-Math.sqrt(Math.pow(drone.getVelocity().get(1),2)+Math.pow(drone.getVelocity().get(2), 2))/drone.getVelocity().get(1)))));
 //		System.out.println("proj:" + horProjVelD);
-		System.out.println("pos:" + drone.getPosition());
+//		System.out.println("pos:" + drone.getPosition());
 //		System.out.println("pitch" +":" + drone.getPitch());
 //		System.out.println("gewicht:" + (weightVectorD.add(leftWingLiftD.add(rightWingLiftD, new Vector3f()), new Vector3f())).y);
 //		System.out.println("thrust:" + (thrustVectorD.sub(leftWingLiftD.add(rightWingLiftD, new Vector3f()), new Vector3f())).z);
@@ -232,27 +239,27 @@ public class PhysicsEngine {
 		return wingTorque.add(tailTorque, new Vector3f());
 	}
 	
-	public Vector3f acceleration(Drone drone) {
-		return transMatInv(drone).transform(accelerationD(drone), new Vector3f());
+	public Vector3f acceleration(float dt, Drone drone) {
+		return transMatInv(drone).transform(accelerationD(dt, drone), new Vector3f());
 	}
 
 	public Vector3f accRW(float dt, Drone drone) {
-		return acceleration(drone).add(angularVelocity(dt, drone).cross(angularVelocity(dt, drone).cross(relPosRW(), new Vector3f()), new Vector3f())
+		return acceleration(dt, drone).add(angularVelocity(dt, drone).cross(angularVelocity(dt, drone).cross(relPosRW(), new Vector3f()), new Vector3f())
 				.add(angularAcceleration(dt, drone).cross(relPosLW(), new Vector3f()), new Vector3f()), new Vector3f());
 	}
 	
 	public Vector3f accLW(float dt, Drone drone) {
-		return acceleration(drone).add(angularVelocity(dt, drone).cross(angularVelocity(dt, drone).cross(relPosRW(), new Vector3f()), new Vector3f())
+		return acceleration(dt, drone).add(angularVelocity(dt, drone).cross(angularVelocity(dt, drone).cross(relPosRW(), new Vector3f()), new Vector3f())
 				.add(angularAcceleration(dt, drone).cross(relPosLW(), new Vector3f()), new Vector3f()), new Vector3f());
 	}
 	
 	public Vector3f accE(float dt, Drone drone) {
-		return acceleration(drone).add(angularVelocity(dt, drone).cross(angularVelocity(dt, drone).cross(relPosRW(), new Vector3f()), new Vector3f())
+		return acceleration(dt,drone).add(angularVelocity(dt, drone).cross(angularVelocity(dt, drone).cross(relPosRW(), new Vector3f()), new Vector3f())
 				.add(angularAcceleration(dt, drone).cross(relPosLW(), new Vector3f()), new Vector3f()), new Vector3f());
 	}
 	
 	public Vector3f accT(float dt, Drone drone) {
-		return acceleration(drone).add(angularVelocity(dt, drone).cross(angularVelocity(dt, drone).cross(relPosRW(), new Vector3f()), new Vector3f())
+		return acceleration(dt, drone).add(angularVelocity(dt, drone).cross(angularVelocity(dt, drone).cross(relPosRW(), new Vector3f()), new Vector3f())
 				.add(angularAcceleration(dt, drone).cross(relPosLW(), new Vector3f()), new Vector3f()), new Vector3f());
 	}
 	
