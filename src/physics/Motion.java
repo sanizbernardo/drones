@@ -111,7 +111,6 @@ public class Motion implements Autopilot {
         inclPID.setSetpoint(target);
         float actual = approxVel.y();
         float output = (float)inclPID.getOutput(actual);
-
     }
 
     public void adjustThrust(AutopilotInputs inputs, float target) {
@@ -120,16 +119,32 @@ public class Motion implements Autopilot {
         float output = (float)thrustPID.getOutput(actual);
         float thrust;
         if (actual - target > 0) {
-            thrust = 0;
+            thrust = 10*output;
         } else {
-            thrust = 50 + output;
+            thrust = 200*output;
         }
-        setNewThrust(thrust);
+        if (thrust > config.getMaxThrust()) {
+            setNewThrust(config.getMaxThrust());
+        } else {
+            setNewThrust(thrust);
+        }
     }
 
-    public void flyStraightPID(AutopilotInputs input) {
-        flyStablePID(input, 0f);
-        adjustThrust(input, 0f);
+    public void flyStraightPID(AutopilotInputs input, float target) {
+        flyStablePID(input, target);
+        adjustThrust(input, target);
+    }
+
+    public void climbPID(AutopilotInputs inputs, float target) {
+        if (inputs.getY() < target - 2f) {
+            adjustInclination(inputs, (float)Math.toRadians(15));
+            adjustThrust(inputs, 1f);
+        } else if (inputs.getY() > target + 2f) {
+            setNewThrust(0f);
+        } else {
+            adjustInclination(inputs, (float)Math.toRadians(0));
+            flyStraightPID(inputs, target);
+        }
     }
     
 
@@ -152,8 +167,6 @@ public class Motion implements Autopilot {
         
         setLeftWingInclination(0.1721f);
         setRightWingInclination(0.1721f);
-//        setLeftWingInclination(0.173038683372139f);
-//        setRightWingInclination(0.0001f);
         setNewThrust(25f);
 
         
@@ -205,16 +218,9 @@ public class Motion implements Autopilot {
 //        	System.exit(0);
         }
 
-//        if(center != null) {
-//            centerTarget(center, inputs);
-//        } else {
-////            System.out.println("Image recon ziet niets");
-//        }
 
-        
-        //flyStraight(inputs, approxVel);
-        //flyStablePID(inputs, (float)Math.toRadians(0));
-        flyStraightPID(inputs);
+//        flyStraightPID(inputs, 0f);
+        climbPID(inputs,5f);
 
         
         System.out.printf("height = %s\t thrust = %s\t velocity = %s\t %s\t %s\t\n", inputs.getY(), newThrust, approxVel.x(), approxVel.y(), approxVel.z());

@@ -20,8 +20,8 @@ public class Main {
             //start the game loop
             gameEng.start();
         } catch (Exception excp) {
-            excp.printStackTrace();
-            System.exit(-1);
+                excp.printStackTrace();
+                System.exit(-1);
         }
     }
 }
