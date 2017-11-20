@@ -27,7 +27,7 @@ public class TestWorldFlyStraight extends World implements IWorldRules {
 
         /* Do something with your new batch of objects */
         worldObjects[0] = new WorldObject(getCubeMeshes()[0].getMesh());
-        worldObjects[0].setPosition(0f,0f,-100f);
+        worldObjects[0].setPosition(0f,0f,-10f);
 
         /* Give your drone some values */
         drone.setVelocity(new Vector3f(0f,0f,-20f));
