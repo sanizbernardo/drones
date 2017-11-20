@@ -1,10 +1,7 @@
 import engine.Engine;
 import engine.IWorldRules;
-import entities.WorldObject;
-import entities.meshes.cube.Cube;
 import gui.ConfigSetupGUI;
 import utils.Constants;
-import world.*;
 
 public class Main {
 

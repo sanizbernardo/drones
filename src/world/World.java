@@ -1,7 +1,6 @@
 package world;
 
 import datatypes.AutopilotConfig;
-import datatypes.AutopilotInputs;
 import datatypes.AutopilotOutputs;
 import engine.IWorldRules;
 import engine.Window;
@@ -20,9 +19,6 @@ import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
 import utils.Utils;
 import utils.image.ImageCreator;
-
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
 public abstract class World implements IWorldRules {
 
@@ -58,7 +54,6 @@ public abstract class World implements IWorldRules {
     @Override
     public void init(Window window) throws Exception {
         createCubes();
-//        createConfig();
         hooks(window);
         setup();
         addDrone();
@@ -74,7 +69,7 @@ public abstract class World implements IWorldRules {
         cubeMeshes = new Cube[]{redCube, greenCube, blueCube};
     }
 
-    public AutopilotConfig createConfig() {
+    public static AutopilotConfig createConfig() {
         return new AutopilotConfig() {
             public float getGravity() {return 10f;}
             public float getWingX() {return 0.25f;}

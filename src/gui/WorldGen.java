@@ -38,9 +38,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.joml.Vector3f;
 
-import entities.WorldObject;
 import entities.meshes.cube.BufferedCube;
-import entities.meshes.cube.Cube;
 import utils.Utils;
 import world.World;
 import world.WorldBuilder;
@@ -167,7 +165,7 @@ oneCube {
 		boolean wantPhysicsEngine = physics.isSelected();
 		boolean wantPlanner = planner.isSelected();
 		
-		BufferedCube cube = new BufferedCube(hue, sat);
+		BufferedCube cube = new BufferedCube(hue, ((float)sat)/100f);
 		Map<Vector3f, BufferedCube> worldObjects = new HashMap<>();
 		worldObjects.put(new Vector3f(x,y,z), cube);
 		
