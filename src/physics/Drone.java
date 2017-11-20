@@ -167,13 +167,8 @@ public class Drone {
     	float y = right.dot(getU0());
     	float x = right.dot(getR0());
     	return (float) Math.atan2(y,x);
-//    	return 0f;
     }
-    
-    public float getYaw() {
-    	return (float) orientation.get(1);
-    }
-    
+        
     public Vector3f getOrientation() {
     	return orientation;
     }
