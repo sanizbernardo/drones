@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import datatypes.AutopilotConfig;
+import interfaces.AutopilotConfig;
 
 public class PhysicsEngineTest {
 	

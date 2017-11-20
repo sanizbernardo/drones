@@ -2,7 +2,7 @@ package physics;
 
 import org.joml.*;
 
-import datatypes.AutopilotConfig;
+import interfaces.AutopilotConfig;
 
 public class Drone {
 	

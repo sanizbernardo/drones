@@ -4,8 +4,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import autopilot.Autopilot;
-import datatypes.*;
+
+import interfaces.*;
 
 public class AutopilotServer<T extends Autopilot> implements Runnable{
 	

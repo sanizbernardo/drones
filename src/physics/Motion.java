@@ -1,10 +1,10 @@
 package physics;
 
-import autopilot.Autopilot;
-import datatypes.AutopilotConfig;
-import datatypes.AutopilotInputs;
-import datatypes.AutopilotOutputs;
 import gui.AutopilotGUI;
+import interfaces.Autopilot;
+import interfaces.AutopilotConfig;
+import interfaces.AutopilotInputs;
+import interfaces.AutopilotOutputs;
 
 import org.joml.Matrix3f;
 import org.joml.Vector3f;

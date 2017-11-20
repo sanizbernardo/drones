@@ -16,7 +16,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalSliderUI;
 
-import datatypes.AutopilotOutputs;
+import interfaces.AutopilotOutputs;
 import utils.Constants;
 
 import javax.swing.JLabel;

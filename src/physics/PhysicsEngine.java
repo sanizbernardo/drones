@@ -1,9 +1,10 @@
 package physics;
 
 import org.joml.Vector3f;
-import org.joml.Matrix3f;
 
-import datatypes.*;
+import interfaces.*;
+
+import org.joml.Matrix3f;
 
 public class PhysicsEngine {
 			

@@ -4,10 +4,10 @@ import java.util.Map;
 
 import org.joml.Vector3f;
 
-import datatypes.AutopilotConfig;
 import engine.IWorldRules;
 import entities.WorldObject;
 import entities.meshes.cube.*;
+import interfaces.AutopilotConfig;
 import physics.Drone;
 
 public class WorldBuilder extends World implements IWorldRules {

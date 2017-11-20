@@ -5,9 +5,9 @@ import static org.lwjgl.opengl.GL11.*;
 import engine.Window;
 import org.joml.Matrix4f;
 
-import datatypes.AutopilotConfig;
 import utils.*;
 import entities.WorldObject;
+import interfaces.AutopilotConfig;
 
 public class Renderer {
 
