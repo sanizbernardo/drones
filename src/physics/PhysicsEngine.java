@@ -69,8 +69,8 @@ public class PhysicsEngine {
 		// column major -> transposed
 		Matrix3f xRot = new Matrix3f(
 				1f, 					  0f,					    0f,
-				0f,  (float)Math.cos(xAngle),  (float)Math.sin(xAngle),
-				0f, (float)-Math.sin(xAngle), (float)Math.cos(xAngle)),
+				0f,  (float)Math.cos(xAngle),  -(float)Math.sin(xAngle),
+				0f, (float)Math.sin(xAngle), (float)Math.cos(xAngle)),
 				
 			   yRot = new Matrix3f(
 				(float)Math.cos(yAngle),  0f, (float)Math.sin(yAngle),
@@ -78,11 +78,11 @@ public class PhysicsEngine {
 				(float)-Math.sin(yAngle),  0f, (float)Math.cos(yAngle)),
 			   
 			   zRot = new Matrix3f(
-				 (float)Math.cos(zAngle), (float)Math.sin(zAngle), 0f,
-				(float)-Math.sin(zAngle), (float)Math.cos(zAngle), 0f,
+				 (float)Math.cos(zAngle), (float)-Math.sin(zAngle), 0f,
+				(float)Math.sin(zAngle), (float)Math.cos(zAngle), 0f,
 									  0f, 					   0f, 1f);
 		
-		return yRot.mul(xRot).mul(zRot);
+		return xRot.mul(yRot).mul(zRot);
 	}
 	
 	
