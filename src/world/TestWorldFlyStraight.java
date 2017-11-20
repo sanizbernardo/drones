@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 
 import engine.IWorldRules;
 import entities.WorldObject;
+import physics.Drone;
 
 
 /**
@@ -14,6 +15,8 @@ public class TestWorldFlyStraight extends World implements IWorldRules {
     public TestWorldFlyStraight() {
         //Geef de vertraging van je wereld mee
         super(10, true, true);
+        
+        this.config = createConfig();
     }
 
     /**
@@ -30,7 +33,15 @@ public class TestWorldFlyStraight extends World implements IWorldRules {
         worldObjects[0].setPosition(0f,0f,-100f);
 
         /* Give your drone some values */
+        drone = new Drone(config);
+
         drone.setVelocity(new Vector3f(0f,0f,-20f));
     }
+
+	@Override
+	public String getDescription() {
+		return "Demonstrates the ability to fly straight and horizonatally of the autopilot. The drone starts with an initial velocity,"
+				+ " flying towards a cube located 100m infront of it.";
+	}
 
 }

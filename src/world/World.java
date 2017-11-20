@@ -1,7 +1,6 @@
 package world;
 
 import datatypes.AutopilotConfig;
-import datatypes.AutopilotInputs;
 import datatypes.AutopilotOutputs;
 import engine.IWorldRules;
 import engine.Window;
@@ -24,9 +23,6 @@ import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
 import utils.Utils;
 import utils.image.ImageCreator;
-
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
 public abstract class World implements IWorldRules {
 
@@ -64,13 +60,14 @@ public abstract class World implements IWorldRules {
     @Override
     public void init(Window window) throws Exception {
         createCubes();
-        createConfig();
         hooks(window);
-        addDrone();
         setup();
+        addDrone();
         startSimulation();
         testbedGui.showGUI();
     }
+    
+    public abstract String getDescription();
 
     private void createCubes() {
         Cube redCube = new Cube(0,1f);
@@ -79,9 +76,8 @@ public abstract class World implements IWorldRules {
         cubeMeshes = new Cube[]{redCube, greenCube, blueCube};
     }
 
-    private void createConfig() {
-        /* TODO: place hook for the GUI florian made */
-        config = new AutopilotConfig() {
+    public static AutopilotConfig createConfig() {
+        return new AutopilotConfig() {
             public float getGravity() {return 10f;}
             public float getWingX() {return 0.25f;}
             public float getTailSize() {return 0.5f;}
@@ -110,7 +106,6 @@ public abstract class World implements IWorldRules {
         }
 
         imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows());
-        drone = new Drone(config);
     }
 
     private void addDrone() {

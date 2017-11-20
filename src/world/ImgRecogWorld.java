@@ -31,4 +31,8 @@ public class ImgRecogWorld extends World {
 		super.update(interval, mouseInput);
 	}
 
+	@Override
+	public String getDescription() {
+		return "geen zin";
+	}
 }
