@@ -10,7 +10,7 @@ import entities.WorldObject;
 public class TestWorld extends World implements IWorldRules {
 
     public TestWorld() {
-        super(10, true, true);
+        super(1, true, true);
     }
 
     @Override

@@ -51,13 +51,13 @@ public class Renderer {
     	
     	
     	// background for droneCam
-    	glScissor(0, 0, droneCamWidth, droneCamHeight);
+    	glScissor(droneCamX, droneCamY, droneCamWidth, droneCamHeight);
     	glClearColor(1f, 1f, 1f, 0f);
     	
     	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     	
     	// background for free camera
-    	glScissor(droneCamWidth, (int) (droneCamWidth * 1.25), window.getWidth(), window.getHeight());
+    	glScissor(freeCamX, freeCamY, freeCamWidth, freeCamHeigth);
     	glClearColor(.41f, .4f, .4f, 1f);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -71,35 +71,38 @@ public class Renderer {
 
         
         // background for chase cam
-        glScissor(droneCamWidth,0,droneCamWidth + 100,(int) (droneCamWidth * 1.25));
+        glScissor(chaseCamX,chaseCamY,chaseCamWidth,chaseCamHeigth);
         glClearColor(.51f, .51f, .51f, 1f);
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        
+        // background for top ortho cam
+        glScissor(topOrthoCamX,topOrthoCamY,topOrthoCamWidth,topOrthoCamHeigth );
+        glClearColor(.30f, .30f, .30f, 1f);
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
         //end
         glDisable(GL_SCISSOR_TEST);
     }
 
-    /**
-     * Render all the gameObjects
-     * @param window
-     *        The window in which to render
-     * @param freeCamera
-     * 		  The free moving camera
-     * @param droneCamera
-     * 		  The camera attached to the drone
-     * @param gameItems
-     *        All game items that need rendering that are not a part of the drone
-     * @param droneItems
-     * 		  The game items that are part of the drone
-     * 		  (wich will not be rendered on the droneCam view)
-     */
-    public void render(Window window, Camera freeCamera, Camera droneCamera, Camera chaseCamera, WorldObject[] gameItems, WorldObject[] droneItems) {
+    private int freeCamX, freeCamY, freeCamWidth, freeCamHeigth;
+    private int chaseCamX, chaseCamY, chaseCamWidth, chaseCamHeigth;
+    private int droneCamX, droneCamY;
+    private int topOrthoCamX, topOrthoCamY, topOrthoCamWidth, topOrthoCamHeigth;
+
+    public void render(Window window, Camera freeCamera, Camera droneCamera, Camera chaseCamera, Camera topOrthoCamera, WorldObject[] gameItems, WorldObject[] droneItems) {
         clear(window);
 
 
         // The free camera window
-        glViewport(droneCamWidth, (int) (droneCamWidth * 1.25), window.getWidth(), window.getHeight());
+        
+        freeCamX = droneCamWidth;
+        freeCamY = (int) (droneCamWidth * 1.25);
+        freeCamWidth = window.getWidth();
+        freeCamHeigth = window.getHeight();
+        glViewport(freeCamX, freeCamY, freeCamWidth ,freeCamHeigth);
         
         shaderProgram.bind();
 
@@ -133,7 +136,9 @@ public class Renderer {
         
         
         // The droneCam window
-        glViewport(0,0,droneCamWidth,droneCamHeight);
+        droneCamX = 0;
+        droneCamY = 0;
+        glViewport(droneCamX,droneCamY,droneCamWidth,droneCamHeight);
                 
         shaderProgram.bind();
 
@@ -159,16 +164,60 @@ public class Renderer {
         
         
         // The Chase camera
-        glViewport(droneCamWidth,0,droneCamWidth + 100,(int) (droneCamWidth * 1.25) );
+        chaseCamWidth = droneCamWidth + 100;
+        chaseCamHeigth = (int) (droneCamWidth * 1.25);
+        chaseCamX = droneCamWidth;
+        chaseCamY = 0;
+        glViewport(chaseCamX,chaseCamY,chaseCamWidth, chaseCamHeigth);
         
         shaderProgram.bind();
 
         // Update projection Matrix
-        projectionMatrix = transformation.getProjectionMatrix(droneCamFOV, droneCamWidth, droneCamHeight, Constants.Z_NEAR, Constants.Z_FAR);
+        projectionMatrix = transformation.getProjectionMatrix((float) Math.toRadians(60), chaseCamWidth, chaseCamHeigth, Constants.Z_NEAR, Constants.Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
         
         // Update view Matrix
         viewMatrix = transformation.getViewMatrixY(chaseCamera);
+
+        // Render each gameItem
+        for (WorldObject gameItem : gameItems) {
+            Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
+            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+            // Render the mesh for this game item
+            gameItem.getMesh().render();
+        }
+        
+        // Render each droneItem
+        for(WorldObject droneItem: droneItems) {
+        	// Set model view matrix for this item
+        	Matrix4f modelViewMatrix = transformation.getModelViewMatrix(droneItem, viewMatrix);
+            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+            // Render the mesh for this game item
+            droneItem.getMesh().render();
+		}
+
+        shaderProgram.unbind();
+        
+        
+        
+        
+        
+        //Top ortho cam
+        topOrthoCamX = chaseCamX + chaseCamWidth;
+        topOrthoCamY = 0;
+        topOrthoCamWidth = droneCamWidth + 100;
+        topOrthoCamHeigth = (int) (droneCamWidth * 1.25);
+        glViewport(topOrthoCamX, topOrthoCamY, topOrthoCamWidth, topOrthoCamHeigth);
+        
+        shaderProgram.bind();
+
+        // Update projection Matrix
+        int size = 50;
+        projectionMatrix = projectionMatrix.identity().ortho(-size, size,-size, size, Constants.Z_NEAR, Constants.Z_FAR);
+        shaderProgram.setUniform("projectionMatrix", projectionMatrix);
+        
+        // Update view Matrix
+        viewMatrix = transformation.getViewMatrix(topOrthoCamera);
 
         // Render each gameItem
         for (WorldObject gameItem : gameItems) {
