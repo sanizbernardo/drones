@@ -14,7 +14,14 @@ public class Main {
         try {
             //create a world, this will hold the game objects
 
-            IWorldRules worldRules = new ImgRecogWorld();
+        	float x,y,z,dx,dy,dz;
+        	x = 0;
+        	y = 0;
+        	z = -4;
+        	dx = 0;
+        	dy = 0;
+        	dz = -0.1f;
+            IWorldRules worldRules = new ImgRecogWorld(x, y, z, dx, dy, dz);
 
             //create a game engine
             Engine gameEng = new Engine(Constants.TITLE, Constants.WIDTH, Constants.HEIGHT, Constants.VSYNC, worldRules);

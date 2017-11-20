@@ -243,13 +243,13 @@ public class ImageProcessing {
         	double secondAngle = secondRatio*Math.PI/2;
         	dist = dist/Math.cos(secondAngle);
         }
-        if(diffColorsAmounts.size() > 1){
+        if(diffColorsAmounts.size() > 2){
         	double third = diffColorsAmounts.get(2);
         	double thirdRatio = third/(biggest+third);
         	double thirdAngle = thirdRatio*Math.PI/2;
         	dist = dist/Math.cos(thirdAngle);
         }
-        return dist;
+        return dist + 0.5;
         
     }
     
