@@ -19,6 +19,8 @@ public class Engine implements Runnable {
 
     private final MouseInput mouseInput;
 
+	private boolean shouldExit = false;
+
     /**
      * Engine constructor
      * @param windowTitle
@@ -76,9 +78,13 @@ public class Engine implements Runnable {
         window.init();
         timer.init();
         mouseInput.init(window);
-        worldRules.init(window);
+        worldRules.init(window, this);
     }
-
+    
+    public void setLoopShouldExit() {
+    	this.shouldExit = true;
+    }
+    
     /**
      * elapsedTime: time since last loop in seconds
      * accumulator: total elapsed time since last update
@@ -95,7 +101,7 @@ public class Engine implements Runnable {
         float interval = 1f / Constants.TARGET_UPS;
 
 
-        while (!window.windowShouldClose()) {
+        while (!window.windowShouldClose() && ! shouldExit) {
             elapsedTime = timer.getElapsedTime();
             accumulator += elapsedTime;
 

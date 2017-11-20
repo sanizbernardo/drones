@@ -2,7 +2,6 @@ package world;
 
 import entities.WorldObject;
 import entities.meshes.cube.Cube;
-import physics.Motion;
 import recognition.ImgRecogPlanner;
 import utils.IO.MouseInput;
 
@@ -42,8 +41,7 @@ public class ImgRecogWorld extends World {
 		worldObjects[0].setPosition(oldX + dx, oldY + dy, oldZ + dz);
 		//System.out.println(worldObjects[0].getPosition());
 		if (oldZ < -5 && !ended){
-			endSimulation();
-			ended = true;
+			gameEngine.setLoopShouldExit();
 		}
 		super.update(interval, mouseInput);
 	}

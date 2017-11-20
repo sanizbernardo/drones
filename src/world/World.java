@@ -3,6 +3,7 @@ package world;
 import datatypes.AutopilotConfig;
 import datatypes.AutopilotInputs;
 import datatypes.AutopilotOutputs;
+import engine.Engine;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
@@ -23,8 +24,6 @@ import utils.IO.MouseInput;
 import utils.Utils;
 import utils.image.ImageCreator;
 
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
 public abstract class World implements IWorldRules {
 
@@ -40,9 +39,10 @@ public abstract class World implements IWorldRules {
     private int TIME_SLOWDOWN_MULTIPLIER;
     private boolean wantPhysicsEngine, wantPlanner;
     private KeyboardInput keyboardInput;
-
+    
     protected Drone drone;
     protected AutopilotConfig config;
+	protected Engine gameEngine;
 
     /* These are to be directly called in the world classes*/
     WorldObject[] worldObjects;
@@ -58,9 +58,11 @@ public abstract class World implements IWorldRules {
     }
 
     @Override
-    public void init(Window window) throws Exception {
-        createCubes();
-        createConfig();
+
+    public void init(Window window, Engine engine) throws Exception {
+    	this.gameEngine = engine; 
+    	createCubes();
+    	createConfig();
         hooks(window);
         addDrone();
         setup();
