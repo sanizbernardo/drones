@@ -220,6 +220,7 @@ public abstract class World implements IWorldRules {
     
     @Override
     public void endSimulation() {
+    	testbedGui.dispose();
     	planner.simulationEnded();
     }
 }
