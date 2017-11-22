@@ -43,6 +43,7 @@ public class PhysicsEngine {
 	}
 	
 	public Matrix3f transMat(Drone drone) {
+		System.out.println(buildTransformMatrix(drone.getPitch(), drone.getHeading(), drone.getRoll()));
 		return buildTransformMatrix(drone.getPitch(), drone.getHeading(), drone.getRoll());
 	}
 	
@@ -190,9 +191,9 @@ public class PhysicsEngine {
 		//float incl = (float) (2*(Math.atan((drone.getVelocity().get(2)-Math.sqrt(Math.pow(drone.getVelocity().get(1),2)+Math.pow(drone.getVelocity().get(2), 2))/drone.getVelocity().get(1)))));
 //		System.out.println("proj:" + horProjVelD);
 //		System.out.println("pos:" + drone.getPosition());
-		System.out.println("pitch" +":" + drone.getPitch());
-		System.out.println("roll" +":" + drone.getRoll());
-		System.out.println("heading" +":" + drone.getHeading());
+//		System.out.println("pitch" +":" + drone.getPitch());
+//		System.out.println("roll" +":" + drone.getRoll());
+//		System.out.println("heading" +":" + drone.getHeading());
 //		System.out.println("gewicht:" + (weightVectorD.add(leftWingLiftD.add(rightWingLiftD, new Vector3f()), new Vector3f())).y);
 //		System.out.println("thrust:" + (thrustVectorD.sub(leftWingLiftD.add(rightWingLiftD, new Vector3f()), new Vector3f())).z);
 //		System.out.println("gewicht:" + weightVectorD);
