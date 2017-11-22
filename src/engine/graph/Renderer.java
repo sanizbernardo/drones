@@ -212,8 +212,8 @@ public class Renderer {
         shaderProgram.bind();
 
         // Update projection Matrix
-        int size = 50;
-        projectionMatrix = projectionMatrix.identity().ortho(-size, size,-size, size, Constants.Z_NEAR, Constants.Z_FAR);
+        int size = 100;
+        projectionMatrix = projectionMatrix.identity().ortho(-size/4, size/4,0, size, Constants.Z_NEAR, Constants.Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
         
         // Update view Matrix
@@ -231,6 +231,7 @@ public class Renderer {
         for(WorldObject droneItem: droneItems) {
         	// Set model view matrix for this item
         	Matrix4f modelViewMatrix = transformation.getModelViewMatrix(droneItem, viewMatrix);
+        	droneItem.setScale(1);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
             // Render the mesh for this game item
             droneItem.getMesh().render();

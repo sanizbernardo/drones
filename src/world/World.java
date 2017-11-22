@@ -59,7 +59,7 @@ public abstract class World implements IWorldRules {
         this.droneCamera = new Camera();
         this.chaseCamera = new Camera();
         this.topOrthoCamera = new Camera();
-        topOrthoCamera.setPosition(0,0,0);
+        topOrthoCamera.setPosition(0,100,0);
         topOrthoCamera.setRotation(90, 0, 0);
         this.cameraInc = new Vector3f(0, 0, 0);
         this.testbedGui = new TestbedGui();
