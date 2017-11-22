@@ -170,7 +170,7 @@ public class Renderer {
 
             // Update projection Matrix
             int size = 100;
-            projectionMatrix = projectionMatrix.identity().ortho(-size/4, size/4,0, size, Constants.Z_NEAR, Constants.Z_FAR);
+            projectionMatrix = projectionMatrix.identity().ortho(-size/8, size,-size/2, size/2, Constants.Z_NEAR, Constants.Z_FAR).rotateZ((float)Math.toRadians(-90));
             shaderProgram.setUniform("projectionMatrix", projectionMatrix);
             
             // Update view Matrix

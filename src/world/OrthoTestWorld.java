@@ -29,7 +29,7 @@ public class OrthoTestWorld extends World{
             worldObjects[i] = cube;
         }
         drone.setVelocity(new Vector3f(0,0,-15));
-        drone.setLeftWingInclination(1);
+//        drone.setLeftWingInclination(1);
 	}
 
 }

@@ -67,7 +67,7 @@ public abstract class World implements IWorldRules {
     
     private void constructCameras() {
         topOrthoCamera.setPosition(0,100,0);
-        topOrthoCamera.setRotation(90, 0, 0);
+        topOrthoCamera.setRotation(90, 0,0);
         rightOrthoCamera.setPosition(100, 0, 0);
         rightOrthoCamera.setRotation(0, -90, 0);
     }
