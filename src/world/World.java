@@ -27,7 +27,7 @@ import utils.image.ImageCreator;
 public abstract class World implements IWorldRules {
 
     private final Vector3f cameraInc;
-    private final Camera freeCamera, droneCamera;
+    private final Camera freeCamera, droneCamera, chaseCamera, topOrthoCamera, rightOrthoCamera;
     protected Autopilot planner = new Motion();
 
     private Renderer renderer;
@@ -53,8 +53,19 @@ public abstract class World implements IWorldRules {
         this.keyboardInput = new KeyboardInput();
         this.freeCamera = new Camera();
         this.droneCamera = new Camera();
+        this.chaseCamera = new Camera();
+        this.topOrthoCamera = new Camera();
+        this.rightOrthoCamera = new Camera();
+        constructCameras();
         this.cameraInc = new Vector3f(0, 0, 0);
         this.testbedGui = new TestbedGui();
+    }
+    
+    private void constructCameras() {
+        topOrthoCamera.setPosition(0,100,0);
+        topOrthoCamera.setRotation(90, 0,0);
+        rightOrthoCamera.setPosition(100, 0, 0);
+        rightOrthoCamera.setRotation(0, -90, 0);
     }
 
     @Override
@@ -141,7 +152,7 @@ public abstract class World implements IWorldRules {
      */
     @Override
     public void input(Window window, MouseInput mouseInput) {
-        keyboardInput.worldInput(cameraInc, window, imageCreator);
+        keyboardInput.worldInput(cameraInc, window, imageCreator, renderer);
     }
 
     /**
@@ -164,6 +175,12 @@ public abstract class World implements IWorldRules {
         droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
         droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
 
+        float offset = 1f;
+        //TODO: implement getHeading properly...
+        chaseCamera.setPosition(newDronePos.x + offset * (float)Math.sin(drone.getHeading()), newDronePos.y, newDronePos.z + offset * (float)Math.cos(drone.getHeading()));
+        chaseCamera.setRotation(0,-(float)Math.toDegrees(drone.getYaw()),0);
+        
+                
         // Update the position of each drone item
         for (WorldObject droneItem : droneItems) {
             droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
@@ -204,7 +221,7 @@ public abstract class World implements IWorldRules {
 
     @Override
     public void render(Window window) {
-        renderer.render(window, freeCamera, droneCamera, worldObjects, droneItems);
+        renderer.render(window, freeCamera, droneCamera, chaseCamera, topOrthoCamera, rightOrthoCamera, worldObjects, droneItems);
     }
 
     /**

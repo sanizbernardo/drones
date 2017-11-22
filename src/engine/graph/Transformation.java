@@ -10,7 +10,7 @@ public class Transformation {
 
     private final Matrix4f modelViewMatrix;
 
-    private final Matrix4f viewMatrix;
+    private final Matrix4f viewMatrix, viewMatrixY;
     /**
      * Define all the transformations to be applied to GameObjects
      */
@@ -18,6 +18,7 @@ public class Transformation {
         projectionMatrix = new Matrix4f();
         modelViewMatrix = new Matrix4f();
         viewMatrix = new Matrix4f();
+        viewMatrixY = new Matrix4f();
     }
 
     /**
@@ -56,6 +57,20 @@ public class Transformation {
         viewMatrix.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
         return viewMatrix;
     }
+    
+    public Matrix4f getViewMatrixY(Camera camera) {
+        Vector3f cameraPos = camera.getPosition();
+        Vector3f rotation = camera.getRotation();
+
+        
+        viewMatrixY.identity();
+        viewMatrixY.rotate((float)Math.toRadians(rotation.y), new Vector3f(0, 1, 0));
+//        viewMatrix.rotateXYZ((float)Math.toRadians(rotation.x),(float)Math.toRadians(rotation.y),(float)Math.toRadians(rotation.z));
+        // Then do the translation
+        viewMatrixY.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z - 1);
+        return viewMatrixY;
+    }
+
 
     /**
      * As we're changing the position of the objects depening on our camera location we need a common
