@@ -1,6 +1,8 @@
 package utils.IO;
 
 import engine.Window;
+import engine.graph.Renderer;
+
 import org.joml.Vector3f;
 import utils.image.ImageCreator;
 
@@ -9,9 +11,16 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
 public class KeyboardInput {
 
-    public void worldInput(Vector3f cameraInc, Window window, ImageCreator imageCreator) {
+	private Long old = (long) 0;
+	
+    public void worldInput(Vector3f cameraInc, Window window, ImageCreator imageCreator, Renderer renderer) {
         cameraInc.set(0, 0, 0);
         int mult = 1;
+        Long now = System.currentTimeMillis();
+        if(window.isKeyPressed(GLFW_KEY_R) && now-old >= 250) {
+        	renderer.toggleOrtho();
+        	old = System.currentTimeMillis();
+        }
         if(window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
             mult = 20;
         }

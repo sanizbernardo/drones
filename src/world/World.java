@@ -157,7 +157,7 @@ public abstract class World implements IWorldRules {
      */
     @Override
     public void input(Window window, MouseInput mouseInput) {
-        keyboardInput.worldInput(cameraInc, window, imageCreator);
+        keyboardInput.worldInput(cameraInc, window, imageCreator, renderer);
     }
 
     /**
