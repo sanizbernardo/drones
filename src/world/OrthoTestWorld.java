@@ -4,12 +4,16 @@ import java.util.Random;
 
 import org.joml.Vector3f;
 
+import engine.IWorldRules;
 import entities.WorldObject;
+import physics.Drone;
 
-public class OrthoTestWorld extends World{
+public class OrthoTestWorld extends World implements IWorldRules{
 
 	public OrthoTestWorld() {
 		super(2, true, false);
+		
+    	this.config = createConfig();
 	}
 
 	@Override
@@ -28,8 +32,11 @@ public class OrthoTestWorld extends World{
             cube.setPosition(x1, y, z);
             worldObjects[i] = cube;
         }
+        
+        drone = new Drone(config);
+        
         drone.setVelocity(new Vector3f(0,0,-15));
-//        drone.setLeftWingInclination(1);
+        drone.setLeftWingInclination(1);
 	}
 
 	@Override
