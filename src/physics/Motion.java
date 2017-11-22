@@ -165,8 +165,9 @@ public class Motion implements Autopilot {
 
     private void adjustInclination(AutopilotInputs inputs, float target) {
         inclPID.setSetpoint(target);
-        float actual = approxVel.y();
+        float actual = inputs.getY();
         float output = (float)inclPID.getOutput(actual);
+        setLeftWingInclination(output*3);
     }
 
     private void adjustThrust(AutopilotInputs inputs, float target) {
@@ -188,8 +189,8 @@ public class Motion implements Autopilot {
         }
     }
 
-    private void flyStraightPID(AutopilotInputs input) {
-        adjustInclination(input, (float)Math.toRadians(0));
+    private void flyStraightPID(AutopilotInputs input, float height) {
+        adjustInclination(input, height);
         adjustPitch(input, 0f);
         adjustThrust(input, 0f);
     }
@@ -212,7 +213,7 @@ public class Motion implements Autopilot {
         } else if (inputs.getY() > target + 1f) {
             setNewThrust(0f);
         } else {
-            flyStraightPID(inputs);
+            flyStraightPID(inputs, 0);
         }
     }
 
