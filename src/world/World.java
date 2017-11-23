@@ -190,7 +190,7 @@ public abstract class World implements IWorldRules {
 
         if(wantPlanner) plannerUpdate(newDronePos, interval/TIME_SLOWDOWN_MULTIPLIER);
 
-        testbedGui.update(drone.getVelocity(), newDronePos, drone.getOrientation());
+        testbedGui.update(drone.getVelocity(), newDronePos, new Vector3f(drone.getPitch(),drone.getHeading(),drone.getRoll()));
         
     }
 
