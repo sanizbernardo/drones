@@ -62,9 +62,9 @@ public abstract class World implements IWorldRules {
     }
     
     private void constructCameras() {
-        topOrthoCamera.setPosition(0,100,0);
+        topOrthoCamera.setPosition(0,200,0);
         topOrthoCamera.setRotation(90, 0,0);
-        rightOrthoCamera.setPosition(100, 0, 0);
+        rightOrthoCamera.setPosition(200, 0, 0);
         rightOrthoCamera.setRotation(0, -90, 0);
     }
 
@@ -175,7 +175,7 @@ public abstract class World implements IWorldRules {
         droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
         droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getHeading()),-(float)Math.toDegrees(drone.getRoll()));
 
-        float offset = 1f;
+        float offset = 5f;
         //TODO: implement getHeading properly...
         chaseCamera.setPosition(newDronePos.x + offset * (float)Math.sin(drone.getHeading()), newDronePos.y, newDronePos.z + offset * (float)Math.cos(drone.getHeading()));
         chaseCamera.setRotation(0,-(float)Math.toDegrees(drone.getHeading()),0);

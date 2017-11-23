@@ -7,6 +7,7 @@ import org.joml.Vector3f;
 import engine.IWorldRules;
 import entities.WorldObject;
 import physics.Drone;
+import utils.IO.MouseInput;
 
 public class OrthoTestWorld extends World implements IWorldRules{
 
@@ -36,7 +37,7 @@ public class OrthoTestWorld extends World implements IWorldRules{
         drone = new Drone(config);
         
         drone.setVelocity(new Vector3f(0,0,-15));
-//        drone.setLeftWingInclination(1);
+        drone.setLeftWingInclination(1);
 	}
 
 	@Override
