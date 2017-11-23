@@ -10,6 +10,7 @@ public class PhysicsEngine {
 	private final float gravity, weight, wingLiftSlope, horStabLiftSlope, verStabLiftSlope, tailSize, wingX, engineZ;
 	private final Vector3f weightVector; //posRW, posLW, posE, posT, velRW, velLW, velE, velT, accRW, accLW, accE, accT;
 	private final Matrix3f inertia, inertiaInv;
+	private Matrix3f rotMat;
 	private Vector3f wingTorque = new Vector3f(0,0,0), tailTorque = new Vector3f(0,0,0);
 	
 	public PhysicsEngine(AutopilotConfig config) {
@@ -36,71 +37,95 @@ public class PhysicsEngine {
 		
 		inertiaInv = new Matrix3f();
 		inertia.invert(this.inertiaInv);
+		
+		this.rotMat = new Matrix3f(
+				1,			0,		0, 
+				0, 			1,		0,
+				0, 			0,		1);
 	}
 	
 	float getEngineZ() {
 		return this.engineZ;
 	}
 	
-	public Matrix3f transMat(Drone drone) {
-		System.out.println(buildTransformMatrix(drone.getPitch(), drone.getHeading(), drone.getRoll()));
-		return buildTransformMatrix(drone.getPitch(), drone.getHeading(), drone.getRoll());
-	}
-	
-	public Matrix3f transMatInv(Drone drone) {
-		Matrix3f result = new Matrix3f();
-		return transMat(drone).invert(result);
-	}
+//	public Matrix3f transMat(Drone drone) {
+//		return buildTransformMatrix(drone.getPitch(), drone.getHeading(), drone.getRoll());
+//	}
+//	
+//	public Matrix3f transMatInv(Drone drone) {
+//		Matrix3f result = new Matrix3f();
+//		return rotMat.invert(result);
+//	}
 	
 	/**
 	 * wing inclinations are already updated
 	 */
 	public void update(float dt, Drone drone) {
 		
-		Vector3f oldVel = drone.getVelocity();
 		
-		drone.setPosition(drone.getPosition().add(oldVel.mul(dt, new Vector3f())).add(acceleration(dt, drone).mul(dt*dt/2, new Vector3f()), new Vector3f()));
+		updateRotMat(dt, drone);
+		Vector3f oldVel = drone.getVelocity();
+		Vector3f acceleration = acceleration(dt, drone);
+		
+		drone.setPosition(drone.getPosition().add(oldVel.mul(dt, new Vector3f())).add(acceleration.mul(dt*dt/2, new Vector3f()), new Vector3f()));
 		drone.setOrientation(drone.getOrientation().add(drone.getRotation().mul(dt), new Vector3f()).add(angularAcceleration(dt, drone).mul(dt*dt/2, new Vector3f()), new Vector3f()));
 				
-		drone.setVelocity(oldVel.add(acceleration(dt, drone).mul(dt, new Vector3f()), new Vector3f()));
+		drone.setVelocity(oldVel.add(acceleration.mul(dt, new Vector3f()), new Vector3f()));
 		drone.setRotation(drone.getRotation().add(angularVelocity(dt, drone), new Vector3f()));
+		System.out.println(drone.getPitch());
+		System.out.println(rotMat);
+		System.out.println(angularVelocity(dt, drone));
 	}
 	
-	public static Matrix3f buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
-		// column major -> transposed
-		Matrix3f xRot = new Matrix3f(
-				1f, 					  0f,					    0f,
-				0f,  (float)Math.cos(xAngle),  -(float)Math.sin(xAngle),
-				0f, (float)Math.sin(xAngle), (float)Math.cos(xAngle)),
-				
-			   yRot = new Matrix3f(
-				(float)Math.cos(yAngle),  0f, (float)Math.sin(yAngle),
-									 0f,  1f, 						0f,
-				(float)-Math.sin(yAngle),  0f, (float)Math.cos(yAngle)),
-			   
-			   zRot = new Matrix3f(
-				 (float)Math.cos(zAngle), (float)-Math.sin(zAngle), 0f,
-				(float)Math.sin(zAngle), (float)Math.cos(zAngle), 0f,
-									  0f, 					   0f, 1f);
-		
-		return xRot.mul(yRot).mul(zRot);
-	}
+//	public static Matrix3f buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
+//		// column major -> transposed
+//		Matrix3f xRot = new Matrix3f(
+//				1f, 					  0f,					    0f,
+//				0f,  (float)Math.cos(xAngle),  -(float)Math.sin(xAngle),
+//				0f, (float)Math.sin(xAngle), (float)Math.cos(xAngle)),
+//				
+//			   yRot = new Matrix3f(
+//				(float)Math.cos(yAngle),  0f, (float)Math.sin(yAngle),
+//									 0f,  1f, 						0f,
+//				(float)-Math.sin(yAngle),  0f, (float)Math.cos(yAngle)),
+//			   
+//			   zRot = new Matrix3f(
+//				 (float)Math.cos(zAngle), (float)-Math.sin(zAngle), 0f,
+//				(float)Math.sin(zAngle), (float)Math.cos(zAngle), 0f,
+//									  0f, 					   0f, 1f);
+//		
+//		return xRot.mul(yRot).mul(zRot);
+//	}
 	
+	public void updateRotMat(float dt, Drone drone) {
+		Vector3f angVel = angularVelocity(dt, drone);
+		float norm = (float) Math.sqrt(angVel.dot(angVel));
+		if (norm != 0) {
+			Vector3f normAngVel = angVel.div(norm, new Vector3f());
+			float angle = norm*dt;
+			Matrix3f uniMat = new Matrix3f(1,			0,		0, 
+					0, 			1,		0,
+					0, 			0,		1);
+			Matrix3f newMat = uniMat.rotate(-angle, normAngVel, new Matrix3f());
+			rotMat = newMat.mul(rotMat);
+		}
+		drone.setRotMat(rotMat);
+	}
 	
 	public Vector3f posRW(Drone drone) {
-		return drone.getPosition().add(transMat(drone).transform(relPosRW(), new Vector3f()), new Vector3f());
+		return drone.getPosition().add(rotMat.transform(relPosRW(), new Vector3f()), new Vector3f());
 	}
 	
 	public Vector3f posLW(Drone drone) {
-		return drone.getPosition().add(transMat(drone).transform(relPosLW(), new Vector3f()), new Vector3f());
+		return drone.getPosition().add(rotMat.transform(relPosLW(), new Vector3f()), new Vector3f());
 	}
 	
 	public Vector3f posE(Drone drone) {
-		return drone.getPosition().add(transMat(drone).transform(relPosE(), new Vector3f()), new Vector3f());
+		return drone.getPosition().add(rotMat.transform(relPosE(), new Vector3f()), new Vector3f());
 	}
 	
 	public Vector3f posT(Drone drone) {
-		return drone.getPosition().add(transMat(drone).transform(relPosT(), new Vector3f()), new Vector3f());
+		return drone.getPosition().add(rotMat.transform(relPosT(), new Vector3f()), new Vector3f());
 	}
 	
 	public Vector3f relPosRW() {
@@ -152,11 +177,11 @@ public class PhysicsEngine {
 		Vector3f oldVelRW = velRW(dt,drone);
 		Vector3f oldVelT = velT(dt,drone);
 		
-		Vector3f weightVectorD = transMat(drone).transform(weightVector, new Vector3f()),
+		Vector3f weightVectorD = rotMat.transform(weightVector, new Vector3f()),
 				thrustVectorD = new Vector3f(0f, 0f, -drone.getThrust()),
-				relVelLW = transMat(drone).transform(oldVelLW, new Vector3f()),
-				relVelRW = transMat(drone).transform(oldVelRW, new Vector3f()),
-				relVelT = transMat(drone).transform(oldVelT, new Vector3f()),
+				relVelLW = rotMat.transform(oldVelLW, new Vector3f()),
+				relVelRW = rotMat.transform(oldVelRW, new Vector3f()),
+				relVelT = rotMat.transform(oldVelT, new Vector3f()),
 				leftWingAttackVectorD = new Vector3f(0f, (float)Math.sin((double) leftWingInclination), (float)-Math.cos((double) leftWingInclination)),
 				rightWingAttackVectorD = new Vector3f(0f, (float)Math.sin((double) rightWingInclination), (float)-Math.cos((double) rightWingInclination)),
 				horStabAttackVectorD = new Vector3f(0f, (float)Math.sin((double) horStabInclination), (float)-Math.cos((double) horStabInclination)),
@@ -166,6 +191,7 @@ public class PhysicsEngine {
 				horStabNormalVectorD = new Vector3f(0f, (float)Math.cos((double) horStabInclination), (float)Math.sin((double) horStabInclination)),
 				verStabNormalVectorD = new Vector3f((float)-Math.cos((double) verStabInclination), 0f, (float)Math.sin((double) verStabInclination));
 		
+		System.out.println(weightVectorD);
 		Vector3f horProjVelLW = new Vector3f(0, relVelLW.y, relVelLW.z),
 				horProjVelRW = new Vector3f(0, relVelRW.y, relVelRW.z),
 				horProjVelT = new Vector3f(0, relVelT.y, relVelT.z),
@@ -214,7 +240,7 @@ public class PhysicsEngine {
 	}
 	
 	public Vector3f acceleration(float dt, Drone drone) {
-		return transMatInv(drone).transform(accelerationD(dt, drone), new Vector3f());
+		return rotMat.invert(new Matrix3f()).transform(accelerationD(dt, drone), new Vector3f());
 	}
 
 //	public Vector3f accRW(float dt, Drone drone) {
