@@ -71,9 +71,9 @@ public class GuiUtils {
 		JSpinner spinner = new JSpinner();
 		spinner.setModel(new SpinnerNumberModel(defaultValue, min, max, stepSize));
 		spinner.setPreferredSize(new Dimension(70, 20));
-		GridBagConstraints gbc_nbCubesSpinner = buildGBC(1, ypos, GridBagConstraints.NORTHWEST, new Insets(5, 5, 5, 0));
-		gbc_nbCubesSpinner.gridwidth = 3;
-		parentPanel.add(spinner, gbc_nbCubesSpinner);		
+		GridBagConstraints gbc_spinner = buildGBC(1, ypos, GridBagConstraints.NORTHWEST, new Insets(5, 5, 5, 0));
+		gbc_spinner.gridwidth = 3;
+		parentPanel.add(spinner, gbc_spinner);		
 		
 		return spinner;
 	}

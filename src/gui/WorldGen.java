@@ -365,6 +365,55 @@ loadFile {
 		return new WorldBuilder(tSM, wantPhysics, wantPlanner, cubes);
 	}
 	
+},cilinder {
+	
+	private JCheckBox planner, physics;
+	private JSpinner slowDownSpinner;
+	
+	@Override
+	public String getComboText() {
+		return "Generate cubes in a cilinder";
+	}
+
+	@Override
+	public Container getContent() {
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout(0, 0));
+		
+		JPanel inputPanel = buildBase(panel, "Generate a world based on the requirement M 2.3,"
+				+ " with all cubes positioned randomly in a cilinder, based on a certain distribution", 2, 4);
+		
+		planner = GuiUtils.buildCheckBox(inputPanel, "Motion planner?", 1, true);		
+		physics = GuiUtils.buildCheckBox(inputPanel, "Physics engine?", 2, true);
+		
+		slowDownSpinner = GuiUtils.buildInputSpinner(inputPanel, "Time slowdown factor:", 3, 1, 100, 10, 1);
+		
+		return panel;
+	}
+	
+	@Override
+	public World generateWorld() throws Exception {
+		boolean wantPlanner = planner.isSelected(),
+				wantPhysics = physics.isSelected();
+		
+		int tSM = (int) slowDownSpinner.getValue();
+
+		Random rand = new Random();
+		
+		Map<Vector3f,BufferedCube> cubes = new HashMap<>(); 
+		
+		for (int i = 0; i < 5; i ++) {
+			BufferedCube cube = new BufferedCube(rand.nextInt(360), rand.nextFloat());
+			
+			float r = rand.nextFloat()*10, t = rand.nextFloat()*(float)Math.PI;
+			Vector3f pos = new Vector3f((float)(r*Math.cos(t)), (float)(r*Math.sin(t)), (float)-40*i);
+			
+			cubes.put(pos, cube);
+		}
+		
+		return new WorldBuilder(tSM, wantPhysics, wantPlanner, cubes);
+	}
+	
 };
 	
 
