@@ -85,7 +85,7 @@ public class TestbedGui extends JFrame {
 														+ "<br>" +  "\n z:" +  precision(position.z, prec) + "</html>");
 		
 		rollLbl.setText("Roll: " + precision( Math.toDegrees(orientation.z), prec) );
-		yawLbl.setText("Yaw: " + precision( Math.toDegrees(orientation.y), prec));
+		yawLbl.setText("Heading: " + precision( Math.toDegrees(orientation.y), prec));
 		pitchLbl.setText("Pitch: " + precision(Math.toDegrees(orientation.x), prec));
 
 	}
