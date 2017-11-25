@@ -1,9 +1,9 @@
 package recognition;
 
-import autopilot.Autopilot;
-import datatypes.AutopilotConfig;
-import datatypes.AutopilotInputs;
-import datatypes.AutopilotOutputs;
+import interfaces.Autopilot;
+import interfaces.AutopilotConfig;
+import interfaces.AutopilotInputs;
+import interfaces.AutopilotOutputs;
 import utils.Utils;
 
 public class ImgRecogPlanner implements Autopilot {

@@ -1,4 +1,4 @@
-package datatypes;
+package interfaces;
 public class AutopilotInputsReader {
     private static byte[] readByteArray(java.io.DataInputStream stream) throws java.io.IOException {
         int length = stream.readInt();

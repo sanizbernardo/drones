@@ -30,7 +30,7 @@ public class GuiUtils {
 	}
 	
 	
-	static GridBagConstraints buildGBC(int gridx, int gridy, int anchor) {
+	public static GridBagConstraints buildGBC(int gridx, int gridy, int anchor) {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = anchor;
 		gbc.gridx = gridx;
@@ -38,7 +38,7 @@ public class GuiUtils {
 		return gbc;
 	}
 	
-	static GridBagConstraints buildGBC(int gridx, int gridy, int anchor, Insets insets) {
+	public static GridBagConstraints buildGBC(int gridx, int gridy, int anchor, Insets insets) {
 		GridBagConstraints gbc = buildGBC(gridx, gridy, anchor);
 		gbc.insets = insets;
 		return gbc;

@@ -5,7 +5,8 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 import org.joml.Vector3f;
-import datatypes.*;
+
+import interfaces.*;
 
 public class Utils {
 

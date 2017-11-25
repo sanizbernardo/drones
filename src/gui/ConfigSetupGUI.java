@@ -10,7 +10,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.joml.Vector3f;
 
-import datatypes.AutopilotConfig;
+import interfaces.AutopilotConfig;
 import utils.Constants;
 import utils.Utils;
 import world.World;

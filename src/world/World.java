@@ -1,7 +1,5 @@
 package world;
 
-import datatypes.AutopilotConfig;
-import datatypes.AutopilotOutputs;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
@@ -10,11 +8,13 @@ import entities.WorldObject;
 import entities.meshes.cube.Cube;
 import entities.meshes.drone.DroneMesh;
 import gui.testbed.TestbedGui;
+import interfaces.Autopilot;
+import interfaces.AutopilotConfig;
+import interfaces.AutopilotOutputs;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import autopilot.Autopilot;
 import physics.Drone;
 import physics.Motion;
 import physics.PhysicsEngine;
@@ -238,6 +238,7 @@ public abstract class World implements IWorldRules {
     
     @Override
     public void endSimulation() {
+    	testbedGui.dispose();
     	planner.simulationEnded();
     }
 }

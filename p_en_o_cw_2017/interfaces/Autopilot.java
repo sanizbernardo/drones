@@ -1,7 +1,4 @@
-package autopilot;
-import datatypes.AutopilotConfig;
-import datatypes.AutopilotInputs;
-import datatypes.AutopilotOutputs;
+package interfaces;
 
 public interface Autopilot {
     AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs);

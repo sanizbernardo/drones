@@ -188,7 +188,7 @@ premade {
 		
 		JPanel inputPanel = buildBase(panel, "Load one of the premade worlds", 2, 2);
 		
-		classNames = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight", "OrthoTestWorld"};
+		classNames = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight", "OrthoTestWorld", "LogWorld"};
 		worlds = new HashMap<>();
 		for (String className: classNames) {
 			try {
@@ -286,9 +286,7 @@ loadFile {
 		checkBtn.setPreferredSize(new Dimension((int)checkBtn.getPreferredSize().getWidth(), (int)fileTextField.getPreferredSize().getHeight()));
 		GridBagConstraints gbc_checkBtn = GuiUtils.buildGBC(2, 4, GridBagConstraints.NORTHWEST, new Insets(5, 5, 5, 5));
 		inputPanel.add(checkBtn, gbc_checkBtn);
-		
-		
-		
+				
 		return panel;
 	}
 	

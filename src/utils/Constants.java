@@ -28,7 +28,7 @@ public class Constants {
      */
     public static final int TARGET_FPS = 75;
 
-    public static final int TARGET_UPS = 30;
+    public static final int TARGET_UPS = 100;
 
     /**
      * physics.World constants

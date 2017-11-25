@@ -1,4 +1,4 @@
-package datatypes;
+package interfaces;
 public class AutopilotOutputsReader {
     
 	public static AutopilotOutputs read(java.io.DataInputStream stream) throws java.io.IOException {

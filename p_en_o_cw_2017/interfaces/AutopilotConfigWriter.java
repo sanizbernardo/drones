@@ -1,4 +1,4 @@
-package datatypes;
+package interfaces;
 public class AutopilotConfigWriter {
 
     public static void write(java.io.DataOutputStream stream, AutopilotConfig value) throws java.io.IOException {

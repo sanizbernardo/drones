@@ -4,8 +4,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-import autopilot.Autopilot;
-import datatypes.*;
+import interfaces.*;
 
 public class AutopilotClient<T extends Autopilot> implements Autopilot{
 	

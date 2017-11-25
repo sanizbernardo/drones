@@ -4,12 +4,9 @@ import static org.lwjgl.opengl.GL11.*;
 
 import engine.Window;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
-
-import datatypes.AutopilotConfig;
 import utils.*;
 import entities.WorldObject;
-import sun.awt.datatransfer.DataTransferer.CharsetComparator;
+import interfaces.AutopilotConfig;
 
 public class Renderer {
 

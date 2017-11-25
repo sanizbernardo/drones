@@ -4,7 +4,7 @@ import java.lang.Math;
 
 import org.joml.*;
 
-import datatypes.AutopilotConfig;
+import interfaces.AutopilotConfig;
 
 public class Drone {
 	

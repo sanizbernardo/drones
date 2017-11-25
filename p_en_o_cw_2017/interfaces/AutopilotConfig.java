@@ -1,4 +1,4 @@
-package datatypes;
+package interfaces;
 public interface AutopilotConfig {
     float getGravity();
     float getWingX();

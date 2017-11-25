@@ -1,4 +1,4 @@
-package datatypes;
+package interfaces;
 public interface AutopilotOutputs {
     float getThrust();
     float getLeftWingInclination();
