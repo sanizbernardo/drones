@@ -9,9 +9,8 @@ public class Main {
     public static void main(String[] args) {
         try {
 
-//        	ConfigSetupGUI gui = new ConfigSetupGUI();
-//        	IWorldRules worldRules = gui.showDialog();
-        	IWorldRules worldRules = new LogWorld();
+        	ConfigSetupGUI gui = new ConfigSetupGUI();
+        	IWorldRules worldRules = gui.showDialog();
         	
             //create a game engine
             Engine gameEng = new Engine(Constants.TITLE, Constants.WIDTH, Constants.HEIGHT, Constants.VSYNC, worldRules);
