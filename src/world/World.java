@@ -96,7 +96,7 @@ public abstract class World implements IWorldRules {
             public float getWingMass() {return 2.5f;}
             public float getTailMass() {return 3f;}
             public float getMaxThrust() {return 5000f;}
-            public float getMaxAOA() {return -1f;}
+            public float getMaxAOA() {return (float) Math.toRadians(45);}
             public float getWingLiftSlope() {return 1.1f;}
             public float getHorStabLiftSlope() {return 0.11f;}
             public float getVerStabLiftSlope() {return 0.11f;}

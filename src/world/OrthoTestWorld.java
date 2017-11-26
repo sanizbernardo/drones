@@ -7,7 +7,6 @@ import org.joml.Vector3f;
 import engine.IWorldRules;
 import entities.WorldObject;
 import physics.Drone;
-import utils.IO.MouseInput;
 
 public class OrthoTestWorld extends World implements IWorldRules{
 

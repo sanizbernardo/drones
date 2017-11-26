@@ -2,7 +2,6 @@ import engine.Engine;
 import engine.IWorldRules;
 import gui.ConfigSetupGUI;
 import utils.Constants;
-import world.LogWorld;
 
 public class Main {
 

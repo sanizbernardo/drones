@@ -16,9 +16,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalSliderUI;
 
+import interfaces.AutopilotConfig;
 import interfaces.AutopilotOutputs;
-import utils.Constants;
-
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import java.awt.GridBagLayout;
@@ -47,7 +46,22 @@ public class AutopilotGUI extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					AutopilotGUI frame = new AutopilotGUI(200,200,1000);
+					AutopilotGUI frame = new AutopilotGUI(new AutopilotConfig() {
+			            public float getGravity() {return 0f;}
+			            public float getWingX() {return 0f;}
+			            public float getTailSize() {return 0f;}
+			            public float getEngineMass() {return 0f;}
+			            public float getWingMass() {return 0f;}
+			            public float getTailMass() {return 0f;}
+			            public float getMaxThrust() {return 500f;}
+			            public float getMaxAOA() {return (float) Math.toRadians(30);}
+			            public float getWingLiftSlope() {return 0f;}
+			            public float getHorStabLiftSlope() {return 0f;}
+			            public float getVerStabLiftSlope() {return 0f;}
+			            public float getHorizontalAngleOfView() {return (float) Math.toRadians(120f);}
+			            public float getVerticalAngleOfView() {return (float) Math.toRadians(120f);}
+			            public int getNbColumns() {return 200;}
+			            public int getNbRows() {return 200;}});
 					BufferedImage img = ImageIO.read(new File("ss.png"));
 					System.out.println(img.getHeight() + " " + img.getWidth());
 					frame.lblImage.setIcon(new ImageIcon(GuiUtils.addCrossHair(img, 100, 100, 13133055)));
@@ -60,10 +74,12 @@ public class AutopilotGUI extends JFrame {
 	}
 
 
-	public AutopilotGUI(int imgWidth, int imgHeight, int maxThrust) {		
-		this.imgWidth = imgWidth;
-		this.imgHeight = imgHeight;
-				
+	public AutopilotGUI(AutopilotConfig config) {		
+		this.imgWidth = config.getNbColumns();
+		this.imgHeight = config.getNbRows();
+		float maxThrust = config.getMaxThrust();
+		int maxAOA = (int) Math.toDegrees(config.getMaxAOA());
+		
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -102,34 +118,40 @@ public class AutopilotGUI extends JFrame {
 		
 		
 		Hashtable<Integer, JLabel> lblTable = new Hashtable<>();
-		for (int i=-90; i<=90; i+=30) {
+		for (int i=0; i<=10+maxAOA; i+= (maxAOA + 10)/3) {
 			JLabel lbl = new JLabel("" + i);
 			lbl.setFont(lbl.getFont().deriveFont(9.0f));
 			lblTable.put(i, lbl);
+			if (i != 0) {
+				JLabel lbl2 = new JLabel("" + (-i));
+				lbl2.setFont(lbl.getFont().deriveFont(9.0f));
+				lblTable.put(-i, lbl2);
+			}
 		}
 				
-		lwSlider = buildSlider("RW", SwingConstants.VERTICAL, -90, 0, 90, 30, 10, lblTable, false);
+		lwSlider = buildSlider("RW", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
 		horSliderPanel.add(lwSlider.panel, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		
 		
-		horStabSlider = buildSlider("HS", SwingConstants.VERTICAL, -90, 0, 90, 30, 10, lblTable, false);
+		horStabSlider = buildSlider("HS", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
 		horSliderPanel.add(horStabSlider.panel, GuiUtils.buildGBC(1, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		
 		
-		rwSlider = buildSlider("LW", SwingConstants.VERTICAL, -90, 0, 90, 30, 10, lblTable, false);
+		rwSlider = buildSlider("LW", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
 		horSliderPanel.add(rwSlider.panel, GuiUtils.buildGBC(2, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		
 
-		verStabSlider = buildSlider("VS", SwingConstants.HORIZONTAL, -90, 0, 90, 30, 10, lblTable, false); 
+		verStabSlider = buildSlider("VS", SwingConstants.HORIZONTAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false); 
 		sliderPanel.add(verStabSlider.panel, GuiUtils.buildGBC(0, 1, GridBagConstraints.CENTER, new Insets(5, 0, 5, 5)));
 		
 		
 		Hashtable<Integer, JLabel> thrustTable = new Hashtable<>();
 		thrustTable.put(0, new JLabel("0"));
-		thrustTable.put(maxThrust/2, new JLabel(""+maxThrust/2));
-		thrustTable.put(maxThrust, new JLabel(""+maxThrust));
+		thrustTable.put((int)(maxThrust/2f), new JLabel(""+(int)(maxThrust/2f)));
+		thrustTable.put((int)(maxThrust), new JLabel(""+(int)(maxThrust)));
 		
-		thrustSlider = buildSlider("Thrust", SwingConstants.VERTICAL, 0, 0, maxThrust, maxThrust/10, maxThrust/40, thrustTable, true);
+		thrustSlider = buildSlider("Thrust", SwingConstants.VERTICAL, 0, 0, (int)maxThrust, 
+				(int)(maxThrust/10f), (int)(maxThrust/40f), thrustTable, true);
 		thrustSlider.slider.setPreferredSize(new Dimension(57, 270));
 		GridBagConstraints gbc_thrustSlider = GuiUtils.buildGBC(1, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5));
 		gbc_thrustSlider.gridheight = 2;
@@ -160,7 +182,7 @@ public class AutopilotGUI extends JFrame {
 		rwSlider.setValue((int) Math.toDegrees(output.getRightWingInclination()));
 		horStabSlider.setValue((int) Math.toDegrees(output.getHorStabInclination()));
 		verStabSlider.setValue((int) Math.toDegrees(output.getVerStabInclination()));
-		thrustSlider.setValue((int) Math.toDegrees(output.getThrust()));
+		thrustSlider.setValue((int) output.getThrust());
 	}
 
 	

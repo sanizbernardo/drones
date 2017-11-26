@@ -151,7 +151,7 @@ public class Motion implements Autopilot {
         setConfig(config);
 
 
-        gui = new AutopilotGUI(config.getNbColumns(), config.getNbRows(), (int)config.getMaxThrust());
+        gui = new AutopilotGUI(config);
         gui.updateImage(inputs.getImage());
         gui.showGUI();
 
@@ -223,7 +223,7 @@ public class Motion implements Autopilot {
         
 //        System.out.println(inputs.getPitch());
         
-        return new AutopilotOutputs() {
+        AutopilotOutputs output = new AutopilotOutputs() {
             @Override
             public float getThrust() {
                 return getNewThrust();
@@ -249,9 +249,12 @@ public class Motion implements Autopilot {
                 return verStabInclination;
             }
         };
+        gui.updateOutputs(output);
+        return output;
     }
 
 	@Override
 	public void simulationEnded() {
+		gui.dispose();
 	}
 }
