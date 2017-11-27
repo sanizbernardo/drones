@@ -45,7 +45,6 @@ public class WorldBuilder extends World implements IWorldRules {
 		this.drone = new Drone(config);
 		this.drone.setPosition(startPos);
 		this.drone.setVelocity(startVel);
-		this.drone.setOrientation(startOrientation);
 	}
 
 }

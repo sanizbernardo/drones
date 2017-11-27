@@ -69,9 +69,10 @@ public class PhysicsEngineTest {
 
 	/**
 	 * Falling test 1: no wings, starting from (0,5000,0) with no initial speed and no thrust, for 20 seconds.
+	 * @throws Exception 
 	 */
 	@Test
-	public void testFallingNoWings1() {
+	public void testFallingNoWings1() throws Exception {
 		float dt = 1f;
 		
 		droneNoWings.setPosition(new Vector3f(0f, 5000f, 0f));
@@ -92,9 +93,10 @@ public class PhysicsEngineTest {
 	
 	/**
 	 * Falling test 2: no wings, starting from (0,5000,0) with an initial speed of (0,0,-10) and no thrust, for 20 seconds.
+	 * @throws Exception 
 	 */
 	@Test
-	public void testFallingNoWings2() {
+	public void testFallingNoWings2() throws Exception {
 		float dt = 1f;
 		
 		droneNoWings.setPosition(new Vector3f(0f, 5000f, 0f));
@@ -117,9 +119,10 @@ public class PhysicsEngineTest {
 	
 	/**
 	 * Thrust test, no wings, starting from (0,2000,0) with no initial speed with no thrust for 5 seconds and a thrust of 2000 for 15 seconds.
+	 * @throws Exception 
 	 */
 	@Test
-	public void testThrustNoWings() {
+	public void testThrustNoWings() throws Exception {
 		droneNoWings.setPosition(new Vector3f(0f, 2000f, 0f));
 		
 		IntToDoubleFunction posFuncY = i -> 2000.0 - 10.0*i*i/2.0;
@@ -142,9 +145,10 @@ public class PhysicsEngineTest {
 	
 	/**
 	 * Wings (no hor stab) falling test, starting from (0,2000,0) with no initial speed and no thrust, for 20 seconds 
+	 * @throws Exception 
 	 */
 	@Test
-	public void testWingsFalling1() {
+	public void testWingsFalling1() throws Exception {
 		float dt = 1f;
 		
 		droneNoHorStab.setPosition(new Vector3f(0f, 2000f, 0f));		

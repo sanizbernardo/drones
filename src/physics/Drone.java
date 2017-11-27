@@ -12,7 +12,7 @@ public class Drone {
 
 	private final float wingX, tailSize;
 
-	private Vector3f position, velocity, orientation, rotation, forwardD = new Vector3f(0, 0, -1), 
+	private Vector3f position, velocity, rotation, forwardD = new Vector3f(0, 0, -1), 
 			right = new Vector3f(1, 0, 0);
 	
 	private float thrust, leftWingInclination, rightWingInclination, horStabInclination, verStabInclination;
@@ -23,14 +23,12 @@ public class Drone {
 
 
 	public Drone(AutopilotConfig config) {
-		this(new Vector3f(0f, 0f, 0f), new Vector3f(0f, 0f, 0f),
-				new Vector3f(0f, 0f, 0f), config);
+		this(new Vector3f(0f, 0f, 0f), new Vector3f(0f, 0f, 0f), config);
 	}
 	
-	public Drone(Vector3f position, Vector3f velocity, Vector3f orientation, AutopilotConfig config) {
+	public Drone(Vector3f position, Vector3f velocity, AutopilotConfig config) {
 		this.setPosition(position);		
 		this.setVelocity(velocity);
-		this.setOrientation(orientation);
 		this.setRotation(new Vector3f(0f, 0f, 0f));
 
 		this.wingX = config.getWingX();
@@ -175,14 +173,6 @@ public class Drone {
     	float x = right.dot(getR0());
     	return (float) Math.atan2(y,x);
     }
-        
-    public Vector3f getOrientation() {
-    	return orientation;
-    }
-    
-    public void setOrientation(Vector3f orientation) {
-    	this.orientation = orientation;
-    }
 
     // sizes
 
@@ -198,27 +188,4 @@ public class Drone {
 		return engineZ;
 	}
 	
-//	public static Matrix3f buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
-//		// column major -> transposed
-//		Matrix3f xRot = new Matrix3f(
-//				1f, 					  0f,					    0f,
-//				0f,  (float)Math.cos(xAngle),  (float)-Math.sin(xAngle),
-//				0f, (float)Math.sin(xAngle), (float)Math.cos(xAngle)),
-//				
-//			   yRot = new Matrix3f(
-//				(float)Math.cos(yAngle),  0f, (float)Math.sin(yAngle),
-//									 0f,  1f, 						0f,
-//				(float)-Math.sin(yAngle),  0f, (float)Math.cos(yAngle)),
-//			   
-//			   zRot = new Matrix3f(
-//				 (float)Math.cos(zAngle), (float)-Math.sin(zAngle), 0f,
-//				(float)Math.sin(zAngle), (float)Math.cos(zAngle), 0f,
-//									  0f, 					   0f, 1f);
-//		
-//		return xRot.mul(yRot).mul(zRot);
-//	}
-//	
-//	public Matrix3f transMat() {
-//		return buildTransformMatrix(orientation.x, orientation.y, orientation.z);
-//	}
 }

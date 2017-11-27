@@ -161,7 +161,12 @@ public abstract class World implements IWorldRules {
     @Override
     public void update(float interval, MouseInput mouseInput) {
 
-        if(wantPhysicsEngine) physicsEngine.update(interval/TIME_SLOWDOWN_MULTIPLIER, drone);
+        if(wantPhysicsEngine)
+			try {
+				physicsEngine.update(interval/TIME_SLOWDOWN_MULTIPLIER, drone);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
         Vector3f newDronePos = new Vector3f(drone.getPosition());
 
