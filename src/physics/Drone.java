@@ -47,6 +47,8 @@ public class Drone {
 		this.maxThrust = config.getMaxThrust();
 	}
 	
+	
+	
 	// position
 	public void setPosition(Vector3f pos) {
 		this.position = pos;
@@ -197,6 +199,8 @@ public class Drone {
 	public float getEngineZ() {
 		return engineZ;
 	}
+	
+	
 	
 //	public static Matrix3f buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
 //		// column major -> transposed

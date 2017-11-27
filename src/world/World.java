@@ -63,7 +63,7 @@ public abstract class World implements IWorldRules {
     
     private void constructCameras() {
         topOrthoCamera.setPosition(0,200,0);
-        topOrthoCamera.setRotation(90, 0,0);
+        topOrthoCamera.setRotation(90, 0, -90);
         rightOrthoCamera.setPosition(200, 0, 0);
         rightOrthoCamera.setRotation(0, -90, 0);
     }
@@ -116,7 +116,7 @@ public abstract class World implements IWorldRules {
             e.printStackTrace();
         }
 
-        imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows());
+        imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows(), window);
     }
 
     private void addDrone() {
@@ -190,7 +190,7 @@ public abstract class World implements IWorldRules {
 
         if(wantPlanner) plannerUpdate(newDronePos, interval/TIME_SLOWDOWN_MULTIPLIER);
 
-        testbedGui.update(drone.getVelocity(), newDronePos, new Vector3f(drone.getPitch(),drone.getHeading(),drone.getRoll()));
+        testbedGui.update(drone.getVelocity(), newDronePos, drone.getHeading(), drone.getPitch(), drone.getRoll());
         
     }
 

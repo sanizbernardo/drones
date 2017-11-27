@@ -10,7 +10,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 
 public class KeyboardInput {
-
+	
 	private Long old = (long) 0;
 	
     public void worldInput(Vector3f cameraInc, Window window, ImageCreator imageCreator, Renderer renderer) {

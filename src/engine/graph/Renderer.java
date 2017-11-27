@@ -93,7 +93,7 @@ public class Renderer {
             
             // background for right ortho cam
             glScissor(rightOrthoCamX, rightOrthoCamY, rightOrthoCamWidth, rightOrthoCamHeigth);
-            glClearColor(.80f, .78f, .99f, 1f);
+            glClearColor(.50f, .50f, .50f, 1f);
             
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             //end
@@ -173,7 +173,7 @@ public class Renderer {
             // Update projection Matrix
             int size = 75;
 //            projectionMatrix = projectionMatrix.identity().ortho(-size/8, size,-size/2, size/2, Constants.Z_NEAR, Constants.Z_FAR).rotateZ((float)Math.toRadians(-90));
-            projectionMatrix = projectionMatrix.identity().ortho(-size, size,-size, size, Constants.Z_NEAR, Constants.Z_FAR).rotateZ((float)Math.toRadians(-90));
+            projectionMatrix = projectionMatrix.identity().ortho(-size, size,-size, size, Constants.Z_NEAR, Constants.Z_FAR);
             shaderProgram.setUniform("projectionMatrix", projectionMatrix);
             
             // Update view Matrix
@@ -193,7 +193,7 @@ public class Renderer {
             rightOrthoCamHeigth = (int) (window.getHeight() * 0.5);
             glViewport(rightOrthoCamX, rightOrthoCamY, rightOrthoCamWidth, rightOrthoCamHeigth);
             // Update projection Matrix
-            projectionMatrix = projectionMatrix.identity().ortho(-size, size,-size, size, Constants.Z_NEAR, Constants.Z_FAR);
+            projectionMatrix = projectionMatrix.identity().ortho(-size, size,-size, size, Constants.Z_NEAR/100, Constants.Z_FAR*100);
             shaderProgram.setUniform("projectionMatrix", projectionMatrix);
             
             // Update view Matrix
