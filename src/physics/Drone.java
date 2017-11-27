@@ -148,11 +148,7 @@ public class Drone {
 	
 	public Vector3f getR0() {
 		Vector3f heading = getH();
-<<<<<<< HEAD
 		return heading.cross(new Vector3f(0, 1, 0), new Vector3f());
-=======
-		return heading.cross(new Vector3f(0,1,0), new Vector3f());
->>>>>>> ortho-fix
 	}
 	
 	public Vector3f getU0() {
@@ -193,33 +189,4 @@ public class Drone {
 	public float getEngineZ() {
 		return engineZ;
 	}
-	
-<<<<<<< HEAD
-=======
-	
-	
-//	public static Matrix3f buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
-//		// column major -> transposed
-//		Matrix3f xRot = new Matrix3f(
-//				1f, 					  0f,					    0f,
-//				0f,  (float)Math.cos(xAngle),  (float)-Math.sin(xAngle),
-//				0f, (float)Math.sin(xAngle), (float)Math.cos(xAngle)),
-//				
-//			   yRot = new Matrix3f(
-//				(float)Math.cos(yAngle),  0f, (float)Math.sin(yAngle),
-//									 0f,  1f, 						0f,
-//				(float)-Math.sin(yAngle),  0f, (float)Math.cos(yAngle)),
-//			   
-//			   zRot = new Matrix3f(
-//				 (float)Math.cos(zAngle), (float)-Math.sin(zAngle), 0f,
-//				(float)Math.sin(zAngle), (float)Math.cos(zAngle), 0f,
-//									  0f, 					   0f, 1f);
-//		
-//		return xRot.mul(yRot).mul(zRot);
-//	}
-//	
-//	public Matrix3f transMat() {
-//		return buildTransformMatrix(orientation.x, orientation.y, orientation.z);
-//	}
->>>>>>> c61786d099cb7e65644342780d665aaeeff705a4
 }

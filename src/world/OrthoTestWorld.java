@@ -36,11 +36,7 @@ public class OrthoTestWorld extends World implements IWorldRules{
         drone = new Drone(config);
         
         drone.setVelocity(new Vector3f(0,0,-15));
-<<<<<<< HEAD
-        drone.setLeftWingInclination((float) Math.toRadians(30));
-=======
         drone.setLeftWingInclination(-1);
->>>>>>> ortho-fix
 	}
 
 	@Override
