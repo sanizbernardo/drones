@@ -73,7 +73,7 @@ public class TestbedGui extends JFrame {
 		setVisible(true);
 	}
 	
-	public void update(Vector3f velocity, Vector3f position, Vector3f orientation) {
+	public void update(Vector3f velocity, Vector3f position, float heading, float pitch, float roll) {
 	    double precision = 2;
 	    double prec = Math.pow(10, precision);
 	    
@@ -84,9 +84,9 @@ public class TestbedGui extends JFrame {
 														+ "<br>" +"\n y:"+ precision(position.y, prec) 
 														+ "<br>" +  "\n z:" +  precision(position.z, prec) + "</html>");
 		
-		rollLbl.setText("Roll: " + precision( Math.toDegrees(orientation.z), prec) );
-		yawLbl.setText("Heading: " + precision( Math.toDegrees(orientation.y), prec));
-		pitchLbl.setText("Pitch: " + precision(Math.toDegrees(orientation.x), prec));
+		rollLbl.setText("Roll: " + precision( Math.toDegrees(roll), prec) );
+		yawLbl.setText("Heading: " + precision( Math.toDegrees(heading), prec));
+		pitchLbl.setText("Pitch: " + precision(Math.toDegrees(pitch), prec));
 
 	}
 	

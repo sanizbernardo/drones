@@ -61,6 +61,16 @@ public class PhysicsEngine {
 		drone.setPosition(drone.getPosition().add(oldVel.mul(dt, new Vector3f())).add(acceleration.mul(dt*dt/2, new Vector3f()), new Vector3f()));		
 		drone.setVelocity(oldVel.add(acceleration.mul(dt, new Vector3f()), new Vector3f()));
 		drone.setRotation(drone.getRotation().add(angularVelocity(dt, drone), new Vector3f()));
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+//		System.out.println(drone.getPitch());
+=======
+//		System.out.println(drone.getRoll());
+>>>>>>> ortho-fix
+//		System.out.println(rotMat);
+//		System.out.println(angularVelocity(dt, drone));
+>>>>>>> c61786d099cb7e65644342780d665aaeeff705a4
 	}
 	
 	public void updateRotMat(float dt, Drone drone) {
