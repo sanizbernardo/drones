@@ -170,7 +170,7 @@ public class Motion implements Autopilot {
         if (actual - target > 0) {
             thrust = 10*output;
         } else {
-            thrust = 100*output;
+            thrust = 50*output;
         }
         // Check that received output is within bounds
         if (thrust > config.getMaxThrust()) {
@@ -209,7 +209,7 @@ public class Motion implements Autopilot {
     // causes drone to climb by changing pitch and using thrust to increase vertical velocity
     private void climbPID(AutopilotInputs inputs, float target) {
         // Pitch of plane during climb
-        float climbAngle = (float)Math.toRadians(20);
+        float climbAngle = (float)Math.toRadians(25);
 
         if (inputs.getY() < target - 3f) {
             // aircraft is below target, must therefore pitch up and thrust
@@ -230,7 +230,8 @@ public class Motion implements Autopilot {
         } else if (inputs.getY() > target + 3f) {
             // if aircraft overshoots target, it simply drops -> can probably be done better
             System.out.println("Fall");
-            setNewThrust(0f);
+            adjustPitch(inputs, 0f);
+            adjustThrust(inputs, -2f);
         } else {
             // If within 3m from target, flies straight
             System.out.println("Fly straight");
@@ -256,7 +257,7 @@ public class Motion implements Autopilot {
 
         pitchPID = new MiniPID(1.2, 0.15, 0.1);
         pitchPID.setOutputLimits(Math.toRadians(30));
-        thrustPID = new MiniPID(0.7, 0.02, 1.3);
+        thrustPID = new MiniPID(0.6, 0.02, 1.2);
         thrustPID.setOutputLimits(config.getMaxThrust());
 //        inclPID = new MiniPID(1.2, 0.15, 0.1);
 //        inclPID.setOutputLimits(Math.toRadians(30));
@@ -325,7 +326,7 @@ public class Motion implements Autopilot {
         }
 
         // target of climb should be the z position of the cube
-        climbPID(inputs,20f);
+        climbPID(inputs,12f);
         stableYawPID(inputs);
 
         // prints useful variables
