@@ -219,7 +219,7 @@ public class Motion implements Autopilot {
             System.out.println("Fall");
         } else {
             flyStraightPID(inputs, 0);
-            System.out.println("FlyStright");
+            System.out.println("Fly straight");
         }
     }
 
@@ -229,8 +229,9 @@ public class Motion implements Autopilot {
 
         if (inputs.getY() < target - 1f) {
 
+            System.out.println("Rise");
             adjustPitch(inputs, climbAngle);
-            adjustThrust(inputs, 3f);
+            adjustThrust(inputs, 1f);
 
             float incl = stableInclination(inputs);
             if (!Float.isNaN(incl)){
@@ -241,8 +242,10 @@ public class Motion implements Autopilot {
 //            if (inputs.getPitch() < climbAngle + 0.05 && inputs.getPitch() > climbAngle - 0.05) {adjustThrust(inputs, 1f);}
 
         } else if (inputs.getY() > target + 1f) {
+            System.out.println("Fall");
             setNewThrust(0f);
         } else {
+            System.out.println("Fly straight");
             flyStraightPID(inputs, 0);
         }
     }
@@ -259,7 +262,7 @@ public class Motion implements Autopilot {
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
         pitchPID = new MiniPID(1.2, 0.15, 0.1);
         pitchPID.setOutputLimits(Math.toRadians(30));
-        thrustPID = new MiniPID(1.2, 0.15, 0.1);
+        thrustPID = new MiniPID(1, 0.1, 1);
         thrustPID.setOutputLimits(config.getMaxThrust());
         inclPID = new MiniPID(1.2, 0.15, 0.1);
         inclPID.setOutputLimits(Math.toRadians(30));
@@ -325,7 +328,7 @@ public class Motion implements Autopilot {
 //        	System.exit(0);
         }
 
-        climbPID(inputs,5f);
+        climbPID(inputs,20f);
 //        risePID(inputs, 5f);
         stableYawPID(inputs);
 

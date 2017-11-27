@@ -73,9 +73,9 @@ public class PhysicsEngine {
 				
 		drone.setVelocity(oldVel.add(acceleration.mul(dt, new Vector3f()), new Vector3f()));
 		drone.setRotation(drone.getRotation().add(angularVelocity(dt, drone), new Vector3f()));
-		System.out.println(drone.getPitch());
-		System.out.println(rotMat);
-		System.out.println(angularVelocity(dt, drone));
+//		System.out.println(drone.getPitch());
+//		System.out.println(rotMat);
+//		System.out.println(angularVelocity(dt, drone));
 	}
 	
 //	public static Matrix3f buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
@@ -192,7 +192,7 @@ public class PhysicsEngine {
 				horStabNormalVectorD = new Vector3f(0f, (float)Math.cos((double) horStabInclination), (float)Math.sin((double) horStabInclination)),
 				verStabNormalVectorD = new Vector3f((float)-Math.cos((double) verStabInclination), 0f, (float)Math.sin((double) verStabInclination));
 		
-		System.out.println(weightVectorD);
+//		System.out.println(weightVectorD);
 		Vector3f horProjVelLW = new Vector3f(0, relVelLW.y, relVelLW.z),
 				horProjVelRW = new Vector3f(0, relVelRW.y, relVelRW.z),
 				horProjVelT = new Vector3f(0, relVelT.y, relVelT.z),
