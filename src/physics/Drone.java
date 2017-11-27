@@ -150,7 +150,7 @@ public class Drone {
 	
 	public Vector3f getR0() {
 		Vector3f heading = getH();
-		return heading.cross(new Vector3f(), new Vector3f());
+		return heading.cross(new Vector3f(0,1,0), new Vector3f());
 	}
 	
 	public Vector3f getU0() {
