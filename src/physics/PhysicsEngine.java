@@ -111,7 +111,9 @@ public class PhysicsEngine {
 					0, 			0,		1);
 			Matrix3f newMat = uniMat.rotate(-angle, normAngVel, new Matrix3f());
 			rotMat = newMat.mul(rotMat);
+			System.out.println(uniMat.identity().rotate((float) -Math.toRadians(30), new Vector3f(0,1,0), new Matrix3f()));
 		}
+		
 		drone.setRotMat(rotMat);
 	}
 	
