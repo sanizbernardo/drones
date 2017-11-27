@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.sql.Savepoint;
 import java.util.ArrayList;
 
@@ -38,7 +39,6 @@ public class ImgRecogPlanner implements Autopilot {
 	}
 
 	private DefaultCategoryDataset distances = new DefaultCategoryDataset();
-	private double realDistance = 4;
 	private int i = 0;
 	private boolean graphmade = false;
 
@@ -46,32 +46,41 @@ public class ImgRecogPlanner implements Autopilot {
 	private double dx, dy, dz;
 	
 	@Override
-	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
-		
-		
+	public AutopilotOutputs timePassed(AutopilotInputs inputs) {		
 		// doe berekeningen voor image recog hier
 		byte[] image = inputs.getImage();
 		ImageProcessing imageProcess = new ImageProcessing(image);
 		if(!imageProcess.getObjects().isEmpty()){
 			Cube cube = imageProcess.getObjects().get(0);
 			//double[] newDistances = {realDistance,imageProcess.guessDistance(cube)};
-			double actualDistance = Math.sqrt(25+realDistance*realDistance);
+			double actualDistance = Math.sqrt(x*x+y*y+z*z);
 			if(actualDistance < 40){
 				double guess = imageProcess.guessDistance(cube);
+				if (guess > 60){
+					ArrayList<int[]> hull = imageProcess.getConvexHull(cube);
+					for( int[] pixel : hull){
+						System.out.println("x: " + pixel[0] + "         y: " + pixel[1]);
+					}
+					//System.exit(0);
+					//imageProcess.saveImage("testing");
+				}
 				distances.addValue(actualDistance, "actual", "" + i);
 				distances.addValue(guess, "target", "" + i);
 				double difference = Math.abs(actualDistance-guess);
 				distances.addValue(difference, "diff", "" + i);
 			}
 			//distances.add(newDistances);
-			realDistance +=0.1;
+			x += dx;
+			y += dy;
+			z += dz;
 			i +=1;
 		}
 		else{
-			realDistance +=0.1;
+			x += dx;
+			y += dy;
+			z += dz;
 			i +=1;
 		}
-		System.out.println(realDistance);
 		return Utils.buildOutputs(0, 0, 0, 0, 0);
 	}
 

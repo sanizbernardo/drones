@@ -1,5 +1,7 @@
 package world;
 
+import org.joml.Vector3f;
+
 import entities.WorldObject;
 import entities.meshes.cube.Cube;
 import recognition.ImgRecogPlanner;
@@ -24,6 +26,8 @@ public class ImgRecogWorld extends World {
 		worldObjects = new WorldObject[] {new WorldObject(redCube.getMesh())};
 		
 		worldObjects[0].setPosition(x, y, z);
+		
+		drone.setOrientation(new Vector3f(0,0,0));
 	}
 	
 	private float x, y, z;
@@ -40,7 +44,7 @@ public class ImgRecogWorld extends World {
 		float oldY = worldObjects[0].getPosition().y;
 		worldObjects[0].setPosition(oldX + dx, oldY + dy, oldZ + dz);
 		//System.out.println(worldObjects[0].getPosition());
-		if (oldZ < -5 && !ended){
+		if (oldZ < -40){
 			gameEngine.setLoopShouldExit();
 		}
 		super.update(interval, mouseInput);

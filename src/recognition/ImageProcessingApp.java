@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 /**
  * Created by Toon on 31/10/17
@@ -16,7 +17,7 @@ public class ImageProcessingApp {
     	
     	//Path path = Paths.get("C:\\Gebruikers\\Tomas\\Afbeeldingen\\ss2.png");
     	//byte[] data = Files.readAllBytes(path);
-    	ImageProcessing image = new ImageProcessing("ss6.png");
+    	ImageProcessing image = new ImageProcessing("ss.png");
     	
         long start = System.currentTimeMillis();
         long end = System.currentTimeMillis();
@@ -27,6 +28,12 @@ public class ImageProcessingApp {
         for (Cube cube : image.getObjects()){
             //System.out.println(Arrays.toString(cube.getCubeData()));
             image.approximateLocation(cube, null, null);
+            
+            ArrayList<int[]> hull = image.getConvexHull(cube);
+            for(int[] pixel : hull){
+            	System.out.println("x: " + pixel[0] + "     y: " + pixel[1]);
+            }
+            System.out.println(image.guessDistance(cube));
         }
     }
 }

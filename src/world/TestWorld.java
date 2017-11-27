@@ -20,10 +20,15 @@ public class TestWorld extends World implements IWorldRules {
         worldObjects = new WorldObject[AMOUNT_OF_CUBES];
 
         worldObjects[0] = new WorldObject(getCubeMeshes()[0].getMesh());
-        worldObjects[0].setPosition(0f, 10f, -30f);
+        worldObjects[0].setPosition(0f, 0f, -10f);
 
-        drone.setThrust(20f);
-        drone.setVelocity(new Vector3f(0f, 0f, -4f));
+        //worldObjects[1] = new WorldObject(getCubeMeshes()[0].getMesh());
+        //worldObjects[1].setPosition(0f, 10f, -10f);
+
+
+		drone.setOrientation(new Vector3f(0,0,0));
+        //drone.setThrust(20f);
+        //drone.setVelocity(new Vector3f(0f, 0f, -4f));
 
     }
 }

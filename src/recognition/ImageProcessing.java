@@ -23,6 +23,10 @@ public class ImageProcessing {
     private int imageHeight;
     private BufferedImage image;
     private double fieldOfView = 120;
+    //TODO: pitch en jaw in constructor
+    private final double pitch = Math.PI/4;
+    private final double jaw = 0;
+    private ArrayList<int[]> convexhull = null;
 
     //constructor in case of a byte[]
     public ImageProcessing(byte[] imageByte){
@@ -182,23 +186,52 @@ public class ImageProcessing {
     }
 
     public double guessDistance(Cube cube){ //TODO check
-        ArrayList<int[]> pixels = cube.getPixels();
+        ArrayList<int[]> pixels = this.getConvexHull(cube);
         double currentMaxAngle = 0;
         
-//        twee oudere methodes:
-//        double largestDistance = -1;
-//        int[] pixelOne = null;
-//        int[] pixelTwo =  null;
-//        for (int[] pixel1 : pixels){
-//            for (int[] pixel2 : pixels){
-//                double distance = Math.sqrt(Math.pow((pixel1[0]-pixel2[0]),2) + Math.pow((pixel1[1]-pixel2[1]),2));
-//                if (distance > largestDistance){
-//                    largestDistance = distance;
-//                    pixelOne = pixel1;
-//                    pixelTwo = pixel2;
-//                }
-//            }
-//        }
+//        oudere methodes:
+        double largestDistance = -1;
+        int[] pixelOne = null;
+        int[] pixelTwo =  null;
+        for (int[] pixel1 : pixels){
+            for (int[] pixel2 : pixels){
+                double distance = Math.sqrt(Math.pow((pixel1[0]-pixel2[0]),2) + Math.pow((pixel1[1]-pixel2[1]),2));
+                if (distance > largestDistance){
+                    largestDistance = distance;
+                    pixelOne = pixel1;
+                    pixelTwo = pixel2;
+                }
+            }
+        }
+        System.out.println(pixelOne[0] + "     " + pixelOne[1]);
+        System.out.println(pixelTwo[0] + "     " + pixelTwo[1]);
+        
+        if (pixelOne[0] > pixelTwo[0]){
+        	pixelOne[0] += 1;
+        }
+        else {
+        	pixelTwo[0] +=1;
+        }
+        if (pixelOne[1] > pixelTwo[1]){
+        	pixelOne[1] += 1;
+        }
+        else {
+        	pixelTwo[1] +=1;
+        }
+        
+        double angleX = calculateAngleX(pixelOne[0], pixelTwo[0]);
+        double angleY = calculateAngleY(pixelOne[1], pixelTwo[1]);
+        double totAngle = Math.sqrt(angleX*angleX + angleY*angleY);
+        
+        System.out.println(Math.toDegrees(angleX));
+        System.out.println(Math.toDegrees(angleY));
+        System.out.println(Math.toDegrees(totAngle));
+        double sum = 0;
+        for(double i = 0; i < 199; i++){
+        	sum += calculateAngleX(i, i+1);
+        }
+        System.out.println("should be 2PI/3: " + sum);
+        return (Math.sqrt(3)/2)/Math.tan(totAngle/2);
         
 //        for(int i = 0; i<pixels.size();i++){
 //            for(int j = 0; j< pixels.size();j++){
@@ -213,53 +246,72 @@ public class ImageProcessing {
 //        double dist = Math.abs((Math.sqrt(3)/2)/Math.tan(currentMaxAngle/2));
 //        return dist;
         
-        ArrayList<int[]> diffColors = new ArrayList<int[]>();
-        ArrayList<Integer> diffColorsAmounts = new ArrayList<Integer>();
-        for(int[] pixel : pixels){
-        	if (!contains(pixel, diffColors)){
-        		diffColors.add(pixel);
-        		diffColorsAmounts.add(1);
-        	}
-        	else{
-        		int index = indexOf(pixel,diffColors);
-        		int temp = diffColorsAmounts.get(index);
-        		temp +=1;
-        		diffColorsAmounts.set(index, temp);
-        	}
-        }
-        Collections.sort(diffColorsAmounts);
-        Collections.reverse(diffColorsAmounts);
-        double biggest = diffColorsAmounts.get(0);
-        System.out.println(cube.getNbPixels());
-        double side = Math.sqrt(biggest);
-    	double x = cube.getAveragePixel()[0];
-        //side = side/Math.cos(Math.atan(((x - 99)/100)*Math.tan(Math.PI/3)));
-        double angle = calculateAngle(side, cube.getAveragePixel());
-        //double angle = side*getAnglePerPixel();
-        double dist = 0.5/Math.tan(angle/2);
-        if(diffColorsAmounts.size() > 1){
-        	double second = diffColorsAmounts.get(1);
-        	double secondRatio = second/(biggest+second);
-        	double secondAngle = secondRatio*Math.PI/2;
-        	dist = dist/Math.cos(secondAngle);
-        }
-        if(diffColorsAmounts.size() > 2){
-        	double third = diffColorsAmounts.get(2);
-        	double thirdRatio = third/(biggest+third);
-        	double thirdAngle = thirdRatio*Math.PI/2;
-        	dist = dist/Math.cos(thirdAngle);
-        }
-        return dist + 0.5;
+//        ArrayList<int[]> diffColors = new ArrayList<int[]>();
+//        ArrayList<Integer> diffColorsAmounts = new ArrayList<Integer>();
+//        for(int[] pixel : pixels){
+//        	if (!contains(pixel, diffColors)){
+//        		diffColors.add(pixel);
+//        		diffColorsAmounts.add(1);
+//        	}
+//        	else{
+//        		int index = indexOf(pixel,diffColors);
+//        		int temp = diffColorsAmounts.get(index);
+//        		temp +=1;
+//        		diffColorsAmounts.set(index, temp);
+//        	}
+//        }
+//        Collections.sort(diffColorsAmounts);
+//        Collections.reverse(diffColorsAmounts);
+//        //TODO:: ms ipv te kijken naar de meeste berekenen welke kleur de 'voorste' is.
+//        double biggest = diffColorsAmounts.get(0)/(Math.cos(pitch)*Math.cos(pitch))/(Math.cos(jaw)*Math.cos(jaw));
+//        System.out.println(cube.getNbPixels());
+//        double side = Math.sqrt(biggest);
+//    	double x = cube.getAveragePixel()[0];
+//        //side = side/Math.cos(Math.atan(((x - 99)/100)*Math.tan(Math.PI/3)));
+//        double angle = calculateAngle(side, cube.getAveragePixel());
+//        //double angle = side*getAnglePerPixel();
+//        double dist = 0.5/Math.tan(angle/2);
+//        if(diffColorsAmounts.size() > 1){
+//        	double second = diffColorsAmounts.get(1);
+//        	double secondRatio = second/(biggest+second);
+//        	double secondAngle = secondRatio*Math.PI/2;
+//        	dist = dist/Math.cos(secondAngle);
+//        }
+//        if(diffColorsAmounts.size() > 2){
+//        	double third = diffColorsAmounts.get(2);
+//        	double thirdRatio = third/(biggest+third);
+//        	double thirdAngle = thirdRatio*Math.PI/2;
+//        	dist = dist/Math.cos(thirdAngle);
+//        }
+//        return dist + 0.5;
         
     }
     
+    //TODO opkuisen
     private double calculateAngle(double side, int[] averagePixel) {
-    	double x = averagePixel[0];
-    	x -= 99;
-    	//double anglePerPixel = Math.atan(((x+1)/100)*Math.tan(Math.PI/3)) - Math.atan((x/100)*Math.tan(Math.PI/3));
-    	double anglePerPixel = Math.atan(((0.0+1)/100)*Math.tan(Math.PI/3)) - Math.atan((0.0/100)*Math.tan(Math.PI/3));
+    	//double x = averagePixel[0];
+    	//x -= 99;
+    	double x = 100*Math.tan(pitch)/Math.tan(Math.PI/3);
+    	double anglePerPixel = Math.atan(((x+1)/100)*Math.tan(Math.PI/3)) - Math.atan((x/100)*Math.tan(Math.PI/3));
+    	//double anglePerPixel = Math.atan(((0.0+1)/100)*Math.tan(Math.PI/3)) - Math.atan((0.0/100)*Math.tan(Math.PI/3));
     	System.out.println(anglePerPixel);
 		return side*anglePerPixel;
+	}
+    
+    private double calculateAngleX(double x1, double x2) {
+    	//double x = averagePixel[0];
+    	//x -= 99;
+    	double angle = Math.atan(((x2-100)/100)*Math.tan(Math.PI/3)) - Math.atan(((x1-100)/100)*Math.tan(Math.PI/3));
+    	//double anglePerPixel = Math.atan(((0.0+1)/100)*Math.tan(Math.PI/3)) - Math.atan((0.0/100)*Math.tan(Math.PI/3));
+		return Math.abs(angle);
+	}
+    
+    private double calculateAngleY(double y1, double y2) {
+    	//double x = averagePixel[0];
+    	//x -= 99;
+    	double angle = Math.atan(((y2-100)/100)*Math.tan(Math.PI/3)) - Math.atan(((y1-100)/100)*Math.tan(Math.PI/3));
+    	//double anglePerPixel = Math.atan(((0.0+1)/100)*Math.tan(Math.PI/3)) - Math.atan((0.0/100)*Math.tan(Math.PI/3));
+		return Math.abs(angle);
 	}
 
 	private int indexOf(int[] pixel, ArrayList<int[]> diffColors) {
@@ -279,11 +331,92 @@ public class ImageProcessing {
 	}
 
 
-    //some getters
+	public ArrayList<int[]> getConvexHull(Cube cube){
+		if (convexhull != null){
+			return convexhull;
+		}
+		else{
+			ArrayList<int[]> pixels = cube.getPixels();
+			int[] pointOnHull = pixels.get(0);
+			for(int[] pixel : pixels){
+				if((pixel[0] < pointOnHull[0]) || (pixel[0] == pointOnHull[0] && pixel[1] > pointOnHull[1])){
+					pointOnHull = pixel;
+				}
+			}
+			ArrayList<int[]> hull = new ArrayList<int[]>();
+			int[] endPoint = null;
+			while(hull.isEmpty() || endPoint != hull.get(0)){
+				hull.add(pointOnHull);
+				endPoint = pixels.get(0);
+				for(int i = 1; i < pixels.size(); i++){
+					if((endPoint[0] == pointOnHull[0] && endPoint[1] == pointOnHull[1]) || orientation(pointOnHull, pixels.get(i), endPoint) == 2){
+						endPoint = pixels.get(i);
+					}
+				}
+				pointOnHull = endPoint;
+			}
+			for (int i = 2; i < hull.size(); i++){
+				if(orientation(hull.get(i-2), hull.get(i-1), hull.get(i))==0){
+					hull.remove(i-1);
+					i--;
+				}
+			}
+			return hull;
+		}
+	}
+	
+    private int orientation(int[] p, int[] q, int[] r) {
+    	int val = (q[1] - p[1]) * (r[0] - q[0]) -
+                (q[0] - p[0]) * (r[1] - q[1]);
+    
+        if (val == 0) return 0;  // collinear
+        return (val > 0)? 1: 2; // clock or counterclock wise
+	}
+
+	//some getters
     private double getAnglePerPixel(){
             return Math.toRadians(this.fieldOfView/200);
     }
 
+    public boolean isOnBorder(int[] pixel){
+    	if(pixel[0] == 0 || pixel[0] == 199 || pixel[1] == 0 || pixel[1] == 199) return true;
+    	return false;
+    }
+    
+    public boolean touches(ArrayList<int[]> hull){
+    	for(int[] pixel : hull){
+            float[] hsv = rgbConversion(this.image.getRGB(pixel[0], pixel[1]));
+            float h = hsv[0];
+            float[] hsv2 = rgbConversion(this.image.getRGB(pixel[0]-1, pixel[1]-1));
+            float h2 = hsv[0];
+            if(!checkBg(hsv2) && h !=h2) return true;
+            hsv2 = rgbConversion(this.image.getRGB(pixel[0]-1, pixel[1]));
+            h2 = hsv[0];
+            if(!checkBg(hsv2) && h !=h2) return true;
+            hsv2 = rgbConversion(this.image.getRGB(pixel[0]-1, pixel[1]+1));
+            h2 = hsv[0];
+            if(!checkBg(hsv2) && h !=h2) return true;
+            hsv2 = rgbConversion(this.image.getRGB(pixel[0], pixel[1]-1));
+            h2 = hsv[0];
+            if(!checkBg(hsv2) && h !=h2) return true;
+            hsv2 = rgbConversion(this.image.getRGB(pixel[0], pixel[1]+1));
+            h2 = hsv[0];
+            if(!checkBg(hsv2) && h !=h2) return true;
+            hsv2 = rgbConversion(this.image.getRGB(pixel[0]+1, pixel[1]-1));
+            h2 = hsv[0];
+            if(!checkBg(hsv2) && h !=h2) return true;
+            hsv2 = rgbConversion(this.image.getRGB(pixel[0]+1, pixel[1]));
+            h2 = hsv[0];
+            if(!checkBg(hsv2) && h !=h2) return true;
+            hsv2 = rgbConversion(this.image.getRGB(pixel[0]+1, pixel[1]+1));
+            h2 = hsv[0];
+            if(!checkBg(hsv2) && h !=h2) return true;
+    	}
+ 
+    	return false;
+    }
+    
+    
     public double getFieldOfView(){
         return fieldOfView;
     }
