@@ -150,11 +150,7 @@ public class Drone {
 	
 	public Vector3f getR0() {
 		Vector3f heading = getH();
-<<<<<<< HEAD
-		return heading.cross(new Vector3f(0, 1, 0), new Vector3f());
-=======
 		return heading.cross(new Vector3f(0,1,0), new Vector3f());
->>>>>>> ortho-fix
 	}
 	
 	public Vector3f getU0() {

@@ -14,7 +14,7 @@ public class TestWorldFlyStraight extends World implements IWorldRules {
 
     public TestWorldFlyStraight() {
         //Geef de vertraging van je wereld mee
-        super(2, true, true);
+        super(3, true, true);
         this.config = createConfig();
     }
 
