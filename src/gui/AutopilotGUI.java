@@ -16,10 +16,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalSliderUI;
 
-//import com.sun.prism.paint.Color;
 
-import datatypes.AutopilotOutputs;
 
+import interfaces.AutopilotConfig;
+import interfaces.AutopilotOutputs;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import java.awt.GridBagLayout;
@@ -32,7 +32,6 @@ public class AutopilotGUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private final int imgWidth, imgHeight;
-	private final boolean isMac = false;
 	
 	private JLabel lblImage;
 	private JPanel topContentPanel;
@@ -43,16 +42,31 @@ public class AutopilotGUI extends JFrame {
 	
 
 	/**
-	 * Launch the application.
+	 * test the gui
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					AutopilotGUI frame = new AutopilotGUI(200,200,1000);
-					BufferedImage img = ImageIO.read(new File("ActualTest.png"));
+					AutopilotGUI frame = new AutopilotGUI(new AutopilotConfig() {
+			            public float getGravity() {return 0f;}
+			            public float getWingX() {return 0f;}
+			            public float getTailSize() {return 0f;}
+			            public float getEngineMass() {return 0f;}
+			            public float getWingMass() {return 0f;}
+			            public float getTailMass() {return 0f;}
+			            public float getMaxThrust() {return 500f;}
+			            public float getMaxAOA() {return (float) Math.toRadians(30);}
+			            public float getWingLiftSlope() {return 0f;}
+			            public float getHorStabLiftSlope() {return 0f;}
+			            public float getVerStabLiftSlope() {return 0f;}
+			            public float getHorizontalAngleOfView() {return (float) Math.toRadians(120f);}
+			            public float getVerticalAngleOfView() {return (float) Math.toRadians(120f);}
+			            public int getNbColumns() {return 200;}
+			            public int getNbRows() {return 200;}});
+					BufferedImage img = ImageIO.read(new File("ss.png"));
 					System.out.println(img.getHeight() + " " + img.getWidth());
-					frame.lblImage.setIcon(new ImageIcon(addCrossHair(img, 100, 100, 13133055)));
+					frame.lblImage.setIcon(new ImageIcon(GuiUtils.addCrossHair(img, 100, 100, 13133055)));
 					frame.showGUI();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -61,14 +75,13 @@ public class AutopilotGUI extends JFrame {
 		});
 	}
 
-	
-	/**
-	 * Create the frame.
-	 */
-	public AutopilotGUI(int imgWidth, int imgHeight, int maxThrust) {		
-		this.imgWidth = imgWidth;
-		this.imgHeight = imgHeight;
-				
+
+	public AutopilotGUI(AutopilotConfig config) {		
+		this.imgWidth = config.getNbColumns();
+		this.imgHeight = config.getNbRows();
+		float maxThrust = config.getMaxThrust();
+		int maxAOA = (int) Math.toDegrees(config.getMaxAOA());
+		
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -89,55 +102,60 @@ public class AutopilotGUI extends JFrame {
 		
 		
 		lblImage = new JLabel("");
-		contentPanel.add(lblImage, buildGBC(0, 0, GridBagConstraints.CENTER, new Insets(5, 5, 5, 5)));
+		contentPanel.add(lblImage, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER, new Insets(5, 5, 5, 5)));
 		lblImage.setIcon(new ImageIcon());
 		lblImage.setPreferredSize(new Dimension(imgWidth, imgHeight));
 		
 		sliderPanel = new JPanel();
-		contentPanel.add(sliderPanel, buildGBC(1, 0, GridBagConstraints.CENTER));
+		contentPanel.add(sliderPanel, GuiUtils.buildGBC(1, 0, GridBagConstraints.CENTER));
 		GridBagLayout gbl_sliderPanel = new GridBagLayout();
 		sliderPanel.setLayout(gbl_sliderPanel);
 		
 		
 		horSliderPanel = new JPanel();
-		sliderPanel.add(horSliderPanel, buildGBC(0, 0, GridBagConstraints.CENTER));
+		sliderPanel.add(horSliderPanel, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER));
 		GridBagLayout gbl_horSliderPanel = new GridBagLayout();
 		gbl_horSliderPanel.columnWidths = new int[] {60, 60, 60};
 		horSliderPanel.setLayout(gbl_horSliderPanel);
 		
 		
 		Hashtable<Integer, JLabel> lblTable = new Hashtable<>();
-		for (int i=-90; i<=90; i+=30) {
+		for (int i=0; i<=10+maxAOA; i+= (maxAOA + 10)/3) {
 			JLabel lbl = new JLabel("" + i);
 			lbl.setFont(lbl.getFont().deriveFont(9.0f));
 			lblTable.put(i, lbl);
+			if (i != 0) {
+				JLabel lbl2 = new JLabel("" + (-i));
+				lbl2.setFont(lbl.getFont().deriveFont(9.0f));
+				lblTable.put(-i, lbl2);
+			}
 		}
+				
+		lwSlider = buildSlider("RW", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
+		horSliderPanel.add(lwSlider.panel, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		
 		
-		lwSlider = buildSlider("RW", SwingConstants.VERTICAL, -90, 0, 90, 30, 10, lblTable, false);
-		horSliderPanel.add(lwSlider.panel, buildGBC(0, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
+		horStabSlider = buildSlider("HS", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
+		horSliderPanel.add(horStabSlider.panel, GuiUtils.buildGBC(1, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		
 		
-		horStabSlider = buildSlider("HS", SwingConstants.VERTICAL, -90, 0, 90, 30, 10, lblTable, false);
-		horSliderPanel.add(horStabSlider.panel, buildGBC(1, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
-		
-		
-		rwSlider = buildSlider("LW", SwingConstants.VERTICAL, -90, 0, 90, 30, 10, lblTable, false);
-		horSliderPanel.add(rwSlider.panel, buildGBC(2, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
+		rwSlider = buildSlider("LW", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
+		horSliderPanel.add(rwSlider.panel, GuiUtils.buildGBC(2, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		
 
-		verStabSlider = buildSlider("VS", SwingConstants.HORIZONTAL, -90, 0, 90, 30, 10, lblTable, false); 
-		sliderPanel.add(verStabSlider.panel, buildGBC(0, 1, GridBagConstraints.CENTER, new Insets(5, 0, 5, 5)));
+		verStabSlider = buildSlider("VS", SwingConstants.HORIZONTAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false); 
+		sliderPanel.add(verStabSlider.panel, GuiUtils.buildGBC(0, 1, GridBagConstraints.CENTER, new Insets(5, 0, 5, 5)));
 		
 		
 		Hashtable<Integer, JLabel> thrustTable = new Hashtable<>();
 		thrustTable.put(0, new JLabel("0"));
-		thrustTable.put(maxThrust/2, new JLabel(""+maxThrust/2));
-		thrustTable.put(maxThrust, new JLabel(""+maxThrust));
+		thrustTable.put((int)(maxThrust/2f), new JLabel(""+(int)(maxThrust/2f)));
+		thrustTable.put((int)(maxThrust), new JLabel(""+(int)(maxThrust)));
 		
-		thrustSlider = buildSlider("Thrust", SwingConstants.VERTICAL, 0, 0, maxThrust, maxThrust/10, maxThrust/40, thrustTable, true);
+		thrustSlider = buildSlider("Thrust", SwingConstants.VERTICAL, 0, 0, (int)maxThrust, 
+				(int)(maxThrust/10f), (int)(maxThrust/40f), thrustTable, true);
 		thrustSlider.slider.setPreferredSize(new Dimension(57, 270));
-		GridBagConstraints gbc_thrustSlider = buildGBC(1, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5));
+		GridBagConstraints gbc_thrustSlider = GuiUtils.buildGBC(1, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5));
 		gbc_thrustSlider.gridheight = 2;
 		sliderPanel.add(thrustSlider.panel, gbc_thrustSlider);
 	}
@@ -151,7 +169,7 @@ public class AutopilotGUI extends JFrame {
 	public void updateImage(byte[] image, int x, int y) {
 		BufferedImage img = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR);
 		img.getRaster().setDataElements(0, 0, imgWidth, imgHeight, image);
-		lblImage.setIcon(new ImageIcon(addCrossHair(img, x, y, 255)));
+		lblImage.setIcon(new ImageIcon(GuiUtils.addCrossHair(img, x, y, 255)));
 	}
 	
 	public void updateImage(byte[] image) {
@@ -166,7 +184,7 @@ public class AutopilotGUI extends JFrame {
 		rwSlider.setValue((int) Math.toDegrees(output.getRightWingInclination()));
 		horStabSlider.setValue((int) Math.toDegrees(output.getHorStabInclination()));
 		verStabSlider.setValue((int) Math.toDegrees(output.getVerStabInclination()));
-		thrustSlider.setValue((int) Math.toDegrees(output.getThrust()));
+		thrustSlider.setValue((int) output.getThrust());
 	}
 
 	
@@ -176,7 +194,7 @@ public class AutopilotGUI extends JFrame {
 		panel.setLayout(gbl);
 		
 		JLabel titleLbl = new JLabel(title);
-		panel.add(titleLbl, buildGBC(0, 0, GridBagConstraints.CENTER));
+		panel.add(titleLbl, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER));
 		
 		JSlider slider = new JSlider(orientation, min, max, val);
 		slider.setPaintTicks(true);
@@ -184,45 +202,17 @@ public class AutopilotGUI extends JFrame {
 		slider.setMinorTickSpacing(minorSpacing);
 		slider.setLabelTable(lblTable);
 		slider.setPaintLabels(true);
-		if (!hasBar && !isMac)
+		if (!hasBar)
 			slider.setUI(new NoBarMetalSliderUI());
-		panel.add(slider, buildGBC(0, 1, GridBagConstraints.CENTER));
+		panel.add(slider, GuiUtils.buildGBC(0, 1, GridBagConstraints.CENTER));
 		
 		JLabel label = new JLabel("" + val);
-		panel.add(label, buildGBC(0, 2, GridBagConstraints.CENTER));
+		panel.add(label, GuiUtils.buildGBC(0, 2, GridBagConstraints.CENTER));
 		
 		SliderHandler handler = new SliderHandler(slider, panel, label);
 		slider.addChangeListener(handler);
 		return handler;
 	}
-	
-	private static GridBagConstraints buildGBC(int gridx, int gridy, int anchor) {
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = anchor;
-		gbc.gridx = gridx;
-		gbc.gridy = gridy;
-		return gbc;
-	}
-	
-	private static GridBagConstraints buildGBC(int gridx, int gridy, int anchor, Insets insets) {
-		GridBagConstraints gbc = buildGBC(gridx, gridy, anchor);
-		gbc.insets = insets;
-		return gbc;
-	}
-	
-	private static BufferedImage addCrossHair(BufferedImage img, int imgx, int imgy, int color) {
-		int[] xcoords = new int[] {0, 1, -1, 2, -2 ,3, -3, 1,  1, -1, -1};
-		int[] ycoords = new int[] {0, 0,  0, 0,  0, 0,  0, 1, -1,  1, -1};	
-		for (int i = 0; i < xcoords.length; i++) {
-			if (imgx+xcoords[i] >= 0 && imgx+xcoords[i] < img.getWidth() && imgy + ycoords[i] >= 0 && imgy + ycoords[i] < img.getHeight())
-				img.setRGB(imgx + xcoords[i], imgy + ycoords[i], color);
-			if (imgx+ycoords[i] >= 0 && imgx+ycoords[i] < img.getWidth() && imgy + xcoords[i] >= 0 && imgy + xcoords[i] < img.getHeight())
-				img.setRGB(imgx + ycoords[i], imgy + xcoords[i], color);
-		}		
-		img.flush();
-		return img;
-	}
-	
 	
 	private static class SliderHandler implements ChangeListener {
 

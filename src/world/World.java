@@ -1,8 +1,5 @@
 package world;
 
-import datatypes.AutopilotConfig;
-import datatypes.AutopilotInputs;
-import datatypes.AutopilotOutputs;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
@@ -10,8 +7,14 @@ import engine.graph.Renderer;
 import entities.WorldObject;
 import entities.meshes.cube.Cube;
 import entities.meshes.drone.DroneMesh;
+import gui.testbed.TestbedGui;
+import interfaces.Autopilot;
+import interfaces.AutopilotConfig;
+import interfaces.AutopilotOutputs;
+
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+
 import physics.Drone;
 import physics.Motion;
 import physics.PhysicsEngine;
@@ -21,14 +24,11 @@ import utils.IO.MouseInput;
 import utils.Utils;
 import utils.image.ImageCreator;
 
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
-
 public abstract class World implements IWorldRules {
 
     private final Vector3f cameraInc;
-    private final Camera freeCamera, droneCamera;
-    private final Motion planner = new Motion();
+    private final Camera freeCamera, droneCamera, chaseCamera, topOrthoCamera, rightOrthoCamera;
+    protected Autopilot planner = new Motion();
 
     private Renderer renderer;
     private WorldObject[] droneItems;
@@ -38,6 +38,7 @@ public abstract class World implements IWorldRules {
     private int TIME_SLOWDOWN_MULTIPLIER;
     private boolean wantPhysicsEngine, wantPlanner;
     private KeyboardInput keyboardInput;
+    private TestbedGui testbedGui;
 
     protected Drone drone;
     protected AutopilotConfig config;
@@ -52,18 +53,32 @@ public abstract class World implements IWorldRules {
         this.keyboardInput = new KeyboardInput();
         this.freeCamera = new Camera();
         this.droneCamera = new Camera();
+        this.chaseCamera = new Camera();
+        this.topOrthoCamera = new Camera();
+        this.rightOrthoCamera = new Camera();
+        constructCameras();
         this.cameraInc = new Vector3f(0, 0, 0);
+        this.testbedGui = new TestbedGui();
+    }
+    
+    private void constructCameras() {
+        topOrthoCamera.setPosition(0,200,0);
+        topOrthoCamera.setRotation(90, 0,0);
+        rightOrthoCamera.setPosition(200, 0, 0);
+        rightOrthoCamera.setRotation(0, -90, 0);
     }
 
     @Override
     public void init(Window window) throws Exception {
         createCubes();
-        createConfig();
         hooks(window);
-        addDrone();
         setup();
+        addDrone();
         startSimulation();
+        testbedGui.showGUI();
     }
+    
+    public abstract String getDescription();
 
     private void createCubes() {
         Cube redCube = new Cube(0,1f);
@@ -72,9 +87,8 @@ public abstract class World implements IWorldRules {
         cubeMeshes = new Cube[]{redCube, greenCube, blueCube};
     }
 
-    private void createConfig() {
-        /* TODO: place hook for the GUI florian made */
-        config = new AutopilotConfig() {
+    public static AutopilotConfig createConfig() {
+        return new AutopilotConfig() {
             public float getGravity() {return 10f;}
             public float getWingX() {return 0.25f;}
             public float getTailSize() {return 0.5f;}
@@ -82,7 +96,7 @@ public abstract class World implements IWorldRules {
             public float getWingMass() {return 2.5f;}
             public float getTailMass() {return 3f;}
             public float getMaxThrust() {return 5000f;}
-            public float getMaxAOA() {return -1f;}
+            public float getMaxAOA() {return (float) Math.toRadians(45);}
             public float getWingLiftSlope() {return 1.1f;}
             public float getHorStabLiftSlope() {return 0.11f;}
             public float getVerStabLiftSlope() {return 0.11f;}
@@ -103,7 +117,6 @@ public abstract class World implements IWorldRules {
         }
 
         imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows());
-        drone = new Drone(config);
     }
 
     private void addDrone() {
@@ -139,7 +152,7 @@ public abstract class World implements IWorldRules {
      */
     @Override
     public void input(Window window, MouseInput mouseInput) {
-        keyboardInput.worldInput(cameraInc, window, imageCreator);
+        keyboardInput.worldInput(cameraInc, window, imageCreator, renderer);
     }
 
     /**
@@ -160,16 +173,25 @@ public abstract class World implements IWorldRules {
         }
 
         droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-        droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
+        droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getHeading()),-(float)Math.toDegrees(drone.getRoll()));
 
+        float offset = 5f;
+        //TODO: implement getHeading properly...
+        chaseCamera.setPosition(newDronePos.x + offset * (float)Math.sin(drone.getHeading()), newDronePos.y, newDronePos.z + offset * (float)Math.cos(drone.getHeading()));
+        chaseCamera.setRotation(0,-(float)Math.toDegrees(drone.getHeading()),0);
+        
+                
         // Update the position of each drone item
         for (WorldObject droneItem : droneItems) {
             droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-            droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getYaw()),-(float)Math.toDegrees(drone.getRoll()));
+
+            droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getHeading()),-(float)Math.toDegrees(drone.getRoll()));
         }
 
         if(wantPlanner) plannerUpdate(newDronePos, interval/TIME_SLOWDOWN_MULTIPLIER);
 
+        testbedGui.update(drone.getVelocity(), newDronePos, new Vector3f(drone.getPitch(),drone.getHeading(),drone.getRoll()));
+        
     }
 
     /**
@@ -200,7 +222,7 @@ public abstract class World implements IWorldRules {
 
     @Override
     public void render(Window window) {
-        renderer.render(window, freeCamera, droneCamera, worldObjects, droneItems);
+        renderer.render(window, freeCamera, droneCamera, chaseCamera, topOrthoCamera, rightOrthoCamera, worldObjects, droneItems);
     }
 
     /**
@@ -212,5 +234,11 @@ public abstract class World implements IWorldRules {
         for (WorldObject gameItem : worldObjects) {
             gameItem.getMesh().cleanUp();
         }
+    }
+    
+    @Override
+    public void endSimulation() {
+    	testbedGui.dispose();
+    	planner.simulationEnded();
     }
 }

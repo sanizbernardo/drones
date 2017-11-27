@@ -44,15 +44,9 @@ public class Engine implements Runnable {
 
     /**
      * Game loop start
-     * Has an extra clause for Mac because it has threading issues
      */
     public void start() {
-        String osName = System.getProperty("os.name");
-        if ( osName.contains("Mac") ) {
-            gameLoopThread.run();
-        } else {
-            gameLoopThread.start();
-        }
+        gameLoopThread.start();    
     }
 
     @Override
@@ -112,6 +106,7 @@ public class Engine implements Runnable {
                 sync();
             }
         }
+        worldRules.endSimulation();
     }
 
     protected void cleanup() {

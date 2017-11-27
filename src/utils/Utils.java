@@ -5,7 +5,8 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 import org.joml.Vector3f;
-import datatypes.*;
+
+import interfaces.*;
 
 public class Utils {
 
@@ -98,5 +99,9 @@ public class Utils {
     public static AutopilotInputs buildInputs(byte[] image, Vector3f pos, Vector3f orientation, float dt) {
     	return buildInputs(image, pos.x, pos.y, pos.z, orientation.y, orientation.x, orientation.z, dt);
     }
+
+	public static int[] buildIntArr(int... args) {
+		return args;
+	}
     
 }

@@ -1,11 +1,12 @@
 package physics;
 
-import autopilot.Autopilot;
+
 import com.stormbots.MiniPID;
-import datatypes.AutopilotConfig;
-import datatypes.AutopilotInputs;
-import datatypes.AutopilotOutputs;
 import gui.AutopilotGUI;
+import interfaces.Autopilot;
+import interfaces.AutopilotConfig;
+import interfaces.AutopilotInputs;
+import interfaces.AutopilotOutputs;
 
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
@@ -266,11 +267,11 @@ public class Motion implements Autopilot {
         yawPID.setOutputLimits(Math.toRadians(30));
         setConfig(config);
 
-        if(!Constants.isMac) {
-            gui = new AutopilotGUI(config.getNbColumns(), config.getNbRows(), (int)config.getMaxThrust());
-            gui.updateImage(inputs.getImage());
-            gui.showGUI();
-        }
+
+        gui = new AutopilotGUI(config);
+        gui.updateImage(inputs.getImage());
+        gui.showGUI();
+
 
         
         setLeftWingInclination(0.1721f);
@@ -318,9 +319,7 @@ public class Motion implements Autopilot {
     	ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
         double[] center = recog.getCenter();
         
-        if(!Constants.isMac) {
-        	if (center != null) gui.updateImage(inputs.getImage(), (int)center[0], (int)center[1]);
-        }
+    	if (center != null) gui.updateImage(inputs.getImage(), (int)center[0], (int)center[1]);
         
         if(recog.getDistApprox() < 4){
 //        	System.exit(0);
@@ -334,7 +333,7 @@ public class Motion implements Autopilot {
         System.out.printf("height = %s\t pitch = %s\t thrust = %s\t y-velocity = %s\t wings = %s\t \n", inputs.getY(), inputs.getPitch(), newThrust, approxVel.y(), leftWingInclination);
 
         
-        return new AutopilotOutputs() {
+        AutopilotOutputs output = new AutopilotOutputs() {
             @Override
             public float getThrust() {
                 return getNewThrust();
@@ -360,9 +359,12 @@ public class Motion implements Autopilot {
                 return verStabInclination;
             }
         };
+        gui.updateOutputs(output);
+        return output;
     }
 
 	@Override
 	public void simulationEnded() {
+		gui.dispose();
 	}
 }

@@ -1,8 +1,10 @@
 package physics;
 
+import java.lang.Math;
+
 import org.joml.*;
 
-import datatypes.AutopilotConfig;
+import interfaces.AutopilotConfig;
 
 public class Drone {
 	
@@ -10,11 +12,15 @@ public class Drone {
 
 	private final float wingX, tailSize;
 
-	private Vector3f position, velocity, orientation, rotation;
+	private Vector3f position, velocity, orientation, rotation, forwardD = new Vector3f(0, 0, -1), 
+			right = new Vector3f(1, 0, 0);
 	
 	private float thrust, leftWingInclination, rightWingInclination, horStabInclination, verStabInclination;
 
 	private float engineZ;
+	
+	private Matrix3f rotMat;
+
 
 	public Drone(AutopilotConfig config) {
 		this(new Vector3f(0f, 0f, 0f), new Vector3f(0f, 0f, 0f),
@@ -31,7 +37,6 @@ public class Drone {
 		this.tailSize = config.getTailSize();
 
 		engineZ = config.getTailMass() / config.getEngineMass() * tailSize;
-
 
 		this.thrust = 0;
 		this.leftWingInclination = 0;
@@ -122,23 +127,55 @@ public class Drone {
 	
 	
     // orientations
-
+	
+	public void setRotMat(Matrix3f mat) {
+		this.rotMat = mat;
+	}
+	
+	public Vector3f getForward() {
+		return  rotMat.transpose(new Matrix3f()).transform(forwardD, new Vector3f());
+	}
+	
+	public Vector3f getH0() {
+		Vector3f forward = getForward();
+		return new Vector3f(forward.x, 0, forward.z);
+	}
+	
+	public Vector3f getH() {
+		Vector3f heading0 = getH0();
+		return heading0.div((float) Math.sqrt(heading0.dot(heading0)), new Vector3f());
+	}
+	
+	public Vector3f getR0() {
+		Vector3f heading = getH();
+		return heading.cross(new Vector3f(), new Vector3f());
+	}
+	
+	public Vector3f getU0() {
+		Vector3f forward = getForward();
+		return getR0().cross(forward, new Vector3f());
+	}
+	
     public float getPitch() {
-    	return (float) orientation.get(0);
+    	Vector3f forward = getForward();
+    	float y = forward.dot(new Vector3f(0, 1, 0));
+    	float x = forward.dot(getH());
+    	return (float) Math.atan2(y,x);
     }
     
     public float getHeading() {
-    	return 0f;
-    }
-    
-    public float getYaw() {
-    	return (float) orientation.get(1);
+    	Vector3f heading = getH();
+    	float y = heading.dot(new Vector3f(-1, 0, 0));
+    	float x = heading.dot(forwardD);
+    	return (float) Math.atan2(y,x);
     }
     
     public float getRoll() {
-    	return (float) orientation.get(2);
+    	float y = right.dot(getU0());
+    	float x = right.dot(getR0());
+    	return (float) Math.atan2(y,x);
     }
-    
+        
     public Vector3f getOrientation() {
     	return orientation;
     }
@@ -160,4 +197,28 @@ public class Drone {
 	public float getEngineZ() {
 		return engineZ;
 	}
+	
+//	public static Matrix3f buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
+//		// column major -> transposed
+//		Matrix3f xRot = new Matrix3f(
+//				1f, 					  0f,					    0f,
+//				0f,  (float)Math.cos(xAngle),  (float)-Math.sin(xAngle),
+//				0f, (float)Math.sin(xAngle), (float)Math.cos(xAngle)),
+//				
+//			   yRot = new Matrix3f(
+//				(float)Math.cos(yAngle),  0f, (float)Math.sin(yAngle),
+//									 0f,  1f, 						0f,
+//				(float)-Math.sin(yAngle),  0f, (float)Math.cos(yAngle)),
+//			   
+//			   zRot = new Matrix3f(
+//				 (float)Math.cos(zAngle), (float)-Math.sin(zAngle), 0f,
+//				(float)Math.sin(zAngle), (float)Math.cos(zAngle), 0f,
+//									  0f, 					   0f, 1f);
+//		
+//		return xRot.mul(yRot).mul(zRot);
+//	}
+//	
+//	public Matrix3f transMat() {
+//		return buildTransformMatrix(orientation.x, orientation.y, orientation.z);
+//	}
 }
