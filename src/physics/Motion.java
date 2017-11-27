@@ -126,7 +126,7 @@ public class Motion implements Autopilot {
         float AOA = wingAOA(inputs);
         float L = 2*config.getWingLiftSlope()*AOA*horProjVel(inputs).dot(horProjVel(inputs));
 //        double incl = inputs.getPitch() + Math.toRadians(90) - Math.asin(-newThrust*Math.cos(inputs.getPitch())/L);
-        double incl = inputs.getPitch() + Math.toRadians(90) - Math.asin(config.getGravity()*getMass()/L);
+        double incl = inputs.getPitch() - Math.asin(config.getGravity()*getMass()/L);
         return (float)incl;
     }
 
@@ -195,7 +195,7 @@ public class Motion implements Autopilot {
     }
 
     private void flyStraightPID(AutopilotInputs input, float height) {
-        adjustInclination(input, height);
+//        adjustInclination(input, height);
         adjustPitch(input, 0f);
         adjustThrust(input, 0f);
     }
@@ -203,19 +203,22 @@ public class Motion implements Autopilot {
     // causes dront to rise by increasing lift through higher speed.
     private void risePID(AutopilotInputs inputs, float target) {
 
-        if (inputs.getY() < target - 1f) {
+        if (inputs.getY() < target - 2f) {
             adjustThrust(inputs, 3f);
+            System.out.println("Rise");
 
-            float incl = stableInclination(inputs);
-            if (!Float.isNaN(incl)){
-                setRightWingInclination(incl);
-                setLeftWingInclination(incl);
-            }
+//            float incl = stableInclination(inputs);
+//            if (!Float.isNaN(incl)){
+//                setRightWingInclination(incl);
+//                setLeftWingInclination(incl);
+//            }
 
-        } else if (inputs.getY() > target + 1f) {
+        } else if (inputs.getY() > target + 2f) {
             setNewThrust(0f);
+            System.out.println("Fall");
         } else {
             flyStraightPID(inputs, 0);
+            System.out.println("FlyStright");
         }
     }
 
@@ -228,11 +231,11 @@ public class Motion implements Autopilot {
             adjustPitch(inputs, climbAngle);
             adjustThrust(inputs, 3f);
 
-//            float incl = stableInclination(inputs);
-//            if (!Float.isNaN(incl)){
-//                setRightWingInclination(incl);
-//                setLeftWingInclination(incl);
-//            }
+            float incl = stableInclination(inputs);
+            if (!Float.isNaN(incl)){
+                setRightWingInclination(incl);
+                setLeftWingInclination(incl);
+            }
 
 //            if (inputs.getPitch() < climbAngle + 0.05 && inputs.getPitch() > climbAngle - 0.05) {adjustThrust(inputs, 1f);}
 
@@ -323,7 +326,7 @@ public class Motion implements Autopilot {
 //        	System.exit(0);
         }
 
-        climbPID(inputs,0f);
+        climbPID(inputs,5f);
 //        risePID(inputs, 5f);
         stableYawPID(inputs);
 
