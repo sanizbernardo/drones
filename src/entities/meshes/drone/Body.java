@@ -1,20 +1,21 @@
 package entities.meshes.drone;
 
-import physics.Drone;
+import interfaces.AutopilotConfig;
+import utils.Utils;
 
 public class Body extends DroneComponent {
 
-    public Body(Drone drone) {
-        super(drone);
+    public Body(AutopilotConfig config) {
+        super(config);
     }
 
     @Override
     public void setPositions() {
         this.positions = new float[]{
-                drone.getTailSize()/8, 0f, drone.getTailSize(), //#0
-                -drone.getTailSize()/8, 0f, drone.getTailSize(), //#1
-                drone.getTailSize()/8,0,-drone.getEngineZ(),
-                -drone.getTailSize()/8,0,-drone.getEngineZ(),
+        		config.getTailSize()/8, 0f, config.getTailSize(), //#0
+                -config.getTailSize()/8, 0f, config.getTailSize(), //#1
+                config.getTailSize()/8,0,-Utils.getEngineZ(config),
+                -config.getTailSize()/8,0,-Utils.getEngineZ(config),
         };
     }
 

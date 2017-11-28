@@ -104,4 +104,7 @@ public class Utils {
 		return args;
 	}
     
+	public static float getEngineZ(AutopilotConfig config) {
+		return config.getTailMass() / config.getEngineMass() * config.getTailSize();
+	}
 }

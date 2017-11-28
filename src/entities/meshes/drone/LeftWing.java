@@ -1,20 +1,20 @@
 package entities.meshes.drone;
 
-import physics.Drone;
+import interfaces.AutopilotConfig;
 
 public class LeftWing extends DroneComponent{
 
-    public LeftWing(Drone drone) {
-        super(drone);
+    public LeftWing(AutopilotConfig config) {
+        super(config);
     }
 
     protected void setPositions() {
         this.positions = new float[]{
                 //left wing
-                0f                  , 0f, -drone.getWingX()/4, //#0
-                drone.getWingX()*-2f, 0f, -drone.getWingX()/4, //#1
-                drone.getWingX()*-2f, 0f, drone.getWingX()/4, //#2
-                0f                  , 0f, drone.getWingX()/4, //#3
+                0f                  , 0f, -config.getWingX()/4, //#0
+                config.getWingX()*-2f, 0f, -config.getWingX()/4, //#1
+                config.getWingX()*-2f, 0f, config.getWingX()/4, //#2
+                0f                  , 0f, config.getWingX()/4, //#3
         };
     }
 
