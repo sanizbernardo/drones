@@ -230,7 +230,7 @@ public class ConfigSetupGUI extends JDialog {
 												(float) Math.toRadians(orientationDeg.y),
 												(float) Math.toRadians(orientationDeg.z));
 			
-			((WorldBuilder) world).setupDrone(generateAutoPilotConfig(), pos, vel, orientation);
+			((WorldBuilder) world).setupDrone(generateAutoPilotConfig(), pos, vel.z, orientation);
 	}
 		
 		return world; 

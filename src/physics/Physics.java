@@ -73,6 +73,10 @@ public class Physics {
 		init(config, new Vector3f(0,0,0));
 	}
 	
+	public void init(AutopilotConfig config, float startVelocity) {
+		init(config, new Vector3f(0,0,0), startVelocity);
+	}
+	
 	/**
 	 * Initialises the drone at the given position, with the given starting velocity
 	 * and no starting orientation.

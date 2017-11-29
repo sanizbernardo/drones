@@ -34,10 +34,10 @@ public class Body extends DroneComponent {
                 0f, 0f, 1f,
                 
                 //Face 1 (front)
-                0f, 0f, 1f,
-                0f, 0f, 1f,
-                0f, 0f, 1f,
-                0f, 0f, 1f,
+                0f, 1f, 1f,
+                0f, 1f, 1f,
+                0f, 1f, 1f,
+                0f, 1f, 1f,
         };
     }
 

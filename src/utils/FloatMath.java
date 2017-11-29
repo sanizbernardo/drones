@@ -55,6 +55,17 @@ public class FloatMath {
 		return a*a;
 	}
 	
+	public static float toRadians(float deg) {
+		return (float) Math.toRadians(deg);
+	}
+	
+	public static float toDegrees (float rad) {
+		return (float) Math.toDegrees(rad);
+	}
+	
+	public static final float PI = (float) Math.PI;
+	
+			
 	public static Vector3f transform(Matrix3f mat, Vector3f vec) {
 		return mat.transform(vec, new Vector3f());
 	}

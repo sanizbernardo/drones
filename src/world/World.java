@@ -109,16 +109,7 @@ public abstract class World implements IWorldRules {
      * Things you have to do here: generate config, init physics, 
      * generate worldObjects, and make your planner.
      */
-    public abstract void setup() {
-    	config = Utils.createDefaultConfig();
-    	
-    	physics.init(config);
-    	
-    	worldObjects = new WorldObject[] {new WorldObject(Cubes.greenCube.getMesh())};
-    	worldObjects[0].setPosition(new Vector3f(0,0,-10));
-    	
-    	planner = new LogPilot();
-    }
+    public abstract void setup();
     
     public abstract String getDescription();
 

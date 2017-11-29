@@ -2,9 +2,9 @@ package world;
 
 
 import engine.IWorldRules;
-import org.joml.Vector3f;
 import entities.WorldObject;
-import physics.Drone;
+import utils.Cubes;
+import utils.Utils;
 
 import java.util.Random;
 
@@ -14,20 +14,24 @@ import java.util.Random;
 public class CubeWorld extends World implements IWorldRules {
 
     public CubeWorld() {
-        super(3, true, false);
-        
-        this.config = createConfig();
+        super(3, true);
     }
 
     @Override
     public void setup() {
+    	config = Utils.createDefaultConfig();
+  
+    	physics.init(config);
+
+    	planner = null;
     	
         Random rand = new Random();
 
+        //World specifics
         worldObjects = new WorldObject[7000];
 
         for(int i = 0; i < worldObjects.length; i++) {
-            WorldObject cube = new WorldObject(getCubeMeshes()[rand.nextInt(getCubeMeshes().length)].getMesh());
+            WorldObject cube = new WorldObject(Cubes.getCubes()[rand.nextInt(Cubes.getCubes().length)].getMesh());
             cube.setScale(0.5f);
             int x1 = rand.nextInt(100)-50,
             		y = rand.nextInt(100)-50,
@@ -37,11 +41,10 @@ public class CubeWorld extends World implements IWorldRules {
             worldObjects[i] = cube;
         }
 
-        drone = new Drone(config);
+        float leftWingInc = (float)Math.toRadians(90f);
+        float thrust = 0f;
+        physics.updateDrone(Utils.buildOutputs(leftWingInc,0, 0, 0, thrust));
 
-        drone.setThrust(20f);
-        drone.setVelocity(new Vector3f(0f, 0f, -10f));
-        drone.setLeftWingInclination((float)Math.toRadians(90f));
         
     }
 
