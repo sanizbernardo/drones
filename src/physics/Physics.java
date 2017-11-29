@@ -25,11 +25,17 @@ public class Physics {
 	
 	private Vector3f[] axisVectors, wingPositions, velProj;
 	private float[] liftSlopes;
+
+	
+	public Physics() {
+		updateDrone(Utils.buildOutputs(0, 0, 0, 0, 0));
+	}
 	
 	/**
-	 * Sets up a drone with the given config, starting position and velocity.
+	 * Initialises the drone at the given position, with the given starting velocity,
+	 * and the given heading, pitch and roll.
 	 */
-	public Physics(AutopilotConfig config, Vector3f startPos, float startVel) {
+	public void init(AutopilotConfig config, Vector3f startPos, float startVel, float startHeading, float startPitch, float startRoll) {
 		setupCalculations(config);
 		
 		this.pos = new Vector3f(startPos);
@@ -38,20 +44,43 @@ public class Physics {
 		this.angVel = new Vector3f();
 		
 		this.transMat = new Matrix3f().identity();
-		this.transMatInv = new Matrix3f().identity();
 		
-		updateDrone(Utils.buildOutputs(0, 0, 0, 0, 0));
+		if (Math.abs(startHeading) > 1E-6)
+			this.transMat.rotate(startHeading, new Vector3f(0, 1, 0));
+		if (Math.abs(startPitch) > 1E-6)
+			this.transMat.rotate(startPitch, new Vector3f(1, 0, 0));
+		if (Math.abs(startRoll) > 1E-6)
+			this.transMat.rotate(startRoll, new Vector3f(0, 0, 1));
+
+		this.transMatInv = this.transMat.invert(new Matrix3f());
 		
 		update(0);
 	}
 	
 	/**
-	 * Sets up a drone with the given config and starting velocity,
-	 * the initial position will be (0, 0, 0).
+	 * Initialises the drone at the given position, with starting velocity of 10
+	 * and no starting orientation.  
 	 */
-	public Physics(AutopilotConfig config, float startVel) {
-		this(config, new Vector3f(), startVel);
+	public void init(AutopilotConfig config, Vector3f startPos) {
+		init(config, startPos, 10f, 0f, 0f, 0f);
 	}
+	
+	/**
+	 * Initialises the drone at (0, 0, 0), with starting velocity of 10
+	 * and no starting orientation.  
+	 */
+	public void init(AutopilotConfig config) {
+		init(config, new Vector3f(0,0,0));
+	}
+	
+	/**
+	 * Initialises the drone at the given position, with the given starting velocity
+	 * and no starting orientation.
+	 */
+	public void init(AutopilotConfig config, Vector3f startPos, float startVel) {
+		init(config, startPos, startVel, 0f, 0f, 0f);
+	}
+	
 	
 	/**
 	 * Initialisation constants for calculations
@@ -115,6 +144,21 @@ public class Physics {
 		return this.roll;
 	}
 	
+	public float getLWInclination() {
+		return this.lwIncl;
+	}
+	
+	public float getRWInclination() {
+		return this.rwIncl;
+	}
+	
+	public float getHSInclination() {
+		return this.hsIncl;
+	}
+	
+	public float getVSInclination() {
+		return this.vsIncl;
+	}
 	
 	/**
 	 * Updates the wing inclinations and thrust of the drone

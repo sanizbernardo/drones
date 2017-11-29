@@ -66,7 +66,7 @@ public class Utils {
     }
     
     
-    public static AutopilotInputs buildInputs(byte[] image, float x, float y, float z, float yaw, float pitch, float roll, float dt) {
+    public static AutopilotInputs buildInputs(byte[] image, float x, float y, float z, float heading, float pitch, float roll, float dt) {
     	return new AutopilotInputs() {
 			public float getZ() {
 				return z;
@@ -87,7 +87,7 @@ public class Utils {
 				return image;
 			}
 			public float getHeading() {
-				return yaw;
+				return heading;
 			}
 			public float getElapsedTime() {
 				return dt;
@@ -96,8 +96,8 @@ public class Utils {
     }
     
     
-    public static AutopilotInputs buildInputs(byte[] image, Vector3f pos, Vector3f orientation, float dt) {
-    	return buildInputs(image, pos.x, pos.y, pos.z, orientation.y, orientation.x, orientation.z, dt);
+    public static AutopilotInputs buildInputs(byte[] image, Vector3f pos, float heading, float pitch, float roll, float dt) {
+    	return buildInputs(image, pos.x, pos.y, pos.z, heading, pitch, roll, dt);
     }
 
 	public static int[] buildIntArr(int... args) {
@@ -107,4 +107,24 @@ public class Utils {
 	public static float getEngineZ(AutopilotConfig config) {
 		return config.getTailMass() / config.getEngineMass() * config.getTailSize();
 	}
+	
+	public static AutopilotConfig createDefaultConfig() {
+        return new AutopilotConfig() {
+            public float getGravity() {return 10f;}
+            public float getWingX() {return 0.25f;}
+            public float getTailSize() {return 0.5f;}
+            public float getEngineMass() {return 7f;}
+            public float getWingMass() {return 2.5f;}
+            public float getTailMass() {return 3f;}
+            public float getMaxThrust() {return 5000f;}
+            public float getMaxAOA() {return (float) Math.toRadians(45);}
+            public float getWingLiftSlope() {return 0.11f;}
+            public float getHorStabLiftSlope() {return 0.11f;}
+            public float getVerStabLiftSlope() {return 0.11f;}
+            public float getHorizontalAngleOfView() {return (float) Math.toRadians(120f);}
+            public float getVerticalAngleOfView() {return (float) Math.toRadians(120f);}
+            public int getNbColumns() {return 200;}
+            public int getNbRows() {return 200;}};
+    }
+	
 }
