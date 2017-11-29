@@ -218,9 +218,13 @@ public class ImageProcessing {
         else {
         	pixelTwo[1] +=1;
         }
-        
+        int[] averagePixel = cube.getAveragePixel();
         double angleX = calculateAngleX(pixelOne[0], pixelTwo[0]);
+        System.out.println("x1:   " + angleX);
+        angleX = 2*Math.atan(Math.cos(calculateAngleY(100, averagePixel[1]))*Math.tan(angleX/2));
+        System.out.println("x2:   " + angleX + "     " + Math.cos(calculateAngleY(100, averagePixel[1])));
         double angleY = calculateAngleY(pixelOne[1], pixelTwo[1]);
+        angleY = 2*Math.atan(Math.cos(calculateAngleX(100, averagePixel[0]))*Math.tan(angleY/2));
         double totAngle = Math.sqrt(angleX*angleX + angleY*angleY);
         
         System.out.println(Math.toDegrees(angleX));

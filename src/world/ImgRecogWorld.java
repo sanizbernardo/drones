@@ -27,7 +27,7 @@ public class ImgRecogWorld extends World {
 		
 		worldObjects[0].setPosition(x, y, z);
 		
-		drone.setOrientation(new Vector3f(0,0,0));
+		drone.setOrientation(new Vector3f(45,-45,0));
 	}
 	
 	private float x, y, z;
