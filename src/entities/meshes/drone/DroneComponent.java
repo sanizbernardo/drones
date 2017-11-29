@@ -10,9 +10,11 @@ public abstract class DroneComponent {
 	protected float[] positions, colours;
     protected int[] indices;
     private Mesh mesh;
-
-    public DroneComponent(AutopilotConfig config){
+    protected float width;
+    
+    public DroneComponent(AutopilotConfig config, float width){
         this.config = config;
+        this.width = width;
         setPositions();
         setColours();
         setIndices();

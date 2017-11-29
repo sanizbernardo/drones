@@ -12,10 +12,10 @@ public class DroneMesh {
     private Body body;
 
     public DroneMesh(AutopilotConfig config){
-
-        left = new LeftWing(config);
-        right = new RightWing(config);
-        body = new Body(config);
+    	float width = 0.01f;
+        left = new LeftWing(config, width);
+        right = new RightWing(config, width);
+        body = new Body(config, width);
     }
 
     public Mesh getLeft() {
