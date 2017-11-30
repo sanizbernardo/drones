@@ -11,16 +11,16 @@ public class LeftWing extends DroneComponent{
     protected void setPositions() {
         this.positions = new float[]{
                 //left wing top
-                0f                  , this.width, -config.getWingX()/4, //#0
+                -config.getTailSize()/8, this.width, -config.getWingX()/4, //#0
                 config.getWingX()*-2f, this.width, -config.getWingX()/4, //#1
                 config.getWingX()*-2f, this.width, config.getWingX()/4, //#2
-                0f                  , this.width, config.getWingX()/4, //#3
+                -config.getTailSize()/8, this.width, config.getWingX()/4, //#3
                 
                 //left wing bot
-                0f                  , -this.width, -config.getWingX()/4, //#0
+                -config.getTailSize()/8, -this.width, -config.getWingX()/4, //#0
                 config.getWingX()*-2f, -this.width, -config.getWingX()/4, //#1
                 config.getWingX()*-2f, -this.width, config.getWingX()/4, //#2
-                0f                  , -this.width, config.getWingX()/4, //#3
+                -config.getTailSize()/8, -this.width, config.getWingX()/4, //#3
         };
     }
 
