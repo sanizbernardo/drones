@@ -43,8 +43,13 @@ public class ImgRecogPlanner implements Autopilot {
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {		
 		// doe berekeningen voor image recog hier
 		byte[] image = inputs.getImage();
-		ImageProcessing imageProcess = new ImageProcessing(image);
-		if(!imageProcess.getObjects().isEmpty()){
+		ImageProcessing imageProcess = null;
+		if (z < -4){
+			imageProcess = new ImageProcessing(image);
+		}
+		System.out.println(z);
+		System.out.println(imageProcess == null);
+		if(imageProcess != null && !imageProcess.getObjects().isEmpty()){
 			Cube cube = imageProcess.getObjects().get(0);
 			//double[] newDistances = {realDistance,imageProcess.guessDistance(cube)};
 			double actualDistance = Math.sqrt(x*x+y*y+z*z);

@@ -84,7 +84,7 @@ public class ImageProcessing {
     //Saves this.image with the passed name in PNG format
     public void saveImage(String imageName){
         try{
-            ImageIO.write(this.image, "png", new File("outputFile.png"));
+            ImageIO.write(this.image, "png", new File(imageName));
         }catch (IOException e){}
     }
 
@@ -114,7 +114,7 @@ public class ImageProcessing {
     //method for checking black pixel
     //TODO change from black to white
     private boolean checkBg(float[] hsv){
-        if(hsv[0] == 0 && hsv[1] == 0 && hsv[2] == 0){
+        if(hsv[0] == 0 && hsv[1] == 0 && hsv[2] == 1){
             return true;
         } else {
             return false;
@@ -123,6 +123,7 @@ public class ImageProcessing {
 
     //Creates the different cube objects
     public ArrayList<Cube> getObjects() {
+    	saveImage("test");
         ArrayList<Cube> objects = new ArrayList<>();
         ArrayList<Float> colors = new ArrayList<>();
         for (int i = 0; i < this.imageWidth; i++) {
@@ -188,6 +189,7 @@ public class ImageProcessing {
     public double guessDistance(Cube cube){ //TODO check
         ArrayList<int[]> pixels = this.getConvexHull(cube);
         double currentMaxAngle = 0;
+        System.out.println("hier");
         
 //        oudere methodes:
         double largestDistance = -1;
