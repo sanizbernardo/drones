@@ -326,7 +326,7 @@ public class Motion implements Autopilot {
         }
 
         // target of climb should be the z position of the cube
-        climbPID(inputs,12f);
+        climbPID(inputs,15f);
         stableYawPID(inputs);
 
         // prints useful variables
