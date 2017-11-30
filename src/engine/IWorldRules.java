@@ -7,7 +7,7 @@ import utils.IO.MouseInput;
  */
 public interface IWorldRules {
 
-    void init(Window window) throws Exception;
+    void init(Window window, Engine engine) throws Exception;
 
     void input(Window window, MouseInput mouseInput);
 

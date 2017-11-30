@@ -3,6 +3,7 @@ package world;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import engine.Engine;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
@@ -20,6 +21,7 @@ import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
 import utils.image.ImageCreator;
 
+
 public abstract class World implements IWorldRules {
 
     private final Vector3f cameraInc;
@@ -31,20 +33,21 @@ public abstract class World implements IWorldRules {
     private int TIME_SLOWDOWN_MULTIPLIER;
     private KeyboardInput keyboardInput;
     private TestbedGui testbedGui;
+    private boolean wantPhysics;
     
-
     /* These are to be directly called in the world classes*/
     protected Autopilot planner;
     protected WorldObject[] worldObjects;
     protected AutopilotConfig config;
     protected Physics physics;
+    protected Engine gameEngine;
     
     
     public World(int tSM, boolean wantPhysicsEngine) {
         this.TIME_SLOWDOWN_MULTIPLIER = tSM;
         
-        if (wantPhysicsEngine)
-        	this.physics = new Physics();
+        this.wantPhysics = wantPhysicsEngine;
+        this.physics = new Physics();
         
         this.keyboardInput = new KeyboardInput();
         
@@ -70,7 +73,9 @@ public abstract class World implements IWorldRules {
     }
 
     @Override
-    public void init(Window window) throws Exception {
+    public void init(Window window, Engine engine) throws Exception {
+    	this.gameEngine = engine; 
+    	
     	setup();
     	
     	try {
@@ -123,13 +128,13 @@ public abstract class World implements IWorldRules {
     @Override
     public void update(float interval, MouseInput mouseInput) {
 
-        if (physics != null)
+        if (wantPhysics) {
 			try {
 				physics.update(interval/TIME_SLOWDOWN_MULTIPLIER);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-        
+        }
         
         Vector3f newDronePos = new Vector3f(physics.getPosition());
 
@@ -155,6 +160,7 @@ public abstract class World implements IWorldRules {
             droneItem.setRotation(-(float)Math.toDegrees(physics.getPitch()),-(float)Math.toDegrees(physics.getHeading()),-(float)Math.toDegrees(physics.getRoll()));
         }
 
+        
         if (planner != null) plannerUpdate(newDronePos, interval/TIME_SLOWDOWN_MULTIPLIER);
 
         testbedGui.update(physics.getVelocity(), newDronePos, physics.getHeading(), physics.getPitch(), physics.getRoll());

@@ -31,7 +31,6 @@ public class TestWorld extends World implements IWorldRules {
 
         float thrust = 20f;
         physics.updateDrone(Utils.buildOutputs(0 ,0, 0, 0, thrust));
-
     }
 
 	@Override
