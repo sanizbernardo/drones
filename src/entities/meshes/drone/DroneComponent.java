@@ -2,7 +2,6 @@ package entities.meshes.drone;
 
 import entities.meshes.Mesh;
 import interfaces.AutopilotConfig;
-import physics.Drone;
 
 public abstract class DroneComponent {
 
