@@ -2,28 +2,30 @@ package world;
 
 import java.util.Random;
 
-import org.joml.Vector3f;
-
 import engine.IWorldRules;
 import entities.WorldObject;
-import physics.Drone;
+import utils.Cubes;
+import utils.FloatMath;
+import utils.Utils;
 
 public class OrthoTestWorld extends World implements IWorldRules{
 
 	public OrthoTestWorld() {
-		super(2, true, false);
-		
-    	this.config = createConfig();
+		super(50, true);
 	}
 
 	@Override
 	public void setup() {
+    	config = Utils.createDefaultConfig();
+    	  
+    	physics.init(config, 15);
+    	
         worldObjects = new WorldObject[100];
 
         Random rand = new Random();
         
         for(int i = 0; i < worldObjects.length; i++) {
-            WorldObject cube = new WorldObject(getCubeMeshes()[rand.nextInt(getCubeMeshes().length)].getMesh());
+            WorldObject cube = new WorldObject(Cubes.getCubes()[rand.nextInt(Cubes.getCubes().length)].getMesh());
             cube.setScale(0.5f);
             int x1 = rand.nextInt(100)-50,
             		y = 0,
@@ -33,15 +35,12 @@ public class OrthoTestWorld extends World implements IWorldRules{
             worldObjects[i] = cube;
         }
         
-        drone = new Drone(config);
-        
-        drone.setVelocity(new Vector3f(0,0,-15));
-        drone.setLeftWingInclination(-1);
+        float leftWingInc = FloatMath.toRadians(45f);
+        physics.updateDrone(Utils.buildOutputs(leftWingInc, 0,0,0,0));
 	}
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
 		return "Test for the Orthographic cameras";
 	}
 

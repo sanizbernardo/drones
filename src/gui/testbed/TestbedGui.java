@@ -11,13 +11,12 @@ import org.joml.Vector3f;
 import javax.swing.JLabel;
 
 import java.awt.GridLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.FlowLayout;
 
 public class TestbedGui extends JFrame {
 
+
+	private static final long serialVersionUID = 1L;
+	
 	private JPanel contentPane;
 	private final JLabel velocityLbl, positionLbl, yawLbl, rollLbl, pitchLbl;
 

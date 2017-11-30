@@ -1,7 +1,7 @@
 package entities.meshes.drone;
 
 import entities.meshes.Mesh;
-import physics.Drone;
+import interfaces.AutopilotConfig;
 
 public class DroneMesh {
 
@@ -10,11 +10,11 @@ public class DroneMesh {
     private RightWing right;
     private Body body;
 
-    public DroneMesh(Drone drone){
-
-        left = new LeftWing(drone);
-        right = new RightWing(drone);
-        body = new Body(drone);
+    public DroneMesh(AutopilotConfig config){
+    	float width = 0.01f;
+        left = new LeftWing(config, width);
+        right = new RightWing(config, width);
+        body = new Body(config, width);
     }
 
     public Mesh getLeft() {

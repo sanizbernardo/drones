@@ -121,7 +121,7 @@ public class Renderer {
 		shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 		  
 		//Update view Matrix
-		viewMatrix = transformation.getViewMatrixY(chaseCamera);
+		viewMatrix = transformation.getViewMatrix(chaseCamera);
 		
 		renderWorldItems(gameItems, viewMatrix);
 		renderDroneItems(droneItems, viewMatrix, 1);

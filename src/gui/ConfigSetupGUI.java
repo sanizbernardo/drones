@@ -60,9 +60,9 @@ public class ConfigSetupGUI extends JDialog {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				generateAutoPilotConfig();
 				setVisible(false);
 				dispose();
+				System.exit(0);
 			}
 		});
 		
@@ -230,7 +230,7 @@ public class ConfigSetupGUI extends JDialog {
 												(float) Math.toRadians(orientationDeg.y),
 												(float) Math.toRadians(orientationDeg.z));
 			
-			((WorldBuilder) world).setupDrone(generateAutoPilotConfig(), pos, vel, orientation);
+			((WorldBuilder) world).setupDrone(generateAutoPilotConfig(), pos, vel.z, orientation);
 	}
 		
 		return world; 

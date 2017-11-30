@@ -1,10 +1,10 @@
 package world;
 
-import org.joml.Vector3f;
-
 import engine.IWorldRules;
 import entities.WorldObject;
-import physics.Drone;
+import physics.Motion;
+import utils.Cubes;
+import utils.Utils;
 
 
 /**
@@ -13,10 +13,8 @@ import physics.Drone;
 public class TestWorldFlyStraight extends World implements IWorldRules {
 
     public TestWorldFlyStraight() {
-        //Geef de vertraging van je wereld mee
-        super(10, true, true);
+        super(10, true);
         
-        this.config = createConfig();
     }
 
     /**
@@ -24,18 +22,17 @@ public class TestWorldFlyStraight extends World implements IWorldRules {
      */
     @Override
     public void setup() {
-        /* Init the objects and set them as you like */
-        int AMOUNT_OF_CUBES = 1;
-        worldObjects = new WorldObject[AMOUNT_OF_CUBES];
+    	config = Utils.createDefaultConfig();
+    	  
+    	physics.init(config, 20);
 
-        /* Do something with your new batch of objects */
-        worldObjects[0] = new WorldObject(getCubeMeshes()[0].getMesh());
+    	planner = new Motion();
+    	
+        worldObjects = new WorldObject[1];
+        worldObjects[0] = new WorldObject(Cubes.getCubes()[0].getMesh());
         worldObjects[0].setPosition(0f,0f,-10f);
 
-        /* Give your drone some values */
-        drone = new Drone(config);
 
-        drone.setVelocity(new Vector3f(0f,0f,-20f));
     }
 
 	@Override
