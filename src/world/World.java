@@ -1,155 +1,122 @@
 package world;
 
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+
+import engine.Engine;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Camera;
 import engine.graph.Renderer;
 import entities.WorldObject;
-import entities.meshes.cube.Cube;
 import entities.meshes.drone.DroneMesh;
 import gui.testbed.TestbedGui;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotOutputs;
-
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-
-import physics.Drone;
-import physics.Motion;
-import physics.PhysicsEngine;
+import physics.Physics;
 import utils.Constants;
+import utils.Utils;
 import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
-import utils.Utils;
 import utils.image.ImageCreator;
+
 
 public abstract class World implements IWorldRules {
 
     private final Vector3f cameraInc;
-    private final Camera freeCamera, droneCamera, chaseCamera, topOrthoCamera, rightOrthoCamera;
-    protected Autopilot planner = new Motion();
-
+    private Camera freeCamera, droneCamera, chaseCamera, topOrthoCamera, rightOrthoCamera;
+	
     private Renderer renderer;
     private WorldObject[] droneItems;
-    private PhysicsEngine physicsEngine;
     private ImageCreator imageCreator;
-    private Cube[] cubeMeshes;
     private int TIME_SLOWDOWN_MULTIPLIER;
-    private boolean wantPhysicsEngine, wantPlanner;
     private KeyboardInput keyboardInput;
     private TestbedGui testbedGui;
-
-    protected Drone drone;
-    protected AutopilotConfig config;
-
+    private boolean wantPhysics;
+    
     /* These are to be directly called in the world classes*/
-    WorldObject[] worldObjects;
-
-    World(int tSM, boolean wantPhysicsEngine, boolean wantPlanner) {
+    protected Autopilot planner;
+    protected WorldObject[] worldObjects;
+    protected AutopilotConfig config;
+    protected Physics physics;
+    protected Engine gameEngine;
+    
+    
+    public World(int tSM, boolean wantPhysicsEngine) {
         this.TIME_SLOWDOWN_MULTIPLIER = tSM;
-        this.wantPhysicsEngine = wantPhysicsEngine;
-        this.wantPlanner = wantPlanner;
+        
+        this.wantPhysics = wantPhysicsEngine;
+        this.physics = new Physics();
+        
         this.keyboardInput = new KeyboardInput();
-        this.freeCamera = new Camera();
-        this.droneCamera = new Camera();
-        this.chaseCamera = new Camera();
-        this.topOrthoCamera = new Camera();
-        this.rightOrthoCamera = new Camera();
+        
         constructCameras();
         this.cameraInc = new Vector3f(0, 0, 0);
+        
         this.testbedGui = new TestbedGui();
     }
     
+    
     private void constructCameras() {
+    	this.freeCamera = new Camera();
+        this.droneCamera = new Camera();
+        this.chaseCamera = new Camera();
+        
+        this.topOrthoCamera = new Camera();
         topOrthoCamera.setPosition(0,200,0);
         topOrthoCamera.setRotation(90, 0, -90);
+        
+        this.rightOrthoCamera = new Camera();
         rightOrthoCamera.setPosition(200, 0, 0);
         rightOrthoCamera.setRotation(0, -90, 0);
     }
 
     @Override
-    public void init(Window window) throws Exception {
-        createCubes();
-        hooks(window);
-        setup();
-        addDrone();
-        startSimulation();
-        testbedGui.showGUI();
+    public void init(Window window, Engine engine) throws Exception {
+    	this.gameEngine = engine; 
+    	
+    	setup();
+    	
+    	try {
+			this.renderer = new Renderer(config);
+		    this.renderer.init(window);
+		} catch (Exception e) {
+		    System.out.println("Abstract class World (render.init(window)) gave this error: " + e.getMessage());
+		    e.printStackTrace();
+		}
+		
+		this.imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows(), window);
+		
+		addDrone();
+		
+		if (planner != null)
+			planner.simulationStarted(config, Utils.buildInputs(imageCreator.screenShot(),
+				physics.getPosition(), physics.getHeading(), physics.getPitch(), physics.getRoll(), 0));
+		
+		testbedGui.showGUI();
     }
+
     
-    public abstract String getDescription();
-
-    private void createCubes() {
-        Cube redCube = new Cube(0,1f);
-        Cube greenCube = new Cube(120,1f);
-        Cube blueCube = new Cube(240,1f);
-        cubeMeshes = new Cube[]{redCube, greenCube, blueCube};
-    }
-
-    public static AutopilotConfig createConfig() {
-        return new AutopilotConfig() {
-            public float getGravity() {return 10f;}
-            public float getWingX() {return 0.25f;}
-            public float getTailSize() {return 0.5f;}
-            public float getEngineMass() {return 7f;}
-            public float getWingMass() {return 2.5f;}
-            public float getTailMass() {return 3f;}
-            public float getMaxThrust() {return 5000f;}
-            public float getMaxAOA() {return (float) Math.toRadians(45);}
-            public float getWingLiftSlope() {return 1.1f;}
-            public float getHorStabLiftSlope() {return 0.11f;}
-            public float getVerStabLiftSlope() {return 0.11f;}
-            public float getHorizontalAngleOfView() {return (float) Math.toRadians(120f);}
-            public float getVerticalAngleOfView() {return (float) Math.toRadians(120f);}
-            public int getNbColumns() {return 200;}
-            public int getNbRows() {return 200;}};
-    }
-
-    private void hooks(Window window) {
-        physicsEngine = new PhysicsEngine(config);
-        renderer = new Renderer(config);
-        try {
-            renderer.init(window);
-        } catch (Exception e) {
-            System.out.println("Abstract class World (render.init(window)) gave this error: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows(), window);
-    }
-
     private void addDrone() {
-        DroneMesh droneMesh = new DroneMesh(drone);
+        DroneMesh droneMesh = new DroneMesh(config);
         WorldObject left = new WorldObject(droneMesh.getLeft());
         WorldObject right = new WorldObject(droneMesh.getRight());
         WorldObject body = new WorldObject(droneMesh.getBody());
         droneItems = new WorldObject[]{left, right, body};
     }
 
-    private void startSimulation() {
-        planner.simulationStarted(config, Utils.buildInputs(imageCreator.screenShot(),
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            0));
-    }
-
-    public Cube[] getCubeMeshes() {
-        return cubeMeshes;
-    }
-
     /**
-     * World specific init
+     * World specific setup. 
+     * 
+     * Things you have to do here: generate config, init physics, 
+     * generate worldObjects, and make your planner.
      */
     public abstract void setup();
+    
+    public abstract String getDescription();
 
-    /**
-     * Handle input, should be in separate class
-     */
+    
     @Override
     public void input(Window window, MouseInput mouseInput) {
         keyboardInput.worldInput(cameraInc, window, imageCreator, renderer);
@@ -161,9 +128,15 @@ public abstract class World implements IWorldRules {
     @Override
     public void update(float interval, MouseInput mouseInput) {
 
-        if(wantPhysicsEngine) physicsEngine.update(interval/TIME_SLOWDOWN_MULTIPLIER, drone);
-
-        Vector3f newDronePos = new Vector3f(drone.getPosition());
+        if (wantPhysics) {
+			try {
+				physics.update(interval/TIME_SLOWDOWN_MULTIPLIER);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+        }
+        
+        Vector3f newDronePos = new Vector3f(physics.getPosition());
 
         // Update camera based on mouse
         freeCamera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
@@ -173,24 +146,24 @@ public abstract class World implements IWorldRules {
         }
 
         droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-        droneCamera.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getHeading()),-(float)Math.toDegrees(drone.getRoll()));
+        droneCamera.setRotation(-(float)Math.toDegrees(physics.getPitch()),-(float)Math.toDegrees(physics.getHeading()),-(float)Math.toDegrees(physics.getRoll()));
 
         float offset = 1f;
-        //TODO: implement getHeading properly...
-        chaseCamera.setPosition(newDronePos.x + offset * (float)Math.sin(drone.getHeading()), newDronePos.y, newDronePos.z + offset * (float)Math.cos(drone.getHeading()));
-        chaseCamera.setRotation(0,-(float)Math.toDegrees(drone.getHeading()),0);
+        chaseCamera.setPosition(newDronePos.x + offset * (float)Math.sin(physics.getHeading()), newDronePos.y, newDronePos.z + offset * (float)Math.cos(physics.getHeading()));
+        chaseCamera.setRotation(0,-(float)Math.toDegrees(physics.getHeading()),0);
         
-                
+        
         // Update the position of each drone item
         for (WorldObject droneItem : droneItems) {
             droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
 
-            droneItem.setRotation(-(float)Math.toDegrees(drone.getPitch()),-(float)Math.toDegrees(drone.getHeading()),-(float)Math.toDegrees(drone.getRoll()));
+            droneItem.setRotation(-(float)Math.toDegrees(physics.getPitch()),-(float)Math.toDegrees(physics.getHeading()),-(float)Math.toDegrees(physics.getRoll()));
         }
 
-        if(wantPlanner) plannerUpdate(newDronePos, interval/TIME_SLOWDOWN_MULTIPLIER);
+        
+        if (planner != null) plannerUpdate(newDronePos, interval/TIME_SLOWDOWN_MULTIPLIER);
 
-        testbedGui.update(drone.getVelocity(), newDronePos, drone.getHeading(), drone.getPitch(), drone.getRoll());
+        testbedGui.update(physics.getVelocity(), newDronePos, physics.getHeading(), physics.getPitch(), physics.getRoll());
         
     }
 
@@ -207,17 +180,13 @@ public abstract class World implements IWorldRules {
                         newDronePos.x,
                         newDronePos.y,
                         newDronePos.z,
-                        drone.getHeading(),
-                        drone.getPitch(),
-                        drone.getRoll(),
+                        physics.getHeading(),
+                        physics.getPitch(),
+                        physics.getRoll(),
                         interval)
         );
 
-        drone.setHorStabInclination(out.getHorStabInclination());
-        drone.setVerStabInclination(out.getVerStabInclination());
-        drone.setLeftWingInclination(out.getLeftWingInclination());
-        drone.setRightWingInclination(out.getRightWingInclination());
-        drone.setThrust(out.getThrust());
+        physics.updateDrone(out);
     }
 
     @Override
@@ -239,6 +208,6 @@ public abstract class World implements IWorldRules {
     @Override
     public void endSimulation() {
     	testbedGui.dispose();
-    	planner.simulationEnded();
+    	if (planner != null) planner.simulationEnded();
     }
 }

@@ -1,20 +1,26 @@
 package entities.meshes.drone;
 
-import physics.Drone;
+import interfaces.AutopilotConfig;
+import utils.Utils;
 
 public class Body extends DroneComponent {
 
-    public Body(Drone drone) {
-        super(drone);
+    public Body(AutopilotConfig config, float width) {
+        super(config, width);
     }
 
     @Override
     public void setPositions() {
         this.positions = new float[]{
-                drone.getTailSize()/8, 0f, drone.getTailSize(), //#0
-                -drone.getTailSize()/8, 0f, drone.getTailSize(), //#1
-                drone.getTailSize()/8,0,-drone.getEngineZ(),
-                -drone.getTailSize()/8,0,-drone.getEngineZ(),
+        		config.getTailSize()/8, this.width, config.getTailSize(), //#0
+                -config.getTailSize()/8, this.width, config.getTailSize(), //#1
+                config.getTailSize()/8, this.width, -Utils.getEngineZ(config), //#2
+                -config.getTailSize()/8, this.width, -Utils.getEngineZ(config), //#3
+                
+        		config.getTailSize()/8, -this.width, config.getTailSize(), //#0
+                -config.getTailSize()/8, -this.width, config.getTailSize(), //#1
+                config.getTailSize()/8, -this.width, -Utils.getEngineZ(config), //#2
+                -config.getTailSize()/8, -this.width, -Utils.getEngineZ(config), //#3
         };
     }
 
@@ -26,13 +32,35 @@ public class Body extends DroneComponent {
                 0f, 0f, 1f,
                 0f, 0f, 1f,
                 0f, 0f, 1f,
+                
+                //Face 1 (front)
+                0f, 1f, 1f,
+                0f, 1f, 1f,
+                0f, 1f, 1f,
+                0f, 1f, 1f,
         };
     }
 
     @Override
     public void setIndices() {
         this.indices = new int[]{
+        		//top
                 0, 1, 2, 3, 2, 1,
+                
+                //bot
+                5, 6, 7, 5, 6, 4,
+                
+                //right
+                4, 6, 2, 4, 0, 2,
+                
+                //left
+                5, 1, 3, 5, 3, 7,
+                
+                //front
+                7, 3, 2, 7, 2, 6,
+                
+                //back
+                5, 1, 0, 5, 0, 4, 
         };
     }
 }

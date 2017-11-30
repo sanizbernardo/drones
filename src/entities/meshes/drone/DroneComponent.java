@@ -1,17 +1,19 @@
 package entities.meshes.drone;
 
 import entities.meshes.Mesh;
-import physics.Drone;
+import interfaces.AutopilotConfig;
 
 public abstract class DroneComponent {
 
-    protected Drone drone;
-    protected float[] positions, colours;
+	protected AutopilotConfig config;
+	protected float[] positions, colours;
     protected int[] indices;
     private Mesh mesh;
-
-    public DroneComponent(Drone drone){
-        this.drone = drone;
+    protected float width;
+    
+    public DroneComponent(AutopilotConfig config, float width){
+        this.config = config;
+        this.width = width;
         setPositions();
         setColours();
         setIndices();
