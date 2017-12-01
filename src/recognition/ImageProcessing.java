@@ -123,7 +123,6 @@ public class ImageProcessing {
 
     //Creates the different cube objects
     public ArrayList<Cube> getObjects() {
-    	saveImage("test");
         ArrayList<Cube> objects = new ArrayList<>();
         ArrayList<Float> colors = new ArrayList<>();
         for (int i = 0; i < this.imageWidth; i++) {
@@ -187,9 +186,12 @@ public class ImageProcessing {
     }
 
     public double guessDistance(Cube cube){ //TODO check
+    	//double start = System.currentTimeMillis();
         ArrayList<int[]> pixels = this.getConvexHull(cube);
+    	//double end = System.currentTimeMillis();
+    	//System.out.println(end-start);
         double currentMaxAngle = 0;
-        System.out.println("hier");
+        //System.out.println("hier");
         
 //        oudere methodes:
         double largestDistance = -1;
