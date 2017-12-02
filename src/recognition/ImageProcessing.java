@@ -357,7 +357,9 @@ public class ImageProcessing {
 				hull.add(pointOnHull);
 				endPoint = pixels.get(0);
 				for(int i = 1; i < pixels.size(); i++){
-					if((endPoint[0] == pointOnHull[0] && endPoint[1] == pointOnHull[1]) || orientation(pointOnHull, pixels.get(i), endPoint) == 2){
+					if((endPoint[0] == pointOnHull[0] && endPoint[1] == pointOnHull[1]) 
+							|| orientation(pointOnHull, pixels.get(i), endPoint) == 2 
+							|| (orientation(pointOnHull, pixels.get(i), endPoint) == 0 && distance(pointOnHull, endPoint) < distance(pointOnHull, pixels.get(i)))){
 						endPoint = pixels.get(i);
 					}
 				}
@@ -373,7 +375,13 @@ public class ImageProcessing {
 		}
 	}
 	
-    private int orientation(int[] p, int[] q, int[] r) {
+    private double distance(int[] point1, int[] point2) {
+		double xDiff = point1[0] - point2[0];
+		double yDiff = point1[1] - point2[1];
+		return Math.sqrt(xDiff*xDiff + yDiff*yDiff);
+	}
+
+	private int orientation(int[] p, int[] q, int[] r) {
     	int val = (q[1] - p[1]) * (r[0] - q[0]) -
                 (q[0] - p[0]) * (r[1] - q[1]);
     
