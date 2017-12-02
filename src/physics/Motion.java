@@ -144,7 +144,7 @@ public class Motion implements Autopilot {
         pitchPID.setSetpoint(target);
         pitchPID.setOutputLimits(min, max);
         float output = (float)pitchPID.getOutput(actual);
-        System.out.println(output);
+//        System.out.println(output);
         if (output > max) {
             setHorStabInclination(-max);
         } else if (output < min) {
@@ -171,9 +171,9 @@ public class Motion implements Autopilot {
         float thrust;
         // This scaling is necessary for flying straight
         if (actual - target > 0) {
-            thrust = 30*output;
+            thrust = 10*output;
         } else {
-            thrust = 150*output;
+            thrust = 100*output;
         }
         // Check that received output is within bounds
         if (thrust > config.getMaxThrust()) {
@@ -190,7 +190,7 @@ public class Motion implements Autopilot {
         setLeftWingInclination(0.1721f);
         setRightWingInclination(0.1721f);
         adjustPitch(input, 0f);
-        adjustThrust(input, 0f);
+//        adjustThrust(input, 0f);
     }
 
     // causes drone to rise by increasing lift through higher speed. Not used currently.
@@ -215,8 +215,8 @@ public class Motion implements Autopilot {
         float climbAngle = (float)Math.toRadians(25);
 
         if (inputs.getY() < target - 2f) {
-            // aircraft is below target, must therefore pitch up and thrust
 
+            // aircraft is below target, must therefore pitch up and thrust
             System.out.println("Rise");
             adjustPitch(inputs, climbAngle);
             adjustThrust(inputs, 2f);
@@ -224,6 +224,7 @@ public class Motion implements Autopilot {
             // Stabilisers are set to cancel the weight of the aircraft. Vertical component of thrust causes drone to rise.
             float incl = stableInclination(inputs);
             float wAOA = leftWingAOA(inputs);
+
             // AOA often returns NaN -> error?
             if (!Float.isNaN(incl) && Math.abs(incl) < config.getMaxAOA() - 0.02){
                 setRightWingInclination(incl);
@@ -258,12 +259,10 @@ public class Motion implements Autopilot {
     @Override
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 
-        pitchPID = new MiniPID(1, 0.2, 0.5);
+        pitchPID = new MiniPID(1.2, 0.2, 1.5);
         pitchPID.setOutputLimits(Math.toRadians(30));
-        thrustPID = new MiniPID(0.6, 0.02, 1.2);
+        thrustPID = new MiniPID(0, 0, 0);
         thrustPID.setOutputLimits(config.getMaxThrust());
-//        inclPID = new MiniPID(1.2, 0.15, 0.1);
-//        inclPID.setOutputLimits(Math.toRadians(30));
         yawPID = new MiniPID(1.2, 0.15, 0.1);
         yawPID.setOutputLimits(Math.toRadians(30));
 
@@ -328,9 +327,10 @@ public class Motion implements Autopilot {
 //        	System.exit(0);
         }
 
+        flyStraightPID(inputs, 0f);
         // target of climb should be the z position of the cube
-        climbPID(inputs,0f);
-        stableYawPID(inputs);
+//        climbPID(inputs,0f);
+//        stableYawPID(inputs);
 
         // prints useful variables
         System.out.printf("height = %s\t pitch = %s\t thrust = %s\t y-velocity = %s\t hStab = %s\t \n", inputs.getY(), inputs.getPitch(), newThrust, approxVel.y(), getHorStabInclination());
