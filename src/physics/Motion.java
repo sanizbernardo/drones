@@ -134,6 +134,41 @@ public class Motion implements Autopilot {
         return (float)incl;
     }
 
+    public Vector3f getRelVel(AutopilotInputs input) {
+        Vector3f vel = approxVel;
+        return transMat(input).transform(vel, new Vector3f());
+    }
+
+    // function for maintaining constant pitch
+    public void maintainPitch(AutopilotInputs input) {
+//    	to fly straight AOA has to be 0;
+//    	AOA is -atan2(y,x) and -atan2(y,x) == 0 if y=0
+//    	y = horProjVelD * horStabNormalVectorD
+//    	==> y-vel * cos(inclination) + z-vel * sin(inclination) == 0
+//    	Vector vel = velocity(input.getX(), input.getY(), input.getZ(), input.getElapsedTime());
+        Vector3f relVel = getRelVel(input);
+        float yVel = (float) relVel.y;
+        float zVel = (float) relVel.z;
+        float incl = 0;
+        if (yVel == 0) {
+            setHorStabInclination(0);
+        }else {
+            float n = 0f;
+            incl = (float) (2*(Math.PI*n + Math.atan((zVel-Math.sqrt(Math.pow(yVel,2)+Math.pow(zVel, 2))/yVel))));
+            if (incl > Math.PI/2) {
+                n = -1/2f;
+                incl = (float) (2*(Math.PI*n + Math.atan((zVel-Math.sqrt(Math.pow(yVel,2)+Math.pow(zVel, 2))/yVel))));
+            }
+            else if (incl < -Math.PI/2) {
+                n = 1/2f;
+                incl = (float) (2*(Math.PI*n + Math.atan((zVel-Math.sqrt(Math.pow(yVel,2)+Math.pow(zVel, 2))/yVel))));
+            }
+            if (Math.abs(incl) < Math.PI/4) {
+                setHorStabInclination(incl);
+            }
+        }
+    }
+
 
     // PID uses horizontal stabbiliser to adjust pitch.
     private void adjustPitch(AutopilotInputs input, float target) {
@@ -171,9 +206,9 @@ public class Motion implements Autopilot {
         float thrust;
         // This scaling is necessary for flying straight
         if (actual - target > 0) {
-            thrust = 10*output;
+            thrust = output;
         } else {
-            thrust = 100*output;
+            thrust = output;
         }
         // Check that received output is within bounds
         if (thrust > config.getMaxThrust()) {
@@ -189,8 +224,9 @@ public class Motion implements Autopilot {
     private void flyStraightPID(AutopilotInputs input, float height) {
         setLeftWingInclination(0.1721f);
         setRightWingInclination(0.1721f);
-        adjustPitch(input, 0f);
-//        adjustThrust(input, 0f);
+//        adjustPitch(input, 0f);
+        maintainPitch(input);
+        adjustThrust(input, 0f);
     }
 
     // causes drone to rise by increasing lift through higher speed. Not used currently.
@@ -261,7 +297,7 @@ public class Motion implements Autopilot {
 
         pitchPID = new MiniPID(1.2, 0.2, 1.5);
         pitchPID.setOutputLimits(Math.toRadians(30));
-        thrustPID = new MiniPID(0, 0, 0);
+        thrustPID = new MiniPID(1.2, 0.15, 0.1);
         thrustPID.setOutputLimits(config.getMaxThrust());
         yawPID = new MiniPID(1.2, 0.15, 0.1);
         yawPID.setOutputLimits(Math.toRadians(30));
@@ -317,15 +353,15 @@ public class Motion implements Autopilot {
     	oldPos = new Vector3f(newPos);
 
     	//get the information from image recognition
-    	ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
-        double[] center = recog.getCenter();
+//    	ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
+//        double[] center = recog.getCenter();
         
-    	if (center != null) gui.updateImage(inputs.getImage(), (int)center[0], (int)center[1]);
+//    	if (center != null) gui.updateImage(inputs.getImage(), (int)center[0], (int)center[1]);
 
     	// end simulation if target is reached
-        if(recog.getDistApprox() < 4){
+//        if(recog.getDistApprox() < 4){
 //        	System.exit(0);
-        }
+//        }
 
         flyStraightPID(inputs, 0f);
         // target of climb should be the z position of the cube
