@@ -3,6 +3,7 @@ import engine.IWorldRules;
 import gui.ConfigSetupGUI;
 import utils.Constants;
 import world.ImgRecogWorld;
+import world.TestWorldFlyStraight;
 
 
 public class Main {
@@ -10,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
         try {
         	ConfigSetupGUI gui = new ConfigSetupGUI();
-        	IWorldRules worldRules = gui.showDialog();
+        	//IWorldRules worldRules = gui.showDialog();
 
         	//untoggle for imagerecog tests
 //        	float x,y,z,dx,dy,dz;
@@ -21,6 +22,7 @@ public class Main {
 //        	dy = 0f;
 //        	dz = -0.1f;
 //            IWorldRules worldRules = new ImgRecogWorld(x, y, z, dx, dy, dz);
+            IWorldRules worldRules = new TestWorldFlyStraight();
             
             //create a game engine
             Engine gameEng = new Engine(Constants.TITLE, Constants.WIDTH, Constants.HEIGHT, Constants.VSYNC, worldRules);

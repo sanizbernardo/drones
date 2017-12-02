@@ -13,7 +13,7 @@ import utils.Utils;
 public class TestWorldFlyStraight extends World implements IWorldRules {
 
     public TestWorldFlyStraight() {
-        super(10, true);
+        super(1, true);
     }
 
     /**
@@ -29,7 +29,7 @@ public class TestWorldFlyStraight extends World implements IWorldRules {
     	
         worldObjects = new WorldObject[1];
         worldObjects[0] = new WorldObject(Cubes.getCubes()[0].getMesh());
-        worldObjects[0].setPosition(0f,0f,-10f);
+        worldObjects[0].setPosition(0f,0f,-100f);
 
 
     }

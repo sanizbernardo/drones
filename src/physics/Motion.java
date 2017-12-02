@@ -36,7 +36,7 @@ public class Motion implements Autopilot {
 
     public float getY() { return y; }
 
-    private float getZ() { return z; }
+    private float getHorStabInclination() { return horStabInclination; }
 
     private float getNewThrust() { return newThrust; }
 
@@ -61,11 +61,6 @@ public class Motion implements Autopilot {
     
     private Matrix3f transMat(AutopilotInputs input) {
 		return buildTransformMatrix(input.getPitch(), input.getHeading(), input.getRoll());
-	}
-    
-    public Matrix3f transMatInv(AutopilotInputs input) {
-		Matrix3f result = new Matrix3f();
-		return transMat(input).invert(result);
 	}
     
     private static Matrix3f buildTransformMatrix(float xAngle, float yAngle, float zAngle) {
@@ -142,11 +137,19 @@ public class Motion implements Autopilot {
 
     // PID uses horizontal stabbiliser to adjust pitch.
     private void adjustPitch(AutopilotInputs input, float target) {
-        pitchPID.setSetpoint(target);
         float actual = input.getPitch();
-        float output = (float)pitchPID.getOutput(actual);
         float hAOA = horStabAOA(input);
-        if (Math.abs(output) < config.getMaxAOA() - 0.02) {
+        float min = getHorStabInclination() - hAOA - config.getMaxAOA();
+        float max = getHorStabInclination() - hAOA + config.getMaxAOA();
+        pitchPID.setSetpoint(target);
+        pitchPID.setOutputLimits(min, max);
+        float output = (float)pitchPID.getOutput(actual);
+        System.out.println(output);
+        if (output > max) {
+            setHorStabInclination(-max);
+        } else if (output < min) {
+            setHorStabInclination(-min);
+        } else {
             setHorStabInclination(-output);
         }
     }
@@ -168,9 +171,9 @@ public class Motion implements Autopilot {
         float thrust;
         // This scaling is necessary for flying straight
         if (actual - target > 0) {
-            thrust = 10*output;
+            thrust = 30*output;
         } else {
-            thrust = 50*output;
+            thrust = 150*output;
         }
         // Check that received output is within bounds
         if (thrust > config.getMaxThrust()) {
@@ -211,7 +214,7 @@ public class Motion implements Autopilot {
         // Pitch of plane during climb
         float climbAngle = (float)Math.toRadians(25);
 
-        if (inputs.getY() < target - 3f) {
+        if (inputs.getY() < target - 2f) {
             // aircraft is below target, must therefore pitch up and thrust
 
             System.out.println("Rise");
@@ -227,7 +230,7 @@ public class Motion implements Autopilot {
                 setLeftWingInclination(incl);
             }
 
-        } else if (inputs.getY() > target + 3f) {
+        } else if (inputs.getY() > target + 2f) {
             // if aircraft overshoots target, it simply drops -> can probably be done better
             System.out.println("Fall");
             adjustPitch(inputs, 0f);
@@ -255,7 +258,7 @@ public class Motion implements Autopilot {
     @Override
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 
-        pitchPID = new MiniPID(1.2, 0.15, 0.1);
+        pitchPID = new MiniPID(1, 0.2, 0.5);
         pitchPID.setOutputLimits(Math.toRadians(30));
         thrustPID = new MiniPID(0.6, 0.02, 1.2);
         thrustPID.setOutputLimits(config.getMaxThrust());
@@ -326,11 +329,11 @@ public class Motion implements Autopilot {
         }
 
         // target of climb should be the z position of the cube
-        climbPID(inputs,15f);
+        climbPID(inputs,0f);
         stableYawPID(inputs);
 
         // prints useful variables
-        System.out.printf("height = %s\t pitch = %s\t thrust = %s\t y-velocity = %s\t wings = %s\t \n", inputs.getY(), inputs.getPitch(), newThrust, approxVel.y(), leftWingInclination);
+        System.out.printf("height = %s\t pitch = %s\t thrust = %s\t y-velocity = %s\t hStab = %s\t \n", inputs.getY(), inputs.getPitch(), newThrust, approxVel.y(), getHorStabInclination());
 
         
         AutopilotOutputs output = new AutopilotOutputs() {
