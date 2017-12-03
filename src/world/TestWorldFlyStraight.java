@@ -13,7 +13,7 @@ import utils.Utils;
 public class TestWorldFlyStraight extends World implements IWorldRules {
 
     public TestWorldFlyStraight() {
-        super(1, true);
+        super(15, true);
     }
 
     /**

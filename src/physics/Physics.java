@@ -248,8 +248,8 @@ public class Physics {
 			veli.mul(this.velProj[i]); // projecteren op vlak loodrecht op axis
 			float aoa = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
 			
-			if (Math.abs(aoa) > maxAOA)
-				System.out.println("wing nb " + i + " exceeded maximum aoa");
+//			if (Math.abs(aoa) > maxAOA)
+//				System.out.println("wing nb " + i + " exceeded maximum aoa");
 			
 			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
 			
