@@ -47,22 +47,22 @@ public class ImgRecogPlanner implements Autopilot {
 		if (z < -4){
 			imageProcess = new ImageProcessing(image);
 		}
-		System.out.println(z);
-		System.out.println(imageProcess == null);
+		//System.out.println(z);
+		//System.out.println(imageProcess == null);
 		if(imageProcess != null && !imageProcess.getObjects().isEmpty()){
 			Cube cube = imageProcess.getObjects().get(0);
 			//double[] newDistances = {realDistance,imageProcess.guessDistance(cube)};
 			double actualDistance = Math.sqrt(x*x+y*y+z*z);
 			if(actualDistance < 60){
 				double guess = imageProcess.guessDistance(cube);
-				if (guess > 60){
-					ArrayList<int[]> hull = imageProcess.getConvexHull(cube);
-					for( int[] pixel : hull){
-//						System.out.println("x: " + pixel[0] + "         y: " + pixel[1]);
-					}
+				//if (guess > 60){
+				//	ArrayList<int[]> hull = imageProcess.getConvexHull(cube);
+				//	//for( int[] pixel : hull){
+//				//		System.out.println("x: " + pixel[0] + "         y: " + pixel[1]);
+					//}
 					//System.exit(0);
 					//imageProcess.saveImage("testing");
-				}
+				//}
 				distances.addValue(actualDistance, "actual", "" + i);
 				distances.addValue(guess, "target", "" + i);
 				double difference = Math.abs(actualDistance-guess);
