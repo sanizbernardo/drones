@@ -197,7 +197,7 @@ public class Motion implements Autopilot {
         pitchPID.setSetpoint(target);
         pitchPID.setOutputLimits(min, max);
         float output = (float)pitchPID.getOutput(actual);
-        System.out.println(output);
+//        System.out.println(output);
         float angle;
         
         if (actual < 0) {
@@ -251,9 +251,9 @@ public class Motion implements Autopilot {
     private void flyStraightPID(AutopilotInputs input, float height) {
         setLeftWingInclination(0.1721f);
         setRightWingInclination(0.1721f);
-        adjustPitch(input, 0f);
-//        maintainPitch(input);
-//        adjustThrust(input, 0f);
+//        adjustPitch(input, 0f);
+        maintainPitch(input);
+        adjustThrust(input, 0f);
     }
 
     // causes drone to rise by increasing lift through higher speed. Not used currently.
@@ -397,7 +397,7 @@ public class Motion implements Autopilot {
 
         // prints useful variables
 //        System.out.printf("height = %s\t pitch = %s\t thrust = %s\t y-velocity = %s\t hStab = %s\t \n", inputs.getY(), inputs.getPitch(), newThrust, approxVel.y(), getHorStabInclination());
-        System.out.printf("pitch = %s\t hStab = %s\t \n", inputs.getPitch(), getHorStabInclination());
+        System.out.printf("pitch = %s\t hStab = %s\t y-vel = %s\t thrust = %s\t \n", inputs.getPitch(), getHorStabInclination(), approxVel.y(), newThrust);
 
         
         AutopilotOutputs output = new AutopilotOutputs() {
