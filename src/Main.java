@@ -23,6 +23,7 @@ public class Main {
 //        	dy = 0f;
 //        	dz = -0.1f;
 //            IWorldRules worldRules = new ImgRecogWorld(x, y, z, dx, dy, dz);
+
             IWorldRules worldRules = new TestWorldFlyStraight();
             
             //create a game engine
