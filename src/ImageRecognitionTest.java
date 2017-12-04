@@ -8,12 +8,12 @@ public class ImageRecognitionTest {
         try {
 
         	float x,y,z,dx,dy,dz;
-        	x = 1f;
-        	y = 1f;
+        	x = -1f;
+        	y = -1f;
         	z = -1f;
-        	dx = 0.05f;
-        	dy = 0.05f;
-        	dz = -0.05f;
+        	dx = -0.01f;
+        	dy = -0.01f;
+        	dz = -0.01f;
             IWorldRules worldRules = new ImgRecogWorld(x, y, z, dx, dy, dz);
         	
             //IWorldRules worldRules = new TestWorld();

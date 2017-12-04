@@ -5,17 +5,25 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
+
+import org.joml.Matrix3f;
+import org.joml.Vector3f;
+
+import javafx.scene.effect.FloatMapBuilder;
+import utils.FloatMath;
+
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Collections;
 
 /**
- * Created by Toon on 31/10/17
+ * Created by Toon en Tomas on 31/10/17
  */
 public class ImageProcessing {
 
@@ -23,20 +31,22 @@ public class ImageProcessing {
     private int imageHeight;
     private BufferedImage image;
     private double fieldOfView = 120;
-    //TODO: pitch en jaw in constructor
-    private final double pitch = Math.PI/4;
-    private final double jaw = 0;
-    private ArrayList<int[]> convexhull = null;
+    private final float pitch;
+    private final float heading;
+    private final float roll;
+    private ArrayList<Cube> cubes;
+    private final Matrix3f transMat;
+    private final float[] dronePosition;
 
     //constructor in case of a byte[]
-    public ImageProcessing(byte[] imageByte){
+    public ImageProcessing(byte[] imageByte, float pitch, float heading, float roll, float[] dronePosition){
 //    	InputStream in = new ByteArrayInputStream(imageByte);
 //    	System.out.println(in == null);
 //    	BufferedImage bImageFromConvert = null;
 //		try {
 //			bImageFromConvert = ImageIO.read(in);
 //		} catch (IOException e) {
-//			// TODO Auto-generated catch block
+//			// TOD Auto-generated catch block
 //			e.printStackTrace();
 //		}
 //		System.out.println(bImageFromConvert == null);
@@ -60,6 +70,22 @@ public class ImageProcessing {
         BufferedImage imageOut = new BufferedImage(this.imageWidth, this.imageHeight, BufferedImage.TYPE_3BYTE_BGR);
 		imageOut.getRaster().setDataElements(0, 0, this.imageWidth, this.imageHeight, imageByte);
 		this.image = imageOut;
+		this.heading = heading;
+		this.pitch = pitch;
+		this.roll = roll;
+		this.dronePosition = dronePosition;
+		
+		this.transMat = new Matrix3f().identity();
+		if (Math.abs(heading) > 1E-6)
+			transMat.rotate(heading, new Vector3f(0, 1, 0));
+		if (Math.abs(pitch) > 1E-6)
+			transMat.rotate(pitch, new Vector3f(1, 0, 0));
+		if (Math.abs(roll) > 1E-6)
+			transMat.rotate(roll, new Vector3f(0, 0, 1));
+		this.transMat.invert();
+		Vector3f pos = FloatMath.transform(transMat, new Vector3f(1,2,3));
+			
+			 	
     }
 
     //constructor for local images (mainly testing purposes)
@@ -71,6 +97,11 @@ public class ImageProcessing {
         }catch(IOException e){
             System.out.println("Software could not load the image");
         }
+        this.pitch=0;
+        this.heading=0;
+        this.roll=0;
+        this.transMat=null;
+        this.dronePosition = null;
     }
 
     //Saves the passed image with the passed name in PNG format
@@ -112,7 +143,6 @@ public class ImageProcessing {
     }
 
     //method for checking black pixel
-    //TODO change from black to white
     private boolean checkBg(float[] hsv){
         if(hsv[0] == 0 && hsv[1] == 0 && hsv[2] == 1){
             return true;
@@ -124,21 +154,23 @@ public class ImageProcessing {
     //Creates the different cube objects
     public ArrayList<Cube> getObjects() {
         ArrayList<Cube> objects = new ArrayList<>();
-        ArrayList<Float> colors = new ArrayList<>();
+        ArrayList<float[]> colors = new ArrayList<>();
         for (int i = 0; i < this.imageWidth; i++) {
             for (int j = 0; j < this.imageHeight; j++) {
                 float[] hsv = rgbConversion(this.image.getRGB(i, j));           //Retrieves the hsv color value of the pixel
                 int[] pixel = {i, j};
                 float h = hsv[0];
+                float s = hsv[1];
                 if (! checkBg(hsv)) {                                           //Checks whether the pixel is black or not
-                    if (! colors.contains(h)){                                  //Checks whether we already encountered a certain colortype
-                        Cube newObject = new Cube(h);
+                    if (! contains2(colors, h, s)){                                  //Checks whether we already encountered a certain colortype
+                        Cube newObject = new Cube(h, s);
                         objects.add(newObject);
                         newObject.addPixel(pixel);
-                        colors.add(h);
+                        float[] newColor = {h, s};
+                        colors.add(newColor);
                     } else {                                                    //Creates a new cube when finding new colortype
                         for (Cube cube : objects) {
-                            if (cube.gethValue() == h){
+                            if (cube.gethValue() == h && cube.getsValue() == s){
                                 cube.addPixel(pixel);
                             }
                         }
@@ -146,29 +178,91 @@ public class ImageProcessing {
                 }
             }
         }
+        this.cubes = objects;
         return objects;
     }
 
-    //Approximate location of cube in world //TODO
-    public double[] approximateLocation(Cube cube, int[] dronePos, int[] viewDirection){
+    private boolean contains2(ArrayList<float[]> colors, float h, float s) {
+    	for(float[] color : colors){
+    		//TODO die 0.01?? der is ergens een afrondingsfout, hoe kunt ge die dan vinde
+    		//     misschien de maximale fout bij die rgbconversion berekenen.
+    		//     en ook nog is checke da ge voor h hetzelfde moet doen
+    		if(h == color[0] && s < color[1] + 0.01 && s > color[1] - 0.01) return true;
+    	}
+    	return false;
+	}
+
+    
+    public ArrayList<Cube> generateLocations(){
+    	ArrayList<Cube> retList = new ArrayList<Cube>();
+    	ArrayList<Cube> ignoreList = new ArrayList<Cube>();
+    	for( Cube newCube : this.cubes){
+    		if(isOnBorder(newCube)) ignoreList.add(newCube);
+    		else{
+    			ArrayList<float[]> touchesColors = touchesCubes(newCube);
+    			if(touchesColors.size() > 0){
+    				for(float[] color : touchesColors){
+    					Cube otherCube = findCube(color);
+    					if (otherCube.getNbPixels() < newCube.getNbPixels()){
+    						ignoreList.add(otherCube);
+    					}
+    					else ignoreList.add(newCube);
+    				}
+    			}
+    		}
+    	}
+    	for(Cube newCube : this.cubes){
+    		if(!ignoreList.contains(newCube)) retList.add(newCube);
+    	}
+    	
+    	for(Cube cube : retList){
+    		double[] toTransform = approximateLocation(cube);
+    		Vector3f pos = FloatMath.transform(transMat, new Vector3f((float)toTransform[0],(float)toTransform[1],(float)toTransform[2]));
+    		
+    		float[] location = {this.dronePosition[0]+ pos.x,this.dronePosition[1]+pos.y,this.dronePosition[2]+pos.z};
+    		cube.setLocation(location);
+    	}
+    	
+    	return retList;
+    }
+    
+	private Cube findCube(float[] color) {
+		for(Cube cube : this.cubes){
+			if(cube.gethValue() == color[0] && cube.getsValue() > color[1] -0.01 
+					&& cube.getsValue() < color[1] +0.01) return cube;
+		}
+		return null;
+	}
+
+	//Approximate location of cube in world 
+    public double[] approximateLocation(Cube cube){
         int[] dronePosition = {0,0,0};
         int[] averagePixel = cube.getAveragePixel();
-        int[] vDirection = viewDirection;
 
-        averagePixel[0] -= 100;
-        averagePixel[1] = -averagePixel[1]+100;
+        //averagePixel[0] -= 100;
+        //averagePixel[1] = -averagePixel[1]+100;
         double anglePerPixel = getAnglePerPixel();
 
-        double estimateHorAngle = estimateAngle(averagePixel[0]);
-        double estimateVerAngle = estimateAngle(averagePixel[1]);
+        //double estimateHorAngle = estimateAngle(averagePixel[0]);
+        double estimateHorAngle = calculateAngleX(99, averagePixel[0]);
+        //double estimateVerAngle = estimateAngle(averagePixel[1]);
+        double estimateVerAngle = calculateAngleY(99, averagePixel[1]);
         double estimateDistance = guessDistance(cube);
         double totalAngle = Math.sqrt(estimateHorAngle*estimateHorAngle+estimateVerAngle*estimateVerAngle);
 
 //        System.out.println();
+        //TODO: hier zit een fout denk ik, Edit: ben er vrij zeker van, Edit2: ja kijk is hoe ik het gedaan het bij guessdistance.
         double estimateX = dronePosition[0] + Math.sin(estimateHorAngle)*estimateDistance*Math.cos(estimateVerAngle);
         double estimateY = dronePosition[1] + Math.sin(estimateVerAngle)*estimateDistance*Math.cos(estimateHorAngle);
         //double estimateZ = -(dronePosition[2] + Math.cos(totalAngle)*estimateDistance);
         double estimateZ = (-1) * estimateDistance*Math.cos(estimateVerAngle)*Math.cos(estimateHorAngle);
+        
+        if(averagePixel[0] < 99){
+        	estimateX *= -1;
+        }
+        if(averagePixel[1] > 99){
+        	estimateY *= -1;
+        }
         
         double[] approx = {estimateX, estimateY, estimateZ};
         //prints for testing:
@@ -185,9 +279,9 @@ public class ImageProcessing {
     	return angle;
     }
 
-    public double guessDistance(Cube cube){ //TODO check
+    public double guessDistance(Cube cube){
     	//double start = System.currentTimeMillis();
-        ArrayList<int[]> pixels = this.getConvexHull(cube);
+        ArrayList<int[]> pixels = cube.getConvexHull();
     	//double end = System.currentTimeMillis();
     	//System.out.println(end-start);
         double currentMaxAngle = 0;
@@ -225,10 +319,10 @@ public class ImageProcessing {
         int[] averagePixel = cube.getAveragePixel();
         double angleX = calculateAngleX(pixelOne[0], pixelTwo[0]);
 //        System.out.println("x1:   " + angleX);
-        angleX = 2*Math.atan(Math.cos(calculateAngleY(100, averagePixel[1]))*Math.tan(angleX/2));
+        angleX = 2*Math.atan(Math.cos(calculateAngleY(99, averagePixel[1]))*Math.tan(angleX/2));
 //        System.out.println("x2:   " + angleX + "     " + Math.cos(calculateAngleY(100, averagePixel[1])));
         double angleY = calculateAngleY(pixelOne[1], pixelTwo[1]);
-        angleY = 2*Math.atan(Math.cos(calculateAngleX(100, averagePixel[0]))*Math.tan(angleY/2));
+        angleY = 2*Math.atan(Math.cos(calculateAngleX(99, averagePixel[0]))*Math.tan(angleY/2));
         double totAngle = Math.sqrt(angleX*angleX + angleY*angleY);
         
 //        System.out.println(Math.toDegrees(angleX));
@@ -270,7 +364,7 @@ public class ImageProcessing {
 //        }
 //        Collections.sort(diffColorsAmounts);
 //        Collections.reverse(diffColorsAmounts);
-//        //TODO:: ms ipv te kijken naar de meeste berekenen welke kleur de 'voorste' is.
+//        //TOD:: ms ipv te kijken naar de meeste berekenen welke kleur de 'voorste' is.
 //        double biggest = diffColorsAmounts.get(0)/(Math.cos(pitch)*Math.cos(pitch))/(Math.cos(jaw)*Math.cos(jaw));
 //        System.out.println(cube.getNbPixels());
 //        double side = Math.sqrt(biggest);
@@ -339,97 +433,87 @@ public class ImageProcessing {
 	}
 
 
-	public ArrayList<int[]> getConvexHull(Cube cube){
-		if (convexhull != null){
-			return convexhull;
-		}
-		else{
-			ArrayList<int[]> pixels = cube.getPixels();
-			int[] pointOnHull = pixels.get(0);
-			for(int[] pixel : pixels){
-				if((pixel[0] < pointOnHull[0]) || (pixel[0] == pointOnHull[0] && pixel[1] > pointOnHull[1])){
-					pointOnHull = pixel;
-				}
-			}
-			ArrayList<int[]> hull = new ArrayList<int[]>();
-			int[] endPoint = null;
-			while(hull.isEmpty() || endPoint != hull.get(0)){
-				hull.add(pointOnHull);
-				endPoint = pixels.get(0);
-				for(int i = 1; i < pixels.size(); i++){
-					if((endPoint[0] == pointOnHull[0] && endPoint[1] == pointOnHull[1]) 
-							|| orientation(pointOnHull, pixels.get(i), endPoint) == 2 
-							|| (orientation(pointOnHull, pixels.get(i), endPoint) == 0 && distance(pointOnHull, endPoint) < distance(pointOnHull, pixels.get(i)))){
-						endPoint = pixels.get(i);
-					}
-				}
-				pointOnHull = endPoint;
-			}
-			for (int i = 2; i < hull.size(); i++){
-				if(orientation(hull.get(i-2), hull.get(i-1), hull.get(i))==0){
-					hull.remove(i-1);
-					i--;
-				}
-			}
-			return hull;
-		}
-	}
 	
-    private double distance(int[] point1, int[] point2) {
-		double xDiff = point1[0] - point2[0];
-		double yDiff = point1[1] - point2[1];
-		return Math.sqrt(xDiff*xDiff + yDiff*yDiff);
-	}
-
-	private int orientation(int[] p, int[] q, int[] r) {
-    	int val = (q[1] - p[1]) * (r[0] - q[0]) -
-                (q[0] - p[0]) * (r[1] - q[1]);
-    
-        if (val == 0) return 0;  // collinear
-        return (val > 0)? 1: 2; // clock or counterclock wise
-	}
 
 	//some getters
     private double getAnglePerPixel(){
             return Math.toRadians(this.fieldOfView/200);
     }
 
-    public boolean isOnBorder(int[] pixel){
-    	if(pixel[0] == 0 || pixel[0] == 199 || pixel[1] == 0 || pixel[1] == 199) return true;
+    public boolean isOnBorder(Cube cube){
+    	ArrayList<int[]> hull = cube.getConvexHull();
+    	for(int[] pixel : hull){
+        	if(pixel[0] == 0 || pixel[0] == 199 || pixel[1] == 0 || pixel[1] == 199) return true;
+    	}
     	return false;
     }
     
-    public boolean touches(ArrayList<int[]> hull){
+    public ArrayList<float[]> touchesCubes(Cube cube){
+    	ArrayList<int[]> hull = cube.getConvexHull();
+    	ArrayList<float[]> retList = new ArrayList<float[]>();
     	for(int[] pixel : hull){
             float[] hsv = rgbConversion(this.image.getRGB(pixel[0], pixel[1]));
             float h = hsv[0];
+            float s = hsv[1];
             float[] hsv2 = rgbConversion(this.image.getRGB(pixel[0]-1, pixel[1]-1));
-            float h2 = hsv[0];
-            if(!checkBg(hsv2) && h !=h2) return true;
+            float h2 = hsv2[0];
+            float s2 = hsv2[1];
+            if(!checkBg(hsv2) && (h != h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            	float[] n = {h2, s2};
+            	retList.add(n);
+            }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]-1, pixel[1]));
-            h2 = hsv[0];
-            if(!checkBg(hsv2) && h !=h2) return true;
+            h2 = hsv2[0];
+            s2 = hsv2[1];
+            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            	float[] n = {h2, s2};
+            	retList.add(n);
+            }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]-1, pixel[1]+1));
-            h2 = hsv[0];
-            if(!checkBg(hsv2) && h !=h2) return true;
+            h2 = hsv2[0];
+            s2 = hsv2[1];
+            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            	float[] n = {h2, s2};
+            	retList.add(n);
+            }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0], pixel[1]-1));
-            h2 = hsv[0];
-            if(!checkBg(hsv2) && h !=h2) return true;
+            h2 = hsv2[0];
+            s2 = hsv2[1];
+            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            	float[] n = {h2, s2};
+            	retList.add(n);
+            }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0], pixel[1]+1));
-            h2 = hsv[0];
-            if(!checkBg(hsv2) && h !=h2) return true;
+            h2 = hsv2[0];
+            s2 = hsv2[1];
+            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            	float[] n = {h2, s2};
+            	retList.add(n);
+            }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]+1, pixel[1]-1));
-            h2 = hsv[0];
-            if(!checkBg(hsv2) && h !=h2) return true;
+            h2 = hsv2[0];
+            s2 = hsv2[1];
+            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            	float[] n = {h2, s2};
+            	retList.add(n);
+            }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]+1, pixel[1]));
-            h2 = hsv[0];
-            if(!checkBg(hsv2) && h !=h2) return true;
+            h2 = hsv2[0];
+            s2 = hsv2[1];
+            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            	float[] n = {h2, s2};
+            	retList.add(n);
+            }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]+1, pixel[1]+1));
-            h2 = hsv[0];
-            if(!checkBg(hsv2) && h !=h2) return true;
+            h2 = hsv2[0];
+            s2 = hsv2[1];
+            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            	float[] n = {h2, s2};
+            	retList.add(n);
+            }
     	}
  
-    	return false;
+    	return retList;
     }
     
     
