@@ -144,8 +144,9 @@ public class Motion implements Autopilot {
 
     // Calculate wing inclination such that lift cancels weight
     private float stableInclination(AutopilotInputs inputs) {
-        float AOA = rightWingAOA(inputs);
-        float L = 2*config.getWingLiftSlope()*AOA*horProjVel(inputs).dot(horProjVel(inputs));
+        float rAOA = rightWingAOA(inputs);
+        float lAOA = leftWingAOA(inputs);
+        float L = config.getWingLiftSlope()*(rAOA + lAOA)*horProjVel(inputs).dot(horProjVel(inputs));
         // incl might be incorrect...
         double incl = inputs.getPitch() - Math.asin(config.getGravity()*getMass()/L);
         return (float)incl;
@@ -316,9 +317,9 @@ public class Motion implements Autopilot {
     @Override
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 
-        pitchPID = new MiniPID(1, 0.01, 0.01);
+        pitchPID = new MiniPID(1, 0.01, 0.1);
         pitchPID.setOutputLimits(Math.toRadians(30));
-        thrustPID = new MiniPID(150, 0.15, 0.05);
+        thrustPID = new MiniPID(150, 0.08, 0.05);
         thrustPID.setOutputLimits(0f, config.getMaxThrust());
         yawPID = new MiniPID(1.2, 0.15, 0.1);
         yawPID.setOutputLimits(Math.toRadians(30));
@@ -392,7 +393,7 @@ public class Motion implements Autopilot {
 
         // prints useful variables
 //        System.out.printf("height = %s\t pitch = %s\t thrust = %s\t y-velocity = %s\t hStab = %s\t \n", inputs.getY(), inputs.getPitch(), newThrust, approxVel.y(), getHorStabInclination());
-        System.out.printf("pitch = %s\t hStab = %s\t y-vel = %s\t thrust = %s\t \n", inputs.getPitch(), getHorStabInclination(), approxVel.y(), newThrust);
+        System.out.printf("height = %s\t pitch = %s\t hStab = %s\t y-vel = %s\t thrust = %s\t \n", inputs.getY(), inputs.getPitch(), getHorStabInclination(), approxVel.y(), newThrust);
 
 //        Vector3f test = new Vector3f(0,10,-10);
 //        System.out.println(Math.toDegrees(Math.atan2(test.y(), -test.z())));
