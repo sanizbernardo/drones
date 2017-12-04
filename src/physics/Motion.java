@@ -251,7 +251,7 @@ public class Motion implements Autopilot {
         setRightWingInclination(0.1221f);
         adjustPitch(input, 0f);
 //        maintainPitch(input);
-        adjustThrust(input, 0f);
+        adjustThrust(input, 0.1f);
     }
     
     private void adjustheightPID(AutopilotInputs input, float height) {
@@ -307,10 +307,12 @@ public class Motion implements Autopilot {
 
     // causes drone to climb by changing pitch and using thrust to increase vertical velocity
     private void climbPID(AutopilotInputs inputs, float target) {
+
             // aircraft is below target, must therefore pitch up and thrust
             System.out.println("Rise");
             adjustPitch(inputs, climbAngle);
             adjustThrust(inputs, 2f);
+
     }
     
     private void dropPID(AutopilotInputs inputs, float target) {
@@ -319,6 +321,7 @@ public class Motion implements Autopilot {
         adjustPitch(inputs, 0f);
         adjustThrust(inputs, -2f);
         
+
     }
 
     // Uses PID controller to stabilise yaw
@@ -326,7 +329,7 @@ public class Motion implements Autopilot {
         yawPID.setSetpoint(0f);
         float actual = input.getHeading();
         float output = (float)yawPID.getOutput(actual);
-        float vAOA = verStabAOA(input);
+
         if (Math.abs(output) < config.getMaxAOA() - 0.02) {
             setVerStabInclination(-output);
         }
@@ -337,10 +340,12 @@ public class Motion implements Autopilot {
     @Override
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 
+
         pitchPID = new MiniPID(0.5, 0.005, 0.005);
         pitchPID.setOutputLimits(Math.toRadians(30));
         thrustPID = new MiniPID(2, 0.01, 0.005);
 //        thrustPID.setOutputLimits(0f, config.getMaxThrust());
+
         yawPID = new MiniPID(1.2, 0.15, 0.1);
         yawPID.setOutputLimits(Math.toRadians(30));
         climbAngle = FloatMath.toRadians(25);
@@ -405,7 +410,9 @@ public class Motion implements Autopilot {
 
 //        flyStraightPID(inputs, 0f);
         // target of climb should be the z position of the cube
+
 //        climbPID(inputs, 10f);
+
 //        stableYawPID(inputs);
     	adjustheightPID(inputs, 13f);
 
