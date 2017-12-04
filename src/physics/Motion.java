@@ -247,8 +247,8 @@ public class Motion implements Autopilot {
 
     // Set wings to empirical values found by Flor. PIDs set pitch and thrust to fly straight.
     private void flyStraightPID(AutopilotInputs input, float height) {
-        setLeftWingInclination(0.1221f);
-        setRightWingInclination(0.1221f);
+        setLeftWingInclination(FloatMath.toRadians(7));
+        setRightWingInclination(FloatMath.toRadians(7));
         adjustPitch(input, 0f);
 //        maintainPitch(input);
         adjustThrust(input, 0.1f);
@@ -270,16 +270,16 @@ public class Motion implements Autopilot {
         	//thrust bijgeven
         	adjustThrust(input, 1f);
         }
+        //sterk dalen
+        else if (height - actualHeight < -1) {
+        	dropPID(input, height);
+        }
         //dalen
         else if (height - actualHeight < -0.5) {
         	//pitch op 0
         	adjustPitch(input, 0);
         	//thrust afnemen
         	adjustThrust(input, -1f);
-        }
-        //sterk dalen
-        else if (height - actualHeight < -1) {
-        	climbPID(input, height);
         }
         //horizontaal blijven
         else {
@@ -307,19 +307,19 @@ public class Motion implements Autopilot {
 
     // causes drone to climb by changing pitch and using thrust to increase vertical velocity
     private void climbPID(AutopilotInputs inputs, float target) {
-
-            // aircraft is below target, must therefore pitch up and thrust
-            System.out.println("Rise");
-            adjustPitch(inputs, climbAngle);
-            adjustThrust(inputs, 2f);
-
+        // aircraft is below target, must therefore pitch up and thrust
+    	System.out.println("Rise");
+    	adjustPitch(inputs, climbAngle);
+        adjustThrust(inputs, 2f);
+        setLeftWingInclination(FloatMath.toRadians(7));
+        setRightWingInclination(FloatMath.toRadians(7));
     }
     
     private void dropPID(AutopilotInputs inputs, float target) {
         // if aircraft overshoots target, it simply drops -> can probably be done better
         System.out.println("Fall");
-        adjustPitch(inputs, 0f);
-        adjustThrust(inputs, -2f);
+        adjustPitch(inputs, FloatMath.toRadians(-5));
+        adjustThrust(inputs, -3f);
         
 
     }
@@ -414,11 +414,14 @@ public class Motion implements Autopilot {
 //        climbPID(inputs, 10f);
 
 //        stableYawPID(inputs);
-    	adjustheightPID(inputs, 13f);
+    	adjustheightPID(inputs, 10f);
+    	if (inputs.getY() >= 10) {
+    		System.out.println("goal reached:" + inputs.getZ());
+    	}
 
         // prints useful variables
 //        System.out.printf("height = %s\t pitch = %s\t thrust = %s\t y-velocity = %s\t hStab = %s\t \n", inputs.getY(), inputs.getPitch(), newThrust, approxVel.y(), getHorStabInclination());
-        System.out.printf("height = %s\t pitch = %s\t hStab = %s\t y-vel = %s\t thrust = %s\t \n", inputs.getY(), inputs.getPitch(), getHorStabInclination(), approxVel.y(), newThrust);
+//        System.out.printf("height = %s\t pitch = %s\t hStab = %s\t y-vel = %s\t thrust = %s\t \n", inputs.getY(), inputs.getPitch(), getHorStabInclination(), approxVel.y(), newThrust);
 
 //        Vector3f test = new Vector3f(0,10,-10);
 //        System.out.println(Math.toDegrees(Math.atan2(test.y(), -test.z())));
