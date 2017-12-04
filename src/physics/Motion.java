@@ -11,6 +11,7 @@ import interfaces.AutopilotOutputs;
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 import recognition.ImageRecognition;
+import utils.FloatMath;
 
 public class Motion implements Autopilot {
 
@@ -203,7 +204,7 @@ public class Motion implements Autopilot {
         float actual = input.getPitch();
         float output = (float)pitchPID.getOutput(actual);
 
-        setHorStabInclination(-output);
+        setHorStabInclination((float) (-output));
 
 //        if (output > max) {
 //            setHorStabInclination(-max);
@@ -231,12 +232,9 @@ public class Motion implements Autopilot {
         float actual = approxVel.y();
         float output = (float)thrustPID.getOutput(actual);
         float thrust;
-        // This scaling is necessary for flying straight
-        if (actual - target > 0) {
-            thrust = output;
-        } else {
-            thrust = output;
-        }
+
+        thrust = (float) (output);
+        
         // Check that received output is within bounds
         if (thrust > config.getMaxThrust()) {
             setNewThrust(config.getMaxThrust());
@@ -249,12 +247,47 @@ public class Motion implements Autopilot {
 
     // Set wings to empirical values found by Flor. PIDs set pitch and thrust to fly straight.
     private void flyStraightPID(AutopilotInputs input, float height) {
-        setLeftWingInclination(0.1721f);
-        setRightWingInclination(0.1721f);
+        setLeftWingInclination(0.1221f);
+        setRightWingInclination(0.1221f);
         adjustPitch(input, 0f);
 //        maintainPitch(input);
         adjustThrust(input, 0f);
     }
+    
+    private void adjustheightPID(AutopilotInputs input, float height) {
+        float actualHeight = input.getY();
+        Vector3f rel = getRelVel(input);
+        float climbAngle = (float) Math.atan2(rel.y(), -rel.z());
+        float incl;
+        //sterk stijgen
+        if (height - actualHeight > 1) {
+        	climbPID(input, height);
+        }
+        //stijgen
+        else if (height - actualHeight > 0.5) {
+        	//pitch op 0
+        	adjustPitch(input, 0);
+        	//thrust bijgeven
+        	adjustThrust(input, 1f);
+        }
+        //dalen
+        else if (height - actualHeight < -0.5) {
+        	//pitch op 0
+        	adjustPitch(input, 0);
+        	//thrust afnemen
+        	adjustThrust(input, -1f);
+        }
+        //sterk dalen
+        else if (height - actualHeight < -1) {
+        	climbPID(input, height);
+        }
+        //horizontaal blijven
+        else {
+        	flyStraightPID(input, height);
+        }
+    }
+       
+    
 
     // causes drone to rise by increasing lift through higher speed. Not used currently.
     private void risePID(AutopilotInputs inputs, float target) {
@@ -274,31 +307,18 @@ public class Motion implements Autopilot {
 
     // causes drone to climb by changing pitch and using thrust to increase vertical velocity
     private void climbPID(AutopilotInputs inputs, float target) {
-        if (inputs.getY() < target - 3f) {
-
             // aircraft is below target, must therefore pitch up and thrust
             System.out.println("Rise");
             adjustPitch(inputs, climbAngle);
             adjustThrust(inputs, 2f);
-
-            // Stabilisers are set to cancel the weight of the aircraft. Vertical component of thrust causes drone to rise.
-            float incl = stableInclination(inputs);
-
-            if (!Float.isNaN(incl) && Math.abs(incl) < config.getMaxAOA() - 0.02){
-                setRightWingInclination(incl);
-                setLeftWingInclination(incl);
-            }
-
-        } else if (inputs.getY() > target + 3f) {
-            // if aircraft overshoots target, it simply drops -> can probably be done better
-            System.out.println("Fall");
-            adjustPitch(inputs, 0f);
-            adjustThrust(inputs, -2f);
-        } else {
-            // If within 3m from target, flies straight
-            System.out.println("Fly straight");
-            flyStraightPID(inputs, 0);
-        }
+    }
+    
+    private void dropPID(AutopilotInputs inputs, float target) {
+        // if aircraft overshoots target, it simply drops -> can probably be done better
+        System.out.println("Fall");
+        adjustPitch(inputs, 0f);
+        adjustThrust(inputs, -2f);
+        
     }
 
     // Uses PID controller to stabilise yaw
@@ -317,23 +337,20 @@ public class Motion implements Autopilot {
     @Override
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 
-        pitchPID = new MiniPID(1, 0.01, 0.1);
+        pitchPID = new MiniPID(0.5, 0.005, 0.005);
         pitchPID.setOutputLimits(Math.toRadians(30));
-        thrustPID = new MiniPID(150, 0.08, 0.05);
-        thrustPID.setOutputLimits(0f, config.getMaxThrust());
+        thrustPID = new MiniPID(2, 0.01, 0.005);
+//        thrustPID.setOutputLimits(0f, config.getMaxThrust());
         yawPID = new MiniPID(1.2, 0.15, 0.1);
         yawPID.setOutputLimits(Math.toRadians(30));
-        climbAngle = (float)Math.toRadians(25);
+        climbAngle = FloatMath.toRadians(25);
 
         setConfig(config);
         gui = new AutopilotGUI(config);
         gui.updateImage(inputs.getImage());
         gui.showGUI();
 
-        // Some empirical values found by Flor, for flying straight
-        setLeftWingInclination(0.1721f);
-        setRightWingInclination(0.1721f);
-        setNewThrust(25f);
+     
 
         
         return new AutopilotOutputs() {
@@ -388,8 +405,9 @@ public class Motion implements Autopilot {
 
 //        flyStraightPID(inputs, 0f);
         // target of climb should be the z position of the cube
-        climbPID(inputs,0f);
+//        climbPID(inputs, 10f);
 //        stableYawPID(inputs);
+    	adjustheightPID(inputs, 13f);
 
         // prints useful variables
 //        System.out.printf("height = %s\t pitch = %s\t thrust = %s\t y-velocity = %s\t hStab = %s\t \n", inputs.getY(), inputs.getPitch(), newThrust, approxVel.y(), getHorStabInclination());

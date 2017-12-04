@@ -12,7 +12,7 @@ import utils.Utils;
 public class OrthoTestWorld extends World implements IWorldRules{
 
 	public OrthoTestWorld() {
-		super(20, true);
+		super(1, true);
 	}
 
 	@Override
