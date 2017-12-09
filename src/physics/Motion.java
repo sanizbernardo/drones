@@ -16,6 +16,16 @@ import utils.FloatMath;
 public class Motion implements Autopilot {
 
     public Motion() {
+        pitchPID = new MiniPID(0.5, 0.005, 0.005);
+        pitchPID.setOutputLimits(Math.toRadians(30));
+        thrustPID = new MiniPID(2, 0.01, 0.005);
+        //YawPID still needs a lot of thought
+        yawPID = new MiniPID(0.2, 0, 0);
+        yawPID.setOutputLimits(Math.toRadians(30));
+        rollPID = new MiniPID(0.0005, 0.000005, 0);
+        rollPID.setOutputLimits(Math.toRadians(30));
+
+        climbAngle = FloatMath.toRadians(25);
     }
 
     private float x = Float.NaN;
@@ -28,7 +38,7 @@ public class Motion implements Autopilot {
     private Vector3f oldPos;
     private Vector3f approxVel = new Vector3f(0f,0f,0f);
     private AutopilotConfig config;
-    private MiniPID pitchPID, thrustPID, yawPID, descentPID, rollPID;
+    private MiniPID pitchPID, thrustPID, yawPID, rollPID;
     private float climbAngle;
     private AutopilotGUI gui;
 
@@ -127,7 +137,6 @@ public class Motion implements Autopilot {
         float rAOA = rightWingAOA(inputs);
         float lAOA = leftWingAOA(inputs);
         float L = config.getWingLiftSlope()*(rAOA + lAOA)*horProjVel(inputs).dot(horProjVel(inputs));
-        // incl might be incorrect...
         double incl = inputs.getPitch() - Math.asin(config.getGravity()*getMass()/L);
         return (float)incl;
     }
@@ -172,9 +181,10 @@ public class Motion implements Autopilot {
         Vector3f rel = getRelVel(input);
         float turn = (float) Math.atan2(rel.x(), -rel.z());
 
-        if (Math.abs(actual - target) < FloatMath.toRadians(2) ) {
+        if (Math.abs(actual - target) < FloatMath.toRadians(1) ) {
             float stable = turn - actual;
             setVerStabInclination(stable);
+//            adjustRoll(input, 0f);
             return;
         }
 
@@ -194,8 +204,6 @@ public class Motion implements Autopilot {
         float output = (float)rollPID.getOutput(actual);
         setLeftWingInclination(leftWingInclination - output);
         setRightWingInclination(rightWingInclination + output);
-
-        //System.out.printf("rollOutput = %s\t", FloatMath.toDegrees(output));
     }
 
 
@@ -203,35 +211,18 @@ public class Motion implements Autopilot {
     // Set wings to empirical values found by Flor. PIDs set pitch and thrust to fly straight.
     private void flyStraightPID(AutopilotInputs input, float height) {
         adjustPitch(input, 0f);
-//        maintainPitch(input);
         adjustThrust(input, 0f);
     }
 
     // causes drone to climb by changing pitch and using thrust to increase vertical velocity
     private void climbPID(AutopilotInputs inputs, float target) {
-        // aircraft is below target, must therefore pitch up and thrust
         adjustPitch(inputs, climbAngle);
-        adjustThrust(inputs, 2f);
+        adjustThrust(inputs, 3f);
     }
 
     private void dropPID(AutopilotInputs inputs, float target) {
-        // if aircraft overshoots target, it simply drops
         adjustPitch(inputs, FloatMath.toRadians(0f));
-        adjustThrust(inputs, -2f);
-    /**
-        descentPID.setSetpoint(target);
-        float actual = approxVel.y();
-        float output = (float)descentPID.getOutput(actual);
-
-        // Check that received output is within bounds
-        if (output > config.getMaxThrust()) {
-            setNewThrust(config.getMaxThrust());
-        } else if (output < 0f){
-            setNewThrust(0);
-        } else {
-            setNewThrust(output);
-        }
-     */
+        adjustThrust(inputs, -3f);
     }
 
     // causes drone to rise by increasing lift through higher speed. Not used currently.
@@ -239,14 +230,14 @@ public class Motion implements Autopilot {
         //pitch op 0
         adjustPitch(inputs, 0);
         //thrust bijgeven
-        adjustThrust(inputs, 0.3f);
+        adjustThrust(inputs, 0.5f);
     }
 
     private void descendPID(AutopilotInputs inputs) {
         //pitch op 0
         adjustPitch(inputs, 0);
         //val vertragen
-        adjustThrust(inputs, -0.3f);
+        adjustThrust(inputs, -0.5f);
     }
     
     private void adjustHeight(AutopilotInputs input, float height) {
@@ -288,23 +279,10 @@ public class Motion implements Autopilot {
     @Override
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 
-        pitchPID = new MiniPID(0.5, 0.005, 0.005);
-        pitchPID.setOutputLimits(Math.toRadians(30));
-        thrustPID = new MiniPID(2, 0.01, 0.005);
-//        thrustPID.setOutputLimits(0f, config.getMaxThrust());
-        yawPID = new MiniPID(0.5, 0.005, 0.005);
-        yawPID.setOutputLimits(Math.toRadians(30));
-        descentPID = new MiniPID(1.2, 0, 0);
-//        descentPID.setOutputLimits(0f, config.getMaxAOA());
-        rollPID = new MiniPID(0.0005, 0, 0);
-        rollPID.setOutputLimits(Math.toRadians(30));
-        climbAngle = FloatMath.toRadians(25);
-
         setConfig(config);
         gui = new AutopilotGUI(config);
         gui.updateImage(inputs.getImage());
         gui.showGUI();
-
         
         return new AutopilotOutputs() {
 
@@ -356,11 +334,12 @@ public class Motion implements Autopilot {
 //        	System.exit(0);
 //        }
 
-    	adjustHeight(inputs, 0f);
-        adjustYaw(inputs, FloatMath.toRadians(0));
+        float height = 13f;
+    	adjustHeight(inputs, height);
+//        adjustYaw(inputs, FloatMath.toRadians(0));
         adjustRoll(inputs, 0f);
-    	if (inputs.getY() >= 10) {
-    		//System.out.println("goal reached:" + inputs.getZ());
+    	if (Math.abs(height - inputs.getY()) < 4) {
+    		System.out.println("goal reached:" + inputs.getZ());
     	}
 
         // prints useful variables

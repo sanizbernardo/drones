@@ -19,7 +19,7 @@ public class OrthoTestWorld extends World implements IWorldRules{
 	public void setup() {
     	config = Utils.createDefaultConfig();
     	  
-    	physics.init(config, 15);
+    	physics.init(config, 12);
     	planner = new Motion();
         worldObjects = new WorldObject[100];
 
