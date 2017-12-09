@@ -25,7 +25,6 @@ public class Main {
 //            IWorldRules worldRules = new ImgRecogWorld(x, y, z, dx, dy, dz);
 
             IWorldRules worldRules = new OrthoTestWorld();
-
             
             //create a game engine
             Engine gameEng = new Engine(Constants.TITLE, Constants.WIDTH, Constants.HEIGHT, Constants.VSYNC, worldRules);

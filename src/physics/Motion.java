@@ -176,7 +176,7 @@ public class Motion implements Autopilot {
     }
 
     // Uses PID controller to stabilise yaw
-    private void adjustYaw(AutopilotInputs input, float target) {
+    private void adjustHeading(AutopilotInputs input, float target) {
         float actual = input.getHeading();
         Vector3f rel = getRelVel(input);
         float turn = (float) Math.atan2(rel.x(), -rel.z());
@@ -217,7 +217,7 @@ public class Motion implements Autopilot {
     // causes drone to climb by changing pitch and using thrust to increase vertical velocity
     private void climbPID(AutopilotInputs inputs, float target) {
         adjustPitch(inputs, climbAngle);
-        adjustThrust(inputs, 3f);
+        adjustThrust(inputs, 4f);
     }
 
     private void dropPID(AutopilotInputs inputs, float target) {
@@ -334,9 +334,9 @@ public class Motion implements Autopilot {
 //        	System.exit(0);
 //        }
 
-        float height = 13f;
+        float height = 16f;
     	adjustHeight(inputs, height);
-//        adjustYaw(inputs, FloatMath.toRadians(0));
+//        adjustHeading(inputs, FloatMath.toRadians(15));
         adjustRoll(inputs, 0f);
     	if (Math.abs(height - inputs.getY()) < 4) {
     		System.out.println("goal reached:" + inputs.getZ());
