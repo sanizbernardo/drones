@@ -76,11 +76,11 @@ public class ImageProcessing {
 		this.dronePosition = dronePosition;
 		
 		this.transMat = new Matrix3f().identity();
-		if (Math.abs(heading) > 1E-6)
+		if (Math.abs(this.heading) > 1E-6)
 			transMat.rotate(heading, new Vector3f(0, 1, 0));
-		if (Math.abs(pitch) > 1E-6)
+		if (Math.abs(this.pitch) > 1E-6)
 			transMat.rotate(pitch, new Vector3f(1, 0, 0));
-		if (Math.abs(roll) > 1E-6)
+		if (Math.abs(this.roll) > 1E-6)
 			transMat.rotate(roll, new Vector3f(0, 0, 1));
 		this.transMat.invert();
 		Vector3f pos = FloatMath.transform(transMat, new Vector3f(1,2,3));
@@ -236,7 +236,6 @@ public class ImageProcessing {
 
 	//Approximate location of cube in world 
     public double[] approximateLocation(Cube cube){
-        int[] dronePosition = {0,0,0};
         int[] averagePixel = cube.getAveragePixel();
 
         //averagePixel[0] -= 100;
@@ -244,27 +243,32 @@ public class ImageProcessing {
         double anglePerPixel = getAnglePerPixel();
 
         //double estimateHorAngle = estimateAngle(averagePixel[0]);
-        double estimateHorAngle = calculateAngleX(99, averagePixel[0]);
+        double estimateHorAngle1 = calculateAngleX(99, averagePixel[0]);
+        double estimateHorAngle2 = 2*Math.atan(Math.cos(calculateAngleY(99, averagePixel[1]))*Math.tan(estimateHorAngle1/2));
         //double estimateVerAngle = estimateAngle(averagePixel[1]);
         double estimateVerAngle = calculateAngleY(99, averagePixel[1]);
+        estimateVerAngle = 2*Math.atan(Math.cos(calculateAngleX(99, averagePixel[0]))*Math.tan(estimateVerAngle/2));
         double estimateDistance = guessDistance(cube);
-        double totalAngle = Math.sqrt(estimateHorAngle*estimateHorAngle+estimateVerAngle*estimateVerAngle);
+        System.out.println(estimateDistance);
+        //double totalAngle = Math.sqrt(estimateHorAngle*estimateHorAngle+estimateVerAngle*estimateVerAngle);
 
-//        System.out.println();
-        //TODO: hier zit een fout denk ik, Edit: ben er vrij zeker van, Edit2: ja kijk is hoe ik het gedaan het bij guessdistance.
-        double estimateX = dronePosition[0] + Math.sin(estimateHorAngle)*estimateDistance*Math.cos(estimateVerAngle);
-        double estimateY = dronePosition[1] + Math.sin(estimateVerAngle)*estimateDistance*Math.cos(estimateHorAngle);
+        double estimateX = Math.sin(estimateHorAngle2)*estimateDistance;
+        double estimateY = Math.sin(estimateVerAngle)*estimateDistance;
         //double estimateZ = -(dronePosition[2] + Math.cos(totalAngle)*estimateDistance);
-        double estimateZ = (-1) * estimateDistance*Math.cos(estimateVerAngle)*Math.cos(estimateHorAngle);
+        double estimateZ = (-1) * estimateDistance*Math.cos(estimateVerAngle)*Math.cos(estimateHorAngle1);
+        //double estimateZ = (-1) * Math.sqrt(estimateDistance*estimateDistance - 
+        //		Math.sqrt(estimateX*estimateX + estimateY*estimateY)*Math.sqrt(estimateX*estimateX + estimateY*estimateY));
         
-        if(averagePixel[0] < 99){
+        if(averagePixel[0] < 100){
         	estimateX *= -1;
         }
-        if(averagePixel[1] > 99){
+        if(averagePixel[1] > 100){
         	estimateY *= -1;
         }
         
         double[] approx = {estimateX, estimateY, estimateZ};
+        System.out.println(approx[0] + "  " + approx[1] + "  " + approx[2] );
+		
         //prints for testing:
         //System.out.println("horAngle : " + Math.toDegrees(estimateHorAngle));
         //System.out.println("verAngle : " + Math.toDegrees(estimateVerAngle));
