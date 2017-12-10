@@ -199,7 +199,7 @@ public class Physics {
 		Vector3f rotation = this.angVel.mul(dt, new Vector3f());
 		
 		float norm = FloatMath.norm(rotation);
-		if (norm > 1E-6) {
+		if (Math.abs(norm) > 1E-6) {
 			this.transMat.rotate(-norm, rotation.normalize());
 			this.transMatInv = this.transMat.invert(new Matrix3f());
 		}
@@ -265,8 +265,8 @@ public class Physics {
 	 */
 	private Vector3f calculateAlfa(Vector3f torque) {
 		
-		Vector3f part1 = FloatMath.cross(this.inertia.transform(this.angVel, new Vector3f()), this.angVel);
-		Vector3f alfa = this.inertiaInv.transform(torque.add(part1, new Vector3f()),new Vector3f()); 
+		Vector3f part1 = FloatMath.cross(this.angVel, FloatMath.transform(this.inertia, this.angVel));
+		Vector3f alfa = FloatMath.transform(this.inertiaInv, torque.add(part1, new Vector3f())); 
 		return alfa;
 	}
 }
