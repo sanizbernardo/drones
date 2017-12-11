@@ -194,9 +194,10 @@ public class ImageProcessing {
 
     
     public ArrayList<Cube> generateLocations(){
+    	getObjects();
     	ArrayList<Cube> retList = new ArrayList<Cube>();
     	ArrayList<Cube> ignoreList = new ArrayList<Cube>();
-    	
+    	System.out.println(this.cubes.size());
     	if(this.cubes == null) return retList;
     	
     	for( Cube newCube : this.cubes){
