@@ -74,7 +74,7 @@ public class Transformation {
         
         viewMatrixY.identity();
 		if (Math.abs(rotation.y) > 1E-6)
-			viewMatrix.rotate(rotation.y, new Vector3f(0, 1, 0));
+			viewMatrix.rotate(FloatMath.toRadians(rotation.y), new Vector3f(0, 1, 0));
 //        viewMatrix.rotateXYZ((float)Math.toRadians(rotation.x),(float)Math.toRadians(rotation.y),(float)Math.toRadians(rotation.z));
         // Then do the translation
         viewMatrixY.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z - 1);
