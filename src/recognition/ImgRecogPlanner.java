@@ -46,7 +46,7 @@ public class ImgRecogPlanner implements Autopilot {
 		ImageProcessing imageProcess = null;
 		if (x > 0){
 			float[] pos = {0,0,0};
-			imageProcess = new ImageProcessing(image, 0f, 0f, 0f, pos);
+			imageProcess = new ImageProcessing(image, (float) -Math.PI/4,(float) -Math.PI/4, 0f, pos);
 		}
 		//System.out.println(z);
 		//System.out.println(imageProcess == null);
@@ -63,7 +63,7 @@ public class ImgRecogPlanner implements Autopilot {
 			//}
 			//double[] newDistances = {realDistance,imageProcess.guessDistance(cube)};
 			double actualDistance = Math.sqrt(x*x+y*y+z*z);
-			if(actualDistance < 60){
+			if(actualDistance < 80){
 				double guess = imageProcess.guessDistance(cube);
 				//if (guess > 60){
 				//	ArrayList<int[]> hull = imageProcess.getConvexHull(cube);

@@ -27,7 +27,7 @@ public class ImgRecogWorld extends World {
 	public void setup() {
 		config = Utils.createDefaultConfig();
 		
-		physics.init(config, new Vector3f(0, 0, 0), 0, 0, 0, 0);
+		physics.init(config, new Vector3f(0, 0, 0), 0, (float) Math.PI/4, (float) -Math.PI/4, 0);
 		
 		planner = new ImgRecogPlanner(x, y, z, dx, dy, dz);
 		
@@ -52,7 +52,7 @@ public class ImgRecogWorld extends World {
 		float oldY = worldObjects[0].getPosition().y;
 		worldObjects[0].setPosition(oldX + dx, oldY + dy, oldZ + dz);
 		
-		if (oldZ < -50){
+		if (oldX > 10){
 			gameEngine.setLoopShouldExit();
 		}
 		super.update(interval, mouseInput);
