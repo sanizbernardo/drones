@@ -44,7 +44,7 @@ public class TestbedGui extends JFrame {
 		setTitle("Testbed GUI");
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 167, 211);
+		setBounds(30, 500, 200, 350);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);

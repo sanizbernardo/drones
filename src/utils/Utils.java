@@ -21,7 +21,7 @@ public class Utils {
      */
     public static String loadResource(String fileName) throws Exception {
         String result;
-        try (InputStream in = Utils.class.getClass().getResourceAsStream(fileName);
+        try (InputStream in = Utils.class.getResourceAsStream(fileName);
              Scanner scanner = new Scanner(in, "UTF-8")) {
             result = scanner.useDelimiter("\\A").next();
         }
@@ -110,19 +110,19 @@ public class Utils {
 	
 	public static AutopilotConfig createDefaultConfig() {
         return new AutopilotConfig() {
-            public float getGravity() {return 10f;}
-            public float getWingX() {return 0.25f;}
+            public float getGravity() {return 9.81f;}
+            public float getWingX() {return 0.5f;}
             public float getTailSize() {return 0.5f;}
-            public float getEngineMass() {return 7f;}
-            public float getWingMass() {return 2.5f;}
-            public float getTailMass() {return 3f;}
-            public float getMaxThrust() {return 5000f;}
-            public float getMaxAOA() {return (float) Math.toRadians(45);}
-            public float getWingLiftSlope() {return 0.11f;}
-            public float getHorStabLiftSlope() {return 0.11f;}
-            public float getVerStabLiftSlope() {return 0.11f;}
-            public float getHorizontalAngleOfView() {return (float) Math.toRadians(120f);}
-            public float getVerticalAngleOfView() {return (float) Math.toRadians(120f);}
+            public float getEngineMass() {return 0.25f;}
+            public float getWingMass() {return 0.25f;}
+            public float getTailMass() {return 0.125f;}
+            public float getMaxThrust() {return 5f;}
+            public float getMaxAOA() {return FloatMath.toRadians(45);}
+            public float getWingLiftSlope() {return 0.1f;}
+            public float getHorStabLiftSlope() {return 0.05f;}
+            public float getVerStabLiftSlope() {return 0.05f;}
+            public float getHorizontalAngleOfView() {return FloatMath.toRadians(120f);}
+            public float getVerticalAngleOfView() {return FloatMath.toRadians(120f);}
             public int getNbColumns() {return 200;}
             public int getNbRows() {return 200;}};
     }

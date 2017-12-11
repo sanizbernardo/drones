@@ -4,6 +4,7 @@ import java.util.Random;
 
 import engine.IWorldRules;
 import entities.WorldObject;
+import physics.Motion;
 import utils.Cubes;
 import utils.FloatMath;
 import utils.Utils;
@@ -11,15 +12,15 @@ import utils.Utils;
 public class OrthoTestWorld extends World implements IWorldRules{
 
 	public OrthoTestWorld() {
-		super(50, true);
+		super(1, true);
 	}
 
 	@Override
 	public void setup() {
     	config = Utils.createDefaultConfig();
     	  
-    	physics.init(config, 15);
-    	
+    	physics.init(config, 12);
+    	planner = new Motion();
         worldObjects = new WorldObject[100];
 
         Random rand = new Random();
@@ -34,9 +35,10 @@ public class OrthoTestWorld extends World implements IWorldRules{
             cube.setPosition(x1, y, z);
             worldObjects[i] = cube;
         }
-        
-        float leftWingInc = FloatMath.toRadians(45f);
+
+        float leftWingInc = FloatMath.toRadians(0f);
         physics.updateDrone(Utils.buildOutputs(leftWingInc, 0,0,0,0));
+
 	}
 
 	@Override
