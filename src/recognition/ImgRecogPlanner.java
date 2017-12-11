@@ -44,16 +44,16 @@ public class ImgRecogPlanner implements Autopilot {
 		// doe berekeningen voor image recog hier
 		byte[] image = inputs.getImage();
 		ImageProcessing imageProcess = null;
-		if (x < -0.5){
+		if (x > 0){
 			float[] pos = {0,0,0};
-			imageProcess = new ImageProcessing(image, 0f, 0f, 0f, pos);
+			imageProcess = new ImageProcessing(image, (float) -Math.PI/4,(float) -Math.PI/4, 0f, pos);
 		}
 		//System.out.println(z);
 		//System.out.println(imageProcess == null);
 		if(imageProcess != null && !imageProcess.getObjects().isEmpty()){
 			Cube cube = imageProcess.getObjects().get(0);
 			//TODO: onderstaande statement zorgt ervoor dat afstandsscgatting verkeerd is -> waarom?
-			imageProcess.generateLocations();
+			//imageProcess.generateLocations();
 			//System.out.println(cube.getLocation()[0] + "  " + cube.getLocation()[1] + "  " + cube.getLocation()[2] + "  " + x + "  " + y +"  "+z);
 			//System.out.println(imageProcess.getObjects().size());
 			//System.out.println(imageProcess.isOnBorder(cube) || imageProcess.touches(cube));
@@ -63,7 +63,7 @@ public class ImgRecogPlanner implements Autopilot {
 			//}
 			//double[] newDistances = {realDistance,imageProcess.guessDistance(cube)};
 			double actualDistance = Math.sqrt(x*x+y*y+z*z);
-			if(actualDistance < 60){
+			if(actualDistance < 80){
 				double guess = imageProcess.guessDistance(cube);
 				//if (guess > 60){
 				//	ArrayList<int[]> hull = imageProcess.getConvexHull(cube);
@@ -95,7 +95,7 @@ public class ImgRecogPlanner implements Autopilot {
 
 	@Override
 	public void simulationEnded() {
-		JFreeChart chart = ChartFactory.createLineChart("distance guess", null, null, distances, PlotOrientation.VERTICAL, true, false, false);
+		JFreeChart chart = ChartFactory.createLineChart("Distance approximation", null, null, distances, PlotOrientation.VERTICAL, true, false, false);
 		ApplicationFrame frame = new ApplicationFrame("test");
 		ChartPanel chartPanel = new ChartPanel(chart);
 		chartPanel.setPreferredSize(new Dimension(900, 600));

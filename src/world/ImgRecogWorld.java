@@ -27,16 +27,16 @@ public class ImgRecogWorld extends World {
 	public void setup() {
 		config = Utils.createDefaultConfig();
 		
-		physics.init(config, new Vector3f(0, 0, 0), 0, 0, 0, 0);
+		physics.init(config, new Vector3f(0, 0, 0), 0, (float) Math.PI/4, (float) -Math.PI/4, 0);
 		
 		planner = new ImgRecogPlanner(x, y, z, dx, dy, dz);
 		
 		Cube redCube = new Cube(0, 1);
-		Cube blueCube = new Cube(0, 0.5f);
-		worldObjects = new WorldObject[] {new WorldObject(redCube.getMesh()), new WorldObject(blueCube.getMesh())};
+		//Cube blueCube = new Cube(0, 0.5f);
+		worldObjects = new WorldObject[] {new WorldObject(redCube.getMesh())};
 		
 		worldObjects[0].setPosition(x, y, z);
-		worldObjects[1].setPosition(3, 4, -4);
+		//worldObjects[1].setPosition(3, 4, -4);
 		
 		
 	}
@@ -52,7 +52,7 @@ public class ImgRecogWorld extends World {
 		float oldY = worldObjects[0].getPosition().y;
 		worldObjects[0].setPosition(oldX + dx, oldY + dy, oldZ + dz);
 		
-		if (oldZ < -60){
+		if (oldX > 10){
 			gameEngine.setLoopShouldExit();
 		}
 		super.update(interval, mouseInput);

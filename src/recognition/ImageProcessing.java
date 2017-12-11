@@ -84,7 +84,10 @@ public class ImageProcessing {
 			transMat.rotate(roll, new Vector3f(0, 0, 1));
 		this.transMat.invert();
 		Vector3f pos = FloatMath.transform(transMat, new Vector3f(1,2,3));
+<<<<<<< HEAD
 //		System.out.println(this.heading + " " + this.pitch + " " + this.roll);
+=======
+>>>>>>> imageRecog2
 			 	
     }
 
