@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
- * Created by Toon on 31/10/17
+ * Created by Toon en Tomas on 31/10/17
  */
 public class ImageProcessingApp {
 
@@ -27,9 +27,9 @@ public class ImageProcessingApp {
 
         for (Cube cube : image.getObjects()){
             //System.out.println(Arrays.toString(cube.getCubeData()));
-            image.approximateLocation(cube, null, null);
+            image.approximateLocation(cube);
             
-            ArrayList<int[]> hull = image.getConvexHull(cube);
+            ArrayList<int[]> hull = cube.getConvexHull();
             for(int[] pixel : hull){
             	System.out.println("x: " + pixel[0] + "     y: " + pixel[1]);
             }
