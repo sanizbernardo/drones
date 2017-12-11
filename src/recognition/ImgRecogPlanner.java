@@ -44,9 +44,9 @@ public class ImgRecogPlanner implements Autopilot {
 		// doe berekeningen voor image recog hier
 		byte[] image = inputs.getImage();
 		ImageProcessing imageProcess = null;
-		if (z < -2.5){
+		if (x < -0.5){
 			float[] pos = {0,0,0};
-			imageProcess = new ImageProcessing(image, 45f, 45f, 128f, pos);
+			imageProcess = new ImageProcessing(image, 0f, 0f, 0f, pos);
 		}
 		//System.out.println(z);
 		//System.out.println(imageProcess == null);
@@ -54,7 +54,7 @@ public class ImgRecogPlanner implements Autopilot {
 			Cube cube = imageProcess.getObjects().get(0);
 			//TODO: onderstaande statement zorgt ervoor dat afstandsscgatting verkeerd is -> waarom?
 			imageProcess.generateLocations();
-			System.out.println(cube.getLocation()[0] + "  " + cube.getLocation()[1] + "  " + cube.getLocation()[2] + "  " + x + "  " + y +"  "+z);
+			//System.out.println(cube.getLocation()[0] + "  " + cube.getLocation()[1] + "  " + cube.getLocation()[2] + "  " + x + "  " + y +"  "+z);
 			//System.out.println(imageProcess.getObjects().size());
 			//System.out.println(imageProcess.isOnBorder(cube) || imageProcess.touches(cube));
 			//if(imageProcess.getObjects().size()>1){

@@ -32,11 +32,11 @@ public class ImgRecogWorld extends World {
 		planner = new ImgRecogPlanner(x, y, z, dx, dy, dz);
 		
 		Cube redCube = new Cube(0, 1);
-		//Cube blueCube = new Cube(0, 0.5f);
-		worldObjects = new WorldObject[] {new WorldObject(redCube.getMesh())};
+		Cube blueCube = new Cube(0, 0.5f);
+		worldObjects = new WorldObject[] {new WorldObject(redCube.getMesh()), new WorldObject(blueCube.getMesh())};
 		
 		worldObjects[0].setPosition(x, y, z);
-		//worldObjects[1].setPosition(3, 4, -4);
+		worldObjects[1].setPosition(3, 4, -4);
 		
 		
 	}

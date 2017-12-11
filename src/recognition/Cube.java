@@ -13,6 +13,7 @@ public class Cube {
     private float hValue, sValue;
     private ArrayList<int[]> pixels = new ArrayList<>();
     private float[] location;
+    private double dist;
 
     public void setLocation(float[]location){
     	this.location = location;
@@ -20,6 +21,14 @@ public class Cube {
     
     public float[] getLocation(){
     	return this.location;
+    }
+    
+    public void setDist(double dist){
+    	this.dist = dist;
+    }
+    
+    public double getDist(){
+    	return this.dist;
     }
     //method for calculating best location approximation
     //TODO

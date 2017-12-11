@@ -21,6 +21,7 @@ import utils.FloatMath;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by Toon en Tomas on 31/10/17
@@ -84,7 +85,7 @@ public class ImageProcessing {
 			transMat.rotate(roll, new Vector3f(0, 0, 1));
 		this.transMat.invert();
 		Vector3f pos = FloatMath.transform(transMat, new Vector3f(1,2,3));
-			
+		System.out.println(this.heading + " " + this.pitch + " " + this.roll);
 			 	
     }
 
@@ -223,6 +224,14 @@ public class ImageProcessing {
     		cube.setLocation(location);
     	}
     	
+    	Collections.sort(retList, new Comparator<Cube>() {
+            @Override
+            public int compare(Cube cube1, Cube cube2)
+            {
+
+                return  Double.compare(cube1.getDist(), cube2.getDist());
+            }
+        });
     	return retList;
     }
     
@@ -274,7 +283,7 @@ public class ImageProcessing {
         //System.out.println("verAngle : " + Math.toDegrees(estimateVerAngle));
         //System.out.println("totAngle : " + Math.toDegrees(totalAngle));
         //System.out.println("distance : " + estimateDistance);
-        //System.out.println("cubeCoords : " + Arrays.toString(approx));
+        System.out.println("cubeCoords : " + Arrays.toString(approx));
         return approx;
     }
     
@@ -308,6 +317,8 @@ public class ImageProcessing {
 //        System.out.println(pixelOne[0] + "     " + pixelOne[1]);
 //        System.out.println(pixelTwo[0] + "     " + pixelTwo[1]);
         
+        boolean same = sameColor(pixelOne, pixelTwo);
+        
         if (pixelOne[0] > pixelTwo[0]){
         	pixelOne[0] += 1;
         }
@@ -337,7 +348,14 @@ public class ImageProcessing {
         	sum += calculateAngleX(i, i+1);
         }
 //        System.out.println("should be 2PI/3: " + sum);
-        return (Math.sqrt(3)/2)/Math.tan(totAngle/2);
+        if(same){
+        	double dist = (Math.sqrt(2)/2)/Math.tan(totAngle/2) + 0.5;
+        	cube.setDist(dist);
+        	return dist;
+        }
+        double dist = (Math.sqrt(3)/2)/Math.tan(totAngle/2);
+    	cube.setDist(dist);
+        return dist;
         
 //        for(int i = 0; i<pixels.size();i++){
 //            for(int j = 0; j< pixels.size();j++){
@@ -393,7 +411,16 @@ public class ImageProcessing {
         
     }
     
-    //TODO opkuisen
+    private boolean sameColor(int[] pixelOne, int[] pixelTwo){
+    	float[] hsv1 = rgbConversion(this.image.getRGB(pixelOne[0], pixelOne[1])); 
+		float[] hsv2 = rgbConversion(this.image.getRGB(pixelTwo[0], pixelTwo[1]));
+		float v1 = hsv1[2];
+		float v2 = hsv2[2];
+		if(v1 == v2) return true;
+		return false;
+	}
+
+	//TODO opkuisen
     private double calculateAngle(double side, int[] averagePixel) {
     	//double x = averagePixel[0];
     	//x -= 99;
