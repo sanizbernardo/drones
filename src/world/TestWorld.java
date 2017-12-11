@@ -26,7 +26,7 @@ public class TestWorld extends World implements IWorldRules {
         worldObjects = new WorldObject[1];
 
         worldObjects[0] = new WorldObject(Cubes.getCubes()[0].getMesh());
-        worldObjects[0].setPosition(0f, 10f, -100f);
+        worldObjects[0].setPosition(0f, 10f, -50f);
 
 
         float thrust = 20f;

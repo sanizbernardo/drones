@@ -10,6 +10,7 @@ import interfaces.AutopilotOutputs;
 
 import java.awt.Image;
 import java.util.ArrayList;
+import java.util.OptionalDouble;
 
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
@@ -324,6 +325,9 @@ public class Motion implements Autopilot {
     }
 
     private float last = 0;
+    private int efficiencyCounter = 0;
+    private ArrayList<Float> avgList = new ArrayList<>();
+    private float guess = Float.NaN;
 
     @Override
     public AutopilotOutputs timePassed(AutopilotInputs inputs) {
@@ -338,16 +342,42 @@ public class Motion implements Autopilot {
     		approxVel = (newPos.sub(oldPos, new Vector3f())).mul(1/inputs.getElapsedTime(), new Vector3f());
     	oldPos = new Vector3f(newPos);
     	
-    	ArrayList<Cube> list = recog.generateLocations();
+    	ArrayList<Cube> list = null;
+    	
+    	efficiencyCounter++;
+    	
+    	if (efficiencyCounter % 2 == 0) {
+    		 list = recog.generateLocations();
+    		 
+    		 if (list != null && !list.isEmpty()) {
+    			 avgList.add(list.get(0).getLocation()[1]);
+    		 }
+    		 
+    		 if (efficiencyCounter >= 100) {
+    			 
+    			 System.out.println(avgList.toString());
+    			 
+    			 OptionalDouble t = avgList.stream()
+    			            .mapToDouble(a -> a)
+    			            .average();
+    			 guess = (float) t.getAsDouble();
+    			 
+    			 avgList.clear();
+    			 
+        		 efficiencyCounter = 0;
+    		 }
+    	}
+    	
     	
     	float height;
-        if(!list.isEmpty()) {
-        	height = list.get(0).getLocation()[1];
-        	last = list.get(0).getLocation()[1];
+        if(guess != Float.NaN) {
+        	height = guess;
+        	last = guess;
         } else {
         	height = last;
         }
         System.out.println(height);
+        
     	adjustHeight(inputs, height);
 //        adjustHeading(inputs, FloatMath.toRadians(15));
         adjustRoll(inputs, 0f);
