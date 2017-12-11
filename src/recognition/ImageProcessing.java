@@ -15,7 +15,6 @@ import javax.imageio.ImageIO;
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
-import javafx.scene.effect.FloatMapBuilder;
 import utils.FloatMath;
 
 import java.awt.image.BufferedImage;

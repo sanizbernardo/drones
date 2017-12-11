@@ -14,7 +14,7 @@ import java.util.Random;
 public class CubeWorld extends World implements IWorldRules {
 
     public CubeWorld() {
-        super(3, true);
+        super(30, true);
     }
 
     @Override
