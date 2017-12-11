@@ -15,7 +15,6 @@ import javax.imageio.ImageIO;
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
-import javafx.scene.effect.FloatMapBuilder;
 import utils.FloatMath;
 
 import java.awt.image.BufferedImage;
@@ -85,7 +84,7 @@ public class ImageProcessing {
 			transMat.rotate(roll, new Vector3f(0, 0, 1));
 		this.transMat.invert();
 		Vector3f pos = FloatMath.transform(transMat, new Vector3f(1,2,3));
-		System.out.println(this.heading + " " + this.pitch + " " + this.roll);
+//		System.out.println(this.heading + " " + this.pitch + " " + this.roll);
 			 	
     }
 
@@ -197,6 +196,9 @@ public class ImageProcessing {
     public ArrayList<Cube> generateLocations(){
     	ArrayList<Cube> retList = new ArrayList<Cube>();
     	ArrayList<Cube> ignoreList = new ArrayList<Cube>();
+    	
+    	if(this.cubes == null) return retList;
+    	
     	for( Cube newCube : this.cubes){
     		if(isOnBorder(newCube)) ignoreList.add(newCube);
     		else{
@@ -258,7 +260,7 @@ public class ImageProcessing {
         double estimateVerAngle = calculateAngleY(99, averagePixel[1]);
         estimateVerAngle = 2*Math.atan(Math.cos(calculateAngleX(99, averagePixel[0]))*Math.tan(estimateVerAngle/2));
         double estimateDistance = guessDistance(cube);
-        System.out.println(estimateDistance);
+//        System.out.println(estimateDistance);
         //double totalAngle = Math.sqrt(estimateHorAngle*estimateHorAngle+estimateVerAngle*estimateVerAngle);
 
         double estimateX = Math.sin(estimateHorAngle2)*estimateDistance;
@@ -276,14 +278,14 @@ public class ImageProcessing {
         }
         
         double[] approx = {estimateX, estimateY, estimateZ};
-        System.out.println(approx[0] + "  " + approx[1] + "  " + approx[2] );
+//        System.out.println(approx[0] + "  " + approx[1] + "  " + approx[2] );
 		
         //prints for testing:
         //System.out.println("horAngle : " + Math.toDegrees(estimateHorAngle));
         //System.out.println("verAngle : " + Math.toDegrees(estimateVerAngle));
         //System.out.println("totAngle : " + Math.toDegrees(totalAngle));
         //System.out.println("distance : " + estimateDistance);
-        System.out.println("cubeCoords : " + Arrays.toString(approx));
+//        System.out.println("cubeCoords : " + Arrays.toString(approx));
         return approx;
     }
     

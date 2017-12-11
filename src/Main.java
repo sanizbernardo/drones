@@ -12,7 +12,7 @@ public class Main {
     public static void main(String[] args) {
         try {
         	ConfigSetupGUI gui = new ConfigSetupGUI();
-        	//IWorldRules worldRules = gui.showDialog();
+        	IWorldRules worldRules = gui.showDialog();
 
         	//untoggle for imagerecog tests
 //        	float x,y,z,dx,dy,dz;
@@ -24,7 +24,7 @@ public class Main {
 //        	dz = -0.1f;
 //            IWorldRules worldRules = new ImgRecogWorld(x, y, z, dx, dy, dz);
 
-            IWorldRules worldRules = new OrthoTestWorld();
+//            IWorldRules worldRules = new OrthoTestWorld();
             
             //create a game engine
             Engine gameEng = new Engine(Constants.TITLE, Constants.WIDTH, Constants.HEIGHT, Constants.VSYNC, worldRules);

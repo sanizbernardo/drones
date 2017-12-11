@@ -12,21 +12,21 @@ import utils.Utils;
 public class TestWorld extends World implements IWorldRules {
 
     public TestWorld() {
-        super(10, true);
+        super(1, true);
     }
 
     @Override
     public void setup() {
     	config = Utils.createDefaultConfig();
     	  
-    	physics.init(config, 40f);
+    	physics.init(config, 12f);
 
     	planner = new Motion();
 
         worldObjects = new WorldObject[1];
 
         worldObjects[0] = new WorldObject(Cubes.getCubes()[0].getMesh());
-        worldObjects[0].setPosition(0f, 10f, -30f);
+        worldObjects[0].setPosition(0f, 10f, -100f);
 
 
         float thrust = 20f;

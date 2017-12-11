@@ -8,8 +8,14 @@ import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
 
+import java.awt.Image;
+import java.util.ArrayList;
+
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
+
+import recognition.Cube;
+import recognition.ImageProcessing;
 import recognition.ImageRecognition;
 import utils.FloatMath;
 
@@ -26,6 +32,7 @@ public class Motion implements Autopilot {
         rollPID.setOutputLimits(Math.toRadians(30));
 
         climbAngle = FloatMath.toRadians(25);
+       
     }
 
     private float x = Float.NaN;
@@ -41,6 +48,7 @@ public class Motion implements Autopilot {
     private MiniPID pitchPID, thrustPID, yawPID, rollPID;
     private float climbAngle;
     private AutopilotGUI gui;
+    private ImageProcessing recog;
 
 
     public float getX() { return x; }
@@ -284,6 +292,8 @@ public class Motion implements Autopilot {
         gui.updateImage(inputs.getImage());
         gui.showGUI();
         
+        recog = new ImageProcessing(inputs.getImage(), inputs.getPitch(), inputs.getHeading(), inputs.getRoll(), new float[] {inputs.getX(),inputs.getY(),inputs.getZ()}) ;
+        
         return new AutopilotOutputs() {
 
             @Override
@@ -313,37 +323,40 @@ public class Motion implements Autopilot {
         };
     }
 
+    private float last = 0;
 
     @Override
     public AutopilotOutputs timePassed(AutopilotInputs inputs) {
 
+    	gui.updateImage(inputs.getImage());
+    	
+        recog = new ImageProcessing(inputs.getImage(), inputs.getPitch(), inputs.getHeading(), inputs.getRoll(), new float[] {inputs.getX(),inputs.getY(),inputs.getZ()}) ;
+    	
         //first approximates velocity; useful for AOA
         Vector3f newPos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
     	if (oldPos != null)
     		approxVel = (newPos.sub(oldPos, new Vector3f())).mul(1/inputs.getElapsedTime(), new Vector3f());
     	oldPos = new Vector3f(newPos);
-
-    	//get the information from image recognition
-//    	ImageRecognition recog = new ImageRecognition(inputs.getImage(), config.getNbRows(), config.getNbColumns(), config.getHorizontalAngleOfView(), config.getVerticalAngleOfView());
-//        double[] center = recog.getCenter();
-        
-//    	if (center != null) gui.updateImage(inputs.getImage(), (int)center[0], (int)center[1]);
-
-    	// end simulation if target is reached
-//        if(recog.getDistApprox() < 4){
-//        	System.exit(0);
-//        }
-
-        float height = 16f;
+    	
+    	ArrayList<Cube> list = recog.generateLocations();
+    	
+    	float height;
+        if(!list.isEmpty()) {
+        	height = list.get(0).getLocation()[1];
+        	last = list.get(0).getLocation()[1];
+        } else {
+        	height = last;
+        }
+        System.out.println(height);
     	adjustHeight(inputs, height);
 //        adjustHeading(inputs, FloatMath.toRadians(15));
         adjustRoll(inputs, 0f);
     	if (Math.abs(height - inputs.getY()) < 4) {
-    		System.out.println("goal reached:" + inputs.getZ());
+//    		System.out.println("goal reached:" + inputs.getZ());
     	}
 
         // prints useful variables
-        System.out.printf("height = %s\t pitch = %s\t hStab = %s\t y-vel = %s\t thrust = %s\t \n", inputs.getY(), FloatMath.toDegrees(inputs.getPitch()), FloatMath.toDegrees(getHorStabInclination()), approxVel.y(), newThrust);
+//        System.out.printf("height = %s\t pitch = %s\t hStab = %s\t y-vel = %s\t thrust = %s\t \n", inputs.getY(), FloatMath.toDegrees(inputs.getPitch()), FloatMath.toDegrees(getHorStabInclination()), approxVel.y(), newThrust);
         //System.out.printf("heading = %s\t vStab = %s\t roll = %s\t leftWing = %s\t rightWing = %s\t \n", FloatMath.toDegrees(inputs.getHeading()), FloatMath.toDegrees(verStabInclination), FloatMath.toDegrees(inputs.getRoll()), FloatMath.toDegrees(leftWingInclination), FloatMath.toDegrees(rightWingInclination));
 
 
