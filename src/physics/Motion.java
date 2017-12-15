@@ -367,6 +367,7 @@ public class Motion implements Autopilot {
     private int efficiencyCounter = 0;
     private ArrayList<Float> avgList = new ArrayList<>();
     private float guess = Float.NaN;
+    private float height;
 
     @Override
     public AutopilotOutputs timePassed(AutopilotInputs inputs) {
@@ -381,37 +382,37 @@ public class Motion implements Autopilot {
     		approxVel = (newPos.sub(oldPos, new Vector3f())).mul(1/inputs.getElapsedTime(), new Vector3f());
     	oldPos = new Vector3f(newPos);
     	
-    	ArrayList<Cube> list = null;
+//    	ArrayList<Cube> list = null;
+//
+//    	efficiencyCounter++;
+//
+//    	if (efficiencyCounter % 2 == 0) {
+//    		 list = recog.generateLocations();
+//
+//    		 if (list != null && !list.isEmpty()) {
+//    			 avgList.add(list.get(0).getLocation()[1]);
+//    		 }
+//
+//    		 if (efficiencyCounter >= 100) {
+//
+//    			 System.out.println(avgList.toString());
+//
+//    			 OptionalDouble t = avgList.stream()
+//    			            .mapToDouble(a -> a)
+//    			            .average();
+//    			 guess = (float) t.getAsDouble();
+//
+//    			 avgList.clear();
+//
+//        		 efficiencyCounter = 0;
+//    		 }
+//    	}
     	
-    	efficiencyCounter++;
-    	
-    	if (efficiencyCounter % 2 == 0) {
-    		 list = recog.generateLocations();
-    		 
-    		 if (list != null && !list.isEmpty()) {
-    			 avgList.add(list.get(0).getLocation()[1]);
-    		 }
-    		 
-    		 if (efficiencyCounter >= 100) {
-    			 
-    			 System.out.println(avgList.toString());
-    			 
-    			 OptionalDouble t = avgList.stream()
-    			            .mapToDouble(a -> a)
-    			            .average();
-    			 guess = (float) t.getAsDouble();
-    			 
-    			 avgList.clear();
-    			 
-        		 efficiencyCounter = 0;
-    		 }
-    	}
-    	
-    	
-    	float height;
-        if(guess != Float.NaN) {
-        	height = guess;
-        	last = guess;
+    	ArrayList<Cube> list = recog.generateLocations();
+
+        if(!list.isEmpty()) {
+        	height = list.get(0).getLocation()[1];
+        	last = height;
         } else {
         	height = last;
         }
