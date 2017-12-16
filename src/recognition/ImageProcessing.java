@@ -321,18 +321,29 @@ public class ImageProcessing {
         
         boolean same = sameColor(pixelOne, pixelTwo);
         
+        int[] newPixelOne = pixelOne.clone();
+        int[] newPixelTwo = pixelTwo.clone();
+   	
         if (pixelOne[0] > pixelTwo[0]){
         	pixelOne[0] += 1;
+        	newPixelOne[0] += 1;
         }
         else {
         	pixelTwo[0] +=1;
+        	newPixelTwo[0] +=1;
         }
         if (pixelOne[1] > pixelTwo[1]){
         	pixelOne[1] += 1;
+        	newPixelOne[1] += 1;
         }
         else {
         	pixelTwo[1] +=1;
+        	newPixelTwo[1] +=1;
         }
+        
+        pixelOne = newPixelOne;
+        pixelTwo = newPixelTwo;
+        
         int[] averagePixel = cube.getAveragePixel();
         double angleX = calculateAngleX(pixelOne[0], pixelTwo[0]);
 //        System.out.println("x1:   " + angleX);
