@@ -182,6 +182,8 @@ public abstract class World implements IWorldRules {
         
     }
 
+    int cubeoounter = 1;
+
     /**
      * Setting them to scale 0 to prevent LWJGL errors, againthis can be improved a lot but not going to waste time on this
      */
@@ -190,9 +192,10 @@ public abstract class World implements IWorldRules {
         for (int i = 0; i < worldObjects.length; i++) {
             WorldObject cube = worldObjects[i];
             if(cube != null && !Utils.euclDistance(cube.getPosition(), pos,4)) {
-                System.out.printf("Hit (%s ,%s, %s), drone was at (%s, %s, %s) \n", cube.getPosition().x,cube.getPosition().y,cube.getPosition().z, pos.x, pos.y, pos.z);
+                System.out.printf("Hit (%s ,%s, %s), drone was at (%s, %s, %s). #%s\n", cube.getPosition().x,cube.getPosition().y,cube.getPosition().z, pos.x, pos.y, pos.z, cubeoounter);
                 //De lijn hieronder is ranzig en ik excuseer mij op voorhand dat ik dit zelfs heb durven typen, mijn excuses
                 worldObjects[i] = null;
+                cubeoounter++;
             }
         }
     }
