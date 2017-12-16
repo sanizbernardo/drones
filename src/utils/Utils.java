@@ -111,12 +111,12 @@ public class Utils {
 	public static AutopilotConfig createDefaultConfig() {
         return new AutopilotConfig() {
             public float getGravity() {return 9.81f;}
-            public float getWingX() {return 0.5f;}
-            public float getTailSize() {return 0.5f;}
-            public float getEngineMass() {return 0.25f;}
-            public float getWingMass() {return 0.25f;}
-            public float getTailMass() {return 0.125f;}
-            public float getMaxThrust() {return 5f;}
+            public float getWingX() {return 0.25f;}
+            public float getTailSize() {return 0.25f;}
+            public float getEngineMass() {return 0.125f;}
+            public float getWingMass() {return 0.125f;}
+            public float getTailMass() {return 0.0625f;}
+            public float getMaxThrust() {return 3f;}
             public float getMaxAOA() {return FloatMath.toRadians(45);}
             public float getWingLiftSlope() {return 0.1f;}
             public float getHorStabLiftSlope() {return 0.05f;}
