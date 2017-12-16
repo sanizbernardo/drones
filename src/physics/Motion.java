@@ -26,7 +26,7 @@ public class Motion implements Autopilot {
         pitchUpPID = new MiniPID(1, 0.02, 0.1);
         pitchUpPID.setOutputLimits(Math.toRadians(30));
         thrustUpPID = new MiniPID(5, 0.02, 0.02);
-        pitchDownPID = new MiniPID(3, 0.005, 0.01);
+        pitchDownPID = new MiniPID(1, 0, 0.05);
         pitchDownPID.setOutputLimits(Math.toRadians(30));
         thrustDownPID = new MiniPID(1, 0.05, 0.05);
         //YawPID still needs a lot of thought
@@ -263,7 +263,7 @@ public class Motion implements Autopilot {
     }
 
     private void dropPID(AutopilotInputs inputs) {
-        adjustPitchDown(inputs, FloatMath.toRadians(0f));
+        adjustPitchDown(inputs, FloatMath.toRadians(-3f));
         adjustThrustDown(inputs, -3f);
     }
 
@@ -284,33 +284,41 @@ public class Motion implements Autopilot {
     
     private void adjustHeight(AutopilotInputs input, float height) {
         float actualHeight = input.getY();
-        setLeftWingInclination(FloatMath.toRadians(7));
-        setRightWingInclination(FloatMath.toRadians(7));
 
         //sterk stijgen
         if (height - actualHeight > 2) {
 //            System.out.println("Climb");
         	climbPID(input);
+        	setLeftWingInclination(FloatMath.toRadians(7));
+            setRightWingInclination(FloatMath.toRadians(7));
         }
         //stijgen
         else if (height - actualHeight > 0.5) {
 //            System.out.println("Rise");
         	risePID(input);
+        	setLeftWingInclination(FloatMath.toRadians(7));
+            setRightWingInclination(FloatMath.toRadians(7));
         }
         //sterk dalen
         else if (height - actualHeight < -2) {
 //            System.out.println("Drop");
         	dropPID(input);
+        	setLeftWingInclination(FloatMath.toRadians(2));
+            setRightWingInclination(FloatMath.toRadians(2));
         }
         //dalen
         else if (height - actualHeight < -0.5) {
 //            System.out.println("Descend");
         	descendPID(input);
+        	setLeftWingInclination(FloatMath.toRadians(7));
+            setRightWingInclination(FloatMath.toRadians(7));
         }
         //horizontaal blijven
         else {
 //            System.out.println("Level");
         	flyStraightPID(input);
+        	setLeftWingInclination(FloatMath.toRadians(7));
+            setRightWingInclination(FloatMath.toRadians(7));
         }
     }
     
@@ -418,11 +426,11 @@ public class Motion implements Autopilot {
         } else {
         	height = last;
         }
-//        System.out.println(height);
+        System.out.println(height);
         
 
 
-    	adjustHeight(inputs, -20);
+    	adjustHeight(inputs, height);
 //        adjustHeading(inputs, FloatMath.toRadians(15));
         adjustRoll(inputs, 0f);
     	if (Math.abs(height - inputs.getY()) < 4) {
