@@ -226,6 +226,7 @@ public class Renderer {
 
     private void renderWorldItems(WorldObject[] gameItems, Matrix4f viewMatrix) {
         for (WorldObject gameItem : gameItems) {
+            if (gameItem == null) continue;
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
             // Render the mesh for this game item

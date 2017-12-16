@@ -9,6 +9,8 @@ import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
 
 import java.util.ArrayList;
+import java.util.OptionalDouble;
+
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
@@ -370,7 +372,6 @@ public class Motion implements Autopilot {
     private float last = 0;
     private int efficiencyCounter = 0;
     private ArrayList<Float> avgList = new ArrayList<>();
-    private float guess = Float.NaN;
     private float height;
 
     @Override
@@ -385,47 +386,41 @@ public class Motion implements Autopilot {
     	if (oldPos != null)
     		approxVel = (newPos.sub(oldPos, new Vector3f())).mul(1/inputs.getElapsedTime(), new Vector3f());
     	oldPos = new Vector3f(newPos);
-    	
-//    	ArrayList<Cube> list = null;
-//
-//    	efficiencyCounter++;
-//
-//    	if (efficiencyCounter % 2 == 0) {
-//    		 list = recog.generateLocations();
-//
-//    		 if (list != null && !list.isEmpty()) {
-//    			 avgList.add(list.get(0).getLocation()[1]);
-//    		 }
-//
-//    		 if (efficiencyCounter >= 100) {
-//
-//    			 System.out.println(avgList.toString());
-//
-//    			 OptionalDouble t = avgList.stream()
-//    			            .mapToDouble(a -> a)
-//    			            .average();
-//    			 guess = (float) t.getAsDouble();
-//
-//    			 avgList.clear();
-//
-//        		 efficiencyCounter = 0;
-//    		 }
-//    	}
 
-        ArrayList<Cube> list = new ArrayList<>();
-        efficiencyCounter ++;
-        if (efficiencyCounter >= 10) {
-            list = recog.generateLocations();
-            efficiencyCounter = 0;
-        }
-        if(!list.isEmpty()) {
+        float guess = Float.NaN;
+
+    	ArrayList<Cube> list = null;
+    	efficiencyCounter++;
+    	if (efficiencyCounter % 2 == 0) {
+    		 list = recog.generateLocations();
+
+    		 if (list != null && !list.isEmpty()) {
+    			 avgList.add(list.get(0).getLocation()[1]);
+
+                 if (efficiencyCounter >= 14 && !avgList.isEmpty()) {
+
+                     OptionalDouble t = avgList.stream()
+                             .mapToDouble(a -> a)
+                             .average();
+                     guess = (float) t.getAsDouble();
+
+                     avgList.clear();
+
+                     efficiencyCounter = 0;
+                 }
+    		 }
+
+
+    	}
+
+        if(!Float.isNaN(guess)) {
         	height = list.get(0).getLocation()[1];
         	last = height;
 
         } else {
         	height = last;
         }
-        System.out.println(height);
+        //System.out.println(height);
         
 
 
@@ -437,7 +432,7 @@ public class Motion implements Autopilot {
     	}
 
        
-        System.out.printf("distance = %s\t height = %s\t pitch = %s\t hStab = %s\t y-vel = %s\t thrust = %s\t \n", inputs.getZ(), inputs.getY(), FloatMath.toDegrees(inputs.getPitch()), FloatMath.toDegrees(getHorStabInclination()), approxVel.y(), newThrust);
+//        System.out.printf("distance = %s\t height = %s\t pitch = %s\t hStab = %s\t y-vel = %s\t thrust = %s\t \n", inputs.getZ(), inputs.getY(), FloatMath.toDegrees(inputs.getPitch()), FloatMath.toDegrees(getHorStabInclination()), approxVel.y(), newThrust);
 //        System.out.printf("heading = %s\t vStab = %s\t roll = %s\t leftWing = %s\t rightWing = %s\t \n", FloatMath.toDegrees(inputs.getHeading()), FloatMath.toDegrees(verStabInclination), FloatMath.toDegrees(inputs.getRoll()), FloatMath.toDegrees(leftWingInclination), FloatMath.toDegrees(rightWingInclination));
 //        System.out.printf("height = %s\t pitch = %s\t wAOA = %s\t \n", inputs.getY(), FloatMath.toDegrees(inputs.getPitch()), (leftWingAOA(inputs)));
 

@@ -187,10 +187,12 @@ public abstract class World implements IWorldRules {
      */
     private void touchedCubes() {
         Vector3f pos = physics.getPosition();
-        for (WorldObject cube :
-                worldObjects) {
-            if(!Utils.euclDistance(cube.getPosition(), pos,4)) {
-                cube.setScale(0);
+        for (int i = 0; i < worldObjects.length; i++) {
+            WorldObject cube = worldObjects[i];
+            if(cube != null && !Utils.euclDistance(cube.getPosition(), pos,4)) {
+                System.out.printf("Hit (%s ,%s, %s), drone was at (%s, %s, %s) \n", cube.getPosition().x,cube.getPosition().y,cube.getPosition().z, pos.x, pos.y, pos.z);
+                //De lijn hieronder is ranzig en ik excuseer mij op voorhand dat ik dit zelfs heb durven typen, mijn excuses
+                worldObjects[i] = null;
             }
         }
     }
