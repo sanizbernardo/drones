@@ -26,7 +26,7 @@ public class Motion implements Autopilot {
         pitchUpPID = new MiniPID(1, 0.02, 0.1);
         pitchUpPID.setOutputLimits(Math.toRadians(30));
         thrustUpPID = new MiniPID(5, 0.02, 0.02);
-        pitchDownPID = new MiniPID(1, 0, 0.05);
+        pitchDownPID = new MiniPID(1, 0, 0.07);
         pitchDownPID.setOutputLimits(Math.toRadians(30));
         thrustDownPID = new MiniPID(1, 0.05, 0.05);
         //YawPID still needs a lot of thought
