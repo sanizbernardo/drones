@@ -16,10 +16,14 @@ import interfaces.AutopilotConfig;
 import interfaces.AutopilotOutputs;
 import physics.Physics;
 import utils.Constants;
+import utils.Cubes;
+import utils.FloatMath;
 import utils.Utils;
 import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
 import utils.image.ImageCreator;
+
+import java.util.ArrayList;
 
 
 public abstract class World implements IWorldRules {
@@ -41,6 +45,7 @@ public abstract class World implements IWorldRules {
     protected AutopilotConfig config;
     protected Physics physics;
     protected Engine gameEngine;
+    protected ArrayList<WorldObject> pathObjects = new ArrayList<>();
     
     
     public World(int tSM, boolean wantPhysicsEngine) {
@@ -128,6 +133,8 @@ public abstract class World implements IWorldRules {
     @Override
     public void update(float interval, MouseInput mouseInput) {
 
+        trail();
+
         if (wantPhysics) {
 			try {
 				physics.update(interval/TIME_SLOWDOWN_MULTIPLIER);
@@ -167,6 +174,23 @@ public abstract class World implements IWorldRules {
         
     }
 
+    Vector3f last = new Vector3f(0,0,0);
+
+    public void trail() {
+        if(Utils.euclDistance(last, physics.getPosition(), 1)) {
+            makeTrail(physics.getPosition());
+        }
+    }
+
+    public void makeTrail(Vector3f pos) {
+        WorldObject cube = new WorldObject(Cubes.yellowCube.getMesh());
+        cube.setPosition(pos);
+        cube.setScale(0.1f);
+        cube.setRotation(45, 45, 0);
+        pathObjects.add(cube);
+        last = pos;
+    }
+
     /**
      * This line is only triggered if the specified world does indeed want a motion planner
      * @param newDronePos
@@ -191,7 +215,7 @@ public abstract class World implements IWorldRules {
 
     @Override
     public void render(Window window) {
-        renderer.render(window, freeCamera, droneCamera, chaseCamera, topOrthoCamera, rightOrthoCamera, worldObjects, droneItems);
+        renderer.render(window, freeCamera, droneCamera, chaseCamera, topOrthoCamera, rightOrthoCamera, worldObjects, droneItems, pathObjects);
     }
 
     /**

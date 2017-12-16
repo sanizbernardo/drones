@@ -8,6 +8,8 @@ import utils.*;
 import entities.WorldObject;
 import interfaces.AutopilotConfig;
 
+import java.util.ArrayList;
+
 public class Renderer {
 
     private final Transformation transformation;
@@ -102,7 +104,7 @@ public class Renderer {
         glDisable(GL_SCISSOR_TEST);
     }
 
-    public void render(Window window, Camera freeCamera, Camera droneCamera, Camera chaseCamera, Camera topOrthoCamera, Camera rightOrthoCamera, WorldObject[] gameItems, WorldObject[] droneItems) {
+    public void render(Window window, Camera freeCamera, Camera droneCamera, Camera chaseCamera, Camera topOrthoCamera, Camera rightOrthoCamera, WorldObject[] gameItems, WorldObject[] droneItems, ArrayList<WorldObject> pathObjects) {
 		clear(window);
 		
 
@@ -158,6 +160,7 @@ public class Renderer {
             // Update view Matrix
             viewMatrix = transformation.getViewMatrix(freeCamera);
 
+            renderTrail(pathObjects, viewMatrix);
             renderWorldItems(gameItems, viewMatrix);
             renderDroneItems(droneItems, viewMatrix, 1);
             shaderProgram.unbind();
@@ -208,7 +211,17 @@ public class Renderer {
 
         
     }
-    
+
+    private void renderTrail(ArrayList<WorldObject> trailItems, Matrix4f viewMatrix) {
+        if(trailItems.isEmpty()) return;
+        for (WorldObject gameItem : trailItems) {
+            Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
+            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+            // Render the mesh for this game item
+            gameItem.getMesh().render();
+        }
+    }
+
     private void renderWorldItems(WorldObject[] gameItems, Matrix4f viewMatrix) {
         for (WorldObject gameItem : gameItems) {
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);

@@ -126,5 +126,9 @@ public class Utils {
             public int getNbColumns() {return 200;}
             public int getNbRows() {return 200;}};
     }
-	
+
+    public static boolean euclDistance(Vector3f start, Vector3f end, float distance) {
+		return Math.abs(start.distance(end)) >= distance;
+	}
+
 }
