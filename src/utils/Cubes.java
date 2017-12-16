@@ -4,7 +4,7 @@ import entities.meshes.cube.BufferedCube;
 import entities.meshes.cube.Cube;
 
 public class Cubes {
-	
+
 	public static Cube getRedCube() { return new Cube(0, 1f);}
 	public static Cube getYellowCube() { return new Cube(60, 1f);}
 	public static Cube getGreenCube() { return new Cube(120, 1f);}
@@ -18,6 +18,7 @@ public class Cubes {
 	public static final BufferedCube cyanBuffCube = new BufferedCube(180, 1f);
 	public static final BufferedCube blueBuffCube = new BufferedCube(240, 1f);
 	public static final BufferedCube pinkBuffCube = new BufferedCube(300, 1f);
+
 	
 	public static Cube[] getCubes() {
 		return new Cube[] {getRedCube(), getGreenCube(), getBlueCube(), getYellowCube(), getCyanCube(), getPinkCube()};

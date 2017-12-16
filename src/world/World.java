@@ -1,5 +1,6 @@
 package world;
 
+import entities.trail.Trail;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -16,10 +17,14 @@ import interfaces.AutopilotConfig;
 import interfaces.AutopilotOutputs;
 import physics.Physics;
 import utils.Constants;
+import utils.Cubes;
+import utils.FloatMath;
 import utils.Utils;
 import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
 import utils.image.ImageCreator;
+
+import java.util.ArrayList;
 
 
 public abstract class World implements IWorldRules {
@@ -41,6 +46,8 @@ public abstract class World implements IWorldRules {
     protected AutopilotConfig config;
     protected Physics physics;
     protected Engine gameEngine;
+    protected ArrayList<WorldObject> pathObjects = new ArrayList<>();
+    protected Trail trail;
     
     
     public World(int tSM, boolean wantPhysicsEngine) {
@@ -65,8 +72,8 @@ public abstract class World implements IWorldRules {
         
         this.topOrthoCamera = new Camera();
         topOrthoCamera.setPosition(0,200,0);
-        topOrthoCamera.setRotation(90, 0, -90);
-        
+        //topOrthoCamera.setRotation(90, 0, -90);
+        topOrthoCamera.setRotation(90, 0, 0);
         this.rightOrthoCamera = new Camera();
         rightOrthoCamera.setPosition(200, 0, 0);
         rightOrthoCamera.setRotation(0, -90, 0);
@@ -95,6 +102,8 @@ public abstract class World implements IWorldRules {
 				physics.getPosition(), physics.getHeading(), physics.getPitch(), physics.getRoll(), 0));
 		
 		testbedGui.showGUI();
+
+		this.trail = new Trail();
     }
 
     
@@ -127,6 +136,12 @@ public abstract class World implements IWorldRules {
      */
     @Override
     public void update(float interval, MouseInput mouseInput) {
+
+        trail.leaveTrail(physics.getPosition(), pathObjects);
+
+        //TODO: the implementation of this function is REALLY bad, N^2 (can be reduced to NlogN +-)
+        //TODO: so if you run cubeWorld this will really mess up the speed of the program.
+        touchedCubes();
 
         if (wantPhysics) {
 			try {
@@ -168,6 +183,19 @@ public abstract class World implements IWorldRules {
     }
 
     /**
+     * Setting them to scale 0 to prevent LWJGL errors, againthis can be improved a lot but not going to waste time on this
+     */
+    private void touchedCubes() {
+        Vector3f pos = physics.getPosition();
+        for (WorldObject cube :
+                worldObjects) {
+            if(!Utils.euclDistance(cube.getPosition(), pos,4)) {
+                cube.setScale(0);
+            }
+        }
+    }
+
+    /**
      * This line is only triggered if the specified world does indeed want a motion planner
      * @param newDronePos
      *        The new position of the drone as per the physics engine
@@ -191,7 +219,7 @@ public abstract class World implements IWorldRules {
 
     @Override
     public void render(Window window) {
-        renderer.render(window, freeCamera, droneCamera, chaseCamera, topOrthoCamera, rightOrthoCamera, worldObjects, droneItems);
+        renderer.render(window, freeCamera, droneCamera, chaseCamera, topOrthoCamera, rightOrthoCamera, worldObjects, droneItems, pathObjects);
     }
 
     /**

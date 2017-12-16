@@ -411,10 +411,13 @@ public class Motion implements Autopilot {
 //        		 efficiencyCounter = 0;
 //    		 }
 //    	}
-    	
 
-    	ArrayList<Cube> list = recog.generateLocations();
-
+        ArrayList<Cube> list = new ArrayList<>();
+        efficiencyCounter ++;
+        if (efficiencyCounter >= 10) {
+            list = recog.generateLocations();
+            efficiencyCounter = 0;
+        }
         if(!list.isEmpty()) {
         	height = list.get(0).getLocation()[1];
         	last = height;

@@ -8,6 +8,8 @@ import utils.*;
 import entities.WorldObject;
 import interfaces.AutopilotConfig;
 
+import java.util.ArrayList;
+
 public class Renderer {
 
     private final Transformation transformation;
@@ -102,7 +104,7 @@ public class Renderer {
         glDisable(GL_SCISSOR_TEST);
     }
 
-    public void render(Window window, Camera freeCamera, Camera droneCamera, Camera chaseCamera, Camera topOrthoCamera, Camera rightOrthoCamera, WorldObject[] gameItems, WorldObject[] droneItems) {
+    public void render(Window window, Camera freeCamera, Camera droneCamera, Camera chaseCamera, Camera topOrthoCamera, Camera rightOrthoCamera, WorldObject[] gameItems, WorldObject[] droneItems, ArrayList<WorldObject> pathObjects) {
 		clear(window);
 		
 
@@ -158,6 +160,7 @@ public class Renderer {
             // Update view Matrix
             viewMatrix = transformation.getViewMatrix(freeCamera);
 
+            renderTrail(pathObjects, viewMatrix);
             renderWorldItems(gameItems, viewMatrix);
             renderDroneItems(droneItems, viewMatrix, 1);
             shaderProgram.unbind();
@@ -173,14 +176,15 @@ public class Renderer {
             // Update projection Matrix
             int size = 75;
 //            projectionMatrix = projectionMatrix.identity().ortho(-size/8, size,-size/2, size/2, Constants.Z_NEAR, Constants.Z_FAR).rotateZ((float)Math.toRadians(-90));
-            projectionMatrix = projectionMatrix.identity().ortho(-size/4, size,-size, size, Constants.Z_NEAR, Constants.Z_FAR);
+            projectionMatrix = projectionMatrix.identity().ortho(0, 4 * size,-size/2, size/2, Constants.Z_NEAR, Constants.Z_FAR).rotateZ(FloatMath.toRadians(-90));
             shaderProgram.setUniform("projectionMatrix", projectionMatrix);
             
             // Update view Matrix
             viewMatrix = transformation.getViewMatrix(topOrthoCamera);
 
+            renderTrail(pathObjects, viewMatrix);
             renderWorldItems(gameItems, viewMatrix);
-            renderDroneItems(droneItems, viewMatrix, 20);
+            renderDroneItems(droneItems, viewMatrix, 10);
             shaderProgram.unbind();
             
             
@@ -193,14 +197,15 @@ public class Renderer {
             rightOrthoCamHeigth = (int) (window.getHeight() * 0.5);
             glViewport(rightOrthoCamX, rightOrthoCamY, rightOrthoCamWidth, rightOrthoCamHeigth);
             // Update projection Matrix
-            projectionMatrix = projectionMatrix.identity().ortho(-size/4, size, (float)-1.5 * size, size / 2, Constants.Z_NEAR/100, Constants.Z_FAR*100);
+            projectionMatrix = projectionMatrix.identity().ortho(0, 4 * size, -15, 15, Constants.Z_NEAR/100, Constants.Z_FAR*100);
             shaderProgram.setUniform("projectionMatrix", projectionMatrix);
             
             // Update view Matrix
             viewMatrix = transformation.getViewMatrix(rightOrthoCamera);
 
+            renderTrail(pathObjects, viewMatrix);
             renderWorldItems(gameItems, viewMatrix);
-            renderDroneItems(droneItems, viewMatrix, 20);
+            renderDroneItems(droneItems, viewMatrix, 10);
             shaderProgram.unbind();
         }
 
@@ -208,7 +213,17 @@ public class Renderer {
 
         
     }
-    
+
+    private void renderTrail(ArrayList<WorldObject> trailItems, Matrix4f viewMatrix) {
+        if(trailItems.isEmpty()) return;
+        for (WorldObject gameItem : trailItems) {
+            Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
+            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+            // Render the mesh for this game item
+            gameItem.getMesh().render();
+        }
+    }
+
     private void renderWorldItems(WorldObject[] gameItems, Matrix4f viewMatrix) {
         for (WorldObject gameItem : gameItems) {
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);

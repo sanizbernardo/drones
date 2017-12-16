@@ -28,13 +28,13 @@ public class TestWorld extends World implements IWorldRules {
         worldObjects[0] = new WorldObject(Cubes.getCubes()[0].getMesh());
         worldObjects[0].setPosition(0f, 10f, -50f);
         worldObjects[1] = new WorldObject(Cubes.getCubes()[0].getMesh());
-        worldObjects[1].setPosition(0f, -3f, -100f);
+        worldObjects[1].setPosition(0f, 4f, -100f);
         worldObjects[2] = new WorldObject(Cubes.getCubes()[0].getMesh());
-        worldObjects[2].setPosition(0f, -7f, -150f);
+        worldObjects[2].setPosition(0f, 0f, -150f);
         worldObjects[3] = new WorldObject(Cubes.getCubes()[0].getMesh());
-        worldObjects[3].setPosition(0f, 2f, -200f);
+        worldObjects[3].setPosition(0f, -2f, -200f);
         worldObjects[4] = new WorldObject(Cubes.getCubes()[0].getMesh());
-        worldObjects[4].setPosition(0f, 10f, -250f);
+        worldObjects[4].setPosition(0f, 8f, -250f);
 
         float thrust = 20f;
         physics.updateDrone(Utils.buildOutputs(0 ,0, 0, 0, thrust));
