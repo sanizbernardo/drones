@@ -76,12 +76,12 @@ public class ImageProcessing {
 		this.dronePosition = dronePosition;
 		
 		this.transMat = new Matrix3f().identity();
-		if (Math.abs(this.heading) > 1E-6)
-			transMat.rotate(heading, new Vector3f(0, 1, 0));
-		if (Math.abs(this.pitch) > 1E-6)
-			transMat.rotate(pitch, new Vector3f(1, 0, 0));
-		if (Math.abs(this.roll) > 1E-6)
-			transMat.rotate(roll, new Vector3f(0, 0, 1));
+		if (Math.abs(-this.heading) > 1E-6)
+			transMat.rotate(-this.heading, new Vector3f(0, 1, 0));
+		if (Math.abs(-this.pitch) > 1E-6)
+			transMat.rotate(-this.pitch, new Vector3f(1, 0, 0));
+		if (Math.abs(-this.roll) > 1E-6)
+			transMat.rotate(-this.roll, new Vector3f(0, 0, 1));
 		this.transMat.invert();
 		Vector3f pos = FloatMath.transform(transMat, new Vector3f(1,2,3));
 			 	

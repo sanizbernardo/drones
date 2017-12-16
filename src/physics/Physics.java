@@ -46,11 +46,11 @@ public class Physics {
 		this.transMat = new Matrix3f().identity();
 		
 		if (Math.abs(startHeading) > 1E-6)
-			this.transMat.rotate(startHeading, new Vector3f(0, 1, 0));
+			this.transMat.rotate(-startHeading, new Vector3f(0, 1, 0));
 		if (Math.abs(startPitch) > 1E-6)
-			this.transMat.rotate(startPitch, new Vector3f(1, 0, 0));
+			this.transMat.rotate(-startPitch, new Vector3f(1, 0, 0));
 		if (Math.abs(startRoll) > 1E-6)
-			this.transMat.rotate(startRoll, new Vector3f(0, 0, 1));
+			this.transMat.rotate(-startRoll, new Vector3f(0, 0, 1));
 
 		this.transMatInv = this.transMat.invert(new Matrix3f());
 		

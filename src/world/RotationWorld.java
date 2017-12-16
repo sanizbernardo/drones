@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 
 import engine.IWorldRules;
 import entities.WorldObject;
+import physics.Motion;
 import utils.Cubes;
 import utils.FloatMath;
 import utils.Utils;
@@ -21,7 +22,7 @@ public class RotationWorld extends World implements IWorldRules{
     	
     	physics.init(config, 12);
     	
-    	planner = null;
+    	planner = new Motion();
         worldObjects = new WorldObject[] {new WorldObject(Cubes.blueCube.getMesh())};
 
         worldObjects[0].setPosition(new Vector3f(0,0,-20));
@@ -34,20 +35,21 @@ public class RotationWorld extends World implements IWorldRules{
 	boolean headingOn = true;
 	boolean pitchOn = true;
 	boolean rollOn = true;
+
 	@Override
 	public void update(float interval, MouseInput mouseInput) {
-		
+
 		float step = 0.005f;
 
 		if (heading <= FloatMath.toRadians(45) && rollOn) {
-			heading += step; 			
-			pitch += step; 			
+			heading += step;
+			pitch += step;
 			roll += step;
-			
+
 			System.out.println(physics.getHeading() + " " + physics.getPitch() + " "  + physics.getRoll());
-			
+
 			physics.init(config, new Vector3f(0, 0, 0), 0, heading, pitch, roll);
-			
+
 		} else if (roll >= 0) {
 			rollOn = false;
 			roll -= step;
