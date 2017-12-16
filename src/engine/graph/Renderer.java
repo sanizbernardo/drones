@@ -182,6 +182,7 @@ public class Renderer {
             // Update view Matrix
             viewMatrix = transformation.getViewMatrix(topOrthoCamera);
 
+            renderTrail(pathObjects, viewMatrix);
             renderWorldItems(gameItems, viewMatrix);
             renderDroneItems(droneItems, viewMatrix, 20);
             shaderProgram.unbind();
@@ -202,6 +203,7 @@ public class Renderer {
             // Update view Matrix
             viewMatrix = transformation.getViewMatrix(rightOrthoCamera);
 
+            renderTrail(pathObjects, viewMatrix);
             renderWorldItems(gameItems, viewMatrix);
             renderDroneItems(droneItems, viewMatrix, 20);
             shaderProgram.unbind();
