@@ -1,6 +1,7 @@
 package utils;
 
 public class Constants {
+
     /**
      * Window constants
      */
@@ -27,7 +28,7 @@ public class Constants {
      */
     public static final int TARGET_FPS = 75;
 
-    public static final int TARGET_UPS = 30;
+    public static final int TARGET_UPS = 100;
 
     /**
      * physics.World constants
@@ -42,19 +43,19 @@ public class Constants {
      */
     public static final float DEFAULT_GRAVITY = 9.81f;
     
-    public static final float DEFAULT_WINGX = 2.5f;
+    public static final float DEFAULT_WINGX = 0.25f;
     
-    public static final float DEFAULT_TAILSIZE = 5f;
+    public static final float DEFAULT_TAILSIZE = 0.5f;
     
-    public static final float DEFAULT_ENGINE_MASS = 70f;
+    public static final float DEFAULT_ENGINE_MASS = 7f;
     
-    public static final float DEFAULT_WING_MASS = 25f;
+    public static final float DEFAULT_WING_MASS = 2.5f;
     
-    public static final float DEFAULT_TAIL_MASS = 30f;
+    public static final float DEFAULT_TAIL_MASS = 3f;
     
     public static final int DEFAULT_MAX_AOA = 60;
     
-    public static final float DEFAULT_WING_LIFTSLOPE = 0.11f;
+    public static final float DEFAULT_WING_LIFTSLOPE = 1.1f;
     
     public static final float DEFAULT_VER_STAB_LIFTSLOPE = 0.11f;
     

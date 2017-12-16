@@ -5,7 +5,8 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 import org.joml.Vector3f;
-import datatypes.*;
+
+import interfaces.*;
 
 public class Utils {
 
@@ -20,7 +21,7 @@ public class Utils {
      */
     public static String loadResource(String fileName) throws Exception {
         String result;
-        try (InputStream in = Utils.class.getClass().getResourceAsStream(fileName);
+        try (InputStream in = Utils.class.getResourceAsStream(fileName);
              Scanner scanner = new Scanner(in, "UTF-8")) {
             result = scanner.useDelimiter("\\A").next();
         }
@@ -65,7 +66,7 @@ public class Utils {
     }
     
     
-    public static AutopilotInputs buildInputs(byte[] image, float x, float y, float z, float yaw, float pitch, float roll, float dt) {
+    public static AutopilotInputs buildInputs(byte[] image, float x, float y, float z, float heading, float pitch, float roll, float dt) {
     	return new AutopilotInputs() {
 			public float getZ() {
 				return z;
@@ -86,7 +87,7 @@ public class Utils {
 				return image;
 			}
 			public float getHeading() {
-				return yaw;
+				return heading;
 			}
 			public float getElapsedTime() {
 				return dt;
@@ -95,8 +96,39 @@ public class Utils {
     }
     
     
-    public static AutopilotInputs buildInputs(byte[] image, Vector3f pos, Vector3f orientation, float dt) {
-    	return buildInputs(image, pos.x, pos.y, pos.z, orientation.y, orientation.x, orientation.z, dt);
+    public static AutopilotInputs buildInputs(byte[] image, Vector3f pos, float heading, float pitch, float roll, float dt) {
+    	return buildInputs(image, pos.x, pos.y, pos.z, heading, pitch, roll, dt);
     }
+
+	public static int[] buildIntArr(int... args) {
+		return args;
+	}
     
+	public static float getEngineZ(AutopilotConfig config) {
+		return config.getTailMass() / config.getEngineMass() * config.getTailSize();
+	}
+	
+	public static AutopilotConfig createDefaultConfig() {
+        return new AutopilotConfig() {
+            public float getGravity() {return 9.81f;}
+            public float getWingX() {return 0.25f;}
+            public float getTailSize() {return 0.25f;}
+            public float getEngineMass() {return 0.125f;}
+            public float getWingMass() {return 0.125f;}
+            public float getTailMass() {return 0.0625f;}
+            public float getMaxThrust() {return 3f;}
+            public float getMaxAOA() {return FloatMath.toRadians(45);}
+            public float getWingLiftSlope() {return 0.1f;}
+            public float getHorStabLiftSlope() {return 0.05f;}
+            public float getVerStabLiftSlope() {return 0.05f;}
+            public float getHorizontalAngleOfView() {return FloatMath.toRadians(120f);}
+            public float getVerticalAngleOfView() {return FloatMath.toRadians(120f);}
+            public int getNbColumns() {return 200;}
+            public int getNbRows() {return 200;}};
+    }
+
+    public static boolean euclDistance(Vector3f start, Vector3f end, float distance) {
+		return Math.abs(start.distance(end)) >= distance;
+	}
+
 }

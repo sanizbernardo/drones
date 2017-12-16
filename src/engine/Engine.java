@@ -1,6 +1,6 @@
 package engine;
 
-import IO.MouseInput;
+import utils.IO.MouseInput;
 import utils.Constants;
 import utils.Timer;
 
@@ -18,6 +18,8 @@ public class Engine implements Runnable {
     private final IWorldRules worldRules;
 
     private final MouseInput mouseInput;
+
+	private boolean shouldExit = false;
 
     /**
      * Engine constructor
@@ -44,15 +46,9 @@ public class Engine implements Runnable {
 
     /**
      * Game loop start
-     * Has an extra clause for Mac because it has threading issues
      */
     public void start() {
-        String osName = System.getProperty("os.name");
-        if ( osName.contains("Mac") ) {
-            gameLoopThread.run();
-        } else {
-            gameLoopThread.start();
-        }
+        gameLoopThread.start();    
     }
 
     @Override
@@ -76,9 +72,13 @@ public class Engine implements Runnable {
         window.init();
         timer.init();
         mouseInput.init(window);
-        worldRules.init(window);
+        worldRules.init(window, this);
     }
-
+    
+    public void setLoopShouldExit() {
+    	this.shouldExit = true;
+    }
+    
     /**
      * elapsedTime: time since last loop in seconds
      * accumulator: total elapsed time since last update
@@ -95,7 +95,7 @@ public class Engine implements Runnable {
         float interval = 1f / Constants.TARGET_UPS;
 
 
-        while (!window.windowShouldClose()) {
+        while (!window.windowShouldClose() && ! shouldExit) {
             elapsedTime = timer.getElapsedTime();
             accumulator += elapsedTime;
 
@@ -112,6 +112,7 @@ public class Engine implements Runnable {
                 sync();
             }
         }
+        worldRules.endSimulation();
     }
 
     protected void cleanup() {
