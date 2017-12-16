@@ -184,7 +184,7 @@ public class Renderer {
 
             renderTrail(pathObjects, viewMatrix);
             renderWorldItems(gameItems, viewMatrix);
-            renderDroneItems(droneItems, viewMatrix, 20);
+            renderDroneItems(droneItems, viewMatrix, 10);
             shaderProgram.unbind();
             
             
@@ -205,7 +205,7 @@ public class Renderer {
 
             renderTrail(pathObjects, viewMatrix);
             renderWorldItems(gameItems, viewMatrix);
-            renderDroneItems(droneItems, viewMatrix, 20);
+            renderDroneItems(droneItems, viewMatrix, 10);
             shaderProgram.unbind();
         }
 

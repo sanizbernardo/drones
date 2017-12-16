@@ -1,5 +1,6 @@
 package world;
 
+import entities.trail.Trail;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -46,6 +47,7 @@ public abstract class World implements IWorldRules {
     protected Physics physics;
     protected Engine gameEngine;
     protected ArrayList<WorldObject> pathObjects = new ArrayList<>();
+    protected Trail trail;
     
     
     public World(int tSM, boolean wantPhysicsEngine) {
@@ -100,6 +102,8 @@ public abstract class World implements IWorldRules {
 				physics.getPosition(), physics.getHeading(), physics.getPitch(), physics.getRoll(), 0));
 		
 		testbedGui.showGUI();
+
+		this.trail = new Trail();
     }
 
     
@@ -133,7 +137,11 @@ public abstract class World implements IWorldRules {
     @Override
     public void update(float interval, MouseInput mouseInput) {
 
-        trail();
+        trail.leaveTrail(physics.getPosition(), pathObjects);
+
+        //TODO: the implementation of this function is REALLY bad, N^2 (can be reduced to NlogN +-)
+        //TODO: so if you run cubeWorld this will really mess up the speed of the program.
+        touchedCubes();
 
         if (wantPhysics) {
 			try {
@@ -174,21 +182,17 @@ public abstract class World implements IWorldRules {
         
     }
 
-    Vector3f last = new Vector3f(0,0,0);
-
-    public void trail() {
-        if(Utils.euclDistance(last, physics.getPosition(), 1)) {
-            makeTrail(physics.getPosition());
+    /**
+     * Setting them to scale 0 to prevent LWJGL errors, againthis can be improved a lot but not going to waste time on this
+     */
+    private void touchedCubes() {
+        Vector3f pos = physics.getPosition();
+        for (WorldObject cube :
+                worldObjects) {
+            if(!Utils.euclDistance(cube.getPosition(), pos,4)) {
+                cube.setScale(0);
+            }
         }
-    }
-
-    public void makeTrail(Vector3f pos) {
-        WorldObject cube = new WorldObject(Cubes.yellowCube.getMesh());
-        cube.setPosition(pos);
-        cube.setScale(0.1f);
-        cube.setRotation(45, 45, 0);
-        pathObjects.add(cube);
-        last = pos;
     }
 
     /**
