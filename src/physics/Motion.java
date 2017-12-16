@@ -23,12 +23,12 @@ import utils.FloatMath;
 public class Motion implements Autopilot {
 
     public Motion() {
-        pitchUpPID = new MiniPID(0.5, 0.005, 0.005);
+        pitchUpPID = new MiniPID(1, 0.02, 0.1);
         pitchUpPID.setOutputLimits(Math.toRadians(30));
-        thrustUpPID = new MiniPID(2, 0.01, 0.005);
-        pitchDownPID = new MiniPID(1, 0.01, 0.15);
+        thrustUpPID = new MiniPID(5, 0.02, 0.02);
+        pitchDownPID = new MiniPID(3, 0.005, 0.01);
         pitchDownPID.setOutputLimits(Math.toRadians(30));
-        thrustDownPID = new MiniPID(2, 0.01, 0.005);
+        thrustDownPID = new MiniPID(1, 0.05, 0.05);
         //YawPID still needs a lot of thought
         yawPID = new MiniPID(0.2, 0, 0);
         yawPID.setOutputLimits(Math.toRadians(30));
@@ -272,14 +272,14 @@ public class Motion implements Autopilot {
         //pitch op 0
         adjustPitchUp(inputs, 0);
         //thrust bijgeven
-        adjustThrustUp(inputs, 0.5f);
+        adjustThrustUp(inputs, 2f);
     }
 
     private void descendPID(AutopilotInputs inputs) {
         //pitch op 0
         adjustPitchDown(inputs, 0);
         //val vertragen
-        adjustThrustDown(inputs, -0.5f);
+        adjustThrustDown(inputs, -1.5f);
     }
     
     private void adjustHeight(AutopilotInputs input, float height) {
@@ -288,22 +288,22 @@ public class Motion implements Autopilot {
         setRightWingInclination(FloatMath.toRadians(7));
 
         //sterk stijgen
-        if (height - actualHeight > 3) {
+        if (height - actualHeight > 2) {
 //            System.out.println("Climb");
         	climbPID(input);
         }
         //stijgen
-        else if (height - actualHeight > 1) {
+        else if (height - actualHeight > 0.5) {
 //            System.out.println("Rise");
         	risePID(input);
         }
         //sterk dalen
-        else if (height - actualHeight < -3) {
+        else if (height - actualHeight < -2) {
 //            System.out.println("Drop");
         	dropPID(input);
         }
         //dalen
-        else if (height - actualHeight < -1) {
+        else if (height - actualHeight < -0.5) {
 //            System.out.println("Descend");
         	descendPID(input);
         }
@@ -385,27 +385,27 @@ public class Motion implements Autopilot {
     	
     	efficiencyCounter++;
     	
-    	if (efficiencyCounter % 2 == 0) {
-    		 list = recog.generateLocations();
-    		 
-    		 if (list != null && !list.isEmpty()) {
-    			 avgList.add(list.get(0).getLocation()[1]);
-    		 }
-    		 
-    		 if (efficiencyCounter >= 100) {
-    			 
-    			 System.out.println(avgList.toString());
-    			 
-    			 OptionalDouble t = avgList.stream()
-    			            .mapToDouble(a -> a)
-    			            .average();
-    			 guess = (float) t.getAsDouble();
-    			 
-    			 avgList.clear();
-    			 
-        		 efficiencyCounter = 0;
-    		 }
-    	}
+//    	if (efficiencyCounter % 2 == 0) {
+//    		 list = recog.generateLocations();
+//    		 
+//    		 if (list != null && !list.isEmpty()) {
+//    			 avgList.add(list.get(0).getLocation()[1]);
+//    		 }
+//    		 
+//    		 if (efficiencyCounter >= 100) {
+//    			 
+//    			 System.out.println(avgList.toString());
+//    			 
+//    			 OptionalDouble t = avgList.stream()
+//    			            .mapToDouble(a -> a)
+//    			            .average();
+//    			 guess = (float) t.getAsDouble();
+//    			 
+//    			 avgList.clear();
+//    			 
+//        		 efficiencyCounter = 0;
+//    		 }
+//    	}
     	
     	
     	float height;
@@ -415,11 +415,11 @@ public class Motion implements Autopilot {
         } else {
         	height = last;
         }
-        System.out.println(height);
+//        System.out.println(height);
         
 
 
-    	adjustHeight(inputs, height);
+    	adjustHeight(inputs, -20);
 //        adjustHeading(inputs, FloatMath.toRadians(15));
         adjustRoll(inputs, 0f);
     	if (Math.abs(height - inputs.getY()) < 4) {
@@ -427,7 +427,7 @@ public class Motion implements Autopilot {
     	}
 
        
-//        System.out.printf("height = %s\t pitch = %s\t hStab = %s\t y-vel = %s\t thrust = %s\t \n", inputs.getY(), FloatMath.toDegrees(inputs.getPitch()), FloatMath.toDegrees(getHorStabInclination()), approxVel.y(), newThrust);
+        System.out.printf("distance = %s\t height = %s\t pitch = %s\t hStab = %s\t y-vel = %s\t thrust = %s\t \n", inputs.getZ(), inputs.getY(), FloatMath.toDegrees(inputs.getPitch()), FloatMath.toDegrees(getHorStabInclination()), approxVel.y(), newThrust);
 //        System.out.printf("heading = %s\t vStab = %s\t roll = %s\t leftWing = %s\t rightWing = %s\t \n", FloatMath.toDegrees(inputs.getHeading()), FloatMath.toDegrees(verStabInclination), FloatMath.toDegrees(inputs.getRoll()), FloatMath.toDegrees(leftWingInclination), FloatMath.toDegrees(rightWingInclination));
 //        System.out.printf("height = %s\t pitch = %s\t wAOA = %s\t \n", inputs.getY(), FloatMath.toDegrees(inputs.getPitch()), (leftWingAOA(inputs)));
 
