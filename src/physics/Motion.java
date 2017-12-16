@@ -8,16 +8,12 @@ import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
 
-import java.awt.Image;
 import java.util.ArrayList;
-import java.util.OptionalDouble;
-
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
 import recognition.Cube;
 import recognition.ImageProcessing;
-import recognition.ImageRecognition;
 import utils.FloatMath;
 
 public class Motion implements Autopilot {

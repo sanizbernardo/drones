@@ -1,6 +1,5 @@
 package interfaces;
 
-import physics.LogPilot;
 import physics.Motion;
 
 public class AutopilotFactory {

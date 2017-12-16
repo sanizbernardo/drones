@@ -1,14 +1,8 @@
 package recognition;
 
 import java.awt.*;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
@@ -18,7 +12,6 @@ import org.joml.Vector3f;
 import utils.FloatMath;
 
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 

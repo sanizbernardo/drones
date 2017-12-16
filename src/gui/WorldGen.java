@@ -39,6 +39,7 @@ import javax.swing.event.ListSelectionListener;
 import org.joml.Vector3f;
 
 import entities.meshes.cube.BufferedCube;
+import utils.Cubes;
 import utils.Utils;
 import world.World;
 import world.WorldBuilder;
@@ -102,16 +103,12 @@ public enum WorldGen {
 			
 			Map<Vector3f, BufferedCube> worldObjects = new HashMap<>();
 			Random rand = new Random();
-			
-			BufferedCube redCube = new BufferedCube(0,1f), greenCube = new BufferedCube(120,1f),
-					blueCube = new BufferedCube(240,1f);
-			BufferedCube[] cubes = new BufferedCube[]{redCube, greenCube, blueCube};
 	        
 			for (int i = 0; i < nbCubes; i++) {
 				int x = rand.nextInt(Math.abs(xMin - xMax))+xMin,
 	            		y = rand.nextInt(Math.abs(yMin - yMax))+yMin,
 	            		z = rand.nextInt(Math.abs(zMin - zMax))+zMin;
-				worldObjects.put(new Vector3f(x,y,z), cubes[rand.nextInt(cubes.length)]);
+				worldObjects.put(new Vector3f(x,y,z), Cubes.getBufferedCubes()[rand.nextInt(Cubes.getBufferedCubes().length)]);
 			}
 			
 			
@@ -236,8 +233,6 @@ premade {
 		return worlds.get(worldList.getSelectedValue());
 	}
 	
-	
-	
 },
 
 loadFile {
@@ -356,7 +351,7 @@ loadFile {
 		Random rand = new Random();
 		
 		for (int i = 0; i < cubePositions.size(); i++) {
-			BufferedCube cube = new BufferedCube(rand.nextInt(360), rand.nextFloat()/0.8f);
+			BufferedCube cube = Cubes.getBufferedCubes()[rand.nextInt(Cubes.getBufferedCubes().length)];
 			cubes.put(cubePositions.get(i), cube);
 		}
 		
@@ -401,7 +396,7 @@ loadFile {
 		Map<Vector3f,BufferedCube> cubes = new HashMap<>(); 
 		
 		for (int i = 0; i < 5; i ++) {
-			BufferedCube cube = new BufferedCube(rand.nextInt(360), rand.nextFloat());
+			BufferedCube cube = Cubes.getBufferedCubes()[rand.nextInt(Cubes.getBufferedCubes().length)];
 			
 			float r = rand.nextFloat()*10, t = rand.nextFloat()*(float)Math.PI;
 			Vector3f pos = new Vector3f((float)(r*Math.cos(t)), (float)(r*Math.sin(t)), (float)-40*i);

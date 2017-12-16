@@ -2,7 +2,6 @@ package world;
 
 import engine.IWorldRules;
 import entities.WorldObject;
-import interfaces.AutopilotConfig;
 import physics.Motion;
 import utils.Cubes;
 import utils.Utils;

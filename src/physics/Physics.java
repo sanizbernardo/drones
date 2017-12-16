@@ -26,6 +26,8 @@ public class Physics {
 	private Vector3f[] axisVectors, wingPositions, velProj;
 	private float[] liftSlopes;
 
+	private final boolean checkAOA = false;
+
 	
 	public Physics() {
 		updateDrone(Utils.buildOutputs(0, 0, 0, 0, 0));
@@ -229,6 +231,7 @@ public class Physics {
 	 * 
 	 * @return {force, torque}
 	 */
+	@SuppressWarnings("unused")
 	private Vector3f[] calculateForce() {
 		Vector3f[] attacks = new Vector3f[] {new Vector3f(0, FloatMath.sin(this.lwIncl), -FloatMath.cos(this.lwIncl)),
 											 new Vector3f(0, FloatMath.sin(this.rwIncl), -FloatMath.cos(this.rwIncl)),
@@ -248,8 +251,8 @@ public class Physics {
 			veli.mul(this.velProj[i]); // projecteren op vlak loodrecht op axis
 			float aoa = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
 			
-//			if (Math.abs(aoa) > maxAOA)
-//				System.out.println("wing nb " + i + " exceeded maximum aoa");
+			if (checkAOA && Math.abs(aoa) > maxAOA)
+				System.out.println("wing nb " + i + " exceeded maximum aoa");
 			
 			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
 			

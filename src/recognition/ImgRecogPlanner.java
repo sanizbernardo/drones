@@ -6,8 +6,6 @@ import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;

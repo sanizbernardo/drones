@@ -23,7 +23,7 @@ public class RotationWorld extends World implements IWorldRules{
     	physics.init(config, 12);
     	
     	planner = new Motion();
-        worldObjects = new WorldObject[] {new WorldObject(Cubes.blueCube.getMesh())};
+        worldObjects = new WorldObject[] {new WorldObject(Cubes.getBlueCube().getMesh())};
 
         worldObjects[0].setPosition(new Vector3f(0,0,-20));
 	}
