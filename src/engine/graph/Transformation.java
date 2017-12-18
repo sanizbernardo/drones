@@ -2,7 +2,8 @@ package engine.graph;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import world.GameItem;
+import entities.WorldObject;
+import utils.FloatMath;
 
 public class Transformation {
 
@@ -10,7 +11,7 @@ public class Transformation {
 
     private final Matrix4f modelViewMatrix;
 
-    private final Matrix4f viewMatrix;
+    private final Matrix4f viewMatrix, viewMatrixY;
     /**
      * Define all the transformations to be applied to GameObjects
      */
@@ -18,6 +19,7 @@ public class Transformation {
         projectionMatrix = new Matrix4f();
         modelViewMatrix = new Matrix4f();
         viewMatrix = new Matrix4f();
+        viewMatrixY = new Matrix4f();
     }
 
     /**
@@ -48,14 +50,37 @@ public class Transformation {
 
         viewMatrix.identity();
         // First do the rotation so camera rotates over to its position ORDER MUST BE Z Y X
-        viewMatrix.rotate((float)Math.toRadians(rotation.z), new Vector3f(0, 0, 1))
-                .rotate((float)Math.toRadians(rotation.y), new Vector3f(0, 1, 0))
-                .rotate((float)Math.toRadians(rotation.x), new Vector3f(1, 0, 0));
+//        viewMatrix.rotate((float)Math.toRadians(rotation.z), new Vector3f(0, 0, 1))
+//                .rotate((float)Math.toRadians(rotation.y), new Vector3f(0, 1, 0))
+//                .rotate((float)Math.toRadians(rotation.x), new Vector3f(1, 0, 0));
+        
+		if (Math.abs(rotation.y) > 1E-6)
+			viewMatrix.rotate(FloatMath.toRadians(rotation.y), new Vector3f(0, 1, 0));
+		if (Math.abs(rotation.x) > 1E-6)
+			viewMatrix.rotate(FloatMath.toRadians(rotation.x), new Vector3f(1, 0, 0));
+		if (Math.abs(rotation.z) > 1E-6)
+			viewMatrix.rotate(FloatMath.toRadians(rotation.z), new Vector3f(0, 0, 1));
+        
 //        viewMatrix.rotateXYZ((float)Math.toRadians(rotation.x),(float)Math.toRadians(rotation.y),(float)Math.toRadians(rotation.z));
         // Then do the translation
         viewMatrix.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
         return viewMatrix;
     }
+    
+    public Matrix4f getViewMatrixY(Camera camera) {
+        Vector3f cameraPos = camera.getPosition();
+        Vector3f rotation = camera.getRotation();
+
+        
+        viewMatrixY.identity();
+		if (Math.abs(rotation.y) > 1E-6)
+			viewMatrix.rotate(FloatMath.toRadians(rotation.y), new Vector3f(0, 1, 0));
+//        viewMatrix.rotateXYZ((float)Math.toRadians(rotation.x),(float)Math.toRadians(rotation.y),(float)Math.toRadians(rotation.z));
+        // Then do the translation
+        viewMatrixY.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z - 1);
+        return viewMatrixY;
+    }
+
 
     /**
      * As we're changing the position of the objects depening on our camera location we need a common
@@ -69,13 +94,19 @@ public class Transformation {
      * @return
      *        The modelViewMatrix
      */
-    public Matrix4f getModelViewMatrix(GameItem gameItem, Matrix4f viewMatrix) {
+    public Matrix4f getModelViewMatrix(WorldObject gameItem, Matrix4f viewMatrix) {
         Vector3f rotation = gameItem.getRotation();
-        modelViewMatrix.identity().translate(gameItem.getPosition()).
-                rotateX((float)Math.toRadians(-rotation.x)).
-                rotateY((float)Math.toRadians(-rotation.y)).
-                rotateZ((float)Math.toRadians(-rotation.z)).
-                scale(gameItem.getScale());
+        modelViewMatrix.identity().translate(gameItem.getPosition());
+        
+		if (Math.abs(rotation.y) > 1E-6)
+			modelViewMatrix.rotate(FloatMath.toRadians(-rotation.y), new Vector3f(0, 1, 0));
+		if (Math.abs(rotation.x) > 1E-6)
+			modelViewMatrix.rotate(FloatMath.toRadians(-rotation.x), new Vector3f(1, 0, 0));
+		if (Math.abs(rotation.z) > 1E-6)
+			modelViewMatrix.rotate(FloatMath.toRadians(-rotation.z), new Vector3f(0, 0, 1));      
+                
+                
+        modelViewMatrix.scale(gameItem.getScale());
         Matrix4f viewCurr = new Matrix4f(viewMatrix);
         return viewCurr.mul(modelViewMatrix);
     }

@@ -1,13 +1,13 @@
 package engine;
 
-import IO.MouseInput;
+import utils.IO.MouseInput;
 
 /**
  * Set of functions every world object needs
  */
 public interface IWorldRules {
 
-    void init(Window window) throws Exception;
+    void init(Window window, Engine engine) throws Exception;
 
     void input(Window window, MouseInput mouseInput);
 
@@ -16,4 +16,6 @@ public interface IWorldRules {
     void render(Window window);
 
     void cleanup();
+
+	void endSimulation();
 }

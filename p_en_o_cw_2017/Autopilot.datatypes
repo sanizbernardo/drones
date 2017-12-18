@@ -88,9 +88,20 @@ public datatype AutopilotConfig {
     int nbRows;
 }
 
-public datatype AutopilotInputs {
+public datatype AutopilotInputs_v2 {
     /** The camera image, top row first. Within a row, leftmost pixel first.
-    Three bytes (R, G, B) per pixel. */
+    Three bytes (R, G, B) per pixel.
+    Note: Java's 'byte' type is signed and its values are the integers between -128 and 127.
+    Color values v between 128 and 255 are encoded as v - 256.
+    So, to set the R value (given as an integer between 0 and 255) of the pixel at row r and column c:
+    
+        image[(r * nbColumns + c) * 3] = (byte)R;
+    
+    To get the B value (as an integer between 0 and 255) of the pixel at row r and column c:
+
+        int B = image[(r * nbColumns + c) * 3 + 2] & 0xff;
+    
+    */
     byte[] image;
     /** X coordinate of the drone's center of gravity in world coordinates. */
     float x;
@@ -98,11 +109,11 @@ public datatype AutopilotInputs {
     float y;
     /** Z coordinate of the drone's center of gravity in world coordinates. */
     float z;
-    /** atan2(H . (-1, 0, 0), H . (0, 0, -1)), where H is the drone's heading vector (which we define as the drone's forward vector ((0, 0, -1) in drone coordinates) projected onto the world XZ plane. */
+    /** atan2(H . (-1, 0, 0), H . (0, 0, -1)), where H is the drone's heading vector (which we define as H0/||H0|| where H0 is the drone's forward vector ((0, 0, -1) in drone coordinates) projected onto the world XZ plane. */
     float heading;
     /** atan2(F . (0, 1, 0), F . H), where F is the drone's forward vector and H is the drone's heading vector. */
     float pitch;
-    /** atan2(R . (0, 1, 0), R . R0), where R is the drone's right direction ((1, 0, 0) in drone coordinates) and R0 = H x (0, 1, 0). */
+    /** atan2(R . U0, R . R0), where R is the drone's right direction ((1, 0, 0) in drone coordinates), R0 = H x (0, 1, 0), and U0 = R0 x F. */
     float roll;
     /** The amount of simulated time elapsed since the start of the simulation. Need not bear any relationship to real time (other than increasing). */
     float elapsedTime;
