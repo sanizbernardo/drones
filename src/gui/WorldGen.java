@@ -185,7 +185,7 @@ premade {
 		
 		JPanel inputPanel = buildBase(panel, "Load one of the premade worlds", 2, 2);
 		
-		classNames = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight", "OrthoTestWorld", "LogWorld", "RotationWorld"};
+		classNames = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight", "OrthoTestWorld", "LogWorld", "RotationWorld", "YZWorld", "TestWorld2"};
 		worlds = new HashMap<>();
 		for (String className: classNames) {
 			try {

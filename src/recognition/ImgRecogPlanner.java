@@ -42,9 +42,9 @@ public class ImgRecogPlanner implements Autopilot {
 		// doe berekeningen voor image recog hier
 		byte[] image = inputs.getImage();
 		ImageProcessing imageProcess = null;
-		if (x > 0){
+		if (z < -4){
 			float[] pos = {0,0,0};
-			imageProcess = new ImageProcessing(image, (float) -Math.PI/4,(float) -Math.PI/4, 0f, pos);
+			imageProcess = new ImageProcessing(image, 0,0, 0f, pos);
 		}
 		//System.out.println(z);
 		//System.out.println(imageProcess == null);
