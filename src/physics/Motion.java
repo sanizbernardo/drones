@@ -30,7 +30,7 @@ public class Motion implements Autopilot {
         //YawPID still needs a lot of thought
         yawPID = new MiniPID(0.2, 0, 0);
         yawPID.setOutputLimits(Math.toRadians(30));
-        rollPID = new MiniPID(0.0005, 0.000005, 0);
+        rollPID = new MiniPID(1, 0.000005, 0);
         rollPID.setOutputLimits(Math.toRadians(30));
 
         climbAngle = FloatMath.toRadians(25);
