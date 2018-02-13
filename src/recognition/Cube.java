@@ -104,6 +104,7 @@ public class Cube {
 
     private ArrayList<int[]> convexhull = null;
     
+    //calculates convex hull, using jarvis march algorithm
     public ArrayList<int[]> getConvexHull(){
 		if (convexhull != null){
 			return convexhull;

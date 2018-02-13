@@ -32,31 +32,9 @@ public class ImageProcessing {
     private final float[] dronePosition;
 
     //constructor in case of a byte[]
-    public ImageProcessing(byte[] imageByte, float pitch, float heading, float roll, float[] dronePosition){
-//    	InputStream in = new ByteArrayInputStream(imageByte);
-//    	System.out.println(in == null);
-//    	BufferedImage bImageFromConvert = null;
-//		try {
-//			bImageFromConvert = ImageIO.read(in);
-//		} catch (IOException e) {
-//			// TOD Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		System.out.println(bImageFromConvert == null);
-//    	this.image = bImageFromConvert;
+    public ImageProcessing(byte[] imageByte, float pitch, float heading, float roll, float[] dronePosition){  
     	
-//    	this.imageWidth = 200;
-//    	this.imageHeight = 200;
-//    	final int bytes_per_pixel = 3;
-//    	byte[] raw = new byte[this.imageWidth * this.imageHeight * bytes_per_pixel];
-//    	BufferedImage image = new BufferedImage(this.imageWidth, this.imageHeight, BufferedImage.TYPE_3BYTE_BGR);
-//    	IntBuffer intBuf
-//    	        = ByteBuffer.wrap(raw)
-//    	        .order(ByteOrder.LITTLE_ENDIAN)
-//    	        .asIntBuffer();
-//    	int[] array = new int[intBuf.remaining()];
-//    	intBuf.get(array);
-//    	image.setRGB(0, 0, this.imageWidth, this.imageHeight, array, 0, this.imageWidth);
+    	//initializing
     	
     	this.imageHeight = 200;
     	this.imageWidth = 200;
@@ -68,6 +46,8 @@ public class ImageProcessing {
 		this.roll = roll;
 		this.dronePosition = dronePosition;
 		
+		//transformation matrix for axial system from drone (z in view direction) to world
+		
 		this.transMat = new Matrix3f().identity();
 		if (Math.abs(-this.heading) > 1E-6)
 			transMat.rotate(-this.heading, new Vector3f(0, 1, 0));
@@ -76,7 +56,6 @@ public class ImageProcessing {
 		if (Math.abs(-this.roll) > 1E-6)
 			transMat.rotate(-this.roll, new Vector3f(0, 0, 1));
 		this.transMat.invert();
-		Vector3f pos = FloatMath.transform(transMat, new Vector3f(1,2,3));
 			 	
     }
 
@@ -134,7 +113,7 @@ public class ImageProcessing {
         return hsv;
     }
 
-    //method for checking black pixel
+    //method for checking background (currently black)
     private boolean checkBg(float[] hsv){
         if(hsv[0] == 0 && hsv[1] == 0 && hsv[2] == 1){
             return true;
@@ -143,7 +122,7 @@ public class ImageProcessing {
         }
     }
 
-    //Creates the different cube objects
+    //Creates the different cube objects and stores pixels belonging to said object
     public ArrayList<Cube> getObjects() {
         ArrayList<Cube> objects = new ArrayList<>();
         ArrayList<float[]> colors = new ArrayList<>();
@@ -153,9 +132,9 @@ public class ImageProcessing {
                 int[] pixel = {i, j};
                 float h = hsv[0];
                 float s = hsv[1];
-                if (! checkBg(hsv)) {                                           //Checks whether the pixel is black or not
-                    if (! contains2(colors, h, s)){                                  //Checks whether we already encountered a certain colortype
-                        Cube newObject = new Cube(h, s);
+                if (! checkBg(hsv)) {                                           //Checks whether the pixel is background
+                    if (! contains2(colors, h, s)){                             //Checks whether we already encountered a certain colortype
+                        Cube newObject = new Cube(h, s);						//creates new cube obect
                         objects.add(newObject);
                         newObject.addPixel(pixel);
                         float[] newColor = {h, s};
@@ -174,6 +153,7 @@ public class ImageProcessing {
         return objects;
     }
 
+    // checks if a color (given h and s) is in a list of colors
     private boolean contains2(ArrayList<float[]> colors, float h, float s) {
     	for(float[] color : colors){
     		//TODO die 0.01?? der is ergens een afrondingsfout, hoe kunt ge die dan vinde
@@ -184,14 +164,15 @@ public class ImageProcessing {
     	return false;
 	}
 
-    
+    //method that generates the locations (an approximate) of each cube
     public ArrayList<Cube> generateLocations(){
     	getObjects();
     	ArrayList<Cube> retList = new ArrayList<Cube>();
     	ArrayList<Cube> ignoreList = new ArrayList<Cube>();
-//    	System.out.println(this.cubes.size());
     	if(this.cubes == null) return retList;
     	
+    	//if a cube is behind another one and touches that cube on the image or the cube touches the border
+    	//that cube is added to a list of cubes we ignore.
     	for( Cube newCube : this.cubes){
     		if(isOnBorder(newCube)) ignoreList.add(newCube);
     		else{
@@ -199,6 +180,7 @@ public class ImageProcessing {
     			if(touchesColors.size() > 0){
     				for(float[] color : touchesColors){
     					Cube otherCube = findCube(color);
+    					//each cube has equal size -> the one with the biggest size is the closest one
     					if (otherCube.getNbPixels() < newCube.getNbPixels()){
     						ignoreList.add(otherCube);
     					}
@@ -207,10 +189,13 @@ public class ImageProcessing {
     			}
     		}
     	}
+    	
+    	//all other cubes are added to a return list
     	for(Cube newCube : this.cubes){
     		if(!ignoreList.contains(newCube)) retList.add(newCube);
     	}
     	
+    	//We calculate the approximate location for each cube in the return list
     	for(Cube cube : retList){
     		double[] toTransform = approximateLocation(cube);
     		Vector3f pos = FloatMath.transform(transMat, new Vector3f((float)toTransform[0],(float)toTransform[1],(float)toTransform[2]));
@@ -219,6 +204,7 @@ public class ImageProcessing {
     		cube.setLocation(location);
     	}
     	
+    	//sorted by approximate distance
     	Collections.sort(retList, new Comparator<Cube>() {
             @Override
             public int compare(Cube cube1, Cube cube2)
@@ -230,6 +216,7 @@ public class ImageProcessing {
     	return retList;
     }
     
+    //if a cube with a certain color exists in this.colors, return that cube
 	private Cube findCube(float[] color) {
 		for(Cube cube : this.cubes){
 			if(cube.gethValue() == color[0] && cube.getsValue() > color[1] -0.01 
@@ -242,26 +229,15 @@ public class ImageProcessing {
     public double[] approximateLocation(Cube cube){
         int[] averagePixel = cube.getAveragePixel();
 
-        //averagePixel[0] -= 100;
-        //averagePixel[1] = -averagePixel[1]+100;
-        double anglePerPixel = getAnglePerPixel();
-
-        //double estimateHorAngle = estimateAngle(averagePixel[0]);
         double estimateHorAngle1 = calculateAngleX(99, averagePixel[0]);
         double estimateHorAngle2 = 2*Math.atan(Math.cos(calculateAngleY(99, averagePixel[1]))*Math.tan(estimateHorAngle1/2));
-        //double estimateVerAngle = estimateAngle(averagePixel[1]);
         double estimateVerAngle = calculateAngleY(99, averagePixel[1]);
         estimateVerAngle = 2*Math.atan(Math.cos(calculateAngleX(99, averagePixel[0]))*Math.tan(estimateVerAngle/2));
         double estimateDistance = guessDistance(cube);
-//        System.out.println(estimateDistance);
-        //double totalAngle = Math.sqrt(estimateHorAngle*estimateHorAngle+estimateVerAngle*estimateVerAngle);
 
         double estimateX = Math.sin(estimateHorAngle2)*estimateDistance;
         double estimateY = Math.sin(estimateVerAngle)*estimateDistance;
-        //double estimateZ = -(dronePosition[2] + Math.cos(totalAngle)*estimateDistance);
         double estimateZ = (-1) * estimateDistance*Math.cos(estimateVerAngle)*Math.cos(estimateHorAngle1);
-        //double estimateZ = (-1) * Math.sqrt(estimateDistance*estimateDistance - 
-        //		Math.sqrt(estimateX*estimateX + estimateY*estimateY)*Math.sqrt(estimateX*estimateX + estimateY*estimateY));
         
         if(averagePixel[0] < 100){
         	estimateX *= -1;
@@ -271,31 +247,13 @@ public class ImageProcessing {
         }
         
         double[] approx = {estimateX, estimateY, estimateZ};
-//        System.out.println(approx[0] + "  " + approx[1] + "  " + approx[2] );
-		
-        //prints for testing:
-        //System.out.println("horAngle : " + Math.toDegrees(estimateHorAngle));
-        //System.out.println("verAngle : " + Math.toDegrees(estimateVerAngle));
-        //System.out.println("totAngle : " + Math.toDegrees(totalAngle));
-        //System.out.println("distance : " + estimateDistance);
-//        System.out.println("cubeCoords : " + Arrays.toString(approx));
         return approx;
     }
     
-    private double estimateAngle(double Xco){
-    	double angle = Math.atan((Xco/100)*Math.tan(Math.PI/3));
-    	return angle;
-    }
-
+    //method that guesse a distance from the drone to a cube
     public double guessDistance(Cube cube){
-    	//double start = System.currentTimeMillis();
         ArrayList<int[]> pixels = cube.getConvexHull();
-    	//double end = System.currentTimeMillis();
-    	//System.out.println(end-start);
-        double currentMaxAngle = 0;
-        //System.out.println("hier");
         
-//        oudere methodes:
         double largestDistance = -1;
         int[] pixelOne = null;
         int[] pixelTwo =  null;
@@ -309,8 +267,6 @@ public class ImageProcessing {
                 }
             }
         }
-//        System.out.println(pixelOne[0] + "     " + pixelOne[1]);
-//        System.out.println(pixelTwo[0] + "     " + pixelTwo[1]);
         
         boolean same = sameColor(pixelOne, pixelTwo);
         
@@ -339,21 +295,13 @@ public class ImageProcessing {
         
         int[] averagePixel = cube.getAveragePixel();
         double angleX = calculateAngleX(pixelOne[0], pixelTwo[0]);
-//        System.out.println("x1:   " + angleX);
         angleX = 2*Math.atan(Math.cos(calculateAngleY(99, averagePixel[1]))*Math.tan(angleX/2));
-//        System.out.println("x2:   " + angleX + "     " + Math.cos(calculateAngleY(100, averagePixel[1])));
+
         double angleY = calculateAngleY(pixelOne[1], pixelTwo[1]);
         angleY = 2*Math.atan(Math.cos(calculateAngleX(99, averagePixel[0]))*Math.tan(angleY/2));
+        
         double totAngle = Math.sqrt(angleX*angleX + angleY*angleY);
         
-//        System.out.println(Math.toDegrees(angleX));
-//        System.out.println(Math.toDegrees(angleY));
-//        System.out.println(Math.toDegrees(totAngle));
-        double sum = 0;
-        for(double i = 0; i < 199; i++){
-        	sum += calculateAngleX(i, i+1);
-        }
-//        System.out.println("should be 2PI/3: " + sum);
         if(same){
         	double dist = (Math.sqrt(2)/2)/Math.tan(totAngle/2) + 0.5;
         	cube.setDist(dist);
@@ -361,62 +309,10 @@ public class ImageProcessing {
         }
         double dist = (Math.sqrt(3)/2)/Math.tan(totAngle/2);
     	cube.setDist(dist);
-        return dist;
-        
-//        for(int i = 0; i<pixels.size();i++){
-//            for(int j = 0; j< pixels.size();j++){
-//                if(i!=j){
-//                    double horAngle = Math.toRadians(getFieldOfView())*(Math.abs(pixels.get(i)[0] - pixels.get(j)[0]))/getImageWidth();
-//                    double verAngle = Math.toRadians(getFieldOfView())*(Math.abs(pixels.get(i)[1] - pixels.get(j)[1]))/getImageHeight();
-//                    double angle = Math.sqrt(Math.pow(horAngle, 2)+Math.pow(verAngle, 2));
-//                    if (angle>currentMaxAngle) currentMaxAngle = angle;
-//                }
-//            }
-//        }
-//        double dist = Math.abs((Math.sqrt(3)/2)/Math.tan(currentMaxAngle/2));
-//        return dist;
-        
-//        ArrayList<int[]> diffColors = new ArrayList<int[]>();
-//        ArrayList<Integer> diffColorsAmounts = new ArrayList<Integer>();
-//        for(int[] pixel : pixels){
-//        	if (!contains(pixel, diffColors)){
-//        		diffColors.add(pixel);
-//        		diffColorsAmounts.add(1);
-//        	}
-//        	else{
-//        		int index = indexOf(pixel,diffColors);
-//        		int temp = diffColorsAmounts.get(index);
-//        		temp +=1;
-//        		diffColorsAmounts.set(index, temp);
-//        	}
-//        }
-//        Collections.sort(diffColorsAmounts);
-//        Collections.reverse(diffColorsAmounts);
-//        //TOD:: ms ipv te kijken naar de meeste berekenen welke kleur de 'voorste' is.
-//        double biggest = diffColorsAmounts.get(0)/(Math.cos(pitch)*Math.cos(pitch))/(Math.cos(jaw)*Math.cos(jaw));
-//        System.out.println(cube.getNbPixels());
-//        double side = Math.sqrt(biggest);
-//    	double x = cube.getAveragePixel()[0];
-//        //side = side/Math.cos(Math.atan(((x - 99)/100)*Math.tan(Math.PI/3)));
-//        double angle = calculateAngle(side, cube.getAveragePixel());
-//        //double angle = side*getAnglePerPixel();
-//        double dist = 0.5/Math.tan(angle/2);
-//        if(diffColorsAmounts.size() > 1){
-//        	double second = diffColorsAmounts.get(1);
-//        	double secondRatio = second/(biggest+second);
-//        	double secondAngle = secondRatio*Math.PI/2;
-//        	dist = dist/Math.cos(secondAngle);
-//        }
-//        if(diffColorsAmounts.size() > 2){
-//        	double third = diffColorsAmounts.get(2);
-//        	double thirdRatio = third/(biggest+third);
-//        	double thirdAngle = thirdRatio*Math.PI/2;
-//        	dist = dist/Math.cos(thirdAngle);
-//        }
-//        return dist + 0.5;
-        
+        return dist;        
     }
     
+    //checks whether two pixels are the same color 
     private boolean sameColor(int[] pixelOne, int[] pixelTwo){
     	float[] hsv1 = rgbConversion(this.image.getRGB(pixelOne[0], pixelOne[1])); 
 		float[] hsv2 = rgbConversion(this.image.getRGB(pixelTwo[0], pixelTwo[1]));
@@ -425,58 +321,21 @@ public class ImageProcessing {
 		if(v1 == v2) return true;
 		return false;
 	}
-
-	//TODO opkuisen
-    private double calculateAngle(double side, int[] averagePixel) {
-    	//double x = averagePixel[0];
-    	//x -= 99;
-    	double x = 100*Math.tan(pitch)/Math.tan(Math.PI/3);
-    	double anglePerPixel = Math.atan(((x+1)/100)*Math.tan(Math.PI/3)) - Math.atan((x/100)*Math.tan(Math.PI/3));
-    	//double anglePerPixel = Math.atan(((0.0+1)/100)*Math.tan(Math.PI/3)) - Math.atan((0.0/100)*Math.tan(Math.PI/3));
-//    	System.out.println(anglePerPixel);
-		return side*anglePerPixel;
-	}
     
+    //calculates angle between two x coordinates
     private double calculateAngleX(double x1, double x2) {
-    	//double x = averagePixel[0];
-    	//x -= 99;
     	double angle = Math.atan(((x2-100)/100)*Math.tan(Math.PI/3)) - Math.atan(((x1-100)/100)*Math.tan(Math.PI/3));
-    	//double anglePerPixel = Math.atan(((0.0+1)/100)*Math.tan(Math.PI/3)) - Math.atan((0.0/100)*Math.tan(Math.PI/3));
 		return Math.abs(angle);
 	}
-    
+
+    //calculates angle between two y coordinates
     private double calculateAngleY(double y1, double y2) {
-    	//double x = averagePixel[0];
-    	//x -= 99;
     	double angle = Math.atan(((y2-100)/100)*Math.tan(Math.PI/3)) - Math.atan(((y1-100)/100)*Math.tan(Math.PI/3));
-    	//double anglePerPixel = Math.atan(((0.0+1)/100)*Math.tan(Math.PI/3)) - Math.atan((0.0/100)*Math.tan(Math.PI/3));
 		return Math.abs(angle);
 	}
-
-	private int indexOf(int[] pixel, ArrayList<int[]> diffColors) {
-		int index = 0;
-		while(index < diffColors.size()){
-			if(getRGB(pixel[0], pixel[1]) == getRGB(diffColors.get(index)[0],diffColors.get(index)[1])) return index;
-			index +=1;
-		}
-		return -1;
-	}
-
-	private boolean contains(int[] pixel, ArrayList<int[]> diffColors) {
-		for(int[] otherPixel : diffColors){
-			if(getRGB(pixel[0], pixel[1]) == getRGB(otherPixel[0],otherPixel[1]))return true;
-		}
-		return false;
-	}
-
-
 	
 
-	//some getters
-    private double getAnglePerPixel(){
-            return Math.toRadians(this.fieldOfView/200);
-    }
-
+    //checks if cube is on the border of the image
     public boolean isOnBorder(Cube cube){
     	ArrayList<int[]> hull = cube.getConvexHull();
     	for(int[] pixel : hull){
@@ -485,6 +344,7 @@ public class ImageProcessing {
     	return false;
     }
     
+    //returns a list of colors that touch a given cube
     public ArrayList<float[]> touchesCubes(Cube cube){
     	ArrayList<int[]> hull = cube.getConvexHull();
     	ArrayList<float[]> retList = new ArrayList<float[]>();
@@ -553,6 +413,8 @@ public class ImageProcessing {
     	return retList;
     }
     
+
+	//some getters
     
     public double getFieldOfView(){
         return fieldOfView;

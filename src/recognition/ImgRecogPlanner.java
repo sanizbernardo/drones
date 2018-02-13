@@ -39,18 +39,16 @@ public class ImgRecogPlanner implements Autopilot {
 	
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {		
-		// doe berekeningen voor image recog hier
+		//hier worden waarden van schattingen vergeleken met werkelijke waarde.
 		byte[] image = inputs.getImage();
 		ImageProcessing imageProcess = null;
 		if (z < -4){
 			float[] pos = {0,0,0};
 			imageProcess = new ImageProcessing(image, 0,0, 0f, pos);
 		}
-		//System.out.println(z);
-		//System.out.println(imageProcess == null);
 		if(imageProcess != null && !imageProcess.getObjects().isEmpty()){
 			Cube cube = imageProcess.getObjects().get(0);
-			//TODO: onderstaande statement zorgt ervoor dat afstandsscgatting verkeerd is -> waarom?
+			//TODO: onderstaande statement zorgt ervoor dat afstandsschatting verkeerd is -> waarom?
 			//imageProcess.generateLocations();
 			//System.out.println(cube.getLocation()[0] + "  " + cube.getLocation()[1] + "  " + cube.getLocation()[2] + "  " + x + "  " + y +"  "+z);
 			//System.out.println(imageProcess.getObjects().size());
@@ -63,20 +61,11 @@ public class ImgRecogPlanner implements Autopilot {
 			double actualDistance = Math.sqrt(x*x+y*y+z*z);
 			if(actualDistance < 80){
 				double guess = imageProcess.guessDistance(cube);
-				//if (guess > 60){
-				//	ArrayList<int[]> hull = imageProcess.getConvexHull(cube);
-				//	//for( int[] pixel : hull){
-//				//		System.out.println("x: " + pixel[0] + "         y: " + pixel[1]);
-					//}
-					//System.exit(0);
-					//imageProcess.saveImage("testing");
-				//}
 				distances.addValue(actualDistance, "actual", "" + i);
 				distances.addValue(guess, "target", "" + i);
 				double difference = Math.abs(actualDistance-guess);
 				distances.addValue(difference, "diff", "" + i);
 			}
-			//distances.add(newDistances);
 			x += dx;
 			y += dy;
 			z += dz;
