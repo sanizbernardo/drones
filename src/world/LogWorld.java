@@ -51,7 +51,57 @@ public class LogWorld extends World {
             @Override
 			public int getNbColumns() {return 200;}
             @Override
-			public int getNbRows() {return 200;}};
+			public int getNbRows() {return 200;}
+			@Override
+			public String getDroneID() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public float getWheelY() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+			@Override
+			public float getFrontWheelZ() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+			@Override
+			public float getRearWheelZ() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+			@Override
+			public float getRearWheelX() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+			@Override
+			public float getTyreSlope() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+			@Override
+			public float getDampSlope() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+			@Override
+			public float getTyreRadius() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+			@Override
+			public float getRMax() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+			@Override
+			public float getFcMax() {
+				// TODO Auto-generated method stub
+				return 0;
+			}};
 		
         physics.init(config);
             

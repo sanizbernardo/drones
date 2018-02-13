@@ -63,7 +63,57 @@ public class AutopilotGUI extends JFrame {
 			            public float getHorizontalAngleOfView() {return (float) Math.toRadians(120f);}
 			            public float getVerticalAngleOfView() {return (float) Math.toRadians(120f);}
 			            public int getNbColumns() {return 200;}
-			            public int getNbRows() {return 200;}});
+			            public int getNbRows() {return 200;}
+						@Override
+						public String getDroneID() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+						@Override
+						public float getWheelY() {
+							// TODO Auto-generated method stub
+							return 0;
+						}
+						@Override
+						public float getFrontWheelZ() {
+							// TODO Auto-generated method stub
+							return 0;
+						}
+						@Override
+						public float getRearWheelZ() {
+							// TODO Auto-generated method stub
+							return 0;
+						}
+						@Override
+						public float getRearWheelX() {
+							// TODO Auto-generated method stub
+							return 0;
+						}
+						@Override
+						public float getTyreSlope() {
+							// TODO Auto-generated method stub
+							return 0;
+						}
+						@Override
+						public float getDampSlope() {
+							// TODO Auto-generated method stub
+							return 0;
+						}
+						@Override
+						public float getTyreRadius() {
+							// TODO Auto-generated method stub
+							return 0;
+						}
+						@Override
+						public float getRMax() {
+							// TODO Auto-generated method stub
+							return 0;
+						}
+						@Override
+						public float getFcMax() {
+							// TODO Auto-generated method stub
+							return 0;
+						}});
 					BufferedImage img = ImageIO.read(new File("ss.png"));
 					System.out.println(img.getHeight() + " " + img.getWidth());
 					frame.lblImage.setIcon(new ImageIcon(GuiUtils.addCrossHair(img, 100, 100, 13133055)));

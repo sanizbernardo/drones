@@ -30,7 +30,7 @@ public class Physics {
 
 	
 	public Physics() {
-		updateDrone(Utils.buildOutputs(0, 0, 0, 0, 0));
+		updateDrone(Utils.buildOutputs(0, 0, 0, 0, 0,-1,-1,-1));
 	}
 	
 	/**

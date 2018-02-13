@@ -29,7 +29,7 @@ public class StopWorld extends World implements IWorldRules {
         worldObjects[0].setPosition(0f,0f,-10f);
 
         float thrust = 30f;
-        physics.updateDrone(Utils.buildOutputs(0 ,0, 0, 0, thrust));
+        physics.updateDrone(Utils.buildOutputs(0 ,0, 0, 0, thrust,-1,-1,-1));
     }
 
 	@Override

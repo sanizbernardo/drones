@@ -366,6 +366,24 @@ public class Motion implements Autopilot {
             public float getVerStabInclination() {
                 return verStabInclination;
             }
+
+			@Override
+			public float getFrontBrakeForce() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public float getLeftBrakeForce() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public float getRightBrakeForce() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
         };
     }
 
@@ -462,6 +480,24 @@ public class Motion implements Autopilot {
             public float getVerStabInclination() {
                 return verStabInclination;
             }
+
+			@Override
+			public float getFrontBrakeForce() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public float getLeftBrakeForce() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public float getRightBrakeForce() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
         };
         gui.updateOutputs(output);
         return output;
