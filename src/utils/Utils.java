@@ -121,42 +121,28 @@ public class Utils {
 	public static AutopilotConfig createDefaultConfig() {
         return new AutopilotConfig() {
             public float getGravity() {return 9.81f;}
-            public float getWingX() {return 0.25f;}
-            public float getTailSize() {return 0.25f;}
-            public float getEngineMass() {return 0.125f;}
-            public float getWingMass() {return 0.125f;}
-            public float getTailMass() {return 0.0625f;}
-            public float getMaxThrust() {return 3f;}
-            public float getMaxAOA() {return FloatMath.toRadians(45);}
-            public float getWingLiftSlope() {return 0.1f;}
-            public float getHorStabLiftSlope() {return 0.05f;}
-            public float getVerStabLiftSlope() {return 0.05f;}
+            public float getWingX() {return 3.7f;}
+            public float getTailSize() {return 5.1f;}
+            public float getEngineMass() {return 262.3f;}
+            public float getWingMass() {return 45.4f;}
+            public float getTailMass() {return 160f;}
+            public float getMaxThrust() {return 1500f;}
+            public float getMaxAOA() {return FloatMath.toRadians(15);}
+            public float getWingLiftSlope() {return 25f;}
+            public float getHorStabLiftSlope() {return 10f;}
+            public float getVerStabLiftSlope() {return 5f;}
             public float getHorizontalAngleOfView() {return FloatMath.toRadians(120f);}
             public float getVerticalAngleOfView() {return FloatMath.toRadians(120f);}
             public int getNbColumns() {return 200;}
             public int getNbRows() {return 200;}
 			public String getDroneID() {return "default Drone";}
-			public float getWheelY() {
-				// TODO Auto-generated method stub
-				return 0;}
-			public float getFrontWheelZ() {
-				// TODO Auto-generated method stub
-				return 0;}
-			public float getRearWheelZ() {
-				// TODO Auto-generated method stub
-				return 0;}
-			public float getRearWheelX() {
-				// TODO Auto-generated method stub
-				return 0;}
-			public float getTyreSlope() {
-				// TODO Auto-generated method stub
-				return 0;}
-			public float getDampSlope() {
-				// TODO Auto-generated method stub
-				return 0;}
-			public float getTyreRadius() {
-				// TODO Auto-generated method stub
-				return 0;}
+			public float getWheelY() {return -1.4f;}
+			public float getFrontWheelZ() {return -2.1f;}
+			public float getRearWheelZ() {return 1f;}
+			public float getRearWheelX() {return 1.4f;}
+			public float getTyreSlope() {return 9000f;}
+			public float getDampSlope() {return 2000f;}
+			public float getTyreRadius() {return 1f;}
 			public float getRMax() {
 				// TODO Auto-generated method stub
 				return 0;}

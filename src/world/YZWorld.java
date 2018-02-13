@@ -22,7 +22,7 @@ public class YZWorld extends World implements IWorldRules {
     public void setup() {
         config = Utils.createDefaultConfig();
 
-        physics.init(config);
+        physics.init(config, 50);
 
         planner = new Motion();
 

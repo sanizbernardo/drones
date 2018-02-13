@@ -40,13 +40,13 @@ public class TestWorldFlyStraight extends World implements IWorldRules {
 //            public int getNbColumns() {return 200;}
 //            public int getNbRows() {return 200;}};
     	  
-    	physics.init(config, 20);
+    	physics.init(config, 36f);
 
     	planner = new Motion();
     	
         worldObjects = new WorldObject[1];
         worldObjects[0] = new WorldObject(Cubes.getCubes()[0].getMesh());
-        worldObjects[0].setPosition(0f,0f,-100f);
+        worldObjects[0].setPosition(0f,0f,-400f);
 
     }
 

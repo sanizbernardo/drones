@@ -265,19 +265,19 @@ public class Motion implements Autopilot {
         adjustThrustDown(inputs, -3f);
     }
 
-    // causes drone to rise by increasing lift through higher speed. Not used currently.
+    // causes drone to rise by increasing lift through higher speed.
     private void risePID(AutopilotInputs inputs) {
         //pitch op 0
         adjustPitchUp(inputs, 0);
         //thrust bijgeven
-        adjustThrustUp(inputs, 2f);
+        adjustThrustUp(inputs, 60f);
     }
 
     private void descendPID(AutopilotInputs inputs) {
         //pitch op 0
         adjustPitchDown(inputs, 0);
         //val vertragen
-        adjustThrustDown(inputs, -1.5f);
+        adjustThrustDown(inputs, 20f);
     }
     
     private void adjustHeight(AutopilotInputs input, float height) {
