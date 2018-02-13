@@ -6,6 +6,7 @@ import org.joml.Vector3f;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotOutputs;
 import utils.FloatMath;
+import utils.PhysicsException;
 import utils.Utils;
 
 public class Physics {
@@ -13,24 +14,27 @@ public class Physics {
 	/**
 	 * pos and vel in world coordinates
 	 */
-	private Vector3f pos, vel, angVel, weightWorld;
+	private Vector3f pos, vel, angVel, weightWorld, enginePos;
 	
 	private float heading, pitch, roll, 
 				  lwIncl, rwIncl, hsIncl, vsIncl,
-				  thrust, weight, 
-				  maxAOA;
+				  thrust, weight,
+				  tyreRadius, tyreSlope, dampSlope,
+				  maxAOA, maxR, maxFC;
 	
 	private Matrix3f transMat, transMatInv,
 					 inertia, inertiaInv;
 	
-	private Vector3f[] axisVectors, wingPositions, velProj;
-	private float[] liftSlopes;
+	private Vector3f[] axisVectors, wingPositions, velProj, wheelPositions;
+	private float[] liftSlopes, dBuffer;
 
-	private final boolean checkAOA = false;
+	private final boolean checkAOA;
 
 	
 	public Physics() {
-		updateDrone(Utils.buildOutputs(0, 0, 0, 0, 0,-1,-1,-1));
+		checkAOA = true;
+		
+		updateDrone(Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0));		
 	}
 	
 	/**
@@ -56,7 +60,12 @@ public class Physics {
 
 		this.transMatInv = this.transMat.invert(new Matrix3f());
 		
-		update(0);
+		try {
+			update(0);
+		} catch (PhysicsException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -75,6 +84,10 @@ public class Physics {
 		init(config, new Vector3f(0,0,0));
 	}
 	
+	/**
+	 * Initialises the drone at (0, 0, 0), with the given starting velocity
+	 * and no starting orientation.
+	 */
 	public void init(AutopilotConfig config, float startVelocity) {
 		init(config, new Vector3f(0,0,0), startVelocity);
 	}
@@ -102,6 +115,10 @@ public class Physics {
 											 new Vector3f(0, 0, config.getTailSize()),
 											 new Vector3f(0, 0, config.getTailSize())};
 		
+		this.wheelPositions = new Vector3f[] {new Vector3f(-config.getRearWheelX(), config.getWheelY(), config.getRearWheelZ()),
+											  new Vector3f(0, config.getWheelY(), config.getFrontWheelZ()),
+											  new Vector3f(config.getRearWheelX(), config.getWheelY(), config.getRearWheelZ())};
+		
 		this.velProj = new Vector3f[] {new Vector3f(0, 1, 1),
 									   new Vector3f(0, 1, 1),
 									   new Vector3f(0, 1, 1),
@@ -113,7 +130,11 @@ public class Physics {
 		
 		this.liftSlopes = new float[] {config.getWingLiftSlope(), config.getWingLiftSlope(), config.getHorStabLiftSlope(), config.getVerStabLiftSlope()};
 		
+		this.dBuffer = new float[] {0,0,0};
+		
 		float engineZ = config.getTailMass() / config.getEngineMass() * config.getTailSize();
+		this.enginePos = new Vector3f(0, 0, -engineZ);
+		
 		float Ixx = FloatMath.square(engineZ) * config.getEngineMass() + 
 					FloatMath.square(config.getTailSize()) * config.getTailMass(),
 			  Izz = 2f * FloatMath.square(config.getWingX()) * config.getWingMass();
@@ -124,7 +145,17 @@ public class Physics {
 									   0,     1/(Ixx + Izz), 0,
 									   0,     0,             1/Izz);
 		
+		this.tyreRadius = config.getTyreRadius();
+		
+		this.tyreSlope = config.getTyreSlope();
+		
+		this.dampSlope = config.getDampSlope();
+		
 		this.maxAOA = config.getMaxAOA();
+		
+		this.maxR = config.getRMax();
+		
+		this.maxFC = config.getFcMax();
 	}
 	
 	
@@ -179,21 +210,25 @@ public class Physics {
 	}
 	
 	
-	
-	
-	public void update(float dt) {
+	/**
+	 * advances the time for this drone
+	 * @throws PhysicsException
+	 * 		if an exception occurs (AOA, crash, tyre)
+	 */
+	public void update(float dt) throws PhysicsException {
 		updateTransMat(dt);
 		updateHPR();
 		
-		Vector3f[] forceTorque = calculateForce();
+		Vector3f[] forceTorque = calculateForce(dt);
 		
 		// forward euler
 		this.pos.add(vel.mul(dt, new Vector3f())); 
 		this.vel.add(FloatMath.transform(transMatInv, forceTorque[0]).mul(dt / this.weight));
 		this.angVel.add(calculateAlfa(forceTorque[1]).mul(dt));
+		
+		checkCrash();
 	}
 
-	
 	/**
 	 * Updates the transformation matrix, it rotates with the drone's angular velocity.
 	 */
@@ -230,19 +265,23 @@ public class Physics {
 	 * Calculates total force and torque, in drone coordinates
 	 * 
 	 * @return {force, torque}
+	 * @throws PhysicsException 
 	 */
-	@SuppressWarnings("unused")
-	private Vector3f[] calculateForce() {
-		Vector3f[] attacks = new Vector3f[] {new Vector3f(0, FloatMath.sin(this.lwIncl), -FloatMath.cos(this.lwIncl)),
-											 new Vector3f(0, FloatMath.sin(this.rwIncl), -FloatMath.cos(this.rwIncl)),
-											 new Vector3f(0, FloatMath.sin(this.hsIncl), -FloatMath.cos(this.hsIncl)),
-											 new Vector3f(-FloatMath.sin(this.vsIncl), 0, -FloatMath.cos(this.vsIncl))}; 
+	private Vector3f[] calculateForce(float dt) throws PhysicsException {
 		
+		// thrust & weight
 		Vector3f thrustV = new Vector3f(0, 0, -this.thrust);
 		Vector3f weightDrone = FloatMath.transform(this.transMat, this.weightWorld);
 		
 		Vector3f totalForce = (new Vector3f()).add(thrustV).add(weightDrone);
 		Vector3f totalTorque = new Vector3f(0, 0, 0);
+		
+		
+		// wings
+		Vector3f[] attacks = new Vector3f[] {new Vector3f(0, FloatMath.sin(this.lwIncl), -FloatMath.cos(this.lwIncl)),
+				 new Vector3f(0, FloatMath.sin(this.rwIncl), -FloatMath.cos(this.rwIncl)),
+				 new Vector3f(0, FloatMath.sin(this.hsIncl), -FloatMath.cos(this.hsIncl)),
+				 new Vector3f(-FloatMath.sin(this.vsIncl), 0, -FloatMath.cos(this.vsIncl))}; 
 		
 		for (int i = 0; i < 4; i++) {
 			Vector3f normal = FloatMath.cross(axisVectors[i], attacks[i]);
@@ -252,13 +291,40 @@ public class Physics {
 			float aoa = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
 			
 			if (checkAOA && Math.abs(aoa) > maxAOA)
-				System.out.println("wing nb " + i + " exceeded maximum aoa");
+				throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa");
 			
 			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
 			
 			totalForce.add(force);
 			totalTorque.add(FloatMath.cross(this.wingPositions[i], force));
 		}
+		
+		
+		// wheels
+		for (int i = 0; i < 3; i++) {
+			Vector3f worldPos = this.pos.add(FloatMath.transform(this.transMatInv, wheelPositions[i]),new Vector3f());
+			
+			float d = this.tyreRadius - worldPos.y;
+			
+			if (d >= this.tyreRadius)
+				throw new PhysicsException("Tyre nb " + i + "went underground");
+			
+			if (d > 0) {
+				float dD = (d - dBuffer[i]) / dt,
+					  forceY = this.tyreSlope * d + this.dampSlope * dD;
+				
+				dBuffer[i] = d;
+				
+				if (forceY > 0) {
+					Vector3f force = FloatMath.transform(transMat, new Vector3f(0, forceY, 0));
+					
+					totalForce.add(force);
+					totalTorque.add(FloatMath.cross(this.wheelPositions[i], force));
+				}				
+			}
+		}
+		
+		
 		
 		return new Vector3f[] {totalForce, totalTorque};
 	}
@@ -271,5 +337,30 @@ public class Physics {
 		Vector3f part1 = FloatMath.cross(this.angVel, FloatMath.transform(this.inertia, this.angVel));
 		Vector3f alfa = FloatMath.transform(this.inertiaInv, torque.add(part1, new Vector3f())); 
 		return alfa;
+	}
+	
+	/**
+	 * Checks if the plane hits the ground.
+	 */
+	private void checkCrash() throws PhysicsException {
+		// left wing
+		Vector3f worldPos = this.pos.add(FloatMath.transform(this.transMatInv, this.wingPositions[0]), new Vector3f());
+		if (worldPos.y <= 0)
+			throw new PhysicsException("Left wing hit the ground");
+		
+		// right wing
+		worldPos = this.pos.add(FloatMath.transform(this.transMatInv, this.wingPositions[1]), new Vector3f());
+		if (worldPos.y <= 0)
+			throw new PhysicsException("Right wing hit the ground");
+		
+		// tail
+		worldPos = this.pos.add(FloatMath.transform(this.transMatInv, this.wingPositions[2]), new Vector3f());
+		if (worldPos.y <= 0)
+			throw new PhysicsException("Tail hit the ground");
+		
+		// engine
+		worldPos = this.pos.add(FloatMath.transform(this.transMatInv, this.enginePos), new Vector3f());
+		if (worldPos.y <= 0)
+			throw new PhysicsException("Engine hit the ground");
 	}
 }
