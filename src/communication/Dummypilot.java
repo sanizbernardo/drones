@@ -29,6 +29,18 @@ public class Dummypilot implements Autopilot {
 			public float getHorStabInclination() {
 				return -1;
 			}
+			@Override
+			public float getFrontBrakeForce() {
+				return -1;
+			}
+			@Override
+			public float getLeftBrakeForce() {
+				return -1;
+			}
+			@Override
+			public float getRightBrakeForce() {
+				return -1;
+			}
 		};
 	}
 
@@ -53,6 +65,18 @@ public class Dummypilot implements Autopilot {
 			}
 			@Override
 			public float getHorStabInclination() {
+				return -1*inputs.getElapsedTime();
+			}
+			@Override
+			public float getFrontBrakeForce() {
+				return -1*inputs.getElapsedTime();
+			}
+			@Override
+			public float getLeftBrakeForce() {
+				return -1*inputs.getElapsedTime();
+			}
+			@Override
+			public float getRightBrakeForce() {
 				return -1*inputs.getElapsedTime();
 			}
 		};

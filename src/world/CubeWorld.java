@@ -43,7 +43,7 @@ public class CubeWorld extends World implements IWorldRules {
 
         float leftWingInc = (float)Math.toRadians(90f);
         float thrust = 0f;
-        physics.updateDrone(Utils.buildOutputs(leftWingInc,0, 0, 0, thrust));
+        physics.updateDrone(Utils.buildOutputs(leftWingInc,0, 0, 0, thrust,-1,-1,-1));
 
         
     }

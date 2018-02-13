@@ -37,7 +37,7 @@ public class OrthoTestWorld extends World implements IWorldRules{
         }
 
         float leftWingInc = FloatMath.toRadians(0f);
-        physics.updateDrone(Utils.buildOutputs(leftWingInc, 0,0,0,0));
+        physics.updateDrone(Utils.buildOutputs(leftWingInc, 0,0,0,0,-1,-1,-1));
 
 	}
 

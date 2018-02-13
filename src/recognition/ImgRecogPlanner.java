@@ -29,7 +29,7 @@ public class ImgRecogPlanner implements Autopilot {
 
 	@Override
 	public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
-		return Utils.buildOutputs(0, 0, 0, 0, 0);
+		return Utils.buildOutputs(0, 0, 0, 0, 0,-1,-1,-1);
 	}
 
 	private DefaultCategoryDataset distances = new DefaultCategoryDataset();
@@ -88,7 +88,7 @@ public class ImgRecogPlanner implements Autopilot {
 			z += dz;
 			i +=1;
 		}
-		return Utils.buildOutputs(0, 0, 0, 0, 0);
+		return Utils.buildOutputs(0, 0, 0, 0, 0,-1,-1,-1);
 	}
 
 	@Override

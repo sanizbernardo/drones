@@ -45,7 +45,8 @@ public class Utils {
     }
     
     
-    public static AutopilotOutputs buildOutputs(float lwIncl, float rwIncl, float verStabIncl, float horStabIncl, float thrust) {
+    public static AutopilotOutputs buildOutputs(float lwIncl, float rwIncl, float verStabIncl, float horStabIncl, 
+    				float thrust, float lBrake, float fBrake, float rBrake) {
     	return new AutopilotOutputs() {
 			public float getVerStabInclination() {
 				return verStabIncl;
@@ -61,6 +62,15 @@ public class Utils {
 			}
 			public float getHorStabInclination() {
 				return horStabIncl;
+			}
+			public float getFrontBrakeForce() {
+				return fBrake;
+			}
+			public float getLeftBrakeForce() {
+				return lBrake;
+			}
+			public float getRightBrakeForce() {
+				return rBrake;
 			}
 		};
     }
@@ -124,7 +134,36 @@ public class Utils {
             public float getHorizontalAngleOfView() {return FloatMath.toRadians(120f);}
             public float getVerticalAngleOfView() {return FloatMath.toRadians(120f);}
             public int getNbColumns() {return 200;}
-            public int getNbRows() {return 200;}};
+            public int getNbRows() {return 200;}
+			public String getDroneID() {return "default Drone";}
+			public float getWheelY() {
+				// TODO Auto-generated method stub
+				return 0;}
+			public float getFrontWheelZ() {
+				// TODO Auto-generated method stub
+				return 0;}
+			public float getRearWheelZ() {
+				// TODO Auto-generated method stub
+				return 0;}
+			public float getRearWheelX() {
+				// TODO Auto-generated method stub
+				return 0;}
+			public float getTyreSlope() {
+				// TODO Auto-generated method stub
+				return 0;}
+			public float getDampSlope() {
+				// TODO Auto-generated method stub
+				return 0;}
+			public float getTyreRadius() {
+				// TODO Auto-generated method stub
+				return 0;}
+			public float getRMax() {
+				// TODO Auto-generated method stub
+				return 0;}
+			public float getFcMax() {
+				// TODO Auto-generated method stub
+				return 0;}
+			};
     }
 
     public static boolean euclDistance(Vector3f start, Vector3f end, float distance) {

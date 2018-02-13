@@ -25,7 +25,7 @@ public class LogPilot implements Autopilot {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return utils.Utils.buildOutputs(0, 0, 0, 0, 0);
+		return utils.Utils.buildOutputs(0, 0, 0, 0, 0,-1,-1,-1);
 	}
 	
 	@Override
@@ -41,7 +41,7 @@ public class LogPilot implements Autopilot {
 			e.printStackTrace();
 		}
 		
-		return utils.Utils.buildOutputs(0, 0, 0, 0, 0);
+		return utils.Utils.buildOutputs(0, 0, 0, 0, 0,-1,-1,-1);
 	}
 	
 	@Override
