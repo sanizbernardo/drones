@@ -23,6 +23,8 @@ public class Constants {
 
     public static final float Z_FAR = 1000.f;
 
+    public static final float DRONE_THICKNESS = 0.1f;  //in meters
+
     /**
      * Game engine
      */

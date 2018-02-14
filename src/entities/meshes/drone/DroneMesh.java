@@ -2,19 +2,18 @@ package entities.meshes.drone;
 
 import entities.meshes.Mesh;
 import interfaces.AutopilotConfig;
+import utils.Constants;
 
 public class DroneMesh {
-
 
     private LeftWing left;
     private RightWing right;
     private Body body;
 
     public DroneMesh(AutopilotConfig config){
-    	float width = 0.1f;
-        left = new LeftWing(config, width);
-        right = new RightWing(config, width);
-        body = new Body(config, width);
+        left  = new LeftWing(config, Constants.DRONE_THICKNESS);
+        right = new RightWing(config, Constants.DRONE_THICKNESS);
+        body  = new Body(config, Constants.DRONE_THICKNESS);
     }
 
     public Mesh getLeft() {
