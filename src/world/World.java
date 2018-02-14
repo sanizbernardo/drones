@@ -112,7 +112,15 @@ public abstract class World implements IWorldRules {
         WorldObject left = new WorldObject(droneMesh.getLeft());
         WorldObject right = new WorldObject(droneMesh.getRight());
         WorldObject body = new WorldObject(droneMesh.getBody());
-        droneItems = new WorldObject[]{left, right, body};
+
+        WorldObject wheelFront = new WorldObject(droneMesh.getWheel());
+        wheelFront.setPosition(new Vector3f(0,0,50));
+
+        WorldObject wheelBackLeft = new WorldObject(droneMesh.getWheel());
+
+        WorldObject wheelBackRight = new WorldObject(droneMesh.getWheel());
+        //TODO: add other wheels
+        droneItems = new WorldObject[]{left, right, body, wheelFront};
     }
 
     /**

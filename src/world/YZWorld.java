@@ -15,7 +15,7 @@ import java.util.Random;
 public class YZWorld extends World implements IWorldRules {
 
     public YZWorld() {
-        super(1, true);
+        super(1, false);
     }
 
     @Override
