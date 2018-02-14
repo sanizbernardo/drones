@@ -11,7 +11,7 @@ public class DroneMesh {
     private Body body;
 
     public DroneMesh(AutopilotConfig config){
-    	float width = 0.01f;
+    	float width = 0.1f;
         left = new LeftWing(config, width);
         right = new RightWing(config, width);
         body = new Body(config, width);
