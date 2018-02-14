@@ -144,12 +144,11 @@ public abstract class World implements IWorldRules {
      */
     @Override
     public void update(float interval, MouseInput mouseInput) {
-
+        //ensure the drone is leaving a trail
         trail.leaveTrail(physics.getPosition(), pathObjects);
 
-        //TODO: the implementation of this function is REALLY bad, N^2 (can be reduced to NlogN +-)
-        //TODO: so if you run cubeWorld this will really mess up the speed of the program.
-        touchedCubes();
+        //remove the cubes the drone has touched
+        removeTouchedCubes();
 
         if (wantPhysics) {
 			try {
@@ -190,16 +189,15 @@ public abstract class World implements IWorldRules {
         
     }
 
-    int cubeoounter = 1;
 
     /**
-     * Setting them to scale 0 to prevent LWJGL errors, againthis can be improved a lot but not going to waste time on this
+     * Setting them to scale 0 to prevent LWJGL errors, again this can be improved a lot but not going to waste time on this
      */
-    private void touchedCubes() {
+    private void removeTouchedCubes() {
         Vector3f pos = physics.getPosition();
         for (int i = 0; i < worldObjects.length; i++) {
             WorldObject cube = worldObjects[i];
-            if(cube != null && !Utils.euclDistance(cube.getPosition(), pos,4)) {
+            if(cube != null && !Utils.euclDistance(cube.getPosition(), pos, Constants.PICKUP_DISTANCE)) {
                 System.out.printf("Hit (%s ,%s, %s), drone was at (%s, %s, %s). #%s\n", cube.getPosition().x,cube.getPosition().y,cube.getPosition().z, pos.x, pos.y, pos.z, cubeoounter);
                 //De lijn hieronder is ranzig en ik excuseer mij op voorhand dat ik dit zelfs heb durven typen, mijn excuses
                 worldObjects[i] = null;
@@ -207,6 +205,7 @@ public abstract class World implements IWorldRules {
             }
         }
     }
+    private int cubeoounter = 1;
 
     /**
      * This line is only triggered if the specified world does indeed want a motion planner

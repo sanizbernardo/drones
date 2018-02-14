@@ -1,10 +1,11 @@
-package world;
+package world.premade_worlds;
 
 
 import engine.IWorldRules;
 import entities.WorldObject;
 import utils.Cubes;
 import utils.Utils;
+import world.World;
 
 import java.util.Random;
 

@@ -93,8 +93,7 @@ public class Wheel extends DroneComponent {
             6, 7, 16, 6, 16, 15,
             7, 8, 17, 16, 17, 7,
             1, 8, 10, 8, 17, 10,
-
-
         };
     }
+
 }

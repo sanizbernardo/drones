@@ -1,4 +1,4 @@
-package world;
+package world.premade_worlds;
 
 
 import engine.IWorldRules;
@@ -6,6 +6,7 @@ import entities.WorldObject;
 import physics.Motion;
 import utils.Cubes;
 import utils.Utils;
+import world.World;
 
 import java.util.Random;
 
@@ -15,7 +16,7 @@ import java.util.Random;
 public class YZWorld extends World implements IWorldRules {
 
     public YZWorld() {
-        super(1, false);
+        super(1, true);
     }
 
     @Override

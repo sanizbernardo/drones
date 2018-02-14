@@ -1,4 +1,4 @@
-package world;
+package world.premade_worlds;
 
 import org.joml.Vector3f;
 
@@ -9,6 +9,7 @@ import physics.Motion;
 import utils.Cubes;
 import utils.FloatMath;
 import utils.Utils;
+import world.World;
 
 /**
  * Place where all the GameItem are to be placed in

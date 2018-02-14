@@ -12,6 +12,12 @@ public class Constants {
     //only for initialization!
     public static final int HEIGHT = 750;
 
+    /**
+     * Drone pickup accuracy
+     */
+
+    public static final float PICKUP_DISTANCE = 4f;
+
 
     /**
      * Renderer constants

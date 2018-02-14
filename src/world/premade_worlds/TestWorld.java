@@ -1,10 +1,11 @@
-package world;
+package world.premade_worlds;
 
 import engine.IWorldRules;
 import entities.WorldObject;
 import physics.Motion;
 import utils.Cubes;
 import utils.Utils;
+import world.World;
 
 /**
  * Place where all the GameItem are to be placed in

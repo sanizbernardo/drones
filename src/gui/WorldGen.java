@@ -189,7 +189,7 @@ premade {
 		worlds = new HashMap<>();
 		for (String className: classNames) {
 			try {
-				World world = (World)Class.forName("world." + className).newInstance();
+				World world = (World)Class.forName("world.premade_worlds." + className).newInstance();
 				worlds.put(className, world);
 			} catch (Exception e) {
 				e.printStackTrace();
