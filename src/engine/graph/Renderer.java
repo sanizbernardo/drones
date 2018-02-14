@@ -151,7 +151,7 @@ public class Renderer {
             freeCamX = chaseCamWidth;            freeCamY = 0;
             freeCamWidth = window.getWidth() - chaseCamWidth ;    freeCamHeigth = window.getHeight();
             glViewport(freeCamX, freeCamY, freeCamWidth ,freeCamHeigth);
-            
+
 
             // Update projection Matrix
             projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, (window.getWidth()) - droneCamWidth, window.getHeight(), Constants.Z_NEAR, Constants.Z_FAR);
@@ -184,7 +184,7 @@ public class Renderer {
 
             renderTrail(pathObjects, viewMatrix);
             renderWorldItems(gameItems, viewMatrix);
-            renderDroneItems(droneItems, viewMatrix, 10);
+            renderDroneItems(droneItems, viewMatrix, 1);
             shaderProgram.unbind();
             
             
@@ -205,7 +205,7 @@ public class Renderer {
 
             renderTrail(pathObjects, viewMatrix);
             renderWorldItems(gameItems, viewMatrix);
-            renderDroneItems(droneItems, viewMatrix, 10);
+            renderDroneItems(droneItems, viewMatrix, 1);
             shaderProgram.unbind();
         }
 
