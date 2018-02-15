@@ -23,14 +23,15 @@ import utils.Utils;
 import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
 import utils.image.ImageCreator;
+import world.helpers.CameraHelper;
+import world.helpers.UpdateHelper;
 
 import java.util.ArrayList;
 
 
 public abstract class World implements IWorldRules {
 
-    private final Vector3f cameraInc;
-    private Camera freeCamera, droneCamera, chaseCamera, topOrthoCamera, rightOrthoCamera;
+    private CameraHelper cameraHelper;
 	
     private Renderer renderer;
     private WorldObject[] droneItems;
@@ -39,6 +40,7 @@ public abstract class World implements IWorldRules {
     private KeyboardInput keyboardInput;
     private TestbedGui testbedGui;
     private boolean wantPhysics;
+    private UpdateHelper updateHelper;
     
     /* These are to be directly called in the world classes*/
     protected Autopilot planner;
@@ -48,36 +50,31 @@ public abstract class World implements IWorldRules {
     protected Engine gameEngine;
     protected ArrayList<WorldObject> pathObjects = new ArrayList<>();
     protected Trail trail;
-    
+
     
     public World(int tSM, boolean wantPhysicsEngine) {
+        this.cameraHelper = new CameraHelper();
+
         this.TIME_SLOWDOWN_MULTIPLIER = tSM;
         
         this.wantPhysics = wantPhysicsEngine;
         this.physics = new Physics();
         
         this.keyboardInput = new KeyboardInput();
-        
-        constructCameras();
-        this.cameraInc = new Vector3f(0, 0, 0);
-        
+
         this.testbedGui = new TestbedGui();
     }
-    
-    
-    private void constructCameras() {
-    	this.freeCamera = new Camera();
-        this.droneCamera = new Camera();
-        this.chaseCamera = new Camera();
-        
-        this.topOrthoCamera = new Camera();
-        topOrthoCamera.setPosition(0,200,0);
-        //topOrthoCamera.setRotation(90, 0, -90);
-        topOrthoCamera.setRotation(90, 0, 0);
-        this.rightOrthoCamera = new Camera();
-        rightOrthoCamera.setPosition(200, 0, 0);
-        rightOrthoCamera.setRotation(0, -90, 0);
-    }
+
+
+    /**
+     * World specific setup.
+     *
+     * Things you have to do here: generate config, init physics,
+     * generate worldObjects, and make your planner.
+     */
+    public abstract void setup();
+    public abstract String getDescription();
+
 
     @Override
     public void init(Window window, Engine engine) throws Exception {
@@ -104,6 +101,18 @@ public abstract class World implements IWorldRules {
 		testbedGui.showGUI();
 
 		this.trail = new Trail();
+
+		this.updateHelper = new UpdateHelper(physics,
+                wantPhysics,
+                trail,
+                pathObjects,
+                TIME_SLOWDOWN_MULTIPLIER,
+                cameraHelper,
+                droneItems,
+                worldObjects,
+                planner,
+                testbedGui,
+                imageCreator);
     }
 
     
@@ -123,20 +132,12 @@ public abstract class World implements IWorldRules {
         droneItems = new WorldObject[]{left, right, body, wheelFront};
     }
 
-    /**
-     * World specific setup. 
-     * 
-     * Things you have to do here: generate config, init physics, 
-     * generate worldObjects, and make your planner.
-     */
-    public abstract void setup();
-    
-    public abstract String getDescription();
+
 
     
     @Override
     public void input(Window window, MouseInput mouseInput) {
-        keyboardInput.worldInput(cameraInc, window, imageCreator, renderer);
+        keyboardInput.worldInput(cameraHelper.getCameraInc(), window, imageCreator, renderer);
     }
 
     /**
@@ -144,94 +145,20 @@ public abstract class World implements IWorldRules {
      */
     @Override
     public void update(float interval, MouseInput mouseInput) {
-        //ensure the drone is leaving a trail
-        trail.leaveTrail(physics.getPosition(), pathObjects);
-
-        //remove the cubes the drone has touched
-        removeTouchedCubes();
-
-        if (wantPhysics) {
-			try {
-				physics.update(interval/TIME_SLOWDOWN_MULTIPLIER);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-        }
-        
-        Vector3f newDronePos = new Vector3f(physics.getPosition());
-
-        // Update camera based on mouse
-        freeCamera.movePosition(cameraInc.x * Constants.CAMERA_POS_STEP, cameraInc.y * Constants.CAMERA_POS_STEP, cameraInc.z * Constants.CAMERA_POS_STEP);
-        if (mouseInput.isRightButtonPressed()) {
-            Vector2f rotVec = mouseInput.getDisplVec();
-            freeCamera.moveRotation(rotVec.x * Constants.MOUSE_SENSITIVITY, rotVec.y * Constants.MOUSE_SENSITIVITY, 0);
-        }
-
-        droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-        droneCamera.setRotation(-(float)Math.toDegrees(physics.getPitch()),-(float)Math.toDegrees(physics.getHeading()),-(float)Math.toDegrees(physics.getRoll()));
-
-        float offset = 10f;
-        chaseCamera.setPosition(newDronePos.x + offset * (float)Math.sin(physics.getHeading()), newDronePos.y, newDronePos.z + offset * (float)Math.cos(physics.getHeading()));
-        chaseCamera.setRotation(0,-(float)Math.toDegrees(physics.getHeading()),0);
-        
-        
-        // Update the position of each drone item
-        for (WorldObject droneItem : droneItems) {
-            droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-
-            droneItem.setRotation(-(float)Math.toDegrees(physics.getPitch()),-(float)Math.toDegrees(physics.getHeading()),-(float)Math.toDegrees(physics.getRoll()));
-        }
-
-        
-        if (planner != null) plannerUpdate(newDronePos, interval/TIME_SLOWDOWN_MULTIPLIER);
-
-        testbedGui.update(physics.getVelocity(), newDronePos, physics.getHeading(), physics.getPitch(), physics.getRoll());
-        
-    }
-
-
-    /**
-     * Setting them to scale 0 to prevent LWJGL errors, again this can be improved a lot but not going to waste time on this
-     */
-    private void removeTouchedCubes() {
-        Vector3f pos = physics.getPosition();
-        for (int i = 0; i < worldObjects.length; i++) {
-            WorldObject cube = worldObjects[i];
-            if(cube != null && !Utils.euclDistance(cube.getPosition(), pos, Constants.PICKUP_DISTANCE)) {
-                System.out.printf("Hit (%s ,%s, %s), drone was at (%s, %s, %s). #%s\n", cube.getPosition().x,cube.getPosition().y,cube.getPosition().z, pos.x, pos.y, pos.z, cubeoounter);
-                //De lijn hieronder is ranzig en ik excuseer mij op voorhand dat ik dit zelfs heb durven typen, mijn excuses
-                worldObjects[i] = null;
-                cubeoounter++;
-            }
-        }
-    }
-    private int cubeoounter = 1;
-
-    /**
-     * This line is only triggered if the specified world does indeed want a motion planner
-     * @param newDronePos
-     *        The new position of the drone as per the physics engine
-     * @param interval
-     *        The passed time in this step
-     */
-    private void plannerUpdate(Vector3f newDronePos, float interval) {
-        AutopilotOutputs out = planner.timePassed(
-                Utils.buildInputs(imageCreator.screenShot(),
-                        newDronePos.x,
-                        newDronePos.y,
-                        newDronePos.z,
-                        physics.getHeading(),
-                        physics.getPitch(),
-                        physics.getRoll(),
-                        interval)
-        );
-
-        physics.updateDrone(out);
+        updateHelper.updateCycle(interval, mouseInput);
     }
 
     @Override
     public void render(Window window) {
-        renderer.render(window, freeCamera, droneCamera, chaseCamera, topOrthoCamera, rightOrthoCamera, worldObjects, droneItems, pathObjects);
+        renderer.render(window,
+                        cameraHelper.freeCamera,
+                        cameraHelper.droneCamera,
+                        cameraHelper.chaseCamera,
+                        cameraHelper.topOrthoCamera,
+                        cameraHelper.rightOrthoCamera,
+                        worldObjects,
+                        droneItems,
+                        pathObjects);
     }
 
     /**

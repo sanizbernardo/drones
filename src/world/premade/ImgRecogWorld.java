@@ -1,4 +1,4 @@
-package world.premade_worlds;
+package world.premade;
 
 import org.joml.Vector3f;
 

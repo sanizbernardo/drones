@@ -1,4 +1,4 @@
-package world.premade_worlds;
+package world.premade;
 
 import engine.IWorldRules;
 import entities.WorldObject;

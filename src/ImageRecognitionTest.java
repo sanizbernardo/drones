@@ -1,7 +1,7 @@
 import engine.Engine;
 import engine.IWorldRules;
 import utils.Constants;
-import world.premade_worlds.ImgRecogWorld;
+import world.premade.ImgRecogWorld;
 
 public class ImageRecognitionTest {
 	public static void main(String[] args) {

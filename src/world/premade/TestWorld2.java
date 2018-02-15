@@ -1,12 +1,10 @@
-package world.premade_worlds;
+package world.premade;
 
 import org.joml.Vector3f;
 
 import engine.IWorldRules;
 import entities.WorldObject;
-import interfaces.AutopilotConfig;
 import physics.Motion;
-import utils.Cubes;
 import utils.FloatMath;
 import utils.Utils;
 import world.World;
