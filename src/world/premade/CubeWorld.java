@@ -29,7 +29,7 @@ public class CubeWorld extends World implements IWorldRules {
         Random rand = new Random();
 
         //World specifics
-        worldObjects = new WorldObject[7000];
+        worldObjects = new WorldObject[2000];
 
         for(int i = 0; i < worldObjects.length; i++) {
             WorldObject cube = new WorldObject(Cubes.getCubes()[rand.nextInt(Cubes.getCubes().length)].getMesh());

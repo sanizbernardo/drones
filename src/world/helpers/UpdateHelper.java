@@ -5,8 +5,11 @@ import entities.trail.Trail;
 import gui.testbed.TestbedGui;
 import interfaces.Autopilot;
 import interfaces.AutopilotOutputs;
+
+import org.joml.Matrix3f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+
 import physics.Physics;
 import utils.Constants;
 import utils.FloatMath;
@@ -164,11 +167,11 @@ public class UpdateHelper {
         }
 
         cameraHelper.droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-        cameraHelper.droneCamera.setRotation(-(float)Math.toDegrees(physics.getPitch()),-(float)Math.toDegrees(physics.getHeading()),-(float)Math.toDegrees(physics.getRoll()));
+        cameraHelper.droneCamera.setRotation(-physics.getPitch(),-physics.getHeading(),-physics.getRoll());
 
         float offset = 10f;
         cameraHelper.chaseCamera.setPosition(newDronePos.x + offset * (float)Math.sin(physics.getHeading()), newDronePos.y, newDronePos.z + offset * (float)Math.cos(physics.getHeading()));
-        cameraHelper.chaseCamera.setRotation(0,-(float)Math.toDegrees(physics.getHeading()),0);
+        cameraHelper.chaseCamera.setRotation(0,-physics.getHeading(),0);
     }
 
 
@@ -180,35 +183,31 @@ public class UpdateHelper {
         for (WorldObject droneItem : droneItems) {
             droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
 
-            droneItem.setRotation(-(float)Math.toDegrees(physics.getPitch()),-(float)Math.toDegrees(physics.getHeading()),-(float)Math.toDegrees(physics.getRoll()));
+            droneItem.setRotation(-physics.getPitch(),-physics.getHeading(),-physics.getRoll());
         }
 
-        //get the current rotation of the wing
-        Vector3f refferedRot = droneItems[Constants.DRONE_LEFT_WING].getRotation();
-        //make a deepcopy so that we're not changing the actual rotation
-        Vector3f leftWing = new Vector3f(refferedRot.x, refferedRot.y, refferedRot.z);
-        //transform our deepcopy to the drone axi
-        FloatMath.transform(physics.getTransMat(), leftWing);
-        //rotate the wing aorund the drone's x-axis
-        leftWing.mul(new Vector3f(FloatMath.toDegrees(-physics.getLWInclination()) ,0, 0));
-        //go back to the world axi
-        FloatMath.transform(physics.getTransMatInv(), leftWing);
+        if(droneItems[Constants.DRONE_LEFT_WING].getRotation().x > 0.1f) {
+        	System.out.println("qsdqsd");
+        }
+        
+        Vector3f leftWing = droneItems[Constants.DRONE_LEFT_WING].getRotation();
+        leftWing = FloatMath.transform(physics.getTransMat(), leftWing);
+        Matrix3f rot = new Matrix3f().identity().rotateX(physics.getLWInclination());
+        leftWing = FloatMath.transform(rot, leftWing);
+        leftWing = FloatMath.transform(physics.getTransMatInv(), leftWing);
 
-        droneItems[Constants.DRONE_LEFT_WING].setRotation(leftWing.x, leftWing.y, leftWing.z);
-
-
-        //get the current rotation of the wing
-        Vector3f refferedRot2 = droneItems[Constants.DRONE_RIGHT_WING].getRotation();
-        //make a deepcopy so that we're not changing the actual rotation
-        Vector3f rightWing = new Vector3f(refferedRot2.x, refferedRot2.y, refferedRot2.z);
-        //transform our deepcopy to the drone axi
-        FloatMath.transform(physics.getTransMat(), rightWing);
-        //rotate the wing aorund the drone's x-axis
-        rightWing.mul(new Vector3f(FloatMath.toDegrees(-physics.getRWInclination()) ,0, 0));
-        //go back to the world axi
-        FloatMath.transform(physics.getTransMatInv(), rightWing);
-
-        droneItems[Constants.DRONE_RIGHT_WING].setRotation(rightWing.x, rightWing.y, rightWing.z);
+//        //get the current rotation of the wing
+//        Vector3f refferedRot2 = droneItems[Constants.DRONE_RIGHT_WING].getRotation();
+//        //make a deepcopy so that we're not changing the actual rotation
+//        Vector3f rightWing = new Vector3f(refferedRot2.x, refferedRot2.y, refferedRot2.z);
+//        //transform our deepcopy to the drone axi
+//        FloatMath.transform(physics.getTransMat(), rightWing);
+//        //rotate the wing aorund the drone's x-axis
+//        rightWing.mul(new Vector3f(FloatMath.toDegrees(-physics.getRWInclination()) ,0, 0));
+//        //go back to the world axi
+//        FloatMath.transform(physics.getTransMatInv(), rightWing);
+//
+//        droneItems[Constants.DRONE_RIGHT_WING].setRotation(rightWing.x, rightWing.y, rightWing.z);
     }
 
     private void updatePlanner(float interval, Vector3f newDronePos) {
