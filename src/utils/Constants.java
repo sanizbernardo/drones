@@ -24,12 +24,15 @@ public class Constants {
      */
     //Field of View in Radians
     public static final float FOV = (float) Math.toRadians(90f);
-
     public static final float Z_NEAR = 0.01f;
-
     public static final float Z_FAR = 1000.f;
-
     public static final float DRONE_THICKNESS = 0.1f;  //in meters
+    public static final float DRONE_WHEEL_THICKNESS = 0.12f;
+    public static final int DRONE_LEFT_WING = 0;
+    public static final int DRONE_RIGHT_WING = 1;
+    public static final int DRONE_BODY = 2;
+    public static final int DRONE_WHEEL_FRONT = 3;
+
 
     /**
      * Game engine

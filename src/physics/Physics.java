@@ -165,7 +165,15 @@ public class Physics {
 	public float getVSInclination() {
 		return this.vsIncl;
 	}
-	
+
+	public Matrix3f getTransMat() {
+		return transMat;
+	}
+
+	public Matrix3f getTransMatInv() {
+		return transMatInv;
+	}
+
 	/**
 	 * Updates the wing inclinations and thrust of the drone
 	 */
