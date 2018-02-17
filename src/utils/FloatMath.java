@@ -55,17 +55,28 @@ public class FloatMath {
 		return a*a;
 	}
 	
+	/**
+	 * Converts the given angle from degrees to radians
+	 */
 	public static float toRadians(float deg) {
 		return (float) Math.toRadians(deg);
 	}
 	
+	/**
+	 * Converts the given angle from radians to degrees
+	 */
 	public static float toDegrees (float rad) {
 		return (float) Math.toDegrees(rad);
 	}
 	
+	/**
+	 * PI in float
+	 */
 	public static final float PI = (float) Math.PI;
 	
-			
+	/**
+	 * Transforms the given vector by the given transformation matrix
+	 */
 	public static Vector3f transform(Matrix3f mat, Vector3f vec) {
 		return mat.transform(vec, new Vector3f());
 	}

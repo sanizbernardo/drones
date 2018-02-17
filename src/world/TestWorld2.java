@@ -4,10 +4,9 @@ import org.joml.Vector3f;
 
 import engine.IWorldRules;
 import entities.WorldObject;
-import interfaces.AutopilotConfig;
 import physics.Motion;
-import utils.Cubes;
 import utils.FloatMath;
+import utils.PhysicsException;
 import utils.Utils;
 
 /**
@@ -30,7 +29,11 @@ public class TestWorld2 extends World implements IWorldRules {
     	worldObjects = new WorldObject[0];
 
         float thrust = 20f;
-        physics.updateDrone(Utils.buildOutputs(0 ,0, 0, 0, thrust,-1,-1,-1));
+        try {
+			physics.updateDrone(Utils.buildOutputs(0 ,0, 0, 0, thrust, 0, 0, 0));
+		} catch (PhysicsException e) {
+			e.printStackTrace();
+		}
     }
 
 	@Override

@@ -4,6 +4,7 @@ import engine.IWorldRules;
 import entities.WorldObject;
 import physics.Motion;
 import utils.Cubes;
+import utils.PhysicsException;
 import utils.Utils;
 
 /**
@@ -37,7 +38,11 @@ public class TestWorld extends World implements IWorldRules {
         worldObjects[4].setPosition(0f, 8f, -250f);
 
         float thrust = 20f;
-        physics.updateDrone(Utils.buildOutputs(0 ,0, 0, 0, thrust,-1,-1,-1));
+        try {
+			physics.updateDrone(Utils.buildOutputs(0 ,0, 0, 0, thrust,0,0,0));
+		} catch (PhysicsException e) {
+			e.printStackTrace();
+		}
     }
 
 	@Override

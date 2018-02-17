@@ -4,6 +4,7 @@ package world;
 import engine.IWorldRules;
 import entities.WorldObject;
 import utils.Cubes;
+import utils.PhysicsException;
 import utils.Utils;
 
 import java.util.Random;
@@ -43,7 +44,11 @@ public class CubeWorld extends World implements IWorldRules {
 
         float leftWingInc = (float)Math.toRadians(90f);
         float thrust = 0f;
-        physics.updateDrone(Utils.buildOutputs(leftWingInc,0, 0, 0, thrust,-1,-1,-1));
+        try {
+			physics.updateDrone(Utils.buildOutputs(leftWingInc,0, 0, 0, thrust, 0, 0, 0));
+		} catch (PhysicsException e) {
+			e.printStackTrace();
+		}
 
         
     }

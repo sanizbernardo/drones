@@ -26,7 +26,7 @@ public class Physics {
 					 inertia, inertiaInv;
 	
 	private Vector3f[] axisVectors, wingPositions, velProj, wheelPositions;
-	private float[] liftSlopes, dBuffer;
+	private float[] liftSlopes, dBuffer, brakeForce;
 
 	private final boolean checkAOA;
 
@@ -34,7 +34,12 @@ public class Physics {
 	public Physics() {
 		checkAOA = true;
 		
-		updateDrone(Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0));		
+		brakeForce = new float[] {0, 0, 0};
+		try {
+			updateDrone(Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0));
+		} catch (PhysicsException e) {
+			e.printStackTrace();
+		}		
 	}
 	
 	/**
@@ -199,14 +204,23 @@ public class Physics {
 	
 	/**
 	 * Updates the wing inclinations and thrust of the drone
+	 * @throws PhysicsException 
 	 */
-	public void updateDrone(AutopilotOutputs data) {
+	public void updateDrone(AutopilotOutputs data) throws PhysicsException {
 		this.lwIncl = data.getLeftWingInclination();
 		this.rwIncl = data.getRightWingInclination();
 		this.hsIncl = data.getHorStabInclination();
 		this.vsIncl = data.getVerStabInclination();
 		
 		this.thrust = data.getThrust();
+		
+		this.brakeForce[0] = data.getLeftBrakeForce();
+		this.brakeForce[1] = data.getFrontBrakeForce();
+		this.brakeForce[2] = data.getRightBrakeForce();
+		for (int i = 0; i < 3; i++) {
+			if (brakeForce[i] < 0 || brakeForce[i] > this.maxR)
+				throw new PhysicsException("Illegal brake force on wheel nb " + i);
+		}
 	}
 	
 	
@@ -302,14 +316,40 @@ public class Physics {
 		
 		// wheels
 		for (int i = 0; i < 3; i++) {
-			Vector3f worldPos = this.pos.add(FloatMath.transform(this.transMatInv, wheelPositions[i]),new Vector3f());
+			boolean frictionDone = false;
+			
+			Vector3f worldPos = this.pos.add(FloatMath.transform(this.transMatInv, this.wheelPositions[i]),new Vector3f());
 			
 			float d = this.tyreRadius - worldPos.y;
 			
 			if (d >= this.tyreRadius)
 				throw new PhysicsException("Tyre nb " + i + "went underground");
 			
-			if (d > 0) {
+			if (d > 0) { // op de grond?
+				
+				// wrijving (achterste wielen)
+				
+				if (i != 1 && !frictionDone) {
+					frictionDone = true;
+					Vector3f frictionForce;
+					
+					if (Math.abs(totalForce.x) <=  (-totalForce.y * this.maxFC)) {
+						frictionForce = new Vector3f(0, -totalForce.x, 0);
+						
+					} else {
+						frictionForce = new Vector3f(0, (totalForce.x > 0 ? -1: 1) * Math.abs(totalForce.y) * this.maxFC, 0);
+						
+					}
+					
+					totalForce.add(frictionForce);
+					frictionForce.mul((float)0.5);
+					
+					totalTorque.add(FloatMath.cross(this.wheelPositions[0], frictionForce));
+					totalTorque.add(FloatMath.cross(this.wheelPositions[2], frictionForce));
+				}
+				
+				// lift
+				
 				float dD = (d - dBuffer[i]) / dt,
 					  forceY = this.tyreSlope * d + this.dampSlope * dD;
 				
@@ -320,11 +360,32 @@ public class Physics {
 					
 					totalForce.add(force);
 					totalTorque.add(FloatMath.cross(this.wheelPositions[i], force));
-				}				
+				}
+				
+				// remmen
+				
+				Vector3f worldVel = this.vel.add(FloatMath.cross(this.angVel, this.wheelPositions[i]), new Vector3f());
+				worldVel.y = 0;
+				
+				Vector3f force;
+				if (FloatMath.norm(worldVel) > 0) {
+					force = worldVel.normalize().mul(this.brakeForce[i]);
+					
+				} else {
+					Vector3f direction = totalForce.normalize(new Vector3f());
+					float norm = FloatMath.norm(totalForce);
+					
+					if (norm <= this.brakeForce[i]) {
+						force = direction.mul(norm);
+					} else {
+						force = direction.mul(this.brakeForce[i]);
+					}
+				}
+				
+				totalForce.add(force);
+				totalTorque.add(FloatMath.cross(this.wheelPositions[i], force));
 			}
 		}
-		
-		
 		
 		return new Vector3f[] {totalForce, totalTorque};
 	}
