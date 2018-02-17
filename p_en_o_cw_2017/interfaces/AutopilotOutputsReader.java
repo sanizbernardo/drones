@@ -1,5 +1,6 @@
 package interfaces;
 
+@SuppressWarnings("unused")
 public class AutopilotOutputsReader {
     private static byte[] readByteArray(java.io.DataInputStream stream) throws java.io.IOException {
         int length = stream.readInt();

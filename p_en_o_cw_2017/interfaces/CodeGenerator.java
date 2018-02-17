@@ -83,6 +83,7 @@ class CompilationUnit {
 	}
 }
 
+@SuppressWarnings("serial")
 class ParserException extends RuntimeException {
 	int lineno;
 	String message;
