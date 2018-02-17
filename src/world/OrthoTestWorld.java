@@ -7,6 +7,7 @@ import entities.WorldObject;
 import physics.Motion;
 import utils.Cubes;
 import utils.FloatMath;
+import utils.PhysicsException;
 import utils.Utils;
 
 public class OrthoTestWorld extends World implements IWorldRules{
@@ -37,7 +38,11 @@ public class OrthoTestWorld extends World implements IWorldRules{
         }
 
         float leftWingInc = FloatMath.toRadians(0f);
-        physics.updateDrone(Utils.buildOutputs(leftWingInc, 0,0,0,0,-1,-1,-1));
+        try {
+			physics.updateDrone(Utils.buildOutputs(leftWingInc, 0,0,0,0,0,0,0));
+		} catch (PhysicsException e) {
+			e.printStackTrace();
+		}
 
 	}
 

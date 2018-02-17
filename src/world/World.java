@@ -17,6 +17,7 @@ import interfaces.AutopilotConfig;
 import interfaces.AutopilotOutputs;
 import physics.Physics;
 import utils.Constants;
+import utils.PhysicsException;
 import utils.Utils;
 import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
@@ -174,7 +175,14 @@ public abstract class World implements IWorldRules {
         }
 
         
-        if (planner != null) plannerUpdate(newDronePos, interval/TIME_SLOWDOWN_MULTIPLIER);
+        if (planner != null)
+			try {
+				plannerUpdate(newDronePos, interval/TIME_SLOWDOWN_MULTIPLIER);
+			} catch (PhysicsException e) {
+				// TODO Better physics error handeling
+				System.out.println("Error uccured during physics calculations:" + e.getMessage());
+				endSimulation();
+			}
 
         testbedGui.update(physics.getVelocity(), newDronePos, physics.getHeading(), physics.getPitch(), physics.getRoll());
         
@@ -204,8 +212,9 @@ public abstract class World implements IWorldRules {
      *        The new position of the drone as per the physics engine
      * @param interval
      *        The passed time in this step
+     * @throws PhysicsException 
      */
-    private void plannerUpdate(Vector3f newDronePos, float interval) {
+    private void plannerUpdate(Vector3f newDronePos, float interval) throws PhysicsException {
         AutopilotOutputs out = planner.timePassed(
                 Utils.buildInputs(imageCreator.screenShot(),
                         newDronePos.x,
