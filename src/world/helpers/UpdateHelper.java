@@ -200,9 +200,9 @@ public class UpdateHelper {
     }
     
     private void translateWheels() {
-        setWheel(Constants.DRONE_WHEEL_FRONT, 0, 0, -2.1f);
-        setWheel(Constants.DRONE_WHEEL_BACK_LEFT, -1, 0, 1.4f);
-        setWheel(Constants.DRONE_WHEEL_BACK_RIGHT, 1, 0, 1.4f);
+        setWheel(Constants.DRONE_WHEEL_FRONT, 0, -1.2f, -2.1f);
+        setWheel(Constants.DRONE_WHEEL_BACK_LEFT, -1, -1.2f, 1.4f);
+        setWheel(Constants.DRONE_WHEEL_BACK_RIGHT, 1, -1.2f, 1.4f);
     }
     
     private void setWheel(int id, float x, float y, float z) {
@@ -236,6 +236,7 @@ public class UpdateHelper {
 			physics.updateDrone(out);
 		} catch (PhysicsException e) {
 			e.printStackTrace();
+			//TODO: remove the drone
 		}
     }
 

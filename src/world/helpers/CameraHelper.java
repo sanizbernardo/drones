@@ -29,6 +29,14 @@ public class CameraHelper {
         rightOrthoCamera.setRotation(0, FloatMath.toRadians(-90), 0);
     }
 
+    public void updateTopCam(Vector3f pos) {
+    	topOrthoCamera.setPosition(pos.x, 200, pos.z);
+    }
+    
+    public void updateRightCam(Vector3f pos) {
+    	topOrthoCamera.setPosition(200, pos.y, pos.z);
+    }
+    
     public Vector3f getCameraInc() {
         return cameraInc;
     }

@@ -122,12 +122,9 @@ public abstract class World implements IWorldRules {
         WorldObject body = new WorldObject(droneMesh.getBody());
 
         WorldObject wheelFront = new WorldObject(droneMesh.getWheel());
-        wheelFront.setPosition(new Vector3f(0,0,15));
-
         WorldObject wheelBackLeft = new WorldObject(droneMesh.getWheel());
-
         WorldObject wheelBackRight = new WorldObject(droneMesh.getWheel());
-        //TODO: add other wheels
+        
         droneItems = new WorldObject[]{left, right, body, wheelFront, wheelBackLeft, wheelBackRight};
     }
 
@@ -150,11 +147,7 @@ public abstract class World implements IWorldRules {
     @Override
     public void render(Window window) {
         renderer.render(window,
-                        cameraHelper.freeCamera,
-                        cameraHelper.droneCamera,
-                        cameraHelper.chaseCamera,
-                        cameraHelper.topOrthoCamera,
-                        cameraHelper.rightOrthoCamera,
+                        cameraHelper,
                         worldObjects,
                         droneItems,
                         pathObjects);

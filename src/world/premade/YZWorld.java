@@ -10,6 +10,8 @@ import world.World;
 
 import java.util.Random;
 
+import org.joml.Vector3f;
+
 /**
  * Place where all the GameItem are to be placed in
  */
@@ -23,7 +25,7 @@ public class YZWorld extends World implements IWorldRules {
     public void setup() {
         config = Utils.createDefaultConfig();
 
-        physics.init(config, 50);
+        physics.init(config,  new Vector3f(0,100f,0), 50);
 
         planner = new Motion();
 
