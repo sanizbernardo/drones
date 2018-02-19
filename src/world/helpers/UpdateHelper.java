@@ -182,25 +182,26 @@ public class UpdateHelper {
 
         for (WorldObject droneItem : droneItems) {
             droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-
             droneItem.setRotation(-physics.getPitch(),-physics.getHeading(),-physics.getRoll());
         }
 
-        if(droneItems[Constants.DRONE_LEFT_WING].getRotation().x > 0.1f) {
-        	System.out.println("qsdqsd");
-        }
-        
-        setWheel(Constants.DRONE_WHEEL_FRONT, 0, 0, -2.1f);
-        setWheel(Constants.DRONE_WHEEL_BACK_LEFT, -1, 0, 1.4f);
-        setWheel(Constants.DRONE_WHEEL_BACK_RIGHT, 1, 0, 1.4f);
+        translateWheels();
 
-        
-/*        Vector3f leftWing = droneItems[Constants.DRONE_LEFT_WING].getRotation();
+        rotateWings();
+    }
+    
+    private void rotateWings() {
+    	/*        Vector3f leftWing = droneItems[Constants.DRONE_LEFT_WING].getRotation();
         leftWing = FloatMath.transform(physics.getTransMat(), leftWing);
         Matrix3f rot = new Matrix3f().identity().rotateX(physics.getLWInclination());
         leftWing = FloatMath.transform(rot, leftWing);
         leftWing = FloatMath.transform(physics.getTransMatInv(), leftWing);*/
-
+    }
+    
+    private void translateWheels() {
+        setWheel(Constants.DRONE_WHEEL_FRONT, 0, 0, -2.1f);
+        setWheel(Constants.DRONE_WHEEL_BACK_LEFT, -1, 0, 1.4f);
+        setWheel(Constants.DRONE_WHEEL_BACK_RIGHT, 1, 0, 1.4f);
     }
     
     private void setWheel(int id, float x, float y, float z) {
