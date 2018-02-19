@@ -129,7 +129,7 @@ public abstract class World implements IWorldRules {
 
         WorldObject wheelBackRight = new WorldObject(droneMesh.getWheel());
         //TODO: add other wheels
-        droneItems = new WorldObject[]{left, right, body, wheelFront};
+        droneItems = new WorldObject[]{left, right, body, wheelFront, wheelBackLeft, wheelBackRight};
     }
 
 

@@ -161,8 +161,8 @@ public class UpdateHelper {
                 cameraHelper.getCameraInc().z * Constants.CAMERA_POS_STEP);
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
-            cameraHelper.freeCamera.moveRotation(rotVec.x * Constants.MOUSE_SENSITIVITY,
-                    rotVec.y * Constants.MOUSE_SENSITIVITY,
+            cameraHelper.freeCamera.moveRotation(FloatMath.toRadians(rotVec.x * Constants.MOUSE_SENSITIVITY),
+                    FloatMath.toRadians(rotVec.y * Constants.MOUSE_SENSITIVITY),
                     0);
         }
 
@@ -190,24 +190,25 @@ public class UpdateHelper {
         	System.out.println("qsdqsd");
         }
         
-        Vector3f leftWing = droneItems[Constants.DRONE_LEFT_WING].getRotation();
+        setWheel(Constants.DRONE_WHEEL_FRONT, 0, 0, -2.1f);
+        setWheel(Constants.DRONE_WHEEL_BACK_LEFT, -1, 0, 1.4f);
+        setWheel(Constants.DRONE_WHEEL_BACK_RIGHT, 1, 0, 1.4f);
+
+        
+/*        Vector3f leftWing = droneItems[Constants.DRONE_LEFT_WING].getRotation();
         leftWing = FloatMath.transform(physics.getTransMat(), leftWing);
         Matrix3f rot = new Matrix3f().identity().rotateX(physics.getLWInclination());
         leftWing = FloatMath.transform(rot, leftWing);
-        leftWing = FloatMath.transform(physics.getTransMatInv(), leftWing);
+        leftWing = FloatMath.transform(physics.getTransMatInv(), leftWing);*/
 
-//        //get the current rotation of the wing
-//        Vector3f refferedRot2 = droneItems[Constants.DRONE_RIGHT_WING].getRotation();
-//        //make a deepcopy so that we're not changing the actual rotation
-//        Vector3f rightWing = new Vector3f(refferedRot2.x, refferedRot2.y, refferedRot2.z);
-//        //transform our deepcopy to the drone axi
-//        FloatMath.transform(physics.getTransMat(), rightWing);
-//        //rotate the wing aorund the drone's x-axis
-//        rightWing.mul(new Vector3f(FloatMath.toDegrees(-physics.getRWInclination()) ,0, 0));
-//        //go back to the world axi
-//        FloatMath.transform(physics.getTransMatInv(), rightWing);
-//
-//        droneItems[Constants.DRONE_RIGHT_WING].setRotation(rightWing.x, rightWing.y, rightWing.z);
+    }
+    
+    private void setWheel(int id, float x, float y, float z) {
+	    Vector3f wheel = droneItems[id].getPosition();
+        Vector3f wheelT = FloatMath.transform(physics.getTransMat(), wheel); //Not accessing the position of the drone anymore
+        wheelT.add(new Vector3f(x,y,z));
+        wheelT = FloatMath.transform(physics.getTransMatInv(), wheelT);
+        droneItems[id].setPosition(wheelT.x,  wheelT.y,  wheelT.z);
     }
 
     private void updatePlanner(float interval, Vector3f newDronePos) {

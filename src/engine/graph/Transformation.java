@@ -49,10 +49,6 @@ public class Transformation {
         Vector3f rotation = camera.getRotation();
 
         viewMatrix.identity();
-        // First do the rotation so camera rotates over to its position ORDER MUST BE Z Y X
-//        viewMatrix.rotate((float)Math.toRadians(rotation.z), new Vector3f(0, 0, 1))
-//                .rotate((float)Math.toRadians(rotation.y), new Vector3f(0, 1, 0))
-//                .rotate((float)Math.toRadians(rotation.x), new Vector3f(1, 0, 0));
         
 		if (Math.abs(rotation.y) > 1E-6)
 			viewMatrix.rotate(rotation.y, new Vector3f(0, 1, 0));
