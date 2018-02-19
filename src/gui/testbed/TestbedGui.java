@@ -1,12 +1,16 @@
 package gui.testbed;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import org.joml.Vector3f;
+
+import utils.Constants;
 
 import javax.swing.JLabel;
 
@@ -44,7 +48,16 @@ public class TestbedGui extends JFrame {
 		setTitle("Testbed GUI");
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(30, 500, 200, 350);
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		
+        int ubuntuSiderBar = 0;
+        int ubuntuHeader = 0;
+        if (System.getProperty("os.name").equals("Linux")) {
+        	ubuntuSiderBar = 105;
+        	ubuntuHeader = 44;
+        }
+        
+		setBounds(Constants.AUTOPILOT_GUI_WIDTH - Constants.TESTBED_GUI_WIDTH + ubuntuSiderBar, Constants.AUTOPILOT_GUI_HEIGHT +  2 * ubuntuHeader, Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);

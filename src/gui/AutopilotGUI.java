@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Hashtable;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -18,14 +19,20 @@ import javax.swing.plaf.metal.MetalSliderUI;
 
 
 
+
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotOutputs;
+
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+
 import javax.swing.JSlider;
+
+import utils.Constants;
 
 public class AutopilotGUI extends JFrame {
 
@@ -134,7 +141,7 @@ public class AutopilotGUI extends JFrame {
 		
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(30, 100, 450, 300);
+		setBounds(0, 0, Constants.AUTOPILOT_GUI_WIDTH, Constants.AUTOPILOT_GUI_HEIGHT);
 		setTitle("Autopilot");
 		topContentPanel = new JPanel();
 		topContentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
