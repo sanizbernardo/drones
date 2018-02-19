@@ -1,4 +1,4 @@
-package world;
+package world.premade;
 
 import org.joml.Vector3f;
 
@@ -7,6 +7,7 @@ import entities.meshes.cube.Cube;
 import recognition.ImgRecogPlanner;
 import utils.Utils;
 import utils.IO.MouseInput;
+import world.World;
 
 public class ImgRecogWorld extends World {
 

@@ -1,4 +1,4 @@
-package world;
+package world.premade;
 
 import java.util.Random;
 
@@ -9,6 +9,7 @@ import utils.Cubes;
 import utils.FloatMath;
 import utils.PhysicsException;
 import utils.Utils;
+import world.World;
 
 public class OrthoTestWorld extends World implements IWorldRules{
 

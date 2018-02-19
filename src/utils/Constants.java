@@ -12,9 +12,16 @@ public class Constants {
     //only for initialization!
 //    public static final int HEIGHT = 750;
     
+    /**
+     * Drone pickup accuracy
+     */
+
+    public static final float PICKUP_DISTANCE = 4f;
+
+
     public static final int TESTBED_GUI_HEIGHT = 350;  
     public static final int TESTBED_GUI_WIDTH = 200;  
-
+    
     public static final int AUTOPILOT_GUI_HEIGHT = 300;
     public static final int AUTOPILOT_GUI_WIDTH = 450;
     
@@ -23,13 +30,17 @@ public class Constants {
      */
     //Field of View in Radians
     public static final float FOV = (float) Math.toRadians(90f);
-
     public static final float Z_NEAR = 0.01f;
-
     public static final float Z_FAR = 1000.f;
-
     public static final float DRONE_THICKNESS = 0.1f;  //in meters
-
+    public static final float DRONE_WHEEL_THICKNESS = 0.08f;
+    public static final int DRONE_LEFT_WING = 0;
+    public static final int DRONE_RIGHT_WING = 1;
+    public static final int DRONE_BODY = 2;
+    public static final int DRONE_WHEEL_FRONT = 3;
+    public static final int DRONE_WHEEL_BACK_LEFT = 4;
+    public static final int DRONE_WHEEL_BACK_RIGHT = 5;
+    public static final float DRONE_TIRE_RADIUS = 0.35f;
     /**
      * Game engine
      */

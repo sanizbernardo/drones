@@ -1,4 +1,4 @@
-package world;
+package world.premade;
 
 
 import engine.IWorldRules;
@@ -6,6 +6,7 @@ import entities.WorldObject;
 import utils.Cubes;
 import utils.PhysicsException;
 import utils.Utils;
+import world.World;
 
 import java.util.Random;
 
@@ -15,7 +16,7 @@ import java.util.Random;
 public class CubeWorld extends World implements IWorldRules {
 
     public CubeWorld() {
-        super(30, true);
+        super(5, true);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class CubeWorld extends World implements IWorldRules {
         Random rand = new Random();
 
         //World specifics
-        worldObjects = new WorldObject[7000];
+        worldObjects = new WorldObject[2000];
 
         for(int i = 0; i < worldObjects.length; i++) {
             WorldObject cube = new WorldObject(Cubes.getCubes()[rand.nextInt(Cubes.getCubes().length)].getMesh());

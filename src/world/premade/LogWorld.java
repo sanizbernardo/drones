@@ -1,4 +1,4 @@
-package world;
+package world.premade;
 
 import org.joml.Vector3f;
 
@@ -6,6 +6,7 @@ import entities.WorldObject;
 import entities.meshes.cube.Cube;
 import interfaces.AutopilotConfig;
 import physics.LogPilot;
+import world.World;
 
 public class LogWorld extends World {
 

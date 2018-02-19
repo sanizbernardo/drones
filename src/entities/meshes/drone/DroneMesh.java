@@ -9,11 +9,13 @@ public class DroneMesh {
     private LeftWing left;
     private RightWing right;
     private Body body;
+    private Wheel wheel;
 
     public DroneMesh(AutopilotConfig config){
         left  = new LeftWing(config, Constants.DRONE_THICKNESS);
         right = new RightWing(config, Constants.DRONE_THICKNESS);
         body  = new Body(config, Constants.DRONE_THICKNESS);
+        wheel = new Wheel(config, Constants.DRONE_WHEEL_THICKNESS, 0.5f);
     }
 
     public Mesh getLeft() {
@@ -27,4 +29,9 @@ public class DroneMesh {
     public Mesh getBody() {
         return body.getMesh();
     }
+
+    public Mesh getWheel() {
+        return wheel.getMesh();
+    }
+
 }

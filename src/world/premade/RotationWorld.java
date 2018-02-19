@@ -1,4 +1,4 @@
-package world;
+package world.premade;
 
 import org.joml.Vector3f;
 
@@ -9,6 +9,7 @@ import utils.Cubes;
 import utils.FloatMath;
 import utils.Utils;
 import utils.IO.MouseInput;
+import world.World;
 
 public class RotationWorld extends World implements IWorldRules{
 

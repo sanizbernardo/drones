@@ -1,4 +1,4 @@
-package world;
+package world.premade;
 
 
 import engine.IWorldRules;
@@ -6,6 +6,7 @@ import entities.WorldObject;
 import physics.Motion;
 import utils.Cubes;
 import utils.Utils;
+import world.World;
 
 import java.util.Random;
 
