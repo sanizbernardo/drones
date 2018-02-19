@@ -8,11 +8,16 @@ public class Constants {
     public static final String TITLE = "PnO Drone Simulation";
     public static final boolean VSYNC = true;
     //only for initialization!
-    public static final int WIDTH = 1500;
+//    public static final int WIDTH = 1500;
     //only for initialization!
-    public static final int HEIGHT = 750;
+//    public static final int HEIGHT = 750;
+    
+    public static final int TESTBED_GUI_HEIGHT = 350;  
+    public static final int TESTBED_GUI_WIDTH = 200;  
 
-
+    public static final int AUTOPILOT_GUI_HEIGHT = 300;
+    public static final int AUTOPILOT_GUI_WIDTH = 450;
+    
     /**
      * Renderer constants
      */
