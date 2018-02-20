@@ -100,7 +100,7 @@ public class Window {
         glfwSetWindowPos(
                 windowHandle,
                 Constants.AUTOPILOT_GUI_WIDTH,
-                0
+                System.getProperty("os.name").contains("Windows") ? 40 : 0
         );
 
         // Make the OpenGL context current

@@ -340,7 +340,7 @@ public class Physics {
 			float d = this.tyreRadius - worldPos.y;
 			
 			if (d >= this.tyreRadius)
-				throw new PhysicsException("Tyre nb " + i + "went underground");
+				throw new PhysicsException("Tyre nb " + i + " went underground");
 			
 			if (d > 0) { // op de grond?
 				
