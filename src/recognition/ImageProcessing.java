@@ -132,7 +132,7 @@ public class ImageProcessing {
                 int[] pixel = {i, j};
                 float h = hsv[0];
                 float s = hsv[1];
-                if (! checkBg(hsv)) {                                           //Checks whether the pixel is background
+                if (! checkBg(hsv) || ! checkGround(hsv)) {                                           //Checks whether the pixel is background
                     if (! contains2(colors, h, s)){                             //Checks whether we already encountered a certain colortype
                         Cube newObject = new Cube(h, s);						//creates new cube obect
                         objects.add(newObject);
@@ -153,7 +153,12 @@ public class ImageProcessing {
         return objects;
     }
 
-    // checks if a color (given h and s) is in a list of colors
+    private boolean checkGround(float[] hsv) {
+		float v = hsv[2];
+    	return v > 0.5;
+	}
+
+	// checks if a color (given h and s) is in a list of colors
     private boolean contains2(ArrayList<float[]> colors, float h, float s) {
     	for(float[] color : colors){
     		//TODO die 0.01?? der is ergens een afrondingsfout, hoe kunt ge die dan vinde
