@@ -212,7 +212,7 @@ public class Renderer {
 		
         cameraHelper.updateTopCam(droneItems[Constants.DRONE_BODY].getPosition());
 
-		projectionMatrix = projectionMatrix.identity().ortho(-size * 4 / 3,size * 4 / 3,-size,size, Constants.Z_NEAR, Constants.Z_FAR).rotateZ(FloatMath.toRadians(-90));
+		projectionMatrix = projectionMatrix.identity().ortho(-size * 4 / 3,size * 4 / 3,-size/2,size/2, Constants.Z_NEAR, Constants.Z_FAR).rotateZ(FloatMath.toRadians(-90));
 		shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 		
 		// Update view Matrix
@@ -241,7 +241,7 @@ public class Renderer {
 		
 		cameraHelper.updateRightCam(droneItems[Constants.DRONE_BODY].getPosition());
 		
-		projectionMatrix = projectionMatrix.identity().ortho(-size * 4 / 3,size * 4 / 3,-size,size, Constants.Z_NEAR/100, Constants.Z_FAR*100);
+		projectionMatrix = projectionMatrix.identity().ortho(-size * 4 / 3,size * 4 / 3,-size/4,size/4, Constants.Z_NEAR, Constants.Z_FAR);
 		shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 		
 		// Update view Matrix

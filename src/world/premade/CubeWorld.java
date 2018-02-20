@@ -18,7 +18,7 @@ import org.joml.Vector3f;
 public class CubeWorld extends World implements IWorldRules {
 
     public CubeWorld() {
-        super(5, true);
+        super(1, true);
     }
 
     @Override
