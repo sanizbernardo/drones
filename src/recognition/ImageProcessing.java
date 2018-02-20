@@ -132,7 +132,7 @@ public class ImageProcessing {
                 int[] pixel = {i, j};
                 float h = hsv[0];
                 float s = hsv[1];
-                if (! checkBg(hsv) || ! checkGround(hsv)) {                                           //Checks whether the pixel is background
+                if (! checkBg(hsv) && ! checkGround(hsv)) {                                           //Checks whether the pixel is background
                     if (! contains2(colors, h, s)){                             //Checks whether we already encountered a certain colortype
                         Cube newObject = new Cube(h, s);						//creates new cube obect
                         objects.add(newObject);
