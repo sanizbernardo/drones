@@ -2,7 +2,9 @@ package PathFinding;
 
 import java.util.ArrayList;
 
+import entities.meshes.cube.Cube;
 import interfaces.Path;
+import utils.Cubes;
 
 public class IPath implements Path{
 
@@ -28,12 +30,13 @@ public class IPath implements Path{
 	
 	
 	private void setPath() {
+		ArrayList<float[]> cubesInPath = new ArrayList<>();
 		addLiftOffPoint();
 		for(int i = 0; i<cubeLocations.size(); i++){
-			float[] closestCube = findClosest();
+			float[] closestCube = findClosest(cubesInPath);
 			addToPath(closestCube);
+			cubesInPath.add(closestCube);
 		}
-		
 	}
 	
 	private void addLiftOffPoint() {
@@ -45,14 +48,16 @@ public class IPath implements Path{
 		
 	}
 	
-	private float[] findClosest(){
+	private float[] findClosest(ArrayList<float[]> cubesAlreadyInPath){
 		float[] currentClosest = null;
 		double currentDist = Float.MAX_VALUE;
 		for (float[] cube: cubeLocations){
-			double newDist = Math.sqrt(Math.pow((double)(cube[0]-x.get(x.size()-1)), 2) + Math.pow((double)(cube[1]-y.get(y.size()-1)), 2) + Math.pow((double)(cube[2]-z.get(z.size()-1)), 2));
-			if(newDist<currentDist){
-				currentClosest = cube;
-				currentDist = newDist;
+			if (! cubesAlreadyInPath.contains(cube)) {
+				double newDist = Math.sqrt(Math.pow((double)(cube[0]-x.get(x.size()-1)), 2) + Math.pow((double)(cube[1]-y.get(y.size()-1)), 2) + Math.pow((double)(cube[2]-z.get(z.size()-1)), 2));
+				if(newDist<currentDist){
+					currentClosest = cube;
+					currentDist = newDist;
+				}				
 			}
 		}
 		return currentClosest;
@@ -101,7 +106,6 @@ public class IPath implements Path{
 	}
 	
 
-
 	private float[] auxLocPlusMinZ(float arg) {
 		float[] newLoc = new float[3];
 		newLoc[0] = this.location[0] + (float)Math.sin(heading)*arg;
@@ -115,8 +119,8 @@ public class IPath implements Path{
 		newLoc[0] = this.location[0] + (float)Math.cos(heading)*arg;
 		newLoc[1] = this.location[1];
 		newLoc[0] = this.location[2] - (float)Math.sin(heading)*arg;
-		return newLoc;		
-	}
+		return newLoc;
+		}
 
 	private int orientation(float[] p, float[] q, float[] r) {
     	float val = (q[2] - p[2]) * (r[0] - q[0]) -
@@ -128,20 +132,32 @@ public class IPath implements Path{
 	
 	@Override
 	public float[] getX() {
-		// TODO Auto-generated method stub
-		return null;
+		float[] x = new float[this.x.size()];
+		int i = 0;
+		for (Float f: this.x) {
+			x[i++] = (f != null ? f : Float.NaN);
+		}
+		return x;
 	}
 
 	@Override
 	public float[] getY() {
-		// TODO Auto-generated method stub
-		return null;
+		float[] y = new float[this.y.size()];
+		int i = 0;
+		for (Float f: this.y) {
+			y[i++] = (f != null ? f : Float.NaN);
+		}
+		return y;
 	}
 
 	@Override
 	public float[] getZ() {
-		// TODO Auto-generated method stub
-		return null;
+		float[] z = new float[this.z.size()];
+		int i = 0;
+		for (Float f: this.z) {
+			z[i++] = (f != null ? f : Float.NaN);
+		}
+		return z;
 	}
 
 }
