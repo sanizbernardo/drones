@@ -49,7 +49,8 @@ public class TileManager {
 				flip = !flip;
 				
 				WorldObject tile = new WorldObject(unitTile.getMesh());
-				tile.setPosition(i,0,j);
+				tile.setPosition(i * tileSize,0,j * tileSize);
+				tile.setScale(tileSize);
 				tileList.add(tile);
 				
 			}
