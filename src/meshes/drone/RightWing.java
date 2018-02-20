@@ -8,7 +8,7 @@ public class RightWing extends DroneComponent {
 
     public RightWing(AutopilotConfig config, float thickness) {
         this.thickness = thickness;
-        finalize(config);
+        finalizer(config);
     }
 
     protected void setPositions() {

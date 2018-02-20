@@ -9,7 +9,7 @@ public class Body extends DroneComponent {
 
     public Body(AutopilotConfig config, float thickness) {
         this.thickness = thickness;
-        finalize(config);
+        finalizer(config);
     }
 
     @Override

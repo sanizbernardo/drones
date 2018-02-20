@@ -3,6 +3,7 @@ package world.premade;
 
 import engine.IWorldRules;
 import entities.WorldObject;
+import entities.ground.Ground;
 import physics.Motion;
 import utils.Cubes;
 import utils.Utils;
@@ -42,6 +43,8 @@ public class YZWorld extends World implements IWorldRules {
             cube.setPosition(0, y, -i*40);
             worldObjects[i-1] = cube;
         }
+        
+        this.ground = new Ground(50);
 
         System.out.printf("World started with cubes on y: %s  %s  %s  %s  %s \n", worldObjects[0].getPosition().y,worldObjects[1].getPosition().y,worldObjects[2].getPosition().y,worldObjects[3].getPosition().y,worldObjects[4].getPosition().y);
     }

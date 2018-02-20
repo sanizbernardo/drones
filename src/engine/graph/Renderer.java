@@ -2,12 +2,14 @@ package engine.graph;
 
 import static org.lwjgl.opengl.GL11.*;
 import engine.Window;
+import meshes.Mesh;
 
 import org.joml.Matrix4f;
 
 import utils.*;
 import world.helpers.CameraHelper;
 import entities.WorldObject;
+import entities.ground.Ground;
 import interfaces.AutopilotConfig;
 
 import java.util.ArrayList;
@@ -106,7 +108,7 @@ public class Renderer {
         glDisable(GL_SCISSOR_TEST);
     }
 
-    public void render(Window window, CameraHelper cameraHelper, WorldObject[] gameItems, WorldObject[] droneItems, ArrayList<WorldObject> pathObjects) {
+    public void render(Window window, CameraHelper cameraHelper, WorldObject[] gameItems, WorldObject[] droneItems, ArrayList<WorldObject> pathObjects, Ground ground) {
 		clear(window);
 		
 
@@ -118,7 +120,7 @@ public class Renderer {
         droneCam(cameraHelper, gameItems);
 		
         if(!ortho) {
-            freeCam(window, cameraHelper, gameItems, droneItems, pathObjects);
+            freeCam(window, cameraHelper, gameItems, droneItems, pathObjects, ground);
         } else {
         	int size = 40;
         	
@@ -174,7 +176,7 @@ public class Renderer {
 
 	private void freeCam(Window window, CameraHelper cameraHelper,
 			WorldObject[] gameItems, WorldObject[] droneItems,
-			ArrayList<WorldObject> pathObjects) {
+			ArrayList<WorldObject> pathObjects, Ground ground) {
 		Matrix4f projectionMatrix;
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
@@ -190,6 +192,7 @@ public class Renderer {
 		// Update view Matrix
 		viewMatrix = transformation.getViewMatrix(cameraHelper.freeCamera);
 
+		renderGround(ground, viewMatrix);
 		renderTrail(pathObjects, viewMatrix);
 		renderWorldItems(gameItems, viewMatrix);
 		renderDroneItems(droneItems, viewMatrix, 1);
@@ -263,6 +266,15 @@ public class Renderer {
         }
     }
 
+    private void renderGround(Ground ground, Matrix4f viewMatrix) {
+    	if(ground == null || ground.getTiles().isEmpty()) return;
+    	for(WorldObject tile : ground.getTiles()) {
+    		Matrix4f modelViewMatrix = transformation.getModelViewMatrix(tile, viewMatrix);
+            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+    		tile.getMesh().render();
+    	}
+    }
+    
     private void renderWorldItems(WorldObject[] gameItems, Matrix4f viewMatrix) {
         for (WorldObject gameItem : gameItems) {
             if (gameItem == null) continue;

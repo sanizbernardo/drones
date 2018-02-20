@@ -8,7 +8,7 @@ public class LeftWing extends DroneComponent{
 
     public LeftWing(AutopilotConfig config, float thickness) {
         this.thickness = thickness;
-        finalize(config);
+        finalizer(config);
     }
 
     @Override

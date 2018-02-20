@@ -7,6 +7,7 @@ import engine.Window;
 import engine.graph.Renderer;
 import entities.WorldObject;
 import entities.drone.DroneSkeleton;
+import entities.ground.Ground;
 import gui.testbed.TestbedGui;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
@@ -42,7 +43,7 @@ public abstract class World implements IWorldRules {
     protected Engine gameEngine;
     protected ArrayList<WorldObject> pathObjects = new ArrayList<>();
     protected Trail trail;
-
+    protected Ground ground;
     
     public World(int tSM, boolean wantPhysicsEngine) {
         this.cameraHelper = new CameraHelper();
@@ -143,7 +144,8 @@ public abstract class World implements IWorldRules {
                         cameraHelper,
                         worldObjects,
                         droneItems,
-                        pathObjects);
+                        pathObjects,
+                        ground);
     }
 
     /**

@@ -1,31 +1,17 @@
 package meshes.drone;
 
+import meshes.AbstractMesh;
 import meshes.Mesh;
 import interfaces.AutopilotConfig;
 
-public abstract class DroneComponent {
+public abstract class DroneComponent extends AbstractMesh {
 
 	protected AutopilotConfig config;
 
-    float[] positions, colours;
-    int[] indices;
-
-    private Mesh mesh;
-
-    public void finalize(AutopilotConfig config) {
-        this.config = config;
-        setPositions();
-        setColours();
-        setIndices();
-
-        this.mesh = new Mesh(positions, colours, indices);
+    public void finalizer(AutopilotConfig config) {
+    	this.config = config;
+    	
+        finalizer();
     }
 
-    abstract protected void setPositions();
-    abstract protected void setColours();
-    abstract protected void setIndices();
-
-    public Mesh getMesh() {
-        return mesh;
-    }
 }
