@@ -11,6 +11,7 @@ import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
+import interfaces.Path;
 
 public class LogPilot implements Autopilot {
 
@@ -51,5 +52,13 @@ public class LogPilot implements Autopilot {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+
+
+	@Override
+	public void setPath(Path path) {
+		// TODO Auto-generated method stub
+		
 	}
 }

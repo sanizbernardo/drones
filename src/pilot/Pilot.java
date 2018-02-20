@@ -4,6 +4,7 @@ import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
+import interfaces.Path;
 import utils.Utils;
 
 public class Pilot implements Autopilot {
@@ -75,6 +76,13 @@ public class Pilot implements Autopilot {
 	
 	private PilotPart currentPilot() {
 		return this.pilots[state()];
+	}
+
+
+	@Override
+	public void setPath(Path path) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

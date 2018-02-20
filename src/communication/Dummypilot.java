@@ -3,6 +3,7 @@ import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
+import interfaces.Path;
 
 public class Dummypilot implements Autopilot {
 
@@ -85,6 +86,12 @@ public class Dummypilot implements Autopilot {
 	@Override
 	public void simulationEnded() {
 		System.out.println("exiting");
+	}
+
+	@Override
+	public void setPath(Path path) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
