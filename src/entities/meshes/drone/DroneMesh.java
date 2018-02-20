@@ -15,7 +15,7 @@ public class DroneMesh {
         left  = new LeftWing(config, Constants.DRONE_THICKNESS);
         right = new RightWing(config, Constants.DRONE_THICKNESS);
         body  = new Body(config, Constants.DRONE_THICKNESS);
-        wheel = new Wheel(config, Constants.DRONE_WHEEL_THICKNESS, Constants.DRONE_TIRE_RADIUS);
+        wheel = new Wheel(config, Constants.DRONE_WHEEL_THICKNESS);
     }
 
     public Mesh getLeft() {

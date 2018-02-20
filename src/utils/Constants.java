@@ -40,7 +40,6 @@ public class Constants {
     public static final int DRONE_WHEEL_FRONT = 3;
     public static final int DRONE_WHEEL_BACK_LEFT = 4;
     public static final int DRONE_WHEEL_BACK_RIGHT = 5;
-    public static final float DRONE_TIRE_RADIUS = 0.35f;
     /**
      * Game engine
      */

@@ -6,9 +6,9 @@ public class Wheel extends DroneComponent {
 
     private float radius, thickness;
 
-    Wheel(AutopilotConfig config, float thickness, float radius) {
+    Wheel(AutopilotConfig config, float thickness) {
         this.thickness = thickness;
-        this.radius = radius;
+        this.radius = config.getTyreRadius();
         finalize(config);
     }
 

@@ -30,6 +30,7 @@ public class Physics {
 
 	private final boolean checkAOA;
 
+	private AutopilotConfig config;
 	
 	public Physics() {
 		checkAOA = true;
@@ -48,6 +49,8 @@ public class Physics {
 	 */
 	public void init(AutopilotConfig config, Vector3f startPos, float startVel, float startHeading, float startPitch, float startRoll) {
 		setupCalculations(config);
+		
+		this.config = config;
 		
 		this.pos = new Vector3f(startPos);
 		this.vel = new Vector3f(0, 0, -startVel);
@@ -209,6 +212,12 @@ public class Physics {
 	public Matrix3f getTransMatInv() {
 		return transMatInv;
 	}
+	
+	public AutopilotConfig getConfig() {
+		return config;
+	}
+	
+	
 
 	/**
 	 * Updates the wing inclinations and thrust of the drone
