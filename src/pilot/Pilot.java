@@ -4,6 +4,7 @@ import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
+import utils.Utils;
 
 public class Pilot implements Autopilot {
 	
@@ -19,14 +20,14 @@ public class Pilot implements Autopilot {
 	
 	
 	public Pilot() {
-		this.pilots = new PilotPart[4];
+		this.pilots = new PilotPart[1];
 		
-		this.pilots[STATE_TAKING_OFF] = new TakeOffPilot();
-		this.pilots[STATE_LANDING] = new LandingPilot();
-		this.pilots[STATE_FLYING] = new FlyPilot();
-		this.pilots[STATE_TAXIING] = new TaxiPilot();
+		this.pilots[STATE_TAKING_OFF] = new TakeOffPilot(400);
+//		this.pilots[STATE_LANDING] = new LandingPilot();
+//		this.pilots[STATE_FLYING] = new FlyPilot();
+//		this.pilots[STATE_TAXIING] = new TaxiPilot();
 		
-		this.order = new int[] {STATE_TAKING_OFF, STATE_FLYING, STATE_LANDING, STATE_TAXIING};
+		this.order = new int[] {STATE_TAKING_OFF};
 		this.index = 0;
 	}
 	
@@ -43,6 +44,9 @@ public class Pilot implements Autopilot {
 
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
+		if (this.index >= this.order.length) 
+			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
+		
 		AutopilotOutputs output = currentPilot().timePassed(inputs);
 		
 		if (currentPilot().ended()) {
@@ -50,9 +54,6 @@ public class Pilot implements Autopilot {
 			this.pilots[state()] = null;
 			
 			this.index ++;
-						
-			if (this.index == this.order.length);
-				// TODO: fix dit
 		}
 		
 		return output;

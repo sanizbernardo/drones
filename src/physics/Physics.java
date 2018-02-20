@@ -32,15 +32,19 @@ public class Physics {
 
 	private AutopilotConfig config;
 	
-	public Physics() {
-		checkAOA = true;
+	public Physics(boolean checkAOA) {
+		this.checkAOA = checkAOA;
 		
-		brakeForce = new float[] {0, 0, 0};
+		this.brakeForce = new float[] {0, 0, 0};
 		try {
 			updateDrone(Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0));
 		} catch (PhysicsException e) {
 			e.printStackTrace();
-		}		
+		}
+	}
+	
+	public Physics() {
+		this(true);		
 	}
 	
 	/**
@@ -67,7 +71,7 @@ public class Physics {
 			this.transMat.rotate(-startRoll, new Vector3f(0, 0, 1));
 
 		this.transMatInv = this.transMat.invert(new Matrix3f());
-		
+				
 		try {
 			update(0);
 		} catch (PhysicsException e) {
@@ -321,7 +325,7 @@ public class Physics {
 			veli.mul(this.velProj[i]); // projecteren op vlak loodrecht op axis
 			float aoa = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
 			
-			if (checkAOA && Math.abs(aoa) > maxAOA)
+			if (checkAOA && Math.abs(aoa) > maxAOA && vel.z < -5)
 				throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa");
 			
 			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
