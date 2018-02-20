@@ -16,7 +16,7 @@ public class Constants {
      * Drone pickup accuracy
      */
 
-    public static final float PICKUP_DISTANCE = 4f;
+    public static final float PICKUP_DISTANCE = 3f;
 
 
     public static final int TESTBED_GUI_HEIGHT = 350;  
