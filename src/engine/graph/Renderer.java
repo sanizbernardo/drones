@@ -1,10 +1,12 @@
 package engine.graph;
 
 import static org.lwjgl.opengl.GL11.*;
-
 import engine.Window;
+
 import org.joml.Matrix4f;
+
 import utils.*;
+import world.helpers.CameraHelper;
 import entities.WorldObject;
 import interfaces.AutopilotConfig;
 
@@ -104,16 +106,35 @@ public class Renderer {
         glDisable(GL_SCISSOR_TEST);
     }
 
-    public void render(Window window, Camera freeCamera, Camera droneCamera, Camera chaseCamera, Camera topOrthoCamera, Camera rightOrthoCamera, WorldObject[] gameItems, WorldObject[] droneItems, ArrayList<WorldObject> pathObjects) {
+    public void render(Window window, CameraHelper cameraHelper, WorldObject[] gameItems, WorldObject[] droneItems, ArrayList<WorldObject> pathObjects) {
 		clear(window);
 		
 
 		Matrix4f projectionMatrix;
 		Matrix4f viewMatrix;
         
+        projectionMatrix = chaseCam(window, cameraHelper, gameItems, droneItems);
 		
-		/*The Chase camera*/
-        shaderProgram.bind();
+        droneCam(cameraHelper, gameItems);
+		
+        if(!ortho) {
+            freeCam(window, cameraHelper, gameItems, droneItems, pathObjects);
+        } else {
+        	int size = 40;
+        	
+            projectionMatrix = topOrthoCam(window, cameraHelper, gameItems,
+					droneItems, pathObjects, projectionMatrix, size);
+            
+            rightOrthCam(window, cameraHelper, gameItems, droneItems,
+					pathObjects, projectionMatrix, size);
+        }
+    }
+
+	private Matrix4f chaseCam(Window window, CameraHelper cameraHelper,
+			WorldObject[] gameItems, WorldObject[] droneItems) {
+		Matrix4f projectionMatrix;
+		Matrix4f viewMatrix;
+		shaderProgram.bind();
 		chaseCamWidth =  (int) (window.getWidth() * 0.25);    chaseCamHeigth = (int) (window.getHeight() * 0.5);
 		chaseCamX = 0;              chaseCamY = (int) (window.getHeight() * 0.5);
 		glViewport(chaseCamX,chaseCamY,chaseCamWidth, chaseCamHeigth);
@@ -123,14 +144,18 @@ public class Renderer {
 		shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 		  
 		//Update view Matrix
-		viewMatrix = transformation.getViewMatrix(chaseCamera);
+		viewMatrix = transformation.getViewMatrix(cameraHelper.chaseCamera);
 		
 		renderWorldItems(gameItems, viewMatrix);
 		renderDroneItems(droneItems, viewMatrix, 1);
         shaderProgram.unbind();
-		
-		/* The droneCam window */
-        shaderProgram.bind();
+		return projectionMatrix;
+	}
+
+	private Matrix4f droneCam(CameraHelper cameraHelper, WorldObject[] gameItems) {
+		Matrix4f projectionMatrix;
+		Matrix4f viewMatrix;
+		shaderProgram.bind();
 		droneCamX = (int) ((chaseCamWidth - droneCamWidth) / 2);
 		droneCamY = (int) ((chaseCamHeigth - droneCamHeight) / 2);
 		glViewport(droneCamX,droneCamY,droneCamWidth,droneCamHeight);
@@ -140,79 +165,93 @@ public class Renderer {
 		shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 		
 		// Update view Matrix
-		viewMatrix = transformation.getViewMatrix(droneCamera);
+		viewMatrix = transformation.getViewMatrix(cameraHelper.droneCamera);
 		
 		renderWorldItems(gameItems, viewMatrix);
         shaderProgram.unbind();
+		return projectionMatrix;
+	}
+
+	private void freeCam(Window window, CameraHelper cameraHelper,
+			WorldObject[] gameItems, WorldObject[] droneItems,
+			ArrayList<WorldObject> pathObjects) {
+		Matrix4f projectionMatrix;
+		Matrix4f viewMatrix;
+		shaderProgram.bind();
+		freeCamX = chaseCamWidth;            freeCamY = 0;
+		freeCamWidth = window.getWidth() - chaseCamWidth ;    freeCamHeigth = window.getHeight();
+		glViewport(freeCamX, freeCamY, freeCamWidth ,freeCamHeigth);
+
+
+		// Update projection Matrix
+		projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, (window.getWidth()) - droneCamWidth, window.getHeight(), Constants.Z_NEAR, Constants.Z_FAR);
+		shaderProgram.setUniform("projectionMatrix", projectionMatrix);
+
+		// Update view Matrix
+		viewMatrix = transformation.getViewMatrix(cameraHelper.freeCamera);
+
+		renderTrail(pathObjects, viewMatrix);
+		renderWorldItems(gameItems, viewMatrix);
+		renderDroneItems(droneItems, viewMatrix, 1);
+		shaderProgram.unbind();
+	}
+
+	
+	private Matrix4f topOrthoCam(Window window, CameraHelper cameraHelper,
+			WorldObject[] gameItems, WorldObject[] droneItems,
+			ArrayList<WorldObject> pathObjects, Matrix4f projectionMatrix,
+			int size) {
+		Matrix4f viewMatrix;
+		shaderProgram.bind();
+		topOrthoCamX = chaseCamWidth;     
+		topOrthoCamY = chaseCamY;
+		topOrthoCamWidth = window.getWidth() - chaseCamWidth;       
+		topOrthoCamHeigth = (int) (window.getHeight() * 0.5);
+		glViewport(topOrthoCamX, topOrthoCamY, topOrthoCamWidth, topOrthoCamHeigth);
+		// Update projection Matrix
 		
-        if(!ortho) {
-            /* free camera window */
-            shaderProgram.bind();
-            freeCamX = chaseCamWidth;            freeCamY = 0;
-            freeCamWidth = window.getWidth() - chaseCamWidth ;    freeCamHeigth = window.getHeight();
-            glViewport(freeCamX, freeCamY, freeCamWidth ,freeCamHeigth);
+        cameraHelper.updateTopCam(droneItems[Constants.DRONE_BODY].getPosition());
 
+		projectionMatrix = projectionMatrix.identity().ortho(-size * 4 / 3,size * 4 / 3,-size/2,size/2, Constants.Z_NEAR, Constants.Z_FAR).rotateZ(FloatMath.toRadians(-90));
+		shaderProgram.setUniform("projectionMatrix", projectionMatrix);
+		
+		// Update view Matrix
+		viewMatrix = transformation.getViewMatrix(cameraHelper.topOrthoCamera);
 
-            // Update projection Matrix
-            projectionMatrix = transformation.getProjectionMatrix(Constants.FOV, (window.getWidth()) - droneCamWidth, window.getHeight(), Constants.Z_NEAR, Constants.Z_FAR);
-            shaderProgram.setUniform("projectionMatrix", projectionMatrix);
+		renderTrail(pathObjects, viewMatrix);
+		renderWorldItems(gameItems, viewMatrix);
+		renderDroneItems(droneItems, viewMatrix, 1);
+		shaderProgram.unbind();
+		return projectionMatrix;
+	}
+	
+	private void rightOrthCam(Window window, CameraHelper cameraHelper,
+			WorldObject[] gameItems, WorldObject[] droneItems,
+			ArrayList<WorldObject> pathObjects, Matrix4f projectionMatrix,
+			int size) {
+		Matrix4f viewMatrix;
+		shaderProgram.bind();
 
-            // Update view Matrix
-            viewMatrix = transformation.getViewMatrix(freeCamera);
+		rightOrthoCamX = chaseCamWidth;  
+		rightOrthoCamY = 0;
+		rightOrthoCamWidth = window.getWidth() - chaseCamWidth;       				
+		rightOrthoCamHeigth = (int) (window.getHeight() * 0.5);
+		glViewport(rightOrthoCamX, rightOrthoCamY, rightOrthoCamWidth, rightOrthoCamHeigth);
+		// Update projection Matrix
+		
+		cameraHelper.updateRightCam(droneItems[Constants.DRONE_BODY].getPosition());
+		
+		projectionMatrix = projectionMatrix.identity().ortho(-size * 4 / 3,size * 4 / 3,-size/4,size/4, Constants.Z_NEAR, Constants.Z_FAR);
+		shaderProgram.setUniform("projectionMatrix", projectionMatrix);
+		
+		// Update view Matrix
+		viewMatrix = transformation.getViewMatrix(cameraHelper.rightOrthoCamera);
 
-            renderTrail(pathObjects, viewMatrix);
-            renderWorldItems(gameItems, viewMatrix);
-            renderDroneItems(droneItems, viewMatrix, 1);
-            shaderProgram.unbind();
-        } else {
-            /* Top ortho cam */
-            shaderProgram.bind();
-            topOrthoCamX = chaseCamWidth;     
-            topOrthoCamY = chaseCamY;
-            topOrthoCamWidth = window.getWidth() - chaseCamWidth;       
-            topOrthoCamHeigth = (int) (window.getHeight() * 0.5);
-            glViewport(topOrthoCamX, topOrthoCamY, topOrthoCamWidth, topOrthoCamHeigth);
-
-            // Update projection Matrix
-            int size = 75;
-//            projectionMatrix = projectionMatrix.identity().ortho(-size/8, size,-size/2, size/2, Constants.Z_NEAR, Constants.Z_FAR).rotateZ((float)Math.toRadians(-90));
-            projectionMatrix = projectionMatrix.identity().ortho(0, 4 * size,-size/2, size/2, Constants.Z_NEAR, Constants.Z_FAR).rotateZ(FloatMath.toRadians(-90));
-            shaderProgram.setUniform("projectionMatrix", projectionMatrix);
-            
-            // Update view Matrix
-            viewMatrix = transformation.getViewMatrix(topOrthoCamera);
-
-            renderTrail(pathObjects, viewMatrix);
-            renderWorldItems(gameItems, viewMatrix);
-            renderDroneItems(droneItems, viewMatrix, 1);
-            shaderProgram.unbind();
-            
-            
-            /* Right ortho cam */
-            shaderProgram.bind();
-
-            rightOrthoCamX = chaseCamWidth;  
-            rightOrthoCamY = 0;
-            rightOrthoCamWidth = window.getWidth() - chaseCamWidth;       				
-            rightOrthoCamHeigth = (int) (window.getHeight() * 0.5);
-            glViewport(rightOrthoCamX, rightOrthoCamY, rightOrthoCamWidth, rightOrthoCamHeigth);
-            // Update projection Matrix
-            projectionMatrix = projectionMatrix.identity().ortho(0, 4 * size, -15, 15, Constants.Z_NEAR/100, Constants.Z_FAR*100);
-            shaderProgram.setUniform("projectionMatrix", projectionMatrix);
-            
-            // Update view Matrix
-            viewMatrix = transformation.getViewMatrix(rightOrthoCamera);
-
-            renderTrail(pathObjects, viewMatrix);
-            renderWorldItems(gameItems, viewMatrix);
-            renderDroneItems(droneItems, viewMatrix, 1);
-            shaderProgram.unbind();
-        }
-
-
-
-        
-    }
+		renderTrail(pathObjects, viewMatrix);
+		renderWorldItems(gameItems, viewMatrix);
+		renderDroneItems(droneItems, viewMatrix, 1);
+		shaderProgram.unbind();
+	}
 
     private void renderTrail(ArrayList<WorldObject> trailItems, Matrix4f viewMatrix) {
         if(trailItems.isEmpty()) return;
