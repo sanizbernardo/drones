@@ -44,7 +44,7 @@ public class YZWorld extends World implements IWorldRules {
             worldObjects[i-1] = cube;
         }
         
-        this.ground = new Ground(50);
+        this.ground = new Ground(5000);
 
         System.out.printf("World started with cubes on y: %s  %s  %s  %s  %s \n", worldObjects[0].getPosition().y,worldObjects[1].getPosition().y,worldObjects[2].getPosition().y,worldObjects[3].getPosition().y,worldObjects[4].getPosition().y);
     }

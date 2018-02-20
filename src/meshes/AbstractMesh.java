@@ -1,7 +1,5 @@
 package meshes;
 
-import interfaces.AutopilotConfig;
-
 public abstract class AbstractMesh {
 	
 	protected float[] positions, colours;
