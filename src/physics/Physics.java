@@ -248,7 +248,7 @@ public class Physics {
 		this.vel.add(FloatMath.transform(transMatInv, forceTorque[0]).mul(dt / this.weight));
 		this.angVel.add(calculateAlfa(forceTorque[1]).mul(dt));
 		
-//		checkCrash();
+		checkCrash();
 	}
 
 	/**

@@ -1,23 +1,17 @@
 package world;
 
 import entities.trail.Trail;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 
 import engine.Engine;
 import engine.IWorldRules;
 import engine.Window;
-import engine.graph.Camera;
 import engine.graph.Renderer;
 import entities.WorldObject;
 import entities.meshes.drone.DroneMesh;
 import gui.testbed.TestbedGui;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
-import interfaces.AutopilotOutputs;
 import physics.Physics;
-import utils.Constants;
-import utils.PhysicsException;
 import utils.Utils;
 import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
