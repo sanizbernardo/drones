@@ -59,12 +59,12 @@ public class Cube {
     }
 
     public void setColours(int hue, float saturation) {
-        float[] posY = Utils.toRGB(hue, saturation, 1.00f),
-        		negY = Utils.toRGB(hue, saturation, 0.15f),
-        		posX = Utils.toRGB(hue, saturation, 0.85f),
-        		negX = Utils.toRGB(hue, saturation, 0.30f),
-        		posZ = Utils.toRGB(hue, saturation, 0.70f),
-        		negZ = Utils.toRGB(hue, saturation, 0.45f);    	
+        float[] posY = Utils.toRGB(hue, saturation, 0.45f),
+        		negY = Utils.toRGB(hue, saturation, 0.20f),
+        		posX = Utils.toRGB(hue, saturation, 0.40f),
+        		negX = Utils.toRGB(hue, saturation, 0.25f),
+        		posZ = Utils.toRGB(hue, saturation, 0.35f),
+        		negZ = Utils.toRGB(hue, saturation, 0.30f);    	
     	
         this.colours = new float[]{
             //Face 1 (front) pos Z
