@@ -1,6 +1,6 @@
-package entities.meshes.drone;
+package meshes.drone;
 
-import entities.meshes.Mesh;
+import meshes.Mesh;
 import interfaces.AutopilotConfig;
 
 public abstract class DroneComponent {
@@ -12,7 +12,7 @@ public abstract class DroneComponent {
 
     private Mesh mesh;
 
-    void finalize(AutopilotConfig config) {
+    public void finalize(AutopilotConfig config) {
         this.config = config;
         setPositions();
         setColours();

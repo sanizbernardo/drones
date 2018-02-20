@@ -2,11 +2,12 @@ package world;
 
 import java.util.Map;
 
+import meshes.cube.*;
+
 import org.joml.Vector3f;
 
 import engine.IWorldRules;
 import entities.WorldObject;
-import entities.meshes.cube.*;
 import interfaces.AutopilotConfig;
 import physics.Motion;
 

@@ -1,9 +1,10 @@
 package world.premade;
 
+import meshes.cube.Cube;
+
 import org.joml.Vector3f;
 
 import entities.WorldObject;
-import entities.meshes.cube.Cube;
 import interfaces.AutopilotConfig;
 import physics.LogPilot;
 import world.World;

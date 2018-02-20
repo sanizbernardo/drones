@@ -36,9 +36,10 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import meshes.cube.BufferedCube;
+
 import org.joml.Vector3f;
 
-import entities.meshes.cube.BufferedCube;
 import utils.Cubes;
 import utils.Utils;
 import world.World;

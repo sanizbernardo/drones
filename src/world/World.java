@@ -1,13 +1,12 @@
 package world;
 
 import entities.trail.Trail;
-
 import engine.Engine;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Renderer;
 import entities.WorldObject;
-import entities.meshes.drone.DroneMesh;
+import entities.drone.DroneSkeleton;
 import gui.testbed.TestbedGui;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
@@ -110,7 +109,7 @@ public abstract class World implements IWorldRules {
 
     
     private void addDrone() {
-        DroneMesh droneMesh = new DroneMesh(config);
+        DroneSkeleton droneMesh = new DroneSkeleton(config);
         WorldObject left = new WorldObject(droneMesh.getLeft());
         WorldObject right = new WorldObject(droneMesh.getRight());
         WorldObject body = new WorldObject(droneMesh.getBody());

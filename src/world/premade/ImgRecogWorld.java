@@ -1,9 +1,10 @@
 package world.premade;
 
+import meshes.cube.Cube;
+
 import org.joml.Vector3f;
 
 import entities.WorldObject;
-import entities.meshes.cube.Cube;
 import recognition.ImgRecogPlanner;
 import utils.Utils;
 import utils.IO.MouseInput;
