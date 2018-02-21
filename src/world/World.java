@@ -1,14 +1,13 @@
 package world;
 
 import entities.trail.Trail;
-
+import gui.TestbedGui;
 import engine.Engine;
 import engine.IWorldRules;
 import engine.Window;
 import engine.graph.Renderer;
 import entities.WorldObject;
 import entities.meshes.drone.DroneMesh;
-import gui.testbed.TestbedGui;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import physics.Physics;

@@ -2,7 +2,7 @@ package world.helpers;
 
 import entities.WorldObject;
 import entities.trail.Trail;
-import gui.testbed.TestbedGui;
+import gui.TestbedGui;
 import interfaces.Autopilot;
 import interfaces.AutopilotOutputs;
 
