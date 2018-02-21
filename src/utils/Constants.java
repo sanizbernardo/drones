@@ -22,8 +22,8 @@ public class Constants {
     public static final int TESTBED_GUI_HEIGHT = 350;  
     public static final int TESTBED_GUI_WIDTH = 200;  
     
-    public static final int AUTOPILOT_GUI_HEIGHT = 300;
-    public static final int AUTOPILOT_GUI_WIDTH = 450;
+    public static final int AUTOPILOT_GUI_HEIGHT = 407;
+    public static final int AUTOPILOT_GUI_WIDTH = 508;
     
     /**
      * Renderer constants

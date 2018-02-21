@@ -41,11 +41,8 @@ public class AutopilotGUI extends JFrame {
 	private final int imgWidth, imgHeight;
 	
 	private JLabel lblImage;
-	private JPanel topContentPanel;
-	private JPanel contentPanel;
-	private JPanel sliderPanel;
-	private SliderHandler lwSlider, horStabSlider, rwSlider, verStabSlider, thrustSlider;
-	private JPanel horSliderPanel;
+	private SliderHandler lwSlider, horStabSlider, rwSlider, verStabSlider, thrustSlider,
+						  lbSlider, fbSlider, rbSlider;
 	
 
 	/**
@@ -71,58 +68,18 @@ public class AutopilotGUI extends JFrame {
 			            public float getVerticalAngleOfView() {return (float) Math.toRadians(120f);}
 			            public int getNbColumns() {return 200;}
 			            public int getNbRows() {return 200;}
-						@Override
-						public String getDroneID() {
-							// TODO Auto-generated method stub
-							return null;
-						}
-						@Override
-						public float getWheelY() {
-							// TODO Auto-generated method stub
-							return 0;
-						}
-						@Override
-						public float getFrontWheelZ() {
-							// TODO Auto-generated method stub
-							return 0;
-						}
-						@Override
-						public float getRearWheelZ() {
-							// TODO Auto-generated method stub
-							return 0;
-						}
-						@Override
-						public float getRearWheelX() {
-							// TODO Auto-generated method stub
-							return 0;
-						}
-						@Override
-						public float getTyreSlope() {
-							// TODO Auto-generated method stub
-							return 0;
-						}
-						@Override
-						public float getDampSlope() {
-							// TODO Auto-generated method stub
-							return 0;
-						}
-						@Override
-						public float getTyreRadius() {
-							// TODO Auto-generated method stub
-							return 0;
-						}
-						@Override
-						public float getRMax() {
-							// TODO Auto-generated method stub
-							return 0;
-						}
-						@Override
-						public float getFcMax() {
-							// TODO Auto-generated method stub
-							return 0;
-						}});
+						public String getDroneID() {return "ID";}
+						public float getWheelY() {return 0f;}
+						public float getFrontWheelZ() {return 0f;}
+						public float getRearWheelZ() {return 0f;}
+						public float getRearWheelX() {return 0f;}
+						public float getTyreSlope() {return 0f;}
+						public float getDampSlope() {return 0f;}
+						public float getTyreRadius() {return 0f;}
+						public float getRMax() {return 500f;}
+						public float getFcMax() {return 0f;}});
+					
 					BufferedImage img = ImageIO.read(new File("ss.png"));
-					System.out.println(img.getHeight() + " " + img.getWidth());
 					frame.lblImage.setIcon(new ImageIcon(GuiUtils.addCrossHair(img, 100, 100, 13133055)));
 					frame.showGUI();
 				} catch (Exception e) {
@@ -138,39 +95,75 @@ public class AutopilotGUI extends JFrame {
 		this.imgHeight = config.getNbRows();
 		float maxThrust = config.getMaxThrust();
 		int maxAOA = (int) Math.toDegrees(config.getMaxAOA());
+		float maxBrake = config.getRMax();
 		
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, Constants.AUTOPILOT_GUI_WIDTH, Constants.AUTOPILOT_GUI_HEIGHT);
 		setTitle("Autopilot");
-		topContentPanel = new JPanel();
+		
+		
+		JPanel topContentPanel = new JPanel();
 		topContentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		topContentPanel.setLayout(new BorderLayout(0, 0));
 		setContentPane(topContentPanel);
 		
-		JLabel lblAutopilotGui = new JLabel("Autopilot GUI");
+		JLabel lblAutopilotGui = new JLabel("Autopilot GUI: " + config.getDroneID());
 		lblAutopilotGui.setHorizontalAlignment(SwingConstants.CENTER);
 		topContentPanel.add(lblAutopilotGui, BorderLayout.NORTH);
 		
-		contentPanel = new JPanel();
+		JPanel contentPanel = new JPanel();
 		topContentPanel.add(contentPanel, BorderLayout.CENTER);
-		GridBagLayout gbl_panel = new GridBagLayout();
-		contentPanel.setLayout(gbl_panel);
+		contentPanel.setLayout(new GridBagLayout());
 		
+		JPanel leftPanel = new JPanel();
+		contentPanel.add(leftPanel, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER));		
+		leftPanel.setLayout(new GridBagLayout());
 		
 		lblImage = new JLabel("");
-		contentPanel.add(lblImage, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER, new Insets(5, 5, 5, 5)));
+		GridBagConstraints gbc_img = GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER, new Insets(5, 5, 5, 5));
+		gbc_img.gridwidth = 3;
+		leftPanel.add(lblImage, gbc_img);
 		lblImage.setIcon(new ImageIcon());
 		lblImage.setPreferredSize(new Dimension(imgWidth, imgHeight));
 		
-		sliderPanel = new JPanel();
-		contentPanel.add(sliderPanel, GuiUtils.buildGBC(1, 0, GridBagConstraints.CENTER));
-		GridBagLayout gbl_sliderPanel = new GridBagLayout();
-		sliderPanel.setLayout(gbl_sliderPanel);
+		JPanel brakePanel = new JPanel();
+		leftPanel.add(brakePanel, GuiUtils.buildGBC(0, 1, GridBagConstraints.CENTER));
+		brakePanel.setLayout(new GridBagLayout());
+		
+		Hashtable<Integer, JLabel> brakeTable = new Hashtable<>();
+		JLabel zeroLbl = new JLabel("0");
+		zeroLbl.setFont(zeroLbl.getFont().deriveFont(10.0f));
+		brakeTable.put(0, zeroLbl);
+		JLabel halfLbl = new JLabel("" + (int) (maxBrake/2f));
+		halfLbl.setFont(zeroLbl.getFont().deriveFont(10.0f));
+		brakeTable.put((int) (maxBrake/2f), halfLbl);
+		JLabel maxLbl = new JLabel("" + (int) (maxBrake));
+		maxLbl.setFont(zeroLbl.getFont().deriveFont(10.0f));
+		brakeTable.put((int) (maxBrake), maxLbl);
+		
+		lbSlider = buildSlider("L brake", SwingConstants.VERTICAL, 0, 0, (int) (maxBrake), 
+					(int) (maxBrake/4f), (int) (maxBrake/8f), brakeTable, false);
+		lbSlider.slider.setPreferredSize(new Dimension(50, 100));
+		brakePanel.add(lbSlider.panel, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER, new Insets(0, 20, 0, 5)));		
+		
+		fbSlider = buildSlider("F brake", SwingConstants.VERTICAL, 0, 0, (int) (maxBrake), 
+				(int) (maxBrake/4f), (int) (maxBrake/8f), brakeTable, false);
+		fbSlider.slider.setPreferredSize(new Dimension(50, 100));
+		brakePanel.add(fbSlider.panel, GuiUtils.buildGBC(1, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
+		
+		rbSlider = buildSlider("R brake", SwingConstants.VERTICAL, 0, 0, (int) (maxBrake), 
+				(int) (maxBrake/4f), (int) (maxBrake/8f), brakeTable, false);
+		rbSlider.slider.setPreferredSize(new Dimension(50, 100));
+		brakePanel.add(rbSlider.panel, GuiUtils.buildGBC(2, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		
 		
-		horSliderPanel = new JPanel();
-		sliderPanel.add(horSliderPanel, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER));
+		JPanel rightPanel = new JPanel();
+		contentPanel.add(rightPanel, GuiUtils.buildGBC(1, 0, GridBagConstraints.CENTER));
+		rightPanel.setLayout(new GridBagLayout());
+				
+		JPanel horSliderPanel = new JPanel();
+		rightPanel.add(horSliderPanel, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER));
 		GridBagLayout gbl_horSliderPanel = new GridBagLayout();
 		gbl_horSliderPanel.columnWidths = new int[] {60, 60, 60};
 		horSliderPanel.setLayout(gbl_horSliderPanel);
@@ -188,33 +181,33 @@ public class AutopilotGUI extends JFrame {
 			}
 		}
 				
-		lwSlider = buildSlider("RW", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
+		lwSlider = buildSlider("R wing", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
 		horSliderPanel.add(lwSlider.panel, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		
 		
-		horStabSlider = buildSlider("HS", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
+		horStabSlider = buildSlider("H stab", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
 		horSliderPanel.add(horStabSlider.panel, GuiUtils.buildGBC(1, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		
 		
-		rwSlider = buildSlider("LW", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
+		rwSlider = buildSlider("L wing", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
 		horSliderPanel.add(rwSlider.panel, GuiUtils.buildGBC(2, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		
 
-		verStabSlider = buildSlider("VS", SwingConstants.HORIZONTAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false); 
-		sliderPanel.add(verStabSlider.panel, GuiUtils.buildGBC(0, 1, GridBagConstraints.CENTER, new Insets(5, 0, 5, 5)));
+		verStabSlider = buildSlider("V stab", SwingConstants.HORIZONTAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false); 
+		rightPanel.add(verStabSlider.panel, GuiUtils.buildGBC(0, 1, GridBagConstraints.CENTER, new Insets(5, 0, 5, 5)));
 		
 		
 		Hashtable<Integer, JLabel> thrustTable = new Hashtable<>();
-		thrustTable.put(0, new JLabel("0"));
+		thrustTable.put(0, zeroLbl);
 		thrustTable.put((int)(maxThrust/2f), new JLabel(""+(int)(maxThrust/2f)));
 		thrustTable.put((int)(maxThrust), new JLabel(""+(int)(maxThrust)));
 		
 		thrustSlider = buildSlider("Thrust", SwingConstants.VERTICAL, 0, 0, (int)maxThrust, 
-				(int)(maxThrust/10f), (int)(maxThrust/40f), thrustTable, true);
+				(int)(maxThrust/10f), (int)(maxThrust/20f), thrustTable, true);
 		thrustSlider.slider.setPreferredSize(new Dimension(57, 270));
 		GridBagConstraints gbc_thrustSlider = GuiUtils.buildGBC(1, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5));
 		gbc_thrustSlider.gridheight = 2;
-		sliderPanel.add(thrustSlider.panel, gbc_thrustSlider);
+		rightPanel.add(thrustSlider.panel, gbc_thrustSlider);
 	}
 	
 	
@@ -242,6 +235,9 @@ public class AutopilotGUI extends JFrame {
 		horStabSlider.setValue((int) Math.toDegrees(output.getHorStabInclination()));
 		verStabSlider.setValue((int) Math.toDegrees(output.getVerStabInclination()));
 		thrustSlider.setValue((int) output.getThrust());
+		lbSlider.setValue((int) output.getLeftBrakeForce());
+		fbSlider.setValue((int) output.getFrontBrakeForce());
+		rbSlider.setValue((int) output.getRightBrakeForce());		
 	}
 
 	
