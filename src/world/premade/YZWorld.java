@@ -26,9 +26,9 @@ public class YZWorld extends World implements IWorldRules {
     public void setup() {
         config = Utils.createDefaultConfig();
 
-        physics.init(config,  new Vector3f(0,100f,0), 50);
+        physics.init(config,  new Vector3f(0,-config.getWheelY()+config.getTyreRadius(),-50), 0);
 
-        planner = new Motion();
+        planner = null;
 
         Random rand = new Random();
 
@@ -40,7 +40,7 @@ public class YZWorld extends World implements IWorldRules {
             cube.setScale(0.5f);
             int y = rand.nextInt(10)-10;
 
-            cube.setPosition(0, y, -i*40);
+            cube.setPosition(0, y + 100f, -i*40);
             worldObjects[i-1] = cube;
         }
         

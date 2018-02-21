@@ -3,11 +3,11 @@ package meshes.tile;
 import utils.RGBTuple;
 import meshes.AbstractMesh;
 
-public class UnitTile extends AbstractMesh {
+public class DoubleUnitTile extends AbstractMesh {
 
 	RGBTuple color;
 	
-	public UnitTile(RGBTuple color) {
+	public DoubleUnitTile(RGBTuple color) {
 		this.color = color;
 		finalizer();
 	}
@@ -16,10 +16,10 @@ public class UnitTile extends AbstractMesh {
 	protected void setPositions() {
 		this.positions = new float[]{
 			0       , 0, 0,          //0
-			0.7603f , 0, -0.6495f,   //1
-			0.7603f , 0, 0.6495f,    //2
-			-0.7603f, 0, 0.6495f,   //3
-			-0.7603f, 0, -0.6495f,  //4
+			1 , 0, -1,   //1
+			1 , 0, 1,    //2
+			-1, 0, 1,   //3
+			-1, 0, -1,  //4
 			
 		};
 	}
@@ -41,6 +41,10 @@ public class UnitTile extends AbstractMesh {
 				1,2,3,
 				3,4,1,
 		};
+	}
+
+	public int getSize() {
+		return 2;
 	}
 
 }

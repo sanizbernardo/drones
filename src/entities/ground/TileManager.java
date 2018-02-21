@@ -5,20 +5,18 @@ import java.util.List;
 
 import utils.RGBTuple;
 import utils.Utils;
-import meshes.tile.UnitTile;
+import meshes.tile.DoubleUnitTile;
 import entities.WorldObject;
 
 public class TileManager {
 
 	List<WorldObject> tileList;
 	
-	public TileManager(int size) {
+	public TileManager(int size, int tileSize) {
 		tileList = new ArrayList<WorldObject>();
 		
 		float[] col1 = Utils.toRGB(-105, 1, 0.8f);
 		float[] col2 = Utils.toRGB(-105, 1, 0.7f);
-		
-		int tileSize = 10;
 		
 		RGBTuple light = new RGBTuple(col1[0], col1[1], col1[2]);
 		RGBTuple dark = new RGBTuple(col2[0], col2[1], col2[2]);
@@ -45,15 +43,26 @@ public class TileManager {
 			for(int j = -val; j <= val; j++) {
 				if(j==0 && !checkZero) {continue;}
 				
-				UnitTile unitTile = (flip) ? new UnitTile(light) :  new UnitTile(dark);
+				DoubleUnitTile doubleUnitTile = (flip) ? new DoubleUnitTile(light) :  new DoubleUnitTile(dark);
 				flip = !flip;
 				
-				WorldObject tile = new WorldObject(unitTile.getMesh());
-				tile.setPosition(i * tileSize,0,j * tileSize);
+				WorldObject tile = new WorldObject(doubleUnitTile.getMesh());
+
+				float iVal = 0;
+				if(even) {
+					iVal = (i < 0) ? (+0.5f) : -0.5f;
+				}
+
+                float jVal = 0;
+                if(even) {
+                    jVal = (j < 0) ? (+0.5f) : -0.5f;
+                }
+
+				tile.setPosition((i + iVal) * tileSize * doubleUnitTile.getSize(),0,(j + jVal) *  tileSize * doubleUnitTile.getSize());
 				tile.setScale(tileSize);
 				tileList.add(tile);
 				
-			}
+			} if(even) flip = !flip;
 		}
 		
 	}
