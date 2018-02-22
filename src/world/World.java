@@ -1,10 +1,11 @@
 package world;
 
+import entities.tarmac.Tarmac;
 import entities.trail.Trail;
 import engine.Engine;
 import engine.IWorldRules;
 import engine.Window;
-import engine.graph.Renderer;
+import graphics.Renderer;
 import entities.WorldObject;
 import entities.drone.DroneSkeleton;
 import entities.ground.Ground;
@@ -42,8 +43,10 @@ public abstract class World implements IWorldRules {
     protected Physics physics;
     protected Engine gameEngine;
     protected ArrayList<WorldObject> pathObjects = new ArrayList<>();
+
     protected Trail trail;
     protected Ground ground;
+    protected Tarmac tarmac;
     
     public World(int tSM, boolean wantPhysicsEngine) {
         this.cameraHelper = new CameraHelper();
@@ -145,7 +148,8 @@ public abstract class World implements IWorldRules {
                         worldObjects,
                         droneItems,
                         pathObjects,
-                        ground);
+                        ground,
+                        tarmac);
     }
 
     /**

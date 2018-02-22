@@ -3,11 +3,20 @@ package utils;
 public class RGBTuple {
 	
 	float red, blue, green;
-	
+
+	public RGBTuple() {
+
+	}
 	public RGBTuple(float red, float blue, float green) {
 		this.red = red;
 		this.blue = blue;
 		this.green = green;
+	}
+
+	public void set(float[] col) {
+		this.red = col[0];
+		this.blue = col[1];
+		this.green = col[2];
 	}
 
 	public float getRed() {

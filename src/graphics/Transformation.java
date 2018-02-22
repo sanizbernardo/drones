@@ -1,9 +1,8 @@
-package engine.graph;
+package graphics;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import entities.WorldObject;
-import utils.FloatMath;
 
 public class Transformation {
 

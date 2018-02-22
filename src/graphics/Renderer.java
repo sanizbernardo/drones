@@ -1,9 +1,9 @@
-package engine.graph;
+package graphics;
 
 import static org.lwjgl.opengl.GL11.*;
 import engine.Window;
-import meshes.Mesh;
 
+import entities.tarmac.Tarmac;
 import org.joml.Matrix4f;
 
 import utils.*;
@@ -108,7 +108,7 @@ public class Renderer {
         glDisable(GL_SCISSOR_TEST);
     }
 
-    public void render(Window window, CameraHelper cameraHelper, WorldObject[] gameItems, WorldObject[] droneItems, ArrayList<WorldObject> pathObjects, Ground ground) {
+    public void render(Window window, CameraHelper cameraHelper, WorldObject[] gameItems, WorldObject[] droneItems, ArrayList<WorldObject> pathObjects, Ground ground, Tarmac tarmac) {
 		clear(window);
 		
 
@@ -120,7 +120,7 @@ public class Renderer {
         droneCam(cameraHelper, gameItems, ground);
 		
         if(!ortho) {
-            freeCam(window, cameraHelper, gameItems, droneItems, pathObjects, ground);
+            freeCam(window, cameraHelper, gameItems, droneItems, pathObjects, ground, tarmac);
         } else {
         	int size = 60;
         	
@@ -178,7 +178,7 @@ public class Renderer {
 
 	private void freeCam(Window window, CameraHelper cameraHelper,
 			WorldObject[] gameItems, WorldObject[] droneItems,
-			ArrayList<WorldObject> pathObjects, Ground ground) {
+			ArrayList<WorldObject> pathObjects, Ground ground, Tarmac tarmac) {
 		Matrix4f projectionMatrix;
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
@@ -194,6 +194,7 @@ public class Renderer {
 		// Update view Matrix
 		viewMatrix = transformation.getViewMatrix(cameraHelper.freeCamera);
 
+		renderTarmac(tarmac, viewMatrix);
 		renderGround(ground, viewMatrix);
 		renderTrail(pathObjects, viewMatrix);
 		renderWorldItems(gameItems, viewMatrix);
@@ -269,6 +270,13 @@ public class Renderer {
             gameItem.getMesh().render();
         }
     }
+
+    private void renderTarmac(Tarmac tarmac, Matrix4f viewMatrix) {
+		if(tarmac == null || tarmac.getObject() == null || tarmac.getObject().getMesh() == null) return;
+		Matrix4f modelViewMatrix = transformation.getModelViewMatrix(tarmac.getObject(), viewMatrix);
+		shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+		tarmac.getObject().getMesh().render();
+	}
 
     private void renderGround(Ground ground, Matrix4f viewMatrix) {
     	if(ground == null || ground.getTiles().isEmpty()) return;
