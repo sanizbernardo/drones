@@ -52,6 +52,9 @@ public class Physics {
 		
 		this.config = config;
 		
+		this.lwIncl = FloatMath.toRadians(10);
+		this.rwIncl = FloatMath.toRadians(10);
+		
 		this.pos = new Vector3f(startPos);
 		this.vel = new Vector3f(0, 0, -startVel);
 		
@@ -323,7 +326,8 @@ public class Physics {
 			
 			if (checkAOA && Math.abs(aoa) > maxAOA)
 				throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa");
-			
+//				System.out.println("maxAOA");
+				
 			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
 			
 			totalForce.add(force);

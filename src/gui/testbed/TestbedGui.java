@@ -57,7 +57,7 @@ public class TestbedGui extends JFrame {
         	ubuntuHeader = 44;
         }
         
-		setBounds(Constants.AUTOPILOT_GUI_WIDTH - Constants.TESTBED_GUI_WIDTH + ubuntuSiderBar, Constants.AUTOPILOT_GUI_HEIGHT +  2 * ubuntuHeader, Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT);
+		setBounds(Constants.AUTOPILOT_GUI_WIDTH - Constants.TESTBED_GUI_WIDTH + ubuntuSiderBar, Constants.AUTOPILOT_GUI_HEIGHT +  2 * ubuntuHeader + 200, Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
