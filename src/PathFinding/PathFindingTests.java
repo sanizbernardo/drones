@@ -1,0 +1,19 @@
+package PathFinding;
+
+import java.util.ArrayList;
+
+public class PathFindingTests {
+	
+	public static void main(String[] args) {
+		ArrayList<float[]> cubelocs = new ArrayList<float[]>();
+		cubelocs.add(new float[] {0,30,-1000});
+		float[] start = new float[] {0,0,0};
+		IPath pad = new IPath(cubelocs, 0.1f, 0.1f, 100f, start, 0f);
+		float[] padx = pad.getX();
+		float[] pady = pad.getY();
+		float[] padz = pad.getZ();
+		for(int i = 0; i<padx.length; i++){
+			System.out.println(padx[i] + "     "  + pady[i] + "     "  + padz[i]);
+		}
+	}
+}
