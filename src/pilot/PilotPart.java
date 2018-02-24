@@ -30,5 +30,10 @@ public abstract class PilotPart {
 	 * Afsluiten van de pilot na dat hij klaar is
 	 */
 	public abstract void close();
-
+	
+	
+	/**
+	 * Taakbeschrijving (1-2 woorden)
+	 */
+	public abstract String taskName();
 }

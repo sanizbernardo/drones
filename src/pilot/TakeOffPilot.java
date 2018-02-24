@@ -78,4 +78,10 @@ public class TakeOffPilot extends PilotPart {
 	
 	@Override
 	public void close() { }
+
+
+	@Override
+	public String taskName() {
+		return "Takeoff";
+	}
 }

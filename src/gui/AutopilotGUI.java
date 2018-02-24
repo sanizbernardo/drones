@@ -17,9 +17,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalSliderUI;
 
-
-
-
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotOutputs;
 
@@ -29,10 +26,15 @@ import javax.swing.SwingConstants;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JSlider;
+import javax.swing.JToggleButton;
 
 import utils.Constants;
+import utils.FloatMath;
+import utils.Utils;
 
 public class AutopilotGUI extends JFrame {
 
@@ -43,6 +45,10 @@ public class AutopilotGUI extends JFrame {
 	private JLabel lblImage;
 	private SliderHandler lwSlider, horStabSlider, rwSlider, verStabSlider, thrustSlider,
 						  lbSlider, fbSlider, rbSlider;
+
+	private boolean manual;
+	
+	private JLabel stateLabel;
 	
 
 	/**
@@ -59,7 +65,7 @@ public class AutopilotGUI extends JFrame {
 			            public float getEngineMass() {return 0f;}
 			            public float getWingMass() {return 0f;}
 			            public float getTailMass() {return 0f;}
-			            public float getMaxThrust() {return 500f;}
+			            public float getMaxThrust() {return 1000f;}
 			            public float getMaxAOA() {return (float) Math.toRadians(30);}
 			            public float getWingLiftSlope() {return 0f;}
 			            public float getHorStabLiftSlope() {return 0f;}
@@ -108,9 +114,37 @@ public class AutopilotGUI extends JFrame {
 		topContentPanel.setLayout(new BorderLayout(0, 0));
 		setContentPane(topContentPanel);
 		
+		JPanel northPanel = new JPanel();
+		topContentPanel.add(northPanel, BorderLayout.NORTH);
+		GridBagLayout gbl = new GridBagLayout();
+		gbl.columnWidths = new int[] {Constants.AUTOPILOT_GUI_WIDTH/2, Constants.AUTOPILOT_GUI_WIDTH/2}; 
+		northPanel.setLayout(gbl);
+		
+		
 		JLabel lblAutopilotGui = new JLabel("Autopilot GUI: " + config.getDroneID());
 		lblAutopilotGui.setHorizontalAlignment(SwingConstants.CENTER);
-		topContentPanel.add(lblAutopilotGui, BorderLayout.NORTH);
+		GridBagConstraints gbc_lbl = GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER, new Insets(5, 0, 5, 0));
+		gbc_lbl.gridwidth = 2;
+		northPanel.add(lblAutopilotGui, gbc_lbl);
+		
+		stateLabel = new JLabel("Current Task: ");
+		stateLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		northPanel.add(stateLabel, GuiUtils.buildGBC(0, 1, GridBagConstraints.WEST, new Insets(5, 40, 5, 0)));
+		
+		JToggleButton manualToggle = new JToggleButton("Manual Control");
+		manualToggle.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				manual = ((JToggleButton)e.getSource()).isSelected();
+				if (manual) {
+					setTask("Manual");
+				} else {
+					setTask("");
+				}
+			}
+		});
+		northPanel.add(manualToggle, GuiUtils.buildGBC(1, 1, GridBagConstraints.CENTER, new Insets(5, 0, 5, 20)));
+		
 		
 		JPanel contentPanel = new JPanel();
 		topContentPanel.add(contentPanel, BorderLayout.CENTER);
@@ -143,17 +177,17 @@ public class AutopilotGUI extends JFrame {
 		brakeTable.put((int) (maxBrake), maxLbl);
 		
 		lbSlider = buildSlider("L brake", SwingConstants.VERTICAL, 0, 0, (int) (maxBrake), 
-					(int) (maxBrake/4f), (int) (maxBrake/8f), brakeTable, false);
+					(int) (maxBrake/4f), (int) (maxBrake/8f), brakeTable, true);
 		lbSlider.slider.setPreferredSize(new Dimension(50, 100));
 		brakePanel.add(lbSlider.panel, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER, new Insets(0, 20, 0, 5)));		
 		
 		fbSlider = buildSlider("F brake", SwingConstants.VERTICAL, 0, 0, (int) (maxBrake), 
-				(int) (maxBrake/4f), (int) (maxBrake/8f), brakeTable, false);
+				(int) (maxBrake/4f), (int) (maxBrake/8f), brakeTable, true);
 		fbSlider.slider.setPreferredSize(new Dimension(50, 100));
 		brakePanel.add(fbSlider.panel, GuiUtils.buildGBC(1, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		
 		rbSlider = buildSlider("R brake", SwingConstants.VERTICAL, 0, 0, (int) (maxBrake), 
-				(int) (maxBrake/4f), (int) (maxBrake/8f), brakeTable, false);
+				(int) (maxBrake/4f), (int) (maxBrake/8f), brakeTable, true);
 		rbSlider.slider.setPreferredSize(new Dimension(50, 100));
 		brakePanel.add(rbSlider.panel, GuiUtils.buildGBC(2, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		
@@ -216,6 +250,14 @@ public class AutopilotGUI extends JFrame {
 		setVisible(true);
 	}
 	
+	public void setTask(String task) {
+		stateLabel.setText("Current Task: " + task);
+	}
+	
+	public boolean manualControl() {
+		return this.manual;
+	}
+	
 	public void updateImage(byte[] image, int x, int y) {
 		BufferedImage img = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR);
 		img.getRaster().setDataElements(0, 0, imgWidth, imgHeight, image);
@@ -239,7 +281,17 @@ public class AutopilotGUI extends JFrame {
 		fbSlider.setValue((int) output.getFrontBrakeForce());
 		rbSlider.setValue((int) output.getRightBrakeForce());		
 	}
-
+	
+	public AutopilotOutputs getOutputs() {
+		return Utils.buildOutputs(FloatMath.toRadians(lwSlider.getValue()),
+								  FloatMath.toRadians(rwSlider.getValue()),
+								  FloatMath.toRadians(verStabSlider.getValue()),
+								  FloatMath.toRadians(horStabSlider.getValue()),
+								  thrustSlider.getValue(),
+								  lbSlider.getValue(),
+								  fbSlider.getValue(),
+								  rbSlider.getValue());
+	}
 	
 	private SliderHandler buildSlider(String title, int orientation, int min, int val, int max, int majorSpacing, int minorSpacing, Hashtable<Integer, JLabel> lblTable, boolean hasBar) {
 		JPanel panel = new JPanel();
@@ -267,13 +319,12 @@ public class AutopilotGUI extends JFrame {
 		return handler;
 	}
 	
-	private static class SliderHandler implements ChangeListener {
+	private class SliderHandler implements ChangeListener {
 
 		private final JSlider slider;
 		private final JPanel panel;
 		private final JLabel label;
 		private int val;
-		public boolean lock = true;
 		
 		public SliderHandler(JSlider slider, JPanel panel, JLabel label) {
 			this.slider = slider;
@@ -283,7 +334,7 @@ public class AutopilotGUI extends JFrame {
 		}
 		
 		public void stateChanged(ChangeEvent e) {
-			if (lock) {
+			if (!manual) {
 				slider.setValue(val);
 			} else {
 				val = slider.getValue();
@@ -292,10 +343,14 @@ public class AutopilotGUI extends JFrame {
 		}
 		
 		public void setValue(int val) {
-			boolean oldLock = lock;
-			lock = false;
+			boolean oldLock = !manual;
+			manual = true;
 			slider.setValue(val);
-			lock = oldLock;
+			manual = oldLock;
+		}
+		
+		public int getValue() {
+			return slider.getValue();
 		}
 	}
 	

@@ -135,9 +135,9 @@ public class TestbedGui extends JFrame {
 	    this.velocity[2].setText("" + FloatMath.round(velocity.z, precision));
 	    this.velocity[3].setText("" + FloatMath.round(FloatMath.norm(velocity), precision));
 		
-	    this.orientation[0].setText("" + FloatMath.round(pitch, precision));
-	    this.orientation[1].setText("" + FloatMath.round(heading, precision));
-	    this.orientation[2].setText("" + FloatMath.round(roll, precision));
+	    this.orientation[0].setText("" + FloatMath.round(FloatMath.toDegrees(pitch), precision));
+	    this.orientation[1].setText("" + FloatMath.round(FloatMath.toDegrees(heading), precision));
+	    this.orientation[2].setText("" + FloatMath.round(FloatMath.toDegrees(roll), precision));
 	}
 	
 	

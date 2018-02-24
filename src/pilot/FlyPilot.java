@@ -30,4 +30,10 @@ public class FlyPilot extends PilotPart {
 		
 	}
 
+	@Override
+	public String taskName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
