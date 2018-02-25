@@ -1,5 +1,6 @@
 package utils;
 
+
 public class Constants {
 
     /**
@@ -12,6 +13,10 @@ public class Constants {
     //only for initialization!
 //    public static final int HEIGHT = 750;
     
+    
+	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight", "OrthoTestWorld", "LogWorld", "RotationWorld", "YZWorld", "TestWorld2", "TakeOffWorld"};
+
+    
     /**
      * Drone pickup accuracy
      */
@@ -22,8 +27,8 @@ public class Constants {
     public static final int TESTBED_GUI_HEIGHT = 350;  
     public static final int TESTBED_GUI_WIDTH = 200;  
     
-    public static final int AUTOPILOT_GUI_HEIGHT = 300;
-    public static final int AUTOPILOT_GUI_WIDTH = 450;
+    public static final int AUTOPILOT_GUI_HEIGHT = 407;
+    public static final int AUTOPILOT_GUI_WIDTH = 508;
     
     /**
      * Renderer constants
@@ -53,8 +58,7 @@ public class Constants {
     public static final float MOUSE_SENSITIVITY = 0.4f;
 
     public static final float CAMERA_POS_STEP = 0.05f;
-    
-    
+          
     /**
      * default config settings
      */

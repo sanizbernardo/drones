@@ -22,6 +22,7 @@ public class ConfigSetupGUI extends JDialog {
 	private static final long serialVersionUID = 1L;
 
 	private JPanel spinnerPanel;
+	@SuppressWarnings("unused")
 	private JSpinner 	gravitySpinner, wingSizeSpinner, tailSizeSpinner, engineMassSpinner, 
 						wingMassSpinner, tailMassSpinner, maxThrustSpinner, maxAOASpinner, 
 						wingLiftslopeSpinner, verStabLiftslopeSpinner, horStabLiftslopeSpinner,
@@ -36,6 +37,8 @@ public class ConfigSetupGUI extends JDialog {
 	private JSpinner[] posSpinners;
 
 	private Map<String, WorldGen> worldGens;
+
+	private JCheckBox logCheck;
 
 	
 	public static void main(String[] args) throws Exception {
@@ -91,6 +94,8 @@ public class ConfigSetupGUI extends JDialog {
 		});
 		btnPanel.add(btnStart);
 		
+		SwingUtilities.getRootPane(btnStart).setDefaultButton(btnStart);
+		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 
@@ -125,19 +130,20 @@ public class ConfigSetupGUI extends JDialog {
 		}
 		
 		JPanel comboPanel = new JPanel();
-		FlowLayout fl_comboPanel = new FlowLayout(FlowLayout.LEFT);
-		fl_comboPanel.setHgap(0);
-		comboPanel.setLayout(fl_comboPanel);
+		comboPanel.setLayout(new BorderLayout(0, 0));
 		selectorPanel.add(comboPanel, BorderLayout.NORTH);
 		
+		JPanel anotherPanel = new JPanel();
+		anotherPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		comboPanel.add(anotherPanel, BorderLayout.NORTH);
 		JLabel selectorLbl = new JLabel("Select world generation method: ");
-		comboPanel.add(selectorLbl);
+		anotherPanel.add(selectorLbl);
 		
 		genComboBox = new JComboBox<String>();
 		DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>(genComboLbls);
 		genComboBox.setModel(comboBoxModel);
-		comboPanel.add(genComboBox);
-		genComboBox.addItemListener(new ItemListener() {		
+		anotherPanel.add(genComboBox);
+		genComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					genCardLayout.show(genCards, (String)e.getItem());
@@ -145,25 +151,31 @@ public class ConfigSetupGUI extends JDialog {
 			}
 		});
 		genComboBox.setSelectedItem(WorldGen.premade.getComboText());
+				
+		JPanel checkPanel = new JPanel();
+		checkPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		logCheck = new JCheckBox("Enable logging?");
+		checkPanel.add(logCheck);
+		comboPanel.add(checkPanel, BorderLayout.SOUTH);
 		
 		
 		// create the config tab
-		JPanel configPanel = new JPanel();
-		tabbedPane.addTab("Config", configPanel);
-		configPanel.setLayout(new BorderLayout(0, 0));
-		
-		JLabel lblConfig = new JLabel("Autopilot config settings");
-		lblConfig.setFont(new Font("Tahoma", Font.BOLD, 13));
-		configPanel.add(lblConfig, BorderLayout.NORTH);
-		
-		
-		spinnerPanel = new JPanel();
-		configPanel.add(spinnerPanel, BorderLayout.CENTER);
-		GridBagLayout gbl_fieldsPanel = new GridBagLayout();
-		gbl_fieldsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0};
-		spinnerPanel.setLayout(gbl_fieldsPanel);
-		
-		buildSpinners();
+//		JPanel configPanel = new JPanel();
+//		tabbedPane.addTab("Config", configPanel);
+//		configPanel.setLayout(new BorderLayout(0, 0));
+//		
+//		JLabel lblConfig = new JLabel("Autopilot config settings");
+//		lblConfig.setFont(new Font("Tahoma", Font.BOLD, 13));
+//		configPanel.add(lblConfig, BorderLayout.NORTH);
+//		
+//		
+//		spinnerPanel = new JPanel();
+//		configPanel.add(spinnerPanel, BorderLayout.CENTER);
+//		GridBagLayout gbl_fieldsPanel = new GridBagLayout();
+//		gbl_fieldsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0};
+//		spinnerPanel.setLayout(gbl_fieldsPanel);
+//		
+//		buildSpinners();
 		
 		
 		// create the drone startup tap
@@ -231,106 +243,48 @@ public class ConfigSetupGUI extends JDialog {
 												(float) Math.toRadians(orientationDeg.z));
 			
 			((WorldBuilder) world).setupDrone(generateAutoPilotConfig(), pos, vel.z, orientation);
-	}
+		}
+		
+		if (logCheck.isSelected())
+			world.initLogging();
 		
 		return world; 
 	}
 	
 	private AutopilotConfig generateAutoPilotConfig() {
-		return new AutopilotConfig() {
-			public float getWingX() {return (float) wingSizeSpinner.getValue() / 4f;}
-			
-			public float getWingMass() {return (float) wingMassSpinner.getValue();}
-			
-			public float getWingLiftSlope() {return (float) wingLiftslopeSpinner.getValue();}
-			
-			public float getVerticalAngleOfView() {return (float) (Math.toRadians((int) verFOVSpinner.getValue()));}
-			
-			public float getVerStabLiftSlope() {return (float) verStabLiftslopeSpinner.getValue();}
-			
-			public float getTailSize() {return (float) tailSizeSpinner.getValue();}
-			
-			public float getTailMass() {return (float) tailMassSpinner.getValue();}
-			
-			public int getNbRows() {return (int) nbRowsSpinner.getValue();}
-			
-			public int getNbColumns() {return (int) nbColsSpinner.getValue();}
-			
-			public float getMaxThrust() {return (float) maxThrustSpinner.getValue();}
-			
-			public float getMaxAOA() {return (float) (Math.toRadians((int) maxAOASpinner.getValue()));}
-			
-			public float getHorizontalAngleOfView() {return (float) (Math.toRadians((int) horFOVSpinner.getValue()));}
-			
-			public float getHorStabLiftSlope() {return (float) horStabLiftslopeSpinner.getValue();}
-			
-			public float getGravity() {return (float) gravitySpinner.getValue();}
-			
-			public float getEngineMass() {return (float) engineMassSpinner.getValue();}
-
-			@Override
-			public String getDroneID() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public float getWheelY() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public float getFrontWheelZ() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public float getRearWheelZ() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public float getRearWheelX() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public float getTyreSlope() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public float getDampSlope() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public float getTyreRadius() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public float getRMax() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public float getFcMax() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-		};
+		return Utils.createDefaultConfig();
+		
+//		return new AutopilotConfig() {
+//			public float getWingX() {return (float) wingSizeSpinner.getValue() / 4f;};
+//			public float getWingMass() {return (float) wingMassSpinner.getValue();}
+//			public float getWingLiftSlope() {return (float) wingLiftslopeSpinner.getValue();}
+//			public float getVerticalAngleOfView() {return (float) (Math.toRadians((int) verFOVSpinner.getValue()));}
+//			public float getVerStabLiftSlope() {return (float) verStabLiftslopeSpinner.getValue();}
+//			public float getTailSize() {return (float) tailSizeSpinner.getValue();}
+//			public float getTailMass() {return (float) tailMassSpinner.getValue();}
+//			public int getNbRows() {return (int) nbRowsSpinner.getValue();}
+//			public int getNbColumns() {return (int) nbColsSpinner.getValue();}
+//			public float getMaxThrust() {return (float) maxThrustSpinner.getValue();}
+//			public float getMaxAOA() {return (float) (Math.toRadians((int) maxAOASpinner.getValue()));}
+//			public float getHorizontalAngleOfView() {return (float) (Math.toRadians((int) horFOVSpinner.getValue()));}
+//			public float getHorStabLiftSlope() {return (float) horStabLiftslopeSpinner.getValue();}
+//			public float getGravity() {return (float) gravitySpinner.getValue();}
+//			public float getEngineMass() {return (float) engineMassSpinner.getValue();}
+//			public String getDroneID() {return null;}
+//			public float getWheelY() {return 0;}
+//			public float getFrontWheelZ() {return 0;}
+//			public float getRearWheelZ() {return 0;}
+//			public float getRearWheelX() {return 0;}
+//			public float getTyreSlope() {return 0;}
+//			public float getDampSlope() {return 0;}
+//			public float getTyreRadius() {return 0;}
+//			public float getRMax() {return 0;}
+//			public float getFcMax() {return 0;}
+//		};
 	}
 	
 	
+	@SuppressWarnings("unused")
 	private void buildSpinners() {
 		gravitySpinner = GuiUtils.buildSpinner(spinnerPanel, "Gravity", 0, 0, Constants.DEFAULT_GRAVITY, 0f, 30f, 0.01f);
 
