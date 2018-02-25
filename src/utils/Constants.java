@@ -60,23 +60,25 @@ public class Constants {
      */
     public static final float DEFAULT_GRAVITY = 9.81f;
     
-    public static final float DEFAULT_WINGX = 0.25f;
+    public static final float DEFAULT_WINGX = 4.2f;
     
-    public static final float DEFAULT_TAILSIZE = 0.25f;
+    public static final float DEFAULT_TAILSIZE = 4.2f;
     
-    public static final float DEFAULT_ENGINE_MASS = 0.125f;
+    public static final float DEFAULT_ENGINE_MASS = 180f;
     
-    public static final float DEFAULT_WING_MASS = 0.125f;
+    public static final float DEFAULT_WING_MASS = 100f;
     
-    public static final float DEFAULT_TAIL_MASS = 0.0625f;
+    public static final float DEFAULT_TAIL_MASS = 100f;
     
-    public static final int DEFAULT_MAX_AOA = 45;
+    public static final float DEFAULT_MAX_THRUST = 2000f;
     
-    public static final float DEFAULT_WING_LIFTSLOPE = 0.1f;
+    public static final int DEFAULT_MAX_AOA = 15;
     
-    public static final float DEFAULT_VER_STAB_LIFTSLOPE = 0.05f;
+    public static final float DEFAULT_WING_LIFTSLOPE = 10f;
     
-    public static final float DEFAULT_HOR_STAB_LIFTSLOPE = 0.05f;
+    public static final float DEFAULT_VER_STAB_LIFTSLOPE = 5f;
+    
+    public static final float DEFAULT_HOR_STAB_LIFTSLOPE = 5f;
     
     public static final int DEFAULT_VER_FOV = 120;
     

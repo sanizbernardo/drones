@@ -120,21 +120,21 @@ public class Utils {
 	
 	public static AutopilotConfig createDefaultConfig() {
         return new AutopilotConfig() {
-            public float getGravity() {return 9.81f;}
-            public float getWingX() {return 3.35f;}
-            public float getTailSize() {return 5.11f;}
-            public float getEngineMass() {return 190.24f;}
-            public float getWingMass() {return 102.8f;}
-            public float getTailMass() {return 116.15f;}
-            public float getMaxThrust() {return 4500f;}
-            public float getMaxAOA() {return FloatMath.toRadians(15);}
-            public float getWingLiftSlope() {return 12.5f;}
-            public float getHorStabLiftSlope() {return 6.25f;}
-            public float getVerStabLiftSlope() {return 4.69f;}
-            public float getHorizontalAngleOfView() {return FloatMath.toRadians(120f);}
-            public float getVerticalAngleOfView() {return FloatMath.toRadians(120f);}
-            public int getNbColumns() {return 200;}
-            public int getNbRows() {return 200;}
+            public float getGravity() {return Constants.DEFAULT_GRAVITY;}
+            public float getWingX() {return Constants.DEFAULT_WINGX;}
+            public float getTailSize() {return Constants.DEFAULT_TAILSIZE;}
+            public float getEngineMass() {return Constants.DEFAULT_ENGINE_MASS;}
+            public float getWingMass() {return Constants.DEFAULT_WING_MASS;}
+            public float getTailMass() {return Constants.DEFAULT_TAIL_MASS;}
+            public float getMaxThrust() {return Constants.DEFAULT_MAX_THRUST;}
+            public float getMaxAOA() {return FloatMath.toRadians(Constants.DEFAULT_MAX_AOA);}
+            public float getWingLiftSlope() {return Constants.DEFAULT_WING_LIFTSLOPE;}
+            public float getHorStabLiftSlope() {return Constants.DEFAULT_HOR_STAB_LIFTSLOPE;}
+            public float getVerStabLiftSlope() {return Constants.DEFAULT_VER_STAB_LIFTSLOPE;}
+            public float getHorizontalAngleOfView() {return FloatMath.toRadians(Constants.DEFAULT_HOR_FOV);}
+            public float getVerticalAngleOfView() {return FloatMath.toRadians(Constants.DEFAULT_VER_FOV);}
+            public int getNbColumns() {return Constants.DEFAULT_NB_COLS;}
+            public int getNbRows() {return Constants.DEFAULT_NB_ROWS;}
 			public String getDroneID() {return "default Drone";}
 			public float getWheelY() {return -1.37f;}
 			public float getFrontWheelZ() {return -2.1f;}

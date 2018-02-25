@@ -51,13 +51,13 @@ public class Physics {
 	 * Initialises the drone at the given position, with the given starting velocity,
 	 * and the given heading, pitch and roll.
 	 */
-	public void init(AutopilotConfig config, Vector3f startPos, float startVel, float startHeading, float startPitch, float startRoll) {
+	public void init(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading, float startPitch, float startRoll) {
 		setupCalculations(config);
 		
 		this.config = config;
 		
 		this.pos = new Vector3f(startPos);
-		this.vel = new Vector3f(0, 0, -startVel);
+		this.vel = startVel;
 		
 		this.angVel = new Vector3f();
 		
@@ -78,6 +78,10 @@ public class Physics {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
+	}
+	
+	public void init(AutopilotConfig config, Vector3f startPos, float startVel, float startHeading, float startPitch, float startRoll) {
+		init(config, startPos, new Vector3f(0,0,-startVel), startHeading, startPitch, startRoll);
 	}
 	
 	/**
@@ -109,6 +113,10 @@ public class Physics {
 	 * and no starting orientation.
 	 */
 	public void init(AutopilotConfig config, Vector3f startPos, float startVel) {
+		init(config, startPos, startVel, 0f, 0f, 0f);
+	}
+	
+	public void init(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {
 		init(config, startPos, startVel, 0f, 0f, 0f);
 	}
 	
@@ -257,7 +265,7 @@ public class Physics {
 		Vector3f[] forceTorque = calculateForce(dt);
 		
 		// forward euler
-		this.pos.add(vel.mul(dt, new Vector3f())); 
+		this.pos.add(vel.mul(dt, new Vector3f()));
 		this.vel.add(FloatMath.transform(transMatInv, forceTorque[0]).mul(dt / this.weight));
 		this.angVel.add(calculateAlfa(forceTorque[1]).mul(dt));
 		
@@ -318,57 +326,45 @@ public class Physics {
 				 new Vector3f(0, FloatMath.sin(this.hsIncl), -FloatMath.cos(this.hsIncl)),
 				 new Vector3f(-FloatMath.sin(this.vsIncl), 0, -FloatMath.cos(this.vsIncl))}; 
 		
+		float[] aoa = new float[4];
+		Vector3f wingForce = new Vector3f();
 		for (int i = 0; i < 4; i++) {
 			Vector3f normal = FloatMath.cross(axisVectors[i], attacks[i]);
 			
 			Vector3f veli = (new Vector3f()).add(FloatMath.transform(this.transMat, this.vel)).add(FloatMath.cross(this.angVel, this.wingPositions[i]));
 			veli.mul(this.velProj[i]); // projecteren op vlak loodrecht op axis
-			float aoa = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
+			aoa[i] = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
 			
-			if (checkAOA && Math.abs(aoa) > maxAOA && vel.z < -5)
-				throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa");
+			Vector3f force = normal.mul(this.liftSlopes[i] * aoa[i] * FloatMath.squareNorm(veli));
 			
-			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
-			
-			totalForce.add(force);
+			wingForce.add(force);
 			totalTorque.add(FloatMath.cross(this.wingPositions[i], force));
 		}
 		
 		
+		if (FloatMath.norm(wingForce) < 50) {
+			for (int i = 0; i < 4; i++) {
+				if (checkAOA && Math.abs(aoa[i]) > maxAOA)
+					throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa");
+			}
+		}
+		totalForce.add(wingForce);
+		
+		
 		// wheels
 		for (int i = 0; i < 3; i++) {
-			boolean frictionDone = false;
+			Vector3f worldWheelPos = this.pos.add(FloatMath.transform(this.transMatInv, this.wheelPositions[i]),new Vector3f());
 			
-			Vector3f worldPos = this.pos.add(FloatMath.transform(this.transMatInv, this.wheelPositions[i]),new Vector3f());
+			float d = this.tyreRadius - worldWheelPos.y;
 			
-			float d = this.tyreRadius - worldPos.y;
+			worldWheelPos.y = 0;
 			
+			Vector3f relPos = FloatMath.transform(this.transMat, worldWheelPos.sub(this.pos));
+						
 			if (d >= this.tyreRadius)
 				throw new PhysicsException("Tyre nb " + i + " went underground");
 			
 			if (d > 0) { // op de grond?
-				
-				// wrijving (achterste wielen)
-				
-				if (i != 1 && !frictionDone) {
-					frictionDone = true;
-					Vector3f frictionForce;
-					
-					if (Math.abs(totalForce.x) <=  (-totalForce.y * this.maxFC)) {
-						frictionForce = new Vector3f(0, -totalForce.x, 0);
-						
-					} else {
-						frictionForce = new Vector3f(0, (totalForce.x > 0 ? -1: 1) * Math.abs(totalForce.y) * this.maxFC, 0);
-						
-					}
-					
-					totalForce.add(frictionForce);
-					frictionForce.mul((float)0.5);
-					
-					totalTorque.add(FloatMath.cross(this.wheelPositions[0], frictionForce));
-					totalTorque.add(FloatMath.cross(this.wheelPositions[2], frictionForce));
-				}
-				
 				// lift
 				
 				float dD = (d - dBuffer[i]) / dt,
@@ -377,10 +373,12 @@ public class Physics {
 				dBuffer[i] = d;
 				
 				if (forceY > 0) {
-					Vector3f force = FloatMath.transform(transMat, new Vector3f(0, forceY, 0));
+					Vector3f liftForce = FloatMath.transform(transMat, new Vector3f(0, forceY, 0));
 					
-					totalForce.add(force);
-					totalTorque.add(FloatMath.cross(this.wheelPositions[i], force));
+					totalForce.add(liftForce);
+					totalTorque.add(FloatMath.cross(relPos, liftForce));
+				} else {
+					forceY = 0;
 				}
 				
 				// remmen
@@ -388,23 +386,41 @@ public class Physics {
 				Vector3f worldVel = this.vel.add(FloatMath.cross(this.angVel, this.wheelPositions[i]), new Vector3f());
 				worldVel.y = 0;
 				
-				Vector3f force;
+				Vector3f brakeForce;
 				if (FloatMath.norm(worldVel) > 0) {
-					force = worldVel.normalize().mul(this.brakeForce[i]);
+					brakeForce = worldVel.normalize(new Vector3f()).mul(-this.brakeForce[i]);
 					
 				} else {
 					Vector3f direction = totalForce.normalize(new Vector3f());
 					float norm = FloatMath.norm(totalForce);
 					
 					if (norm <= this.brakeForce[i]) {
-						force = direction.mul(norm);
+						brakeForce = direction.mul(norm);
 					} else {
-						force = direction.mul(this.brakeForce[i]);
+						brakeForce = direction.mul(this.brakeForce[i]);
 					}
 				}
 				
-				totalForce.add(force);
-				totalTorque.add(FloatMath.cross(this.wheelPositions[i], force));
+				totalForce.add(brakeForce);
+				totalTorque.add(FloatMath.cross(relPos, brakeForce));
+				
+				
+				// wrijving
+				if (i != 1) {
+					Vector3f xDirection =  FloatMath.transform(this.transMatInv, new Vector3f(1,0,0));
+					xDirection.y = 0;
+
+					float lateralVel = worldVel.dot(xDirection);
+
+					xDirection = FloatMath.transform(this.transMat, xDirection);
+					xDirection.normalize();
+					
+					Vector3f frictionForce =  xDirection.mul(- this.maxFC * lateralVel * forceY);
+					totalForce.add(frictionForce);
+					totalTorque.add(FloatMath.cross(relPos, frictionForce));
+				}
+			} else {
+				dBuffer[i] = 0;
 			}
 		}
 		
