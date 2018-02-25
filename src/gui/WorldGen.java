@@ -39,6 +39,7 @@ import javax.swing.event.ListSelectionListener;
 import org.joml.Vector3f;
 
 import entities.meshes.cube.BufferedCube;
+import utils.Constants;
 import utils.Cubes;
 import utils.Utils;
 import world.World;
@@ -185,7 +186,7 @@ premade {
 		
 		JPanel inputPanel = buildBase(panel, "Load one of the premade worlds", 2, 2);
 		
-		classNames = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight", "OrthoTestWorld", "LogWorld", "RotationWorld", "YZWorld", "TestWorld2", "TakeOffWorld"};
+		classNames = Constants.PREMADE_WORLDS;
 		worlds = new HashMap<>();
 		for (String className: classNames) {
 			try {

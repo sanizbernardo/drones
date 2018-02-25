@@ -214,7 +214,7 @@ public class AutopilotGUI extends JFrame {
 				lblTable.put(-i, lbl2);
 			}
 		}
-				
+		
 		lwSlider = buildSlider("R wing", SwingConstants.VERTICAL, -10 - maxAOA, 0, 10 + maxAOA, 30, 10, lblTable, false);
 		horSliderPanel.add(lwSlider.panel, GuiUtils.buildGBC(0, 0, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5)));
 		

@@ -6,7 +6,6 @@ import gui.TestbedGui;
 import interfaces.Autopilot;
 import interfaces.AutopilotOutputs;
 
-import org.joml.Matrix3f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 

@@ -54,6 +54,8 @@ public class Pilot implements Autopilot {
 		if (this.gui.manualControl())
 			return this.gui.getOutputs();
 		
+		this.gui.updateImage(inputs.getImage());
+		
 		if (this.index >= this.order.length)
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 
@@ -80,6 +82,7 @@ public class Pilot implements Autopilot {
 			}
 		}
 		
+		this.gui.dispose();
 	}
 	
 	private int state() {

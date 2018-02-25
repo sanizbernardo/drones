@@ -1,5 +1,6 @@
 package utils;
 
+
 public class Constants {
 
     /**
@@ -11,6 +12,10 @@ public class Constants {
 //    public static final int WIDTH = 1500;
     //only for initialization!
 //    public static final int HEIGHT = 750;
+    
+    
+	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight", "OrthoTestWorld", "LogWorld", "RotationWorld", "YZWorld", "TestWorld2", "TakeOffWorld"};
+
     
     /**
      * Drone pickup accuracy
@@ -53,8 +58,7 @@ public class Constants {
     public static final float MOUSE_SENSITIVITY = 0.4f;
 
     public static final float CAMERA_POS_STEP = 0.05f;
-    
-    
+          
     /**
      * default config settings
      */
