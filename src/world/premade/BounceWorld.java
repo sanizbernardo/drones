@@ -2,6 +2,7 @@ package world.premade;
 
 import org.joml.Vector3f;
 
+import entities.WorldObject;
 import physics.Physics;
 import utils.Utils;
 import world.World;
@@ -20,6 +21,8 @@ public class BounceWorld extends World {
 		this.physics.init(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,-1.8f,0));
 		
 		this.planner = null;
+		
+		this.worldObjects = new WorldObject[0];
 	}
 
 	@Override

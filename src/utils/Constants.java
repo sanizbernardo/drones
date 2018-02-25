@@ -13,14 +13,17 @@ public class Constants {
     //only for initialization!
 //    public static final int HEIGHT = 750;
     
-    
-	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight", "OrthoTestWorld", "LogWorld", "RotationWorld", "YZWorld", "TestWorld2", "TakeOffWorld"};
+    /**
+     * Premade worlds that should show in the gui.
+     */
+	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight",
+																"OrthoTestWorld", "RotationWorld", "YZWorld", "TestWorld2", 
+																"TakeOffWorld", "BounceWorld"};
 
     
     /**
      * Drone pickup accuracy
      */
-
     public static final float PICKUP_DISTANCE = 3f;
 
 
