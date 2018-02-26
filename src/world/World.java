@@ -194,7 +194,8 @@ public abstract class World implements IWorldRules {
     	testbedGui.dispose();
     	if (planner != null) planner.simulationEnded();
     	try {
-			writer.close();
+    		if (writer != null)
+    			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

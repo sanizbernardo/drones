@@ -53,7 +53,7 @@ public class TakeOffPilot extends PilotPart {
 		} else {
 			lwIncl = 10;
 			rwIncl = 10;
-			horStabIncl = -(this.climbAngle + input.getPitch());		
+			horStabIncl = -0.5f*(this.climbAngle + input.getPitch());		
 			horStabIncl = horStabIncl > 12 ? 12: horStabIncl;
 			thrust = this.maxThrust;
 		}
@@ -66,7 +66,7 @@ public class TakeOffPilot extends PilotPart {
 			this.ended = true;
 		}
 				
-		return Utils.buildOutputs(lwIncl, rwIncl, 0, horStabIncl, thrust, 0, 0, 0);
+		return Utils.buildOutputs(FloatMath.toRadians(lwIncl), FloatMath.toRadians(rwIncl), 0, FloatMath.toRadians(horStabIncl), thrust, 0, 0, 0);
 	}
 
 	

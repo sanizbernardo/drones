@@ -26,7 +26,7 @@ public class Pilot implements Autopilot {
 	public Pilot() {
 		this.pilots = new PilotPart[4];
 		
-		this.pilots[STATE_TAKING_OFF] = new TakeOffPilot(400);
+		this.pilots[STATE_TAKING_OFF] = new TakeOffPilot(250);
 		this.pilots[STATE_LANDING] = new LandingPilot();
 		this.pilots[STATE_FLYING] = new FlyPilot();
 		this.pilots[STATE_TAXIING] = new TaxiPilot();

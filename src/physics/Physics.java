@@ -342,7 +342,7 @@ public class Physics {
 		}
 		
 		
-		if (FloatMath.norm(wingForce) < 50) {
+		if (FloatMath.norm(wingForce) > 50) {
 			for (int i = 0; i < 4; i++) {
 				if (checkAOA && Math.abs(aoa[i]) > maxAOA)
 					throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa");

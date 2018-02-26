@@ -19,7 +19,7 @@ public class TakeOffWorld extends World {
 	public void setup() {
 		this.config = Utils.createDefaultConfig();
 		
-		this.physics = new Physics(false);
+		this.physics = new Physics(true);
 		this.physics.init(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), 0);
 		
 		this.planner = new Pilot();
