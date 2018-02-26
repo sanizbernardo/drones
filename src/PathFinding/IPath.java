@@ -48,6 +48,7 @@ public class IPath implements Path{
 		
 	}
 	
+	//Find the closest goal location to current location which has not yet been visited
 	private float[] findClosest(ArrayList<float[]> cubesAlreadyInPath){
 		float[] currentClosest = null;
 		double currentDist = Float.MAX_VALUE;
@@ -63,10 +64,10 @@ public class IPath implements Path{
 		return currentClosest;
 	}
 	
-
+	//tempLoc?
+	//TODO All 1.5f are to be optimized
 	private void addToPath(float[] closestCube) {
 		//down
-		//all 1.5 values are a choice -> TODO find a way to optimize these
 		if(closestCube[1] < this.location[1]){
 			float newX = this.location[0] + 1.5f*(float)Math.sin(heading) * (this.location[1] - closestCube[1])/this.maxDeclination;
 			float newY = closestCube[1];
@@ -108,7 +109,7 @@ public class IPath implements Path{
 			corner = bigCorner - smallCorner;
 		}
 
-		//this number is a choice: maybe it is better to let this number depend on corner //TODO
+		//this number is a choice: maybe it is better to let this number depend on corner, or distance between locations //TODO
 		int NbPoints = 10;
 		float cornerPiece = corner/NbPoints;
 		
@@ -150,7 +151,20 @@ public class IPath implements Path{
 		this.location = new float[] {closestCube[0], closestCube[1], closestCube[2]};
 	}
 	
-
+	//check wether we can reach a location in case we start turning right now
+	private Boolean turnable(float[] goalLocation, float turnRadius) {
+		Boolean result = True;
+		float[] currentLoc = this.location;
+		float[] circleCentre1 = currentLoc + turnRadius*(-1/this.heading);
+		float[] circleCentre2 = currentLoc - turnRadius*(-1/this.heading);
+		if (Math.sqrt(Math.pow(goalLocation[0]-circleCentre1[0], 2)+Math.pow(goalLocation[2]-circlecentre1[2], 2)) < turnRadius)
+			result = False;		
+		if (Math.sqrt(Math.pow(goalLocation[0]-circleCentre2[0], 2)+Math.pow(goalLocation[2]-circlecentre2[2], 2)) < turnRadius)
+			result = False;		
+		return result;
+	}
+	
+	
 	private float[] auxLocPlusMinZ(float arg) {
 		float[] newLoc = new float[3];
 		newLoc[0] = this.location[0] + (float)Math.sin(heading)*arg;
