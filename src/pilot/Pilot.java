@@ -1,5 +1,6 @@
 package pilot;
 
+import pilot.fly.FlyPilot;
 import gui.AutopilotGUI;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;

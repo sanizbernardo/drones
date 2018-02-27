@@ -1,4 +1,4 @@
-package pilot;
+package pilot.fly;
 
 import java.util.ArrayList;
 import java.util.OptionalDouble;
@@ -6,10 +6,11 @@ import java.util.OptionalDouble;
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
-import pilot.pid.PitchPID;
-import pilot.pid.RollPID;
-import pilot.pid.ThrustPID;
-import pilot.pid.YawPID;
+import pilot.PilotPart;
+import pilot.fly.pid.PitchPID;
+import pilot.fly.pid.RollPID;
+import pilot.fly.pid.ThrustPID;
+import pilot.fly.pid.YawPID;
 import recognition.Cube;
 import recognition.ImageProcessing;
 import utils.Constants;
@@ -34,17 +35,20 @@ public class FlyPilot extends PilotPart {
 	private float horStabInclination;
 	private float verStabInclination;
 	private float newThrust;
-	private Vector3f oldPos;
 	public Vector3f approxVel = new Vector3f(0f, 0f, 0f);
 	private float climbAngle;
 	private ImageProcessing recog;
 
+	private Vector3f timePassedOldPos;
+
+	
 	private PitchPID pitchPID;
 	private ThrustPID thrustPID;
 	private YawPID yawPID;
 	private RollPID rollPID;
-	
 	private AOAManager aoaManager;
+
+
 	
 	@Override
 	public void initialize(AutopilotConfig config) {
@@ -60,6 +64,36 @@ public class FlyPilot extends PilotPart {
 	
 		climbAngle = Constants.climbAngle;
 	}
+	
+
+	@Override
+	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
+
+		recog = new ImageProcessing(inputs.getImage(), inputs.getPitch(),
+				inputs.getHeading(), inputs.getRoll(), new float[] {
+						inputs.getX(), inputs.getY(), inputs.getZ() });
+
+		Vector3f newPos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
+		
+		
+		if (timePassedOldPos != null)
+			approxVel = (newPos.sub(timePassedOldPos, new Vector3f()))
+			                   .mul(1 / inputs.getElapsedTime(), new Vector3f());
+		timePassedOldPos = new Vector3f(newPos);
+
+		
+		//float desiredHeight = recog.guess();
+
+		//TODO change 200 to desiredHeight
+		adjustHeight(inputs, 200);
+
+		AutopilotOutputs output = Utils.buildOutputs(leftWingInclination,
+				rightWingInclination, verStabInclination, horStabInclination,
+				getNewThrust(), 0, 0, 0);
+
+		return output;
+	}
+	
 
 	Vector3f horProjVel(AutopilotInputs inputs) {
 		Vector3f relVelD = getTransMat(inputs).transform(approxVel,
@@ -133,66 +167,6 @@ public class FlyPilot extends PilotPart {
 		}
 	}
 
-
-	private float last = 0;
-	private int efficiencyCounter = 0;
-	private ArrayList<Float> avgList = new ArrayList<>();
-	private float height;
-
-	@Override
-	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
-
-		recog = new ImageProcessing(inputs.getImage(), inputs.getPitch(),
-				inputs.getHeading(), inputs.getRoll(), new float[] {
-						inputs.getX(), inputs.getY(), inputs.getZ() });
-
-		Vector3f newPos = new Vector3f(inputs.getX(), inputs.getY(),
-				inputs.getZ());
-		if (oldPos != null)
-			approxVel = (newPos.sub(oldPos, new Vector3f())).mul(
-					1 / inputs.getElapsedTime(), new Vector3f());
-		oldPos = new Vector3f(newPos);
-
-		float guess = Float.NaN;
-
-		ArrayList<Cube> list = null;
-		efficiencyCounter++;
-		if (efficiencyCounter % 2 == 0) {
-			list = recog.generateLocations();
-
-			if (list != null && !list.isEmpty()) {
-				avgList.add(list.get(0).getLocation()[1]);
-
-				if (efficiencyCounter >= 14 && !avgList.isEmpty()) {
-
-					OptionalDouble t = avgList.stream().mapToDouble(a -> a)
-							.average();
-					guess = (float) t.getAsDouble();
-
-					avgList.clear();
-
-					efficiencyCounter = 0;
-				}
-			}
-
-		}
-
-		if (!Float.isNaN(guess)) {
-			height = list.get(0).getLocation()[1];
-			last = height;
-
-		} else {
-			height = last;
-		}
-
-		adjustHeight(inputs, 200);
-
-		AutopilotOutputs output = Utils.buildOutputs(leftWingInclination,
-				rightWingInclination, verStabInclination, horStabInclination,
-				getNewThrust(), 0, 0, 0);
-
-		return output;
-	}
 
 	private float getMass() {
 		return config.getEngineMass() + config.getTailMass() + 2

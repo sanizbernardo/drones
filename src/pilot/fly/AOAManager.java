@@ -1,4 +1,4 @@
-package pilot;
+package pilot.fly;
 
 import interfaces.AutopilotInputs;
 

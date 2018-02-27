@@ -1,6 +1,6 @@
-package pilot.pid;
+package pilot.fly.pid;
 
-import pilot.FlyPilot;
+import pilot.fly.FlyPilot;
 import interfaces.AutopilotInputs;
 
 import com.stormbots.MiniPID;
