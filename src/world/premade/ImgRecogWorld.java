@@ -28,7 +28,7 @@ public class ImgRecogWorld extends World {
 	public void setup() {
 		config = Utils.createDefaultConfig();
 		
-		physics.init(config, new Vector3f(0, 0, 0), 0, 0, 0, 0);
+		addDrone(config, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
 		
 		planner = new ImgRecogPlanner(x, y, z, dx, dy, dz);
 		

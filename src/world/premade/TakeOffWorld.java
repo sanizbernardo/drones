@@ -5,7 +5,6 @@ import org.joml.Vector3f;
 import entities.WorldObject;
 import entities.ground.Ground;
 import entities.tarmac.Tarmac;
-import physics.Physics;
 import pilot.Pilot;
 import utils.Cubes;
 import utils.Utils;
@@ -21,8 +20,7 @@ public class TakeOffWorld extends World {
 	public void setup() {
 		this.config = Utils.createDefaultConfig();
 		
-		this.physics = new Physics(true);
-		this.physics.init(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), 0);
+		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0));
 		
 		this.planner = new Pilot();
 		

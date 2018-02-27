@@ -46,7 +46,7 @@ public class WorldBuilder extends World implements IWorldRules {
 	public void setupDrone(AutopilotConfig config, Vector3f startPos, float startVel, Vector3f startOrientation) {
         this.config = config;
 		
-		physics.init(config, startPos, startVel, startOrientation.y, startOrientation.x, startOrientation.z);
+        addDrone(config, startPos, new Vector3f(startVel));
 	}
 
 }

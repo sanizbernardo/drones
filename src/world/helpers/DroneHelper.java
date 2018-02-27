@@ -12,6 +12,8 @@ import entities.drone.DroneSkeleton;
 import entities.trail.Trail;
 import interfaces.AutopilotConfig;
 import physics.Physics;
+import utils.Constants;
+import utils.FloatMath;
 import utils.PhysicsException;
 
 public class DroneHelper {
@@ -32,6 +34,7 @@ public class DroneHelper {
 		drones = new WorldObject[nbDrones][];
 		physics = new Physics[nbDrones];
 		trails = new Trail[nbDrones];
+		
 
 		this.wantPhysics = wantPhysics;
 	}
@@ -41,8 +44,8 @@ public class DroneHelper {
 		while (droneIds.containsValue(i) && i < nbDrones) {
 			i += 1;
 		} 
-		if (i ==nbDrones)
-			throw new IllegalArgumentException();
+		if (i == nbDrones)
+			throw new IllegalArgumentException("Max amount of drones reached");
 		droneIds.put(config.getDroneID(), i);
 
 		DroneSkeleton droneMesh = new DroneSkeleton(config);
@@ -80,26 +83,116 @@ public class DroneHelper {
 		trails[index] = null;		
 	}
 
-	public void updatePhysics(float interval) {
+	public void update(float interval) {
+		updatePhysics(interval);
+		
+		updateTrails();
+		
+		updateDroneItems();
+	}
+	
+	private void updatePhysics(float interval) {
 		if (wantPhysics) {
-			for (String droneId : physics.keySet()) {
+			for (String droneId: droneIds.keySet()) {
 				try {
-					physics.get(droneId).update(interval);
+					getDronePhysics(droneId).update(interval);
 				} catch (PhysicsException e) {
 					JOptionPane.showMessageDialog(null,
 							"A physics error occured for drone " + droneId + ": " + e.getMessage(), "Physics Exception",
 							JOptionPane.ERROR_MESSAGE);
 					removeDrone(droneId);
-				}
+				} catch (NullPointerException e) {}
+			}
+		}
+		
+		checkCollision();
+	}
+
+	private void checkCollision() {
+		for (String droneId1: droneIds.keySet()) {
+			int i = droneIds.get(droneId1);
+			for (String droneId2: droneIds.keySet()) {
+				int j = droneIds.get(droneId2);
+				if (i < j)
+					if (FloatMath.norm(physics[i].getPosition().sub(physics[j].getPosition())) <= Constants.COLLISION_RANGE) {
+						JOptionPane.showMessageDialog(null,
+								"Drone " + droneId1 + " and drone " + droneId2 + " collided.", "Collision Exception",
+								JOptionPane.ERROR_MESSAGE);
+						removeDrone(droneId1);
+						removeDrone(droneId2);
+					}
 			}
 		}
 	}
+	
+	private void updateTrails() {
+		for (String droneId: droneIds.keySet()) {
+			getDroneTrail(droneId).leaveTrail(getDronePhysics(droneId).getPosition());
+		}
+	}
+	
+	
+	private void updateDroneItems() {
+		for (String droneId: droneIds.keySet()) {
+			Physics physics = getDronePhysics(droneId);
+			Vector3f dronePos = physics.getPosition();
+			// Update the position of each drone item
+			for (WorldObject droneItem : drones[droneIds.get(droneId)]) {
+				droneItem.setPosition(dronePos.x, dronePos.y, dronePos.z);
+				droneItem.setRotation(-physics.getPitch(), -physics.getHeading(), -physics.getRoll());
+			}
+			
+			translateWheels(droneId);
+			rotateWings();
+		}
+	}
+	
+	private void rotateWings() {
+		/*
+		 * Vector3f leftWing =
+		 * droneItems[Constants.DRONE_LEFT_WING].getRotation(); leftWing =
+		 * FloatMath.transform(physics.getTransMat(), leftWing); Matrix3f rot =
+		 * new Matrix3f().identity().rotateX(physics.getLWInclination());
+		 * leftWing = FloatMath.transform(rot, leftWing); leftWing =
+		 * FloatMath.transform(physics.getTransMatInv(), leftWing);
+		 */
+	}
 
+	private void translateWheels(String droneId) {
+		Physics physics = getDronePhysics(droneId);
+		setWheel(droneId, Constants.DRONE_WHEEL_FRONT, 0, physics.getConfig().getWheelY(), physics.getConfig().getFrontWheelZ());
+		setWheel(droneId, Constants.DRONE_WHEEL_BACK_LEFT, -physics.getConfig().getRearWheelX(), physics.getConfig().getWheelY(),
+				physics.getConfig().getRearWheelZ());
+		setWheel(droneId, Constants.DRONE_WHEEL_BACK_RIGHT, physics.getConfig().getRearWheelX(), physics.getConfig().getWheelY(),
+				physics.getConfig().getRearWheelZ());
+	}
+
+	private void setWheel(String droneId, int id, float x, float y, float z) {
+		Vector3f wheel = drones[droneIds.get(droneId)][id].getPosition();
+		Vector3f wheelT = FloatMath.transform(getDronePhysics(droneId).getTransMat(), wheel); 
+		
+		wheelT.add(new Vector3f(x, y, z));
+		Physics physics = getDronePhysics(droneId);
+		wheelT = FloatMath.transform(physics.getTransMatInv(), wheelT);
+		drones[droneIds.get(droneId)][id].setPosition(wheelT.x, wheelT.y, wheelT.z);
+	}
+
+	
 	public Physics getDronePhysics(String droneId) {
-		return physics.get(droneId);
+		return droneIds.containsKey(droneId) ? physics[droneIds.get(droneId)]: null;
+	}
+	
+	public Trail getDroneTrail(String droneId) {
+		return droneIds.containsKey(droneId) ? trails[droneIds.get(droneId)]: null;
+	}
+	
+	public WorldObject[] getDroneItems(String droneId) {
+		return droneIds.containsKey(droneId) ? drones[droneIds.get(droneId)]: null;
+	}
+	
+	public int getNbDrones() {
+		return droneIds.size();
 	}
 
-	public void updateTrails() {
-
-	}
+	
 }

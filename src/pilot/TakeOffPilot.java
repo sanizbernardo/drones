@@ -16,6 +16,8 @@ public class TakeOffPilot extends PilotPart {
 	
 	private float maxThrust;
 	
+	private float time;
+	
 	private boolean ended;
 	
 	private Vector3f oldPos = new Vector3f(0, 0, 0);
@@ -25,6 +27,8 @@ public class TakeOffPilot extends PilotPart {
 		this.targetHeight = targetHeight;
 		
 		this.ended = false;
+		
+		this.time = 0;
 	}
 	
 	
@@ -38,12 +42,14 @@ public class TakeOffPilot extends PilotPart {
 	public AutopilotOutputs timePassed(AutopilotInputs input) {
 		Vector3f pos = new Vector3f(input.getX(), input.getY(), input.getZ());
 		
-		Vector3f vel = pos.sub(this.oldPos, new Vector3f()).mul(1/input.getElapsedTime());
+		float dt = input.getElapsedTime() - this.time;
+		this.time = input.getElapsedTime();
+		
+		Vector3f vel = pos.sub(this.oldPos, new Vector3f()).mul(1/dt);
 		this.oldPos = pos;
 		
 		float lwIncl, rwIncl, horStabIncl, thrust;
 		float speed = FloatMath.norm(vel);
-		
 		
 		if (speed < takeOffSpeed) {			
 			lwIncl = 0;

@@ -1,9 +1,9 @@
 package world.helpers;
 
 import entities.WorldObject;
-import entities.trail.Trail;
 import gui.TestbedGui;
 import interfaces.Autopilot;
+import interfaces.AutopilotConfig;
 import interfaces.AutopilotOutputs;
 
 import org.joml.Vector2f;
@@ -17,14 +17,12 @@ import utils.IO.MouseInput;
 import utils.Utils;
 import utils.image.ImageCreator;
 
-import java.util.ArrayList;
-
 import javax.swing.JOptionPane;
 
 public class UpdateHelper {
 
 	public UpdateHelper(DroneHelper droneHelper,
-                        ArrayList<WorldObject> pathObjects,
+						AutopilotConfig config,
                         int TIME_SLOWDOWN_MULTIPLIER,
                         CameraHelper cameraHelper,
                         WorldObject[] worldObjects,
@@ -33,6 +31,7 @@ public class UpdateHelper {
                         ImageCreator imageCreator) {
 
     	this.droneHelper = droneHelper;
+    	this.config = config;
         this.TIME_SLOWDOWN_MULTIPLIER = TIME_SLOWDOWN_MULTIPLIER;
         this.cameraHelper = cameraHelper;
         this.worldObjects = worldObjects;
@@ -46,6 +45,7 @@ public class UpdateHelper {
 	 * All round attributes
 	 */
 	private int TIME_SLOWDOWN_MULTIPLIER;
+	private AutopilotConfig config;
 
 	/**
 	 * Camera update cycle
@@ -78,6 +78,11 @@ public class UpdateHelper {
 	 * Drone update
 	 */
 	private DroneHelper droneHelper;
+	/**
+	 * Cube hit counter
+	 */
+	private int cubeoounter = 1;
+
 
 	/**
 	 * This function will cycle through all the to update variables
@@ -91,62 +96,48 @@ public class UpdateHelper {
 	public void updateCycle(float interval, MouseInput mouseInput) {
 		this.time += interval / TIME_SLOWDOWN_MULTIPLIER;
 
-		updateTrail(this.trail, this.pathObjects);
+		droneHelper.update(interval/TIME_SLOWDOWN_MULTIPLIER);
+		
+		if (droneHelper.getNbDrones() == 0) {
+			return;
+		}
+		Vector3f newDronePos = droneHelper.getDronePhysics(config.getDroneID()).getPosition();
+		
+		updateTouchedCubes(newDronePos);
 
-		updateTouchedCubes();
-
-		updatePhysics(interval);
-
-		Vector3f newDronePos = new Vector3f(physics.getPosition());
 		updateCameraPositions(mouseInput, newDronePos);
-
-		updateDroneItems(newDronePos);
 
 		updatePlanner(newDronePos);
 
-		testbedGui.update(physics.getVelocity(), newDronePos, physics.getHeading(), physics.getPitch(),
-				physics.getRoll());
-
+		testbedGui.update(droneHelper.getDronePhysics(config.getDroneID()).getVelocity(), newDronePos, 
+						  droneHelper.getDronePhysics(config.getDroneID()).getHeading(), 
+						  droneHelper.getDronePhysics(config.getDroneID()).getPitch(),
+						  droneHelper.getDronePhysics(config.getDroneID()).getRoll());
 	}
 
-	private void updateTrail(Trail trail, ArrayList<WorldObject> pathObjects) {
-		trail.leaveTrail(physics.getPosition(), pathObjects);
-	}
-
-	private void updateTouchedCubes() {
-		removeTouchedCubes();
+	private void updateTouchedCubes(Vector3f pos) {
+		removeTouchedCubes(pos);
 	}
 
 	/**
 	 * Setting them to scale 0 to prevent LWJGL errors, again this can be
 	 * improved a lot but not going to waste time on this
 	 */
-	private void removeTouchedCubes() {
-		Vector3f pos = physics.getPosition();
+	private void removeTouchedCubes(Vector3f pos) {
 		for (int i = 0; i < worldObjects.length; i++) {
 			WorldObject cube = worldObjects[i];
 			if (cube != null && !Utils.euclDistance(cube.getPosition(), pos, Constants.PICKUP_DISTANCE)) {
 				System.out.printf("Hit (%s ,%s, %s), drone was at (%s, %s, %s). #%s\n", cube.getPosition().x,
 						cube.getPosition().y, cube.getPosition().z, pos.x, pos.y, pos.z, cubeoounter);
-				// De lijn hieronder is ranzig en ik excuseer mij op voorhand
-				// dat ik dit zelfs heb durven typen, mijn excuses
+				// Arno: "De lijn hieronder is ranzig en ik excuseer mij op voorhand
+				// dat ik dit zelfs heb durven typen, mijn excuses"
 				worldObjects[i] = null;
 				cubeoounter++;
 			}
 		}
 	}
 
-	private int cubeoounter = 1;
 
-	private void updatePhysics(float interval) {
-		if (this.wantPhysics) {
-			try {
-				this.physics.update(interval / this.TIME_SLOWDOWN_MULTIPLIER);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
 	private void updateCameraPositions(MouseInput mouseInput, Vector3f newDronePos) {
 		// Update camera based on mouse
@@ -158,6 +149,8 @@ public class UpdateHelper {
 			cameraHelper.freeCamera.moveRotation(FloatMath.toRadians(rotVec.x * Constants.MOUSE_SENSITIVITY),
 					FloatMath.toRadians(rotVec.y * Constants.MOUSE_SENSITIVITY), 0);
 		}
+		
+		Physics physics = droneHelper.getDronePhysics(config.getDroneID());
 
 		cameraHelper.droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
 		cameraHelper.droneCamera.setRotation(-physics.getPitch(), -physics.getHeading(), -physics.getRoll());
@@ -168,52 +161,7 @@ public class UpdateHelper {
 		cameraHelper.chaseCamera.setRotation(0, -physics.getHeading(), 0);
 	}
 
-	private void updateDroneItems(Vector3f newDronePos) {
-		// Update the position of each drone item
 
-		for (WorldObject droneItem : droneItems) {
-			droneItem.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-			droneItem.setRotation(-physics.getPitch(), -physics.getHeading(), -physics.getRoll());
-		}
-
-		translateWheels();
-
-		rotateWings();
-	}
-
-	private void rotateWings() {
-		/*
-		 * Vector3f leftWing =
-		 * droneItems[Constants.DRONE_LEFT_WING].getRotation(); leftWing =
-		 * FloatMath.transform(physics.getTransMat(), leftWing); Matrix3f rot =
-		 * new Matrix3f().identity().rotateX(physics.getLWInclination());
-		 * leftWing = FloatMath.transform(rot, leftWing); leftWing =
-		 * FloatMath.transform(physics.getTransMatInv(), leftWing);
-		 */
-	}
-
-	private void translateWheels() {
-		setWheel(Constants.DRONE_WHEEL_FRONT, 0, physics.getConfig().getWheelY(), physics.getConfig().getFrontWheelZ());
-		setWheel(Constants.DRONE_WHEEL_BACK_LEFT, -physics.getConfig().getRearWheelX(), physics.getConfig().getWheelY(),
-				physics.getConfig().getRearWheelZ());
-		setWheel(Constants.DRONE_WHEEL_BACK_RIGHT, physics.getConfig().getRearWheelX(), physics.getConfig().getWheelY(),
-				physics.getConfig().getRearWheelZ());
-	}
-
-	private void setWheel(int id, float x, float y, float z) {
-		Vector3f wheel = droneItems[id].getPosition();
-		Vector3f wheelT = FloatMath.transform(physics.getTransMat(), wheel); // Not
-																				// accessing
-																				// the
-																				// position
-																				// of
-																				// the
-																				// drone
-																				// anymore
-		wheelT.add(new Vector3f(x, y, z));
-		wheelT = FloatMath.transform(physics.getTransMatInv(), wheelT);
-		droneItems[id].setPosition(wheelT.x, wheelT.y, wheelT.z);
-	}
 
 	private void updatePlanner(Vector3f newDronePos) {
 		if (planner != null)
@@ -224,16 +172,18 @@ public class UpdateHelper {
 	 * This line is only triggered if the specified world does indeed want a
 	 * motion planner
 	 */
-	private void plannerUpdate(Vector3f newDronePos) {
+	private void plannerUpdate(Vector3f newDronePos) {		
+		Physics physics = droneHelper.getDronePhysics(config.getDroneID());
+
 		AutopilotOutputs out = planner.timePassed(Utils.buildInputs(imageCreator.screenShot(), newDronePos.x,
 				newDronePos.y, newDronePos.z, physics.getHeading(), physics.getPitch(), physics.getRoll(), time));
 
 		try {
 			physics.updateDrone(out);
 		} catch (PhysicsException e) {
-			// TODO: remove the drone
-			JOptionPane.showMessageDialog(null, "A physics error occured: " + e.getMessage(), "Physicsexception",
+			JOptionPane.showMessageDialog(null, "An illegal force was entered for the drone: " + e.getMessage(), "Physics Exception",
 					JOptionPane.ERROR_MESSAGE);
+			droneHelper.removeDrone(config.getDroneID());
 		}
 	}
 

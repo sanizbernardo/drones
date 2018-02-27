@@ -25,7 +25,7 @@ public class CubeWorld extends World implements IWorldRules {
     public void setup() {
     	config = Utils.createDefaultConfig();
   
-    	physics.init(config, new Vector3f(0,100,0));
+    	addDrone(config, new Vector3f(0, 100, 0), new Vector3f(0, 0, 0));
 
     	planner = null;
     	
@@ -48,10 +48,8 @@ public class CubeWorld extends World implements IWorldRules {
         float leftWingInc = (float)Math.toRadians(5f);
         float thrust = 0f;
         try {
-			physics.updateDrone(Utils.buildOutputs(leftWingInc,0, 0, 0, thrust, 0, 0, 0));
-		} catch (PhysicsException e) {
-			
-		}
+        	droneHelper.getDronePhysics(config.getDroneID()).updateDrone(Utils.buildOutputs(leftWingInc,0, 0, 0, thrust, 0, 0, 0));
+		} catch (PhysicsException e) {}
 
         
     }
