@@ -113,8 +113,8 @@ public class Motion implements Autopilot {
     // AOA of right wing
     private float rightWingAOA(AutopilotInputs inputs) {
         Vector3f horProjVelD = horProjVel(inputs);
-        Vector3f WingNormalVectorD = new Vector3f(0f, (float)Math.cos((double) rightWingInclination), (float)Math.sin((double) rightWingInclination));
         Vector3f WingAttackVectorD = new Vector3f(0f, (float)Math.sin((double) rightWingInclination), (float)-Math.cos((double) rightWingInclination));
+        Vector3f WingNormalVectorD = FloatMath.cross(new Vector3f(1,0,0), WingAttackVectorD);
         return (float) -Math.atan2(horProjVelD.dot(WingNormalVectorD), horProjVelD.dot(WingAttackVectorD));
     }
 
@@ -152,27 +152,27 @@ public class Motion implements Autopilot {
 //    }
     
     private void setInclNoAOA(AutopilotInputs inputs) {
-//    	float rAOA = rightWingAOA(inputs);
-//        float lAOA = leftWingAOA(inputs);
-//        if (approxVel.z() == 0) {
-//        	setRightWingInclination(FloatMath.toRadians(10));
-//        	setLeftWingInclination(FloatMath.toRadians(10));
-//        }else {
-//        	if (rAOA > FloatMath.toRadians(10)) {
-//        		setRightWingInclination(FloatMath.toRadians(10-(FloatMath.toDegrees(rAOA)-10)));
-//        	}else if (rAOA < FloatMath.toRadians(-10)) {
-//        		setRightWingInclination(FloatMath.toRadians(10+(FloatMath.toDegrees(rAOA)+10)));
-//        	}else
-//        		setRightWingInclination(FloatMath.toRadians(10));
-//        	if (lAOA > FloatMath.toRadians(10)) {
-//        		setLeftWingInclination(FloatMath.toRadians(10-(FloatMath.toDegrees(lAOA)-10)));
-//        	}else if (lAOA < FloatMath.toRadians(-10)) {
-//        		setLeftWingInclination(FloatMath.toRadians(10+(FloatMath.toDegrees(lAOA)+10)));
-//        	}else
-//        		setLeftWingInclination(FloatMath.toRadians(10));
-//        }
-    	setRightWingInclination(FloatMath.toRadians(7));
-    	setLeftWingInclination(FloatMath.toRadians(7));
+    	float rAOA = rightWingAOA(inputs);
+        float lAOA = leftWingAOA(inputs);
+        if (approxVel.z() == 0) {
+        	setRightWingInclination(FloatMath.toRadians(10));
+        	setLeftWingInclination(FloatMath.toRadians(10));
+        }else {
+        	if (rAOA > FloatMath.toRadians(10)) {
+        		setRightWingInclination(FloatMath.toRadians(10-(FloatMath.toDegrees(rAOA)-10)));
+        	}else if (rAOA < FloatMath.toRadians(-10)) {
+        		setRightWingInclination(FloatMath.toRadians(10+(FloatMath.toDegrees(rAOA)+10)));
+        	}else
+        		setRightWingInclination(FloatMath.toRadians(10));
+        	if (lAOA > FloatMath.toRadians(10)) {
+        		setLeftWingInclination(FloatMath.toRadians(10-(FloatMath.toDegrees(lAOA)-10)));
+        	}else if (lAOA < FloatMath.toRadians(-10)) {
+        		setLeftWingInclination(FloatMath.toRadians(10+(FloatMath.toDegrees(lAOA)+10)));
+        	}else
+        		setLeftWingInclination(FloatMath.toRadians(10));
+        }
+//    	setRightWingInclination(FloatMath.toRadians(7));
+//    	setLeftWingInclination(FloatMath.toRadians(7));
     }
 
 
@@ -468,10 +468,10 @@ public class Motion implements Autopilot {
     	}
 
        
-        System.out.printf("zvel = %s\t height = %s\t pitch = %s\t hStab = %s\t y-vel = %s\t AOA = %s\t \n", approxVel.z(), inputs.getY(), FloatMath.toDegrees(inputs.getPitch()), FloatMath.toDegrees(getHorStabInclination()), approxVel.y(), FloatMath.toDegrees(leftWingAOA(inputs)));
-        System.out.printf("leftWing = %s\t rightWing = %s\t \n", FloatMath.toDegrees(leftWingInclination), FloatMath.toDegrees(rightWingInclination));
-        System.out.printf("thrust = %s\t \n", newThrust);
-
+//        System.out.printf("zvel = %s\t height = %s\t pitch = %s\t hStab = %s\t y-vel = %s\t AOA = %s\t \n", approxVel.z(), inputs.getY(), FloatMath.toDegrees(inputs.getPitch()), FloatMath.toDegrees(getHorStabInclination()), approxVel.y(), FloatMath.toDegrees(leftWingAOA(inputs)));
+        System.out.printf("leftWing = %s\t rightWing = %s\t AOA = %s\t \n", FloatMath.toDegrees(leftWingInclination), FloatMath.toDegrees(rightWingInclination), FloatMath.toDegrees(leftWingAOA(inputs)));
+//        System.out.printf("thrust = %s\t \n", newThrust);
+    	System.out.printf("hs = %s\t \n", FloatMath.toDegrees(horStabInclination));
 
         AutopilotOutputs output = new AutopilotOutputs() {
             @Override
