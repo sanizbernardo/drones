@@ -329,7 +329,6 @@ public class Motion implements Autopilot {
     }
 
 
-
     // Initialises all the parameters for the autpilot
     @Override
     public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
