@@ -66,7 +66,7 @@ public class TakeOffPilot extends PilotPart {
 			this.ended = true;
 		}
 				
-		return Utils.buildOutputs(FloatMath.toRadians(lwIncl), FloatMath.toRadians(rwIncl), 0, FloatMath.toRadians(horStabIncl), thrust, 0, 0, 0);
+		return Utils.buildOutputs(FloatMath.toRadians(lwIncl), FloatMath.toRadians(rwIncl), 0, horStabIncl, thrust, 0, 0, 0);
 	}
 
 	
