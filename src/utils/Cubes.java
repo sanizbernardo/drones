@@ -1,7 +1,7 @@
 package utils;
 
-import entities.meshes.cube.BufferedCube;
-import entities.meshes.cube.Cube;
+import meshes.cube.BufferedCube;
+import meshes.cube.Cube;
 
 public class Cubes {
 

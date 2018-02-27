@@ -4,6 +4,7 @@ import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
+import interfaces.Path;
 
 import java.awt.Dimension;
 import org.jfree.chart.ChartFactory;
@@ -89,6 +90,12 @@ public class ImgRecogPlanner implements Autopilot {
 		frame.setContentPane(chartPanel);
 		frame.pack();
 		frame.setVisible(true);
+		
+	}
+
+	@Override
+	public void setPath(Path path) {
+		// TODO Auto-generated method stub
 		
 	}
 

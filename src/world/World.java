@@ -1,14 +1,15 @@
 package world;
 
+import entities.drone.DroneSkeleton;
+import entities.ground.Ground;
+import entities.tarmac.Tarmac;
 import entities.trail.Trail;
-
+import gui.TestbedGui;
 import engine.Engine;
 import engine.IWorldRules;
 import engine.Window;
-import engine.graph.Renderer;
+import graphics.Renderer;
 import entities.WorldObject;
-import entities.meshes.drone.DroneMesh;
-import gui.testbed.TestbedGui;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import physics.Physics;
@@ -19,6 +20,12 @@ import utils.image.ImageCreator;
 import world.helpers.CameraHelper;
 import world.helpers.UpdateHelper;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 
@@ -34,6 +41,8 @@ public abstract class World implements IWorldRules {
     private TestbedGui testbedGui;
     private boolean wantPhysics;
     private UpdateHelper updateHelper;
+    private BufferedWriter writer;
+    private float time;
     
     /* These are to be directly called in the world classes*/
     protected Autopilot planner;
@@ -42,8 +51,10 @@ public abstract class World implements IWorldRules {
     protected Physics physics;
     protected Engine gameEngine;
     protected ArrayList<WorldObject> pathObjects = new ArrayList<>();
-    protected Trail trail;
 
+    protected Trail trail;
+    protected Ground ground;
+    protected Tarmac tarmac;
     
     public World(int tSM, boolean wantPhysicsEngine) {
         this.cameraHelper = new CameraHelper();
@@ -72,6 +83,7 @@ public abstract class World implements IWorldRules {
     @Override
     public void init(Window window, Engine engine) throws Exception {
     	this.gameEngine = engine; 
+    	this.time = 0;
     	
     	setup();
     	
@@ -108,9 +120,22 @@ public abstract class World implements IWorldRules {
                 imageCreator);
     }
 
+    public void initLogging() {
+    	try {
+			File file = new File("position.log");
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+			writer.write("position log, x  y  z  heading  pitch  roll\n");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+    }
+    
     
     private void addDrone() {
-        DroneMesh droneMesh = new DroneMesh(config);
+        DroneSkeleton droneMesh = new DroneSkeleton(config);
         WorldObject left = new WorldObject(droneMesh.getLeft());
         WorldObject right = new WorldObject(droneMesh.getRight());
         WorldObject body = new WorldObject(droneMesh.getBody());
@@ -136,6 +161,16 @@ public abstract class World implements IWorldRules {
     @Override
     public void update(float interval, MouseInput mouseInput) {
         updateHelper.updateCycle(interval, mouseInput);
+		
+        this.time += interval;
+        if (writer != null) {
+	        try {
+				writer.write(time + ": " + physics.getPosition().x + " " + physics.getPosition().y + " " + physics.getPosition().z +
+							" " + physics.getHeading() + " " + physics.getPitch() + " " + physics.getRoll() + "\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
     }
 
     @Override
@@ -144,7 +179,9 @@ public abstract class World implements IWorldRules {
                         cameraHelper,
                         worldObjects,
                         droneItems,
-                        pathObjects);
+                        pathObjects,
+                        ground,
+                        tarmac);
     }
 
     /**
@@ -154,7 +191,8 @@ public abstract class World implements IWorldRules {
     public void cleanup() {
         renderer.cleanup();
         for (WorldObject gameItem : worldObjects) {
-            gameItem.getMesh().cleanUp();
+            if (gameItem != null)
+            	gameItem.getMesh().cleanUp();
         }
     }
     
@@ -162,5 +200,11 @@ public abstract class World implements IWorldRules {
     public void endSimulation() {
     	testbedGui.dispose();
     	if (planner != null) planner.simulationEnded();
+    	try {
+    		if (writer != null)
+    			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 }

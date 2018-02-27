@@ -42,11 +42,14 @@ public class Engine implements Runnable {
     public Engine(String windowTitle, boolean vSync, IWorldRules worldRules) throws Exception {
         gameLoopThread = new Thread(this, "GAME_LOOP_THREAD");
         
-        int ubuntuSiderBar = 0;
+        int ubuntuSiderBar = 0, windowsToolBar = 0;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        if (System.getProperty("os.name").equals("Linux")) {ubuntuSiderBar = 105;}
+        if (System.getProperty("os.name").equals("Linux")) {ubuntuSiderBar = Constants.UBUNTU_SIDEBAR;}
+        if (System.getProperty("os.name").contains("Windows")) {windowsToolBar = 80;}
         int width = screenSize.width - Constants.AUTOPILOT_GUI_WIDTH - ubuntuSiderBar;
-        window = new Window(windowTitle, width, screenSize.height, vSync);
+        int height = screenSize.height - windowsToolBar;
+        
+        window = new Window(windowTitle, width, height, vSync);
         
         mouseInput = new MouseInput();
         this.worldRules = worldRules;

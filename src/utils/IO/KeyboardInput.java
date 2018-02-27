@@ -1,7 +1,7 @@
 package utils.IO;
 
 import engine.Window;
-import engine.graph.Renderer;
+import graphics.Renderer;
 
 import org.joml.Vector3f;
 import utils.image.ImageCreator;

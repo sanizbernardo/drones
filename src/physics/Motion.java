@@ -7,6 +7,7 @@ import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
+import interfaces.Path;
 
 import java.util.ArrayList;
 import java.util.OptionalDouble;
@@ -524,5 +525,12 @@ public class Motion implements Autopilot {
 	@Override
 	public void simulationEnded() {
 		gui.dispose();
+	}
+
+
+	@Override
+	public void setPath(Path path) {
+		// TODO Auto-generated method stub
+		
 	}
 }
