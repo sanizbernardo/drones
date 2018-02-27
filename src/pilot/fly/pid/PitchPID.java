@@ -14,8 +14,8 @@ public class PitchPID {
 	FlyPilot pilot;
 	
 	public PitchPID(FlyPilot pilot) {
-		pitchUpPID = new MiniPID(1.5, 0, 0);
-		pitchUpPID.setOutputLimits(Math.toRadians(20));
+		pitchUpPID = new MiniPID(1.4, 0, 0);
+		pitchUpPID.setOutputLimits(Math.toRadians(15));
 		pitchDownPID = new MiniPID(1, 0, 0.07);
 		pitchDownPID.setOutputLimits(Math.toRadians(20));
 		
