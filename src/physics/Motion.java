@@ -22,7 +22,7 @@ import utils.FloatMath;
 public class Motion implements Autopilot {
 
     public Motion() {
-        pitchUpPID = new MiniPID(1, 0, 0);
+        pitchUpPID = new MiniPID(1.5, 0, 0);
         pitchUpPID.setOutputLimits(Math.toRadians(20));
         thrustUpPID = new MiniPID(1, 0, 0);
         pitchDownPID = new MiniPID(1, 0, 0.07);
@@ -153,27 +153,27 @@ public class Motion implements Autopilot {
 //    }
     
     private void setInclNoAOA(AutopilotInputs inputs) {
-    	float rAOA = rightWingAOA(inputs);
-        float lAOA = leftWingAOA(inputs);
-        if (approxVel.z() == 0) {
-        	setRightWingInclination(FloatMath.toRadians(10));
-        	setLeftWingInclination(FloatMath.toRadians(10));
-        }else {
-        	if (rAOA > FloatMath.toRadians(10)) {
-        		setRightWingInclination(FloatMath.toRadians(10-(FloatMath.toDegrees(rAOA)-10)));
-        	}else if (rAOA < FloatMath.toRadians(-10)) {
-        		setRightWingInclination(FloatMath.toRadians(10+(FloatMath.toDegrees(rAOA)+10)));
-        	}else
-        		setRightWingInclination(FloatMath.toRadians(10));
-        	if (lAOA > FloatMath.toRadians(10)) {
-        		setLeftWingInclination(FloatMath.toRadians(10-(FloatMath.toDegrees(lAOA)-10)));
-        	}else if (lAOA < FloatMath.toRadians(-10)) {
-        		setLeftWingInclination(FloatMath.toRadians(10+(FloatMath.toDegrees(lAOA)+10)));
-        	}else
-        		setLeftWingInclination(FloatMath.toRadians(10));
-        }
-//    	setRightWingInclination(FloatMath.toRadians(7));
-//    	setLeftWingInclination(FloatMath.toRadians(7));
+//    	float rAOA = rightWingAOA(inputs);
+//        float lAOA = leftWingAOA(inputs);
+//        if (approxVel.z() == 0) {
+//        	setRightWingInclination(FloatMath.toRadians(10));
+//        	setLeftWingInclination(FloatMath.toRadians(10));
+//        }else {
+//        	if (rAOA > FloatMath.toRadians(10)) {
+//        		setRightWingInclination(FloatMath.toRadians(10-(FloatMath.toDegrees(rAOA)-10)));
+//        	}else if (rAOA < FloatMath.toRadians(-10)) {
+//        		setRightWingInclination(FloatMath.toRadians(10+(FloatMath.toDegrees(rAOA)+10)));
+//        	}else
+//        		setRightWingInclination(FloatMath.toRadians(10));
+//        	if (lAOA > FloatMath.toRadians(10)) {
+//        		setLeftWingInclination(FloatMath.toRadians(10-(FloatMath.toDegrees(lAOA)-10)));
+//        	}else if (lAOA < FloatMath.toRadians(-10)) {
+//        		setLeftWingInclination(FloatMath.toRadians(10+(FloatMath.toDegrees(lAOA)+10)));
+//        	}else
+//        		setLeftWingInclination(FloatMath.toRadians(10));
+//        }
+    	setRightWingInclination(FloatMath.toRadians(7));
+    	setLeftWingInclination(FloatMath.toRadians(7));
     }
 
 
@@ -220,7 +220,7 @@ public class Motion implements Autopilot {
         } else if (output < 0f){
             setNewThrust(0);
         } else {
-            setNewThrust(output*300);
+            setNewThrust(output*400);
         }
     }
     
