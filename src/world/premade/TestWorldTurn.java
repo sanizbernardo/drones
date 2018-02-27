@@ -3,7 +3,7 @@ package world.premade;
 
 import engine.IWorldRules;
 import entities.WorldObject;
-import physics.Motion;
+import pilot.Pilot;
 import utils.Cubes;
 import utils.Utils;
 import world.World;
@@ -27,7 +27,7 @@ public class TestWorldTurn extends World implements IWorldRules {
 
         physics.init(config,  new Vector3f(0,100,0), 50);
 
-        planner = new Motion();
+        planner = new Pilot();
         
         worldObjects = new WorldObject[1];
 

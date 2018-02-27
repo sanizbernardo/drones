@@ -4,7 +4,7 @@ import org.joml.Vector3f;
 
 import engine.IWorldRules;
 import entities.WorldObject;
-import physics.Motion;
+import pilot.Pilot;
 import utils.Cubes;
 import utils.FloatMath;
 import utils.Utils;
@@ -23,7 +23,7 @@ public class RotationWorld extends World implements IWorldRules{
     	
     	physics.init(config, 12);
     	
-    	planner = new Motion();
+    	planner = new Pilot();
         worldObjects = new WorldObject[] {new WorldObject(Cubes.getBlueCube().getMesh())};
 
         worldObjects[0].setPosition(new Vector3f(0,0,-20));

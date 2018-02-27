@@ -4,7 +4,7 @@ import java.util.Random;
 
 import engine.IWorldRules;
 import entities.WorldObject;
-import physics.Motion;
+import pilot.Pilot;
 import utils.Cubes;
 import utils.FloatMath;
 import utils.PhysicsException;
@@ -22,7 +22,7 @@ public class OrthoTestWorld extends World implements IWorldRules{
     	config = Utils.createDefaultConfig();
     	  
     	physics.init(config, 10);
-    	planner = new Motion();
+    	planner = new Pilot();
         worldObjects = new WorldObject[100];
 
         Random rand = new Random();

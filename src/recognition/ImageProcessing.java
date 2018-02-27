@@ -186,6 +186,9 @@ public class ImageProcessing {
     				for(float[] color : touchesColors){
     					Cube otherCube = findCube(color);
     					//each cube has equal size -> the one with the biggest size is the closest one
+    					if(otherCube == null) {
+    						continue;
+    					}
     					if (otherCube.getNbPixels() < newCube.getNbPixels()){
     						ignoreList.add(otherCube);
     					}
