@@ -1,4 +1,4 @@
-package entities.meshes.drone;
+package meshes.drone;
 
 import interfaces.AutopilotConfig;
 import utils.Utils;
@@ -7,9 +7,9 @@ public class Body extends DroneComponent {
 
     private float thickness;
 
-    Body(AutopilotConfig config, float thickness) {
+    public Body(AutopilotConfig config, float thickness) {
         this.thickness = thickness;
-        finalize(config);
+        finalizer(config);
     }
 
     @Override

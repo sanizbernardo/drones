@@ -1,11 +1,12 @@
 package engine;
 
 import static org.lwjgl.glfw.GLFW.*;
+
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import utils.Constants;
 
+import utils.Constants;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -99,7 +100,7 @@ public class Window {
         // Center our window
         glfwSetWindowPos(
                 windowHandle,
-                Constants.AUTOPILOT_GUI_WIDTH,
+                System.getProperty("os.name").equals("Linux") ? Constants.AUTOPILOT_GUI_WIDTH + Constants.UBUNTU_SIDEBAR : Constants.AUTOPILOT_GUI_WIDTH,
                 System.getProperty("os.name").contains("Windows") ? 40 : 0
         );
 

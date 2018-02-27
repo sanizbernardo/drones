@@ -1,6 +1,6 @@
 package world.helpers;
 
-import engine.graph.Camera;
+import graphics.Camera;
 
 import org.joml.Vector3f;
 

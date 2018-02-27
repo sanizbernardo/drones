@@ -1,6 +1,7 @@
 package entities;
 
-import entities.meshes.Mesh;
+import meshes.Mesh;
+
 import org.joml.Vector3f;
 
 public class WorldObject {

@@ -1,17 +1,21 @@
-package entities.meshes.drone;
+package entities.drone;
 
-import entities.meshes.Mesh;
+import meshes.Mesh;
+import meshes.drone.Body;
+import meshes.drone.LeftWing;
+import meshes.drone.RightWing;
+import meshes.drone.Wheel;
 import interfaces.AutopilotConfig;
 import utils.Constants;
 
-public class DroneMesh {
+public class DroneSkeleton {
 
     private LeftWing left;
     private RightWing right;
     private Body body;
     private Wheel wheel;
 
-    public DroneMesh(AutopilotConfig config){
+    public DroneSkeleton(AutopilotConfig config){
         left  = new LeftWing(config, Constants.DRONE_THICKNESS);
         right = new RightWing(config, Constants.DRONE_THICKNESS);
         body  = new Body(config, Constants.DRONE_THICKNESS);

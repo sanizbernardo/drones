@@ -1,13 +1,15 @@
 package world;
 
+import entities.drone.DroneSkeleton;
+import entities.ground.Ground;
+import entities.tarmac.Tarmac;
 import entities.trail.Trail;
 import gui.TestbedGui;
 import engine.Engine;
 import engine.IWorldRules;
 import engine.Window;
-import engine.graph.Renderer;
+import graphics.Renderer;
 import entities.WorldObject;
-import entities.meshes.drone.DroneMesh;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import physics.Physics;
@@ -49,8 +51,10 @@ public abstract class World implements IWorldRules {
     protected Physics physics;
     protected Engine gameEngine;
     protected ArrayList<WorldObject> pathObjects = new ArrayList<>();
-    protected Trail trail;
 
+    protected Trail trail;
+    protected Ground ground;
+    protected Tarmac tarmac;
     
     public World(int tSM, boolean wantPhysicsEngine) {
         this.cameraHelper = new CameraHelper();
@@ -124,13 +128,14 @@ public abstract class World implements IWorldRules {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+
 			e.printStackTrace();
 		}
     }
     
     
     private void addDrone() {
-        DroneMesh droneMesh = new DroneMesh(config);
+        DroneSkeleton droneMesh = new DroneSkeleton(config);
         WorldObject left = new WorldObject(droneMesh.getLeft());
         WorldObject right = new WorldObject(droneMesh.getRight());
         WorldObject body = new WorldObject(droneMesh.getBody());
@@ -174,7 +179,9 @@ public abstract class World implements IWorldRules {
                         cameraHelper,
                         worldObjects,
                         droneItems,
-                        pathObjects);
+                        pathObjects,
+                        ground,
+                        tarmac);
     }
 
     /**

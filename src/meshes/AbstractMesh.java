@@ -1,19 +1,13 @@
-package entities.meshes.drone;
+package meshes;
 
-import entities.meshes.Mesh;
-import interfaces.AutopilotConfig;
+public abstract class AbstractMesh {
+	
+	protected float[] positions, colours;
+    protected int[] indices;
 
-public abstract class DroneComponent {
+    protected Mesh mesh;
 
-	protected AutopilotConfig config;
-
-    float[] positions, colours;
-    int[] indices;
-
-    private Mesh mesh;
-
-    void finalize(AutopilotConfig config) {
-        this.config = config;
+    public void finalizer() {
         setPositions();
         setColours();
         setIndices();
@@ -28,4 +22,5 @@ public abstract class DroneComponent {
     public Mesh getMesh() {
         return mesh;
     }
+	
 }

@@ -1,4 +1,4 @@
-package entities.meshes.drone;
+package meshes.drone;
 
 import interfaces.AutopilotConfig;
 
@@ -6,10 +6,10 @@ public class Wheel extends DroneComponent {
 
     private float radius, thickness;
 
-    Wheel(AutopilotConfig config, float thickness) {
+    public Wheel(AutopilotConfig config, float thickness) {
         this.thickness = thickness;
         this.radius = config.getTyreRadius();
-        finalize(config);
+        finalizer(config);
     }
 
     @Override
