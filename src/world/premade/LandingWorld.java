@@ -24,7 +24,7 @@ public class LandingWorld extends World{
 		this.config = Utils.createDefaultConfig();
 		
 		this.physics = new Physics(true);
-		this.physics.init(config, new Vector3f(0, 100, 0), 35);
+		this.physics.init(config, new Vector3f(0, 20, 0), 35);
 		
 		this.planner = new Pilot();
 		
