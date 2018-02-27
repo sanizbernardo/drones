@@ -326,8 +326,8 @@ public class Physics {
 			
 			System.out.printf("realAOA = %s\t \n", FloatMath.toDegrees(aoa));
 			if (checkAOA && Math.abs(aoa) > maxAOA)
-//				throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa");
-				System.out.println("maxAOA"+i);
+				throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa");
+//				System.out.println("maxAOA"+i);
 				
 			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
 			
