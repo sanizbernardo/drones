@@ -15,7 +15,6 @@ public class IPath implements Path{
 		this.turningRadius = turningRadius;
 		this.heading = heading;
 		this.location = startLoc;
-		setPath();
 	}
 
 	private final ArrayList<float[]> cubeLocations;
@@ -29,7 +28,7 @@ public class IPath implements Path{
 	private ArrayList<Float> z = new ArrayList<Float>();
 	
 	
-	private void setPath() {
+	public void setPath() {
 		ArrayList<float[]> cubesInPath = new ArrayList<>();
 		addLiftOffPoint();
 		for(int i = 0; i<cubeLocations.size(); i++){
@@ -90,12 +89,22 @@ public class IPath implements Path{
 		
 		float corner = 0;
 		
+		if(!turnable(closestCube, turningRadius)){
+			float newX = this.location[0] + 2*turningRadius*(float)Math.sin(heading);
+			float newY = closestCube[1];
+			float newZ = this.location[2] - 2*turningRadius*(float)Math.cos(heading);
+			this.x.add(newX);
+			this.y.add(newY);
+			this.z.add(newZ);
+			this.location = new float[] {newX, newY, newZ};			
+		}
+		
 		//behind
 		if(orientation(this.location, auxLocPlusX(1), closestCube) == 1){
 			float dm = (float)Math.sqrt(Math.pow(this.location[0] - auxLocPlusX(this.turningRadius)[0], 2) + Math.pow(this.location[2] - auxLocPlusX(this.turningRadius)[2], 2));
 			float dg = (float)Math.sqrt(Math.pow(this.location[0] - closestCube[0], 2) + Math.pow(this.location[2] - closestCube[2], 2));
 			float mg = (float)Math.sqrt(Math.pow(auxLocPlusX(this.turningRadius)[0] - closestCube[0], 2) + Math.pow(auxLocPlusX(this.turningRadius)[2] - closestCube[2], 2));
-			float bigCorner = (float)(2*Math.PI) - (float)Math.acos(dg*dg - dm*dm - mg*mg)/(-2*dm*mg);
+			float bigCorner = (float)(2*Math.PI) - (float)Math.acos((dg*dg - dm*dm - mg*mg)/(-2*dm*mg));
 			float smallCorner = (float)Math.acos(turningRadius/mg);
 			corner = bigCorner - smallCorner;
 		}
@@ -104,13 +113,19 @@ public class IPath implements Path{
 			float dm = (float)Math.sqrt(Math.pow(this.location[0] - auxLocPlusX(this.turningRadius)[0], 2) + Math.pow(this.location[2] - auxLocPlusX(this.turningRadius)[2], 2));
 			float dg = (float)Math.sqrt(Math.pow(this.location[0] - closestCube[0], 2) + Math.pow(this.location[2] - closestCube[2], 2));
 			float mg = (float)Math.sqrt(Math.pow(auxLocPlusX(this.turningRadius)[0] - closestCube[0], 2) + Math.pow(auxLocPlusX(this.turningRadius)[2] - closestCube[2], 2));
-			float bigCorner = (float)Math.acos(dg*dg - dm*dm - mg*mg)/(-2*dm*mg);
+			System.out.println("dg: " + dg);
+			System.out.println("dm: " + dm);
+			System.out.println("mg: " + mg);
+			System.out.println("jkfkjlhqsdbfljqhs  " + Math.acos(dg*dg - dm*dm - mg*mg));
+			float bigCorner = (float)Math.acos((dg*dg - dm*dm - mg*mg)/(-2*dm*mg));
 			float smallCorner = (float)Math.acos(turningRadius/mg);
 			corner = bigCorner - smallCorner;
+			System.out.println(bigCorner);
+			System.out.println(smallCorner);
 		}
 
 		//this number is a choice: maybe it is better to let this number depend on corner, or distance between locations //TODO
-		int NbPoints = 10;
+		int NbPoints = (int)Math.floor(corner*3) + 1;
 		float cornerPiece = corner/NbPoints;
 		
 		//to the right
@@ -152,15 +167,14 @@ public class IPath implements Path{
 	}
 	
 	//check wether we can reach a location in case we start turning right now
-	private Boolean turnable(float[] goalLocation, float turnRadius) {
-		Boolean result = True;
-		float[] currentLoc = this.location;
-		float[] circleCentre1 = currentLoc + turnRadius*(-1/this.heading);
-		float[] circleCentre2 = currentLoc - turnRadius*(-1/this.heading);
-		if (Math.sqrt(Math.pow(goalLocation[0]-circleCentre1[0], 2)+Math.pow(goalLocation[2]-circlecentre1[2], 2)) < turnRadius)
-			result = False;		
-		if (Math.sqrt(Math.pow(goalLocation[0]-circleCentre2[0], 2)+Math.pow(goalLocation[2]-circlecentre2[2], 2)) < turnRadius)
-			result = False;		
+	private Boolean turnable(float[] goalLocation, float turningRadius) {
+		Boolean result = true;
+		float[] circleCentre1 = auxLocPlusX(turningRadius);
+		float[] circleCentre2 = auxLocPlusX(-1*turningRadius);
+		if (Math.sqrt(Math.pow(goalLocation[0]-circleCentre1[0], 2)+Math.pow(goalLocation[2]-circleCentre1[2], 2)) < turningRadius)
+			result = false;		
+		if (Math.sqrt(Math.pow(goalLocation[0]-circleCentre2[0], 2)+Math.pow(goalLocation[2]-circleCentre2[2], 2)) < turningRadius)
+			result = false;		
 		return result;
 	}
 	
@@ -182,10 +196,9 @@ public class IPath implements Path{
 		}
 
 	private int orientation(float[] p, float[] q, float[] r) {
-    	float val = (q[2] - p[2]) * (r[0] - q[0]) -
-                (q[0] - p[0]) * (r[2] - q[2]);
+    	float val = (-q[2] + p[2]) * (r[0] - q[0]) -
+                (q[0] - p[0]) * (-r[2] + q[2]);
 
-		System.out.println(val);
         if (val == 0) return 0;  // collinear
         return (val > 0)? 1: 2; // clock or counterclock wise
 	}
