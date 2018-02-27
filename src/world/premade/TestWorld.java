@@ -2,7 +2,7 @@ package world.premade;
 
 import engine.IWorldRules;
 import entities.WorldObject;
-import physics.Motion;
+import pilot.Pilot;
 import utils.Cubes;
 import utils.PhysicsException;
 import utils.Utils;
@@ -23,7 +23,7 @@ public class TestWorld extends World implements IWorldRules {
     	  
     	physics.init(config, 12f);
 
-    	planner = new Motion();
+    	planner = new Pilot();
 
         worldObjects = new WorldObject[5];
 

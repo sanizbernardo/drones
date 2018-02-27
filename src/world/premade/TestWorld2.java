@@ -4,7 +4,7 @@ import org.joml.Vector3f;
 
 import engine.IWorldRules;
 import entities.WorldObject;
-import physics.Motion;
+import pilot.Pilot;
 import utils.FloatMath;
 import utils.PhysicsException;
 import utils.Utils;
@@ -25,7 +25,7 @@ public class TestWorld2 extends World implements IWorldRules {
     	  
     	physics.init(config, new Vector3f(0, 0, 0), 12, 0, 0, FloatMath.toRadians(15));
 
-    	planner = new Motion();
+    	planner = new Pilot();
     	
     	worldObjects = new WorldObject[0];
 

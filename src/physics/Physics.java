@@ -56,6 +56,9 @@ public class Physics {
 		
 		this.config = config;
 		
+		this.lwIncl = FloatMath.toRadians(10);
+		this.rwIncl = FloatMath.toRadians(10);
+		
 		this.pos = new Vector3f(startPos);
 		this.vel = startVel;
 		
@@ -337,9 +340,11 @@ public class Physics {
 			
 			Vector3f veli = (new Vector3f()).add(FloatMath.transform(this.transMat, this.vel)).add(FloatMath.cross(this.angVel, this.wingPositions[i]));
 			veli.mul(this.velProj[i]); // projecteren op vlak loodrecht op axis
+
 			aoa[i] = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
 			
 			Vector3f force = normal.mul(this.liftSlopes[i] * aoa[i] * FloatMath.squareNorm(veli));
+
 			
 			wingForce.add(force);
 			totalTorque.add(FloatMath.cross(this.wingPositions[i], force));

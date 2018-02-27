@@ -2,7 +2,7 @@ package world.premade;
 
 import engine.IWorldRules;
 import entities.WorldObject;
-import physics.Motion;
+import pilot.Pilot;
 import utils.Cubes;
 import utils.PhysicsException;
 import utils.Utils;
@@ -24,7 +24,7 @@ public class StopWorld extends World implements IWorldRules {
     	  
     	physics.init(config, 20f);
     	
-    	planner = new Motion();
+    	planner = new Pilot();
 
         worldObjects = new WorldObject[1];
         worldObjects[0] = new WorldObject(Cubes.getCubes()[0].getMesh());

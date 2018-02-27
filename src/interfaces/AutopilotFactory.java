@@ -1,9 +1,9 @@
 package interfaces;
 
-import physics.Motion;
+import pilot.Pilot;
 
 public class AutopilotFactory {
 	public static Autopilot createAutopilot() {
-		return new Motion();
+		return new Pilot();
 	}
 }

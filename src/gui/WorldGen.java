@@ -187,6 +187,7 @@ premade {
 		
 		JPanel inputPanel = buildBase(panel, "Load one of the premade worlds", 2, 2);
 		
+
 		classNames = Constants.PREMADE_WORLDS;
 
 		worlds = new HashMap<>();

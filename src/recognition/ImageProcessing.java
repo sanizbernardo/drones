@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.imageio.ImageIO;
 
 import org.joml.Matrix3f;
@@ -14,6 +15,7 @@ import utils.FloatMath;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.OptionalDouble;
 
 /**
  * Created by Toon en Tomas on 31/10/17
@@ -186,6 +188,9 @@ public class ImageProcessing {
     				for(float[] color : touchesColors){
     					Cube otherCube = findCube(color);
     					//each cube has equal size -> the one with the biggest size is the closest one
+    					if(otherCube == null) {
+    						continue;
+    					}
     					if (otherCube.getNbPixels() < newCube.getNbPixels()){
     						ignoreList.add(otherCube);
     					}
@@ -418,6 +423,46 @@ public class ImageProcessing {
     	return retList;
     }
     
+	private float timePassedLastDesiredHeight = 0;
+	private int timePassedIterationCount = 0;
+	private ArrayList<Float> timePassedAverageList = new ArrayList<>();
+	private float timePassedDesiredHeight;
+	
+	public float guess() {
+		float guess = Float.NaN;
+
+		ArrayList<Cube> list = null;
+		timePassedIterationCount++;
+		if (timePassedIterationCount % 2 == 0) {
+			list = generateLocations();
+
+			if (list != null && !list.isEmpty()) {
+				timePassedAverageList.add(list.get(0).getLocation()[1]);
+
+				if (timePassedIterationCount >= 14 && !timePassedAverageList.isEmpty()) {
+
+					OptionalDouble t = timePassedAverageList.stream().mapToDouble(a -> a)
+							.average();
+					guess = (float) t.getAsDouble();
+
+					timePassedAverageList.clear();
+
+					timePassedIterationCount = 0;
+				}
+			}
+
+		}
+
+		if (!Float.isNaN(guess)) {
+			timePassedDesiredHeight = list.get(0).getLocation()[1];
+			timePassedLastDesiredHeight = timePassedDesiredHeight;
+
+		} else {
+			timePassedDesiredHeight = timePassedLastDesiredHeight;
+		}
+		
+		return timePassedDesiredHeight;
+	}
 
 	//some getters
     
