@@ -39,7 +39,7 @@ public class LandingWorld extends World{
 		}
 		
 		this.ground = new Ground(50);
-		this.tarmac = new Tarmac(new Vector3f(0,0,0), 50f, 300f, 0f);
+		this.tarmac = new Tarmac(new Vector3f(0,0,-200), 50f, 300f, 0f);
 		
 	}
 
