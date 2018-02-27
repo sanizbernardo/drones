@@ -6,6 +6,8 @@ import interfaces.AutopilotOutputs;
 
 public class LandingPilot extends PilotPart {
 
+	private boolean ended;
+	
 	@Override
 	public void initialize(AutopilotConfig config) {
 		// TODO Auto-generated method stub
@@ -20,20 +22,16 @@ public class LandingPilot extends PilotPart {
 
 	@Override
 	public boolean ended() {
-		// TODO Auto-generated method stub
-		return false;
+		return ended;
 	}
 
 	@Override
-	public void close() {
-		// TODO Auto-generated method stub
-		
+	public void close() {	
 	}
 
 	@Override
 	public String taskName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Landing pilot";
 	}
 
 }
