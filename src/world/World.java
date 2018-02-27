@@ -18,6 +18,7 @@ import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
 import utils.image.ImageCreator;
 import world.helpers.CameraHelper;
+import world.helpers.DroneHelper;
 import world.helpers.UpdateHelper;
 
 import java.io.BufferedWriter;
@@ -29,31 +30,30 @@ import java.io.OutputStreamWriter;
 import java.lang.ref.PhantomReference;
 import java.util.ArrayList;
 
+import org.joml.Vector3f;
+
 
 public abstract class World implements IWorldRules {
 
     private CameraHelper cameraHelper;
 	
     private Renderer renderer;
-    private WorldObject[] droneItems;
     private ImageCreator imageCreator;
     private int TIME_SLOWDOWN_MULTIPLIER;
     private KeyboardInput keyboardInput;
     private TestbedGui testbedGui;
-    private boolean wantPhysics;
     private UpdateHelper updateHelper;
-    private BufferedWriter writer;
+    private BufferedWriter writer;    
+    private DroneHelper droneHelper;
     private float time;
     
     /* These are to be directly called in the world classes*/
     protected Autopilot planner;
     protected WorldObject[] worldObjects;
     protected AutopilotConfig config;
-    protected Physics physics;
     protected Engine gameEngine;
     protected ArrayList<WorldObject> pathObjects = new ArrayList<>();
 
-    protected Trail trail;
     protected Ground ground;
     protected Tarmac tarmac;
     
@@ -61,13 +61,12 @@ public abstract class World implements IWorldRules {
         this.cameraHelper = new CameraHelper();
 
         this.TIME_SLOWDOWN_MULTIPLIER = tSM;
-        
-        this.wantPhysics = wantPhysicsEngine;
-        this.physics = new Physics();
-        
+                
         this.keyboardInput = new KeyboardInput();
 
         this.testbedGui = new TestbedGui();
+        
+		this.droneHelper = new DroneHelper(wantPhysicsEngine);
     }
 
 
@@ -97,16 +96,13 @@ public abstract class World implements IWorldRules {
 		}
 		
 		this.imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows(), window);
-		
-		addDrone();
-		
+				
 		if (planner != null)
 			planner.simulationStarted(config, Utils.buildInputs(imageCreator.screenShot(),
-				physics.getPosition(), physics.getHeading(), physics.getPitch(), physics.getRoll(), 0));
+				droneHelper.getDronePos(config.getDroneID()), droneHelper.getDroneHeading(config.getDroneID()),
+				droneHelper.getDronePitch(config.getDroneID()), droneHelper.getDroneRoll(config.getDroneID()), 0));
 		
 		testbedGui.showGUI();
-
-		this.trail = new Trail();
 
 		this.updateHelper = new UpdateHelper(physics,
                 wantPhysics,
@@ -135,20 +131,9 @@ public abstract class World implements IWorldRules {
     }
     
     
-    private void addDrone() {
-        DroneSkeleton droneMesh = new DroneSkeleton(config);
-        WorldObject left = new WorldObject(droneMesh.getLeft());
-        WorldObject right = new WorldObject(droneMesh.getRight());
-        WorldObject body = new WorldObject(droneMesh.getBody());
-
-        WorldObject wheelFront = new WorldObject(droneMesh.getWheel());
-        WorldObject wheelBackLeft = new WorldObject(droneMesh.getWheel());
-        WorldObject wheelBackRight = new WorldObject(droneMesh.getWheel());
-        
-        droneItems = new WorldObject[]{left, right, body, wheelFront, wheelBackLeft, wheelBackRight};
+    public void addDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {
+        droneHelper.addDrone(config, startPos, startVel);
     }
-
-
 
     
     @Override
