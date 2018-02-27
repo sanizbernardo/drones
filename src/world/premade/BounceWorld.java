@@ -3,6 +3,7 @@ package world.premade;
 import org.joml.Vector3f;
 
 import entities.WorldObject;
+import entities.ground.Ground;
 import physics.Physics;
 import utils.Utils;
 import world.World;
@@ -23,6 +24,8 @@ public class BounceWorld extends World {
 		this.planner = null;
 		
 		this.worldObjects = new WorldObject[0];
+		
+		this.ground = new Ground(10);
 	}
 
 	@Override

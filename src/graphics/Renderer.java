@@ -115,9 +115,9 @@ public class Renderer {
 		Matrix4f projectionMatrix;
 		Matrix4f viewMatrix;
         
-        projectionMatrix = chaseCam(window, cameraHelper, gameItems, droneItems, ground);
+        projectionMatrix = chaseCam(window, cameraHelper, gameItems, droneItems, ground, tarmac);
 		
-        droneCam(cameraHelper, gameItems, ground);
+        droneCam(cameraHelper, gameItems, ground, tarmac);
 		
         if(!ortho) {
             freeCam(window, cameraHelper, gameItems, droneItems, pathObjects, ground, tarmac);
@@ -125,15 +125,15 @@ public class Renderer {
         	int size = 60;
         	
             projectionMatrix = topOrthoCam(window, cameraHelper, gameItems,
-					droneItems, pathObjects, projectionMatrix, size, ground);
+					droneItems, pathObjects, projectionMatrix, size, ground, tarmac);
             
             rightOrthCam(window, cameraHelper, gameItems, droneItems,
-					pathObjects, projectionMatrix, size, ground);
+					pathObjects, projectionMatrix, size, ground, tarmac);
         }
     }
 
 	private Matrix4f chaseCam(Window window, CameraHelper cameraHelper,
-			WorldObject[] gameItems, WorldObject[] droneItems, Ground ground) {
+			WorldObject[] gameItems, WorldObject[] droneItems, Ground ground, Tarmac tarmac) {
 		Matrix4f projectionMatrix;
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
@@ -148,6 +148,7 @@ public class Renderer {
 		//Update view Matrix
 		viewMatrix = transformation.getViewMatrix(cameraHelper.chaseCamera);
 
+		renderTarmac(tarmac, viewMatrix);
 		renderGround(ground, viewMatrix);
 		renderWorldItems(gameItems, viewMatrix);
 		renderDroneItems(droneItems, viewMatrix, 1);
@@ -155,7 +156,7 @@ public class Renderer {
 		return projectionMatrix;
 	}
 
-	private Matrix4f droneCam(CameraHelper cameraHelper, WorldObject[] gameItems, Ground ground) {
+	private Matrix4f droneCam(CameraHelper cameraHelper, WorldObject[] gameItems, Ground ground, Tarmac tarmac) {
 		Matrix4f projectionMatrix;
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
@@ -170,6 +171,7 @@ public class Renderer {
 		// Update view Matrix
 		viewMatrix = transformation.getViewMatrix(cameraHelper.droneCamera);
 
+		renderTarmac(tarmac, viewMatrix);
 		renderGround(ground, viewMatrix);
 		renderWorldItems(gameItems, viewMatrix);
         shaderProgram.unbind();
@@ -206,7 +208,7 @@ public class Renderer {
 	private Matrix4f topOrthoCam(Window window, CameraHelper cameraHelper,
 			WorldObject[] gameItems, WorldObject[] droneItems,
 			ArrayList<WorldObject> pathObjects, Matrix4f projectionMatrix,
-			int size, Ground ground) {
+			int size, Ground ground, Tarmac tarmac) {
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
 		topOrthoCamX = chaseCamWidth;     
@@ -224,6 +226,7 @@ public class Renderer {
 		// Update view Matrix
 		viewMatrix = transformation.getViewMatrix(cameraHelper.topOrthoCamera);
 
+		renderTarmac(tarmac, viewMatrix);
 		renderGround(ground, viewMatrix);
 		renderTrail(pathObjects, viewMatrix);
 		renderWorldItems(gameItems, viewMatrix);
@@ -235,7 +238,7 @@ public class Renderer {
 	private void rightOrthCam(Window window, CameraHelper cameraHelper,
 			WorldObject[] gameItems, WorldObject[] droneItems,
 			ArrayList<WorldObject> pathObjects, Matrix4f projectionMatrix,
-			int size, Ground ground) {
+			int size, Ground ground, Tarmac tarmac) {
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
 
@@ -254,6 +257,7 @@ public class Renderer {
 		// Update view Matrix
 		viewMatrix = transformation.getViewMatrix(cameraHelper.rightOrthoCamera);
 
+		renderTarmac(tarmac, viewMatrix);
 		renderGround(ground, viewMatrix);
 		renderTrail(pathObjects, viewMatrix);
 		renderWorldItems(gameItems, viewMatrix);

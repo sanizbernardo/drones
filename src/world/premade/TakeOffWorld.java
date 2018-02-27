@@ -3,6 +3,8 @@ package world.premade;
 import org.joml.Vector3f;
 
 import entities.WorldObject;
+import entities.ground.Ground;
+import entities.tarmac.Tarmac;
 import physics.Physics;
 import pilot.Pilot;
 import utils.Cubes;
@@ -33,6 +35,9 @@ public class TakeOffWorld extends World {
 			
 			this.worldObjects[i] = cube;
 		}
+		
+		this.ground = new Ground(50);
+		this.tarmac = new Tarmac(new Vector3f(0,0,0), 50f, 300f, 0f);
 	}
 
 	@Override
