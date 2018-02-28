@@ -1,10 +1,7 @@
 package entities.ground;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
 import entities.WorldObject;
-import meshes.Mesh;
 import utils.Constants;
 
 public class Ground {

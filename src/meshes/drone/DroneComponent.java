@@ -1,7 +1,6 @@
 package meshes.drone;
 
 import meshes.AbstractMesh;
-import meshes.Mesh;
 import interfaces.AutopilotConfig;
 
 public abstract class DroneComponent extends AbstractMesh {

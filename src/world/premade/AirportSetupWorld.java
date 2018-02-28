@@ -4,7 +4,6 @@ import engine.IWorldRules;
 import entities.WorldObject;
 import entities.ground.Ground;
 import entities.tarmac.Tarmac;
-import utils.Cubes;
 import utils.Utils;
 import world.World;
 import org.joml.Vector3f;
@@ -19,7 +18,7 @@ public class AirportSetupWorld extends World implements IWorldRules {
     public void setup() {
         config = Utils.createDefaultConfig();
 
-        physics.init(config,  new Vector3f(0,-config.getWheelY()+config.getTyreRadius(),-50), 0);
+        addDrone(config,  new Vector3f(0,-config.getWheelY()+config.getTyreRadius(),-50), new Vector3f(0, 0, 0));
 
         planner = null;
 

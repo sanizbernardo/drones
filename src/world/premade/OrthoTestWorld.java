@@ -2,6 +2,8 @@ package world.premade;
 
 import java.util.Random;
 
+import org.joml.Vector3f;
+
 import engine.IWorldRules;
 import entities.WorldObject;
 import pilot.Pilot;
@@ -21,8 +23,9 @@ public class OrthoTestWorld extends World implements IWorldRules{
 	public void setup() {
     	config = Utils.createDefaultConfig();
     	  
-    	physics.init(config, 10);
+    	addDrone(config, new Vector3f(0,0,0), new Vector3f(0,0,-10));
     	planner = new Pilot();
+
         worldObjects = new WorldObject[100];
 
         Random rand = new Random();
@@ -40,7 +43,7 @@ public class OrthoTestWorld extends World implements IWorldRules{
 
         float leftWingInc = FloatMath.toRadians(0f);
         try {
-			physics.updateDrone(Utils.buildOutputs(leftWingInc, 0,0,0,0,0,0,0));
+        	droneHelper.getDronePhysics(config.getDroneID()).updateDrone(Utils.buildOutputs(leftWingInc, 0,0,0,0,0,0,0));
 		} catch (PhysicsException e) {
 			e.printStackTrace();
 		}

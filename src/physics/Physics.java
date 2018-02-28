@@ -20,7 +20,7 @@ public class Physics {
 				  lwIncl, rwIncl, hsIncl, vsIncl,
 				  thrust, weight,
 				  tyreRadius, tyreSlope, dampSlope,
-				  maxAOA, maxR, maxFC;
+				  maxAOA, maxR, maxFC, maxThrust;
 	
 	private Matrix3f transMat, transMatInv,
 					 inertia, inertiaInv;
@@ -179,6 +179,8 @@ public class Physics {
 		this.maxR = config.getRMax();
 		
 		this.maxFC = config.getFcMax();
+		
+		this.maxThrust = config.getMaxThrust();
 	}
 	
 	
@@ -248,6 +250,8 @@ public class Physics {
 		this.hsIncl = data.getHorStabInclination();
 		this.vsIncl = data.getVerStabInclination();
 		
+		if (thrust > maxThrust)
+			throw new PhysicsException("Illegal thrust force");
 		this.thrust = data.getThrust();
 		
 		this.brakeForce[0] = data.getLeftBrakeForce();
@@ -351,7 +355,7 @@ public class Physics {
 		}
 		
 		
-		if (FloatMath.norm(wingForce) > 50) {
+		if (dt != 0 && FloatMath.norm(wingForce) > 50) {
 			for (int i = 0; i < 4; i++) {
 				if (checkAOA && Math.abs(aoa[i]) > maxAOA)
 					throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa");

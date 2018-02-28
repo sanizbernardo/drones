@@ -5,7 +5,6 @@ import org.joml.Vector3f;
 import engine.IWorldRules;
 import entities.WorldObject;
 import pilot.Pilot;
-import utils.FloatMath;
 import utils.PhysicsException;
 import utils.Utils;
 import world.World;
@@ -23,7 +22,7 @@ public class TestWorld2 extends World implements IWorldRules {
     public void setup() {
     	config = Utils.createDefaultConfig();
     	  
-    	physics.init(config, new Vector3f(0, 0, 0), 12, 0, 0, FloatMath.toRadians(15));
+    	addDrone(config, new Vector3f(0, 0, 0), new Vector3f(0,0,-12));
 
     	planner = new Pilot();
     	
@@ -31,7 +30,7 @@ public class TestWorld2 extends World implements IWorldRules {
 
         float thrust = 20f;
         try {
-			physics.updateDrone(Utils.buildOutputs(0 ,0, 0, 0, thrust, 0, 0, 0));
+        	droneHelper.getDronePhysics(config.getDroneID()).updateDrone(Utils.buildOutputs(0 ,0, 0, 0, thrust, 0, 0, 0));
 		} catch (PhysicsException e) {
 			e.printStackTrace();
 		}
