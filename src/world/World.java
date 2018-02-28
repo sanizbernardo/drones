@@ -59,7 +59,7 @@ public abstract class World implements IWorldRules {
 
 		this.testbedGui = new TestbedGui();
 
-		this.droneHelper = new DroneHelper(wantPhysicsEngine, 1);
+		this.droneHelper = new DroneHelper(wantPhysicsEngine, 1, testbedGui);
 	}
 
 	/**

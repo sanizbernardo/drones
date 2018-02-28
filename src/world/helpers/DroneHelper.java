@@ -3,6 +3,7 @@ package world.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.joml.Vector3f;
@@ -24,18 +25,19 @@ public class DroneHelper {
 	private WorldObject[][] drones;
 	private Physics[] physics;
 	private Trail[] trails;
+	private JFrame rootFrame;
 
 	private final boolean wantPhysics;
 
-	public DroneHelper(boolean wantPhysics, int nbDrones) {
+	public DroneHelper(boolean wantPhysics, int nbDrones, JFrame rootFrame) {
 		this.nbDrones = nbDrones;
-		droneIds = new HashMap<>();
+		this.droneIds = new HashMap<>();
 
-		drones = new WorldObject[nbDrones][];
-		physics = new Physics[nbDrones];
-		trails = new Trail[nbDrones];
+		this.drones = new WorldObject[nbDrones][];
+		this.physics = new Physics[nbDrones];
+		this.trails = new Trail[nbDrones];
 		
-
+		this.rootFrame = rootFrame;
 		this.wantPhysics = wantPhysics;
 	}
 
@@ -97,7 +99,7 @@ public class DroneHelper {
 				try {
 					getDronePhysics(droneId).update(interval);
 				} catch (PhysicsException e) {
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(rootFrame,
 							"A physics error occured for drone " + droneId + ": " + e.getMessage(), "Physics Exception",
 							JOptionPane.ERROR_MESSAGE);
 					removeDrone(droneId);
@@ -115,7 +117,7 @@ public class DroneHelper {
 				int j = droneIds.get(droneId2);
 				if (i < j)
 					if (FloatMath.norm(physics[i].getPosition().sub(physics[j].getPosition())) <= Constants.COLLISION_RANGE) {
-						JOptionPane.showMessageDialog(null,
+						JOptionPane.showMessageDialog(rootFrame,
 								"Drone " + droneId1 + " and drone " + droneId2 + " collided.", "Collision Exception",
 								JOptionPane.ERROR_MESSAGE);
 						removeDrone(droneId1);

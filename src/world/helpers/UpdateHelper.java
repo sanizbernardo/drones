@@ -181,7 +181,7 @@ public class UpdateHelper {
 		try {
 			physics.updateDrone(out);
 		} catch (PhysicsException e) {
-			JOptionPane.showMessageDialog(null, "An illegal force was entered for the drone: " + e.getMessage(), "Physics Exception",
+			JOptionPane.showMessageDialog(testbedGui, "An illegal force was entered for the drone: " + e.getMessage(), "Physics Exception",
 					JOptionPane.ERROR_MESSAGE);
 			droneHelper.removeDrone(config.getDroneID());
 		}
