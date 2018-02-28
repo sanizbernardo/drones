@@ -22,7 +22,7 @@ public class TakeOffWorld extends World {
 		
 		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0));
 		
-		this.planner = new Pilot();
+		this.planner = new Pilot(new int[] {Pilot.TAKING_OFF});
 		
 		this.worldObjects = new WorldObject[40];
 		

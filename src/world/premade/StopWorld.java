@@ -26,7 +26,7 @@ public class StopWorld extends World implements IWorldRules {
     	  
     	addDrone(config, new Vector3f(0,0,0), new Vector3f(0,0,-20f));
     	
-    	planner = new Pilot();
+    	planner = new Pilot(new int[] {});
 
         worldObjects = new WorldObject[1];
         worldObjects[0] = new WorldObject(Cubes.getCubes()[0].getMesh());

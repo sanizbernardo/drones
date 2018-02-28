@@ -1,8 +1,5 @@
 package pilot.fly;
 
-import java.util.ArrayList;
-import java.util.OptionalDouble;
-
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
@@ -11,15 +8,11 @@ import pilot.fly.pid.PitchPID;
 import pilot.fly.pid.RollPID;
 import pilot.fly.pid.ThrustPID;
 import pilot.fly.pid.YawPID;
-import recognition.Cube;
 import recognition.ImageProcessing;
 import utils.Constants;
 import utils.FloatMath;
 import utils.Utils;
 
-import com.stormbots.MiniPID;
-
-import gui.AutopilotGUI;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;

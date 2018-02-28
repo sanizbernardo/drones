@@ -24,7 +24,7 @@ public class RotationWorld extends World implements IWorldRules{
     	
     	addDrone(config, new Vector3f(0,0,0), new Vector3f(0,0,-12));
     	
-    	planner = new Pilot();
+    	planner = new Pilot(new int[] {});
         worldObjects = new WorldObject[] {new WorldObject(Cubes.getBlueCube().getMesh())};
 
         worldObjects[0].setPosition(new Vector3f(0,0,-20));

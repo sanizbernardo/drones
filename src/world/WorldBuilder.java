@@ -26,7 +26,7 @@ public class WorldBuilder extends World implements IWorldRules {
 	public void setup() {
 		
 		//TODO: provide correct planner
-		if (wantPlanner) planner = new Pilot();
+		if (wantPlanner) planner = new Pilot(new int[] {});
 		
 		this.worldObjects = new WorldObject[cubes.size()];	
 		int i = 0;		

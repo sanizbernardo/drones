@@ -25,7 +25,7 @@ public class TestWorld extends World implements IWorldRules {
     	  
     	addDrone(config, new Vector3f(0,0,0), new Vector3f(0,0,-12f));
 
-    	planner = new Pilot();
+    	planner = new Pilot(new int[] {});
 
         worldObjects = new WorldObject[5];
 

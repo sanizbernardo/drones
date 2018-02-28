@@ -24,7 +24,7 @@ public class OrthoTestWorld extends World implements IWorldRules{
     	config = Utils.createDefaultConfig();
     	  
     	addDrone(config, new Vector3f(0,0,0), new Vector3f(0,0,-10));
-    	planner = new Pilot();
+    	planner = new Pilot(new int[] {});
 
         worldObjects = new WorldObject[100];
 

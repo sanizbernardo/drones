@@ -23,7 +23,7 @@ public class TestWorldTurn extends World implements IWorldRules {
 
         addDrone(config, new Vector3f(0,100,0), new Vector3f(0,0,-50));
 
-        planner = new Pilot();
+        planner = new Pilot(new int[] {Pilot.FLYING});
         
         worldObjects = new WorldObject[1];
 
