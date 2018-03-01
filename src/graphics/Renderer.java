@@ -30,7 +30,7 @@ public class Renderer {
     private int topOrthoCamX, topOrthoCamY, topOrthoCamWidth, topOrthoCamHeigth;
     private int rightOrthoCamX, rightOrthoCamY, rightOrthoCamWidth, rightOrthoCamHeigth;
 
-    private boolean ortho = false;
+    private boolean ortho = true;
 
     private ShaderProgram shaderProgram;
     

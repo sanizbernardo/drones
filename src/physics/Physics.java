@@ -27,7 +27,12 @@ public class Physics {
 	
 	private Vector3f[] axisVectors, wingPositions, velProj, wheelPositions;
 	private float[] liftSlopes, dBuffer, brakeForce;
-
+	
+	private final String[] wingNames = new String[] {"Left wing", "Right wing", 
+													 "Horizontal Stabilizer", 
+													 "Vertical Stabilizer"};
+	private final String[] tyreNames = new String[] {"Left wheel", "Front wheel", "Right wheel"};
+	
 	private final boolean checkAOA;
 
 	private AutopilotConfig config;
@@ -44,7 +49,7 @@ public class Physics {
 	}
 	
 	public Physics() {
-		this(true);		
+		this(true);
 	}
 	
 	/**
@@ -259,7 +264,7 @@ public class Physics {
 		this.brakeForce[2] = data.getRightBrakeForce();
 		for (int i = 0; i < 3; i++) {
 			if (brakeForce[i] < 0 || brakeForce[i] > this.maxR)
-				throw new PhysicsException("Illegal brake force on wheel nb " + i);
+				throw new PhysicsException("Illegal brake force on " + wheelPositions[i] + " (" + FloatMath.round(brakeForce[i],2) + ")");
 		}
 	}
 	
@@ -358,7 +363,7 @@ public class Physics {
 		if (dt != 0 && FloatMath.norm(wingForce) > 50) {
 			for (int i = 0; i < 4; i++) {
 				if (checkAOA && Math.abs(aoa[i]) > maxAOA)
-					throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa");
+					throw new PhysicsException(wingNames[i] + " exceeded maximum aoa (" + FloatMath.round(FloatMath.toDegrees(aoa[i]), 2) + "°)");
 			}
 		}
 		totalForce.add(wingForce);
@@ -375,7 +380,7 @@ public class Physics {
 			Vector3f relPos = FloatMath.transform(this.transMat, worldWheelPos.sub(this.pos));
 						
 			if (d >= this.tyreRadius)
-				throw new PhysicsException("Tyre nb " + i + " went underground");
+				throw new PhysicsException(tyreNames[i] + " went underground. (" + FloatMath.round(d,2) + ")");
 			
 			if (d > 0) { // op de grond?
 				// lift

@@ -29,7 +29,7 @@ public class Pilot implements Autopilot {
 	public Pilot(int[] tasks) {
 		this.pilots = new PilotPart[4];
 		
-		this.pilots[TAKING_OFF] = new TakeOffPilot(250);
+		this.pilots[TAKING_OFF] = new TakeOffPilot(500);
 		this.pilots[LANDING] = new LandingPilot();
 		this.pilots[FLYING] = new FlyPilot();
 		this.pilots[TAXIING] = new TaxiPilot();
@@ -57,6 +57,12 @@ public class Pilot implements Autopilot {
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
 		this.gui.updateImage(inputs.getImage());
 		
+		if (this.gui.manualControl())
+			return this.gui.getOutputs();
+		
+		if (this.index >= this.tasks.length)
+			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
+
 		if (state() == WAIT_PATH) {
 			if (this.path != null) {
 				//calculate path...
@@ -66,12 +72,6 @@ public class Pilot implements Autopilot {
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 		}
 		
-		if (this.gui.manualControl())
-			return this.gui.getOutputs();
-		
-		if (this.index >= this.tasks.length)
-			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
-
 		this.gui.setTask(currentPilot().taskName());
 		
 		AutopilotOutputs output = currentPilot().timePassed(inputs);
