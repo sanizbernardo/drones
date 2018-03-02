@@ -6,6 +6,10 @@ import entities.meshes.cube.Cube;
 import interfaces.Path;
 import utils.Cubes;
 
+/*
+ * This class contains the method setPath() which generates a path for the drone to follow.
+ * This path contains all target locations it was given and takes several drone parameters into account to ensure it is valid.
+ */
 public class IPath implements Path{
 
 	public IPath(ArrayList<float[]> cubeLocations, float maxInclination, float maxDeclination, float turningRadius, float[] startLoc, float heading){
@@ -17,44 +21,52 @@ public class IPath implements Path{
 		this.location = startLoc;
 	}
 
+	//All cubes that have to visited
 	private final ArrayList<float[]> cubeLocations;
+	//Parameters defined by drone
 	private final float maxInclination;
 	private final float maxDeclination;
 	private final float turningRadius;
+	//Drone location and heading
 	private float heading;
 	private float[] location;
+	//Storage of path
 	private ArrayList<Float> x = new ArrayList<Float>();
 	private ArrayList<Float> y = new ArrayList<Float>();
 	private ArrayList<Float> z = new ArrayList<Float>();
 	
 	
 	public void setPath() {
+		//ArrayList keeping track of already visited cubes
 		ArrayList<float[]> cubesInPath = new ArrayList<>();
+		//Set an initial destination allowing lift-off
 		addLiftOffPoint();
+		//Iterate over all cubes, for each cube:
 		for(int i = 0; i<cubeLocations.size(); i++){
+			//Find the closest cube, ignoring already visited ones
 			float[] closestCube = findClosest(cubesInPath);
+			//Add the closest cube to the path
 			addToPath(closestCube);
+			//Add the closest cube to the already visited cubes
 			cubesInPath.add(closestCube);
 		}
 	}
 	
+	//TODO alter method to take starting location and heading into account
 	private void addLiftOffPoint() {
-		float[] liftOffPoint = {0, 20, -500};//TODO depends on startlocation & heading
-		x.add(liftOffPoint[0]);
-		y.add(liftOffPoint[1]);
-		z.add(liftOffPoint[2]);
-		this.location = liftOffPoint;
-		
+		float[] liftOffPoint = {0, 20, -500};
+		addLocation(liftOffPoint[0], liftOffPoint[1], liftOffPoint[2]);
+		this.location = liftOffPoint;		
 	}
 	
-	//Find the closest goal location to current location which has not yet been visited
+	//Find the cube closest to current location, which has not yet been visited
 	private float[] findClosest(ArrayList<float[]> cubesAlreadyInPath){
 		float[] currentClosest = null;
 		double currentDist = Float.MAX_VALUE;
 		for (float[] cube: cubeLocations){
 			if (! cubesAlreadyInPath.contains(cube)) {
 				double newDist = Math.sqrt(Math.pow((double)(cube[0]-x.get(x.size()-1)), 2) + Math.pow((double)(cube[1]-y.get(y.size()-1)), 2) + Math.pow((double)(cube[2]-z.get(z.size()-1)), 2));
-				if(newDist<currentDist){
+				if(newDist < currentDist){
 					currentClosest = cube;
 					currentDist = newDist;
 				}				
@@ -63,43 +75,36 @@ public class IPath implements Path{
 		return currentClosest;
 	}
 	
-	//tempLoc?
 	//TODO All 1.5f are to be optimized
 	private void addToPath(float[] closestCube) {
-		//down
+		//Cube on lower y-level
 		if(closestCube[1] < this.location[1]){
 			float newX = this.location[0] + 1.5f*(float)Math.sin(heading) * (this.location[1] - closestCube[1])/this.maxDeclination;
 			float newY = closestCube[1];
 			float newZ = this.location[2] - 1.5f*(float)Math.cos(heading) * (this.location[1] - closestCube[1])/this.maxDeclination;
-			this.x.add(newX);
-			this.y.add(newY);
-			this.z.add(newZ);
+			addLocation(newX, newY, newZ);
 			this.location = new float[] {newX, newY, newZ};
 		}
-		//up
+		//Cube on higher y-level
 		else if(closestCube[1] > this.location[1]){
 			float newX = this.location[0] + 1.5f*(float)Math.sin(heading) * (closestCube[1] - this.location[1])/this.maxInclination;
 			float newY = closestCube[1];
 			float newZ = this.location[2] - 1.5f*(float)Math.cos(heading) * (closestCube[1] - this.location[1])/this.maxInclination;
-			this.x.add(newX);
-			this.y.add(newY);
-			this.z.add(newZ);
+			addLocation(newX, newY, newZ);
 			this.location = new float[] {newX, newY, newZ};
 		}
 		
 		float corner = 0;
-		
+		//If not within turning reach, adjust by getting in reach
 		if(!turnable(closestCube, turningRadius)){
 			float newX = this.location[0] + 2*turningRadius*(float)Math.sin(heading);
 			float newY = closestCube[1];
 			float newZ = this.location[2] - 2*turningRadius*(float)Math.cos(heading);
-			this.x.add(newX);
-			this.y.add(newY);
-			this.z.add(newZ);
+			addLocation(newX, newY, newZ);
 			this.location = new float[] {newX, newY, newZ};			
 		}
 		
-		//behind
+		//Cube behind current location
 		if(orientation(this.location, auxLocPlusX(1), closestCube) == 1){
 			float dm = (float)Math.sqrt(Math.pow(this.location[0] - auxLocPlusX(this.turningRadius)[0], 2) + Math.pow(this.location[2] - auxLocPlusX(this.turningRadius)[2], 2));
 			float dg = (float)Math.sqrt(Math.pow(this.location[0] - closestCube[0], 2) + Math.pow(this.location[2] - closestCube[2], 2));
@@ -108,27 +113,20 @@ public class IPath implements Path{
 			float smallCorner = (float)Math.acos(turningRadius/mg);
 			corner = bigCorner - smallCorner;
 		}
-		//in front
+		//Cube in front of current location
 		else{
 			float dm = (float)Math.sqrt(Math.pow(this.location[0] - auxLocPlusX(this.turningRadius)[0], 2) + Math.pow(this.location[2] - auxLocPlusX(this.turningRadius)[2], 2));
 			float dg = (float)Math.sqrt(Math.pow(this.location[0] - closestCube[0], 2) + Math.pow(this.location[2] - closestCube[2], 2));
 			float mg = (float)Math.sqrt(Math.pow(auxLocPlusX(this.turningRadius)[0] - closestCube[0], 2) + Math.pow(auxLocPlusX(this.turningRadius)[2] - closestCube[2], 2));
-			System.out.println("dg: " + dg);
-			System.out.println("dm: " + dm);
-			System.out.println("mg: " + mg);
-			System.out.println("jkfkjlhqsdbfljqhs  " + Math.acos(dg*dg - dm*dm - mg*mg));
 			float bigCorner = (float)Math.acos((dg*dg - dm*dm - mg*mg)/(-2*dm*mg));
 			float smallCorner = (float)Math.acos(turningRadius/mg);
 			corner = bigCorner - smallCorner;
-			System.out.println(bigCorner);
-			System.out.println(smallCorner);
 		}
 
-		//this number is a choice: maybe it is better to let this number depend on corner, or distance between locations //TODO
 		int NbPoints = (int)Math.floor(corner*3) + 1;
 		float cornerPiece = corner/NbPoints;
 		
-		//to the right
+		//Cube to the right of the current location
 		if(orientation(this.location, auxLocPlusMinZ(1), closestCube) == 1){
 			float fwd = turningRadius*(float)Math.sin(cornerPiece);
 			float rightd = turningRadius - (float)Math.cos(cornerPiece)*turningRadius;
@@ -136,14 +134,12 @@ public class IPath implements Path{
 				float newX = this.location[0] + (float)Math.sin(heading)*fwd + (float)Math.cos(heading)*rightd;
 				float newY = this.location[1];
 				float newZ = this.location[2] - (float)Math.cos(heading)*fwd + (float)Math.sin(heading)*rightd;
-				this.x.add(newX);
-				this.y.add(newY);
-				this.z.add(newZ);
+				addLocation(newX, newY, newZ);
 				this.heading += cornerPiece;
 				this.location = new float[] {newX, newY, newZ};
 			}
 		}
-		//to the left
+		//Cube to the left of the current location
 		else if(orientation(this.location, auxLocPlusMinZ(1), closestCube) == 2){
 			for(int i = 0; i < NbPoints; i++){
 				float fwd = turningRadius*(float)Math.sin(cornerPiece);
@@ -151,34 +147,29 @@ public class IPath implements Path{
 				float newX = this.location[0] + (float)Math.sin(heading)*fwd - (float)Math.cos(heading)*leftd;
 				float newY = this.location[1];
 				float newZ = this.location[2] - (float)Math.cos(heading)*fwd - (float)Math.sin(heading)*leftd;
-				this.x.add(newX);
-				this.y.add(newY);
-				this.z.add(newZ);
+				addLocation(newX, newY, newZ);
 				this.heading -= cornerPiece;
 				this.location = new float[] {newX, newY, newZ};
 			}
 		}
 		
 		//done turning -> got to cube
-		this.x.add(closestCube[0]);
-		this.y.add(closestCube[1]);
-		this.z.add(closestCube[2]);
+		addLocation(closestCube[0], closestCube[1], closestCube[2]);
 		this.location = new float[] {closestCube[0], closestCube[1], closestCube[2]};
 	}
-	
-	//check wether we can reach a location in case we start turning right now
+		
+	//Check if a location is within turning radius
 	private Boolean turnable(float[] goalLocation, float turningRadius) {
-		Boolean result = true;
 		float[] circleCentre1 = auxLocPlusX(turningRadius);
 		float[] circleCentre2 = auxLocPlusX(-1*turningRadius);
 		if (Math.sqrt(Math.pow(goalLocation[0]-circleCentre1[0], 2)+Math.pow(goalLocation[2]-circleCentre1[2], 2)) < turningRadius)
-			result = false;		
+			return false;		
 		if (Math.sqrt(Math.pow(goalLocation[0]-circleCentre2[0], 2)+Math.pow(goalLocation[2]-circleCentre2[2], 2)) < turningRadius)
-			result = false;		
-		return result;
+			return false;
+		return true;
 	}
 	
-	
+	//Helper functions
 	private float[] auxLocPlusMinZ(float arg) {
 		float[] newLoc = new float[3];
 		newLoc[0] = this.location[0] + (float)Math.sin(heading)*arg;
@@ -194,15 +185,20 @@ public class IPath implements Path{
 		newLoc[2] = this.location[2] - (float)Math.sin(heading)*arg;
 		return newLoc;
 		}
+	
+	private void addLocation(float x, float y, float z) {
+		this.x.add(x); this.y.add(y); this.z.add(z);
+	}
 
 	private int orientation(float[] p, float[] q, float[] r) {
     	float val = (-q[2] + p[2]) * (r[0] - q[0]) -
                 (q[0] - p[0]) * (-r[2] + q[2]);
 
-        if (val == 0) return 0;  // collinear
-        return (val > 0)? 1: 2; // clock or counterclock wise
+        if (val == 0) return 0;
+        return (val > 0)? 1: 2;	//Clock - Counterclockwise
 	}
 	
+	//Getters (Convert the ArrayLists to float[])
 	@Override
 	public float[] getX() {
 		float[] x = new float[this.x.size()];
