@@ -9,19 +9,28 @@ public class PathFindingTests {
 	public static void main(String[] args) {
 		//Add some test-goal location
 		ArrayList<float[]> cubelocs = new ArrayList<float[]>();
-		cubelocs.add(new float[] {0,30,-1000}); //Standard location
-		cubelocs.add(new float[] {10,30,-1000}); //Not in reach of turn
-		cubelocs.add(new float[] {10, 100, -1000}); //Directly above current location
+		cubelocs.add(new float[] {0,30,-400}); //Standard location
+		cubelocs.add(new float[] {100,30,-400}); //Not in reach of turn
+		cubelocs.add(new float[] {100, 30, -500}); //Directly above current location
+		cubelocs.add(new float[] {60, 30, -40}); //Directly above current location
+		cubelocs.add(new float[] {10, 30, -0}); //Directly above current location
+
 		//Add the starting location
 		float[] start = new float[] {0,0,0};
 		//Create a path object, this calls setPath() automatically
-		IPath pad = new IPath(cubelocs, 0.1f, 0.1f, 100f, start, 0f);
-		pad.setPath();
-		//Get the found path
-		float[] padx = pad.getX();
-		float[] pady = pad.getY();
-		float[] padz = pad.getZ();
+		IPath path = new IPath(cubelocs, 0.1f, 0.1f, 100f, start, 0f);
+		path.setPath();
+
+		//Draw the path
+		new PathDemo(path.getPathArray());
 		
+	}
+	
+	//Extract path into text-file (locations are tuples)
+	//Used for drawing the path using a Python module I already had, 
+	//implemented similar functionality in PathDemo now.
+	@SuppressWarnings("unused")
+	private static void extractPath(float[] x, float[] y, float[] z) {
 		//Write the found path to a file for later graphic representation
 		BufferedWriter	bw = null;
 		Random rand = new Random();
@@ -34,9 +43,9 @@ public class PathFindingTests {
 			FileWriter fw = new FileWriter(file);
 			bw = new BufferedWriter(fw);
 			
-			for(int i = 0; i<padx.length; i++){
-				bw.write("("+Float.toString(padx[i])+", "+Float.toString(pady[i])+", "+Float.toString(padz[i])+")");
-				if (i != padx.length-1) {
+			for(int i = 0; i<x.length; i++){
+				bw.write("("+Float.toString(x[i])+", "+Float.toString(y[i])+", "+Float.toString(z[i])+")");
+				if (i != x.length-1) {
 					bw.newLine();					
 				}
 
@@ -59,3 +68,4 @@ public class PathFindingTests {
 		}
 	}
 }
+

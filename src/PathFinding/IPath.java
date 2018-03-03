@@ -2,9 +2,7 @@ package PathFinding;
 
 import java.util.ArrayList;
 
-import entities.meshes.cube.Cube;
 import interfaces.Path;
-import utils.Cubes;
 
 /*
  * This class contains the method setPath() which generates a path for the drone to follow.
@@ -40,7 +38,7 @@ public class IPath implements Path{
 		//ArrayList keeping track of already visited cubes
 		ArrayList<float[]> cubesInPath = new ArrayList<>();
 		//Set an initial destination allowing lift-off
-		addLiftOffPoint();
+		 addLiftOffPoint();
 		//Iterate over all cubes, for each cube:
 		for(int i = 0; i<cubeLocations.size(); i++){
 			//Find the closest cube, ignoring already visited ones
@@ -54,7 +52,7 @@ public class IPath implements Path{
 	
 	//TODO alter method to take starting location and heading into account
 	private void addLiftOffPoint() {
-		float[] liftOffPoint = {0, 20, -500};
+		float[] liftOffPoint = {0, 30, -100};
 		addLocation(liftOffPoint[0], liftOffPoint[1], liftOffPoint[2]);
 		this.location = liftOffPoint;		
 	}
@@ -227,6 +225,16 @@ public class IPath implements Path{
 			z[i++] = (f != null ? f : Float.NaN);
 		}
 		return z;
+	}
+	
+	public ArrayList<float[]> getPathArray(){
+		ArrayList<float[]> path = new ArrayList<>();
+		for (int i=0; i<this.x.size();i++) {
+			float[] point = new float[3];
+			point[0] = this.x.get(i);point[1] = this.y.get(i);point[2] = this.z.get(i);
+			path.add(point);
+		}
+		return path;
 	}
 
 }
