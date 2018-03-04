@@ -10,30 +10,30 @@ import com.stormbots.MiniPID;
 
 public class PitchPID {
 	
-	MiniPID pitchUpPID, pitchDownPID;
+	MiniPID pitchClimbPID, pitchDownPID;
 	FlyPilot pilot;
 	
 	public PitchPID(FlyPilot pilot) {
-		pitchUpPID = new MiniPID(1.5, 0, 0);
-		pitchUpPID.setOutputLimits(Math.toRadians(20));
-		pitchDownPID = new MiniPID(1, 0, 0.07);
-		pitchDownPID.setOutputLimits(Math.toRadians(20));
+		pitchClimbPID = new MiniPID(2.5, 0, 0.5);
+		pitchClimbPID.setOutputLimits(Math.toRadians(10));
+		pitchDownPID = new MiniPID(3, 0, 0.5);
+		pitchDownPID.setOutputLimits(Math.toRadians(10));
 		
 		this.pilot = pilot;
 	}
 	
 	// PID uses horizontal stabiliser to adjust pitch.
-	public void adjustPitchUp(AutopilotInputs input, float target) {
-		pitchUpPID.setSetpoint(target);
+	public void adjustPitchClimb(AutopilotInputs input, float target) {
+		pitchClimbPID.setSetpoint(target);
 
-		Vector3f rel = pilot.getRelVel(input);
-		float climb = (float) Math.atan2(rel.y(), -rel.z());
-		float min = climb - input.getPitch() + pilot.getConfig().getMaxAOA();
-		float max = climb - input.getPitch() - pilot.getConfig().getMaxAOA();
-		pitchUpPID.setOutputLimits(min, max);
+//		Vector3f rel = pilot.getRelVel(input);
+//		float climb = (float) Math.atan2(rel.y(), -rel.z());
+//		float min = climb - input.getPitch() + pilot.getConfig().getMaxAOA();
+//		float max = climb - input.getPitch() - pilot.getConfig().getMaxAOA();
+//		pitchUpPID.setOutputLimits(min, max);
 
 		float actual = input.getPitch();
-		float output = (float) pitchUpPID.getOutput(actual);
+		float output = (float) pitchClimbPID.getOutput(actual);
 
 		pilot.setHorStabInclination(-output);
 	}
@@ -41,11 +41,11 @@ public class PitchPID {
 	public void adjustPitchDown(AutopilotInputs input, float target) {
 		pitchDownPID.setSetpoint(target);
 
-		Vector3f rel = pilot.getRelVel(input);
-		float climb = (float) Math.atan2(rel.y(), -rel.z());
-		float min = climb - input.getPitch() + pilot.getConfig().getMaxAOA();
-		float max = climb - input.getPitch() - pilot.getConfig().getMaxAOA();
-		pitchDownPID.setOutputLimits(min, max);
+//		Vector3f rel = pilot.getRelVel(input);
+//		float climb = (float) Math.atan2(rel.y(), -rel.z());
+//		float min = climb - input.getPitch() + pilot.getConfig().getMaxAOA();
+//		float max = climb - input.getPitch() - pilot.getConfig().getMaxAOA();
+//		pitchDownPID.setOutputLimits(min, max);
 
 		float actual = input.getPitch();
 		float output = (float) pitchDownPID.getOutput(actual);
