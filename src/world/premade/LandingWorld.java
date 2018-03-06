@@ -23,10 +23,10 @@ public class LandingWorld extends World{
 	public void setup() {
 		this.config = Utils.createDefaultConfig();
 		
-		this.physics = new Physics(true);
-		this.physics.init(config, new Vector3f(0, 100, 0), 35);
+
+		addDrone(config, new Vector3f(0, 200, 0), new Vector3f(0,0,-40));
 		
-		this.planner = new Pilot();
+		this.planner = new Pilot(new int[] {Pilot.LANDING});
 		
 		this.worldObjects = new WorldObject[500];
 		
