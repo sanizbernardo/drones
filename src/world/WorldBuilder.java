@@ -43,10 +43,10 @@ public class WorldBuilder extends World implements IWorldRules {
 		return "Internal hook for GUI world creation";
 	}
 	
-	public void setupDrone(AutopilotConfig config, Vector3f startPos, float startVel, Vector3f startOrientation) {
+	public void setupDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {
         this.config = config;
 		
-        addDrone(config, startPos, new Vector3f(startVel));
+        addDrone(config, startPos, startVel);
 	}
 
 }
