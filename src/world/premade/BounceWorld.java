@@ -4,8 +4,13 @@ import org.joml.Vector3f;
 
 import entities.WorldObject;
 import entities.ground.Ground;
+<<<<<<< HEAD
 import physics.Physics;
 import pilot.Pilot;
+=======
+import utils.FloatMath;
+import utils.PhysicsException;
+>>>>>>> feature
 import utils.Utils;
 import world.World;
 
@@ -19,14 +24,19 @@ public class BounceWorld extends World {
 	public void setup() {
 		this.config = Utils.createDefaultConfig();
 		
-		this.physics = new Physics(false);
-		this.physics.init(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,-1.8f,0));
+		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,-1.8f,0));
 		
-		this.planner = new Pilot();
+		this.planner = new Pilot(new int[] {});
 		
 		this.worldObjects = new WorldObject[0];
 		
 		this.ground = new Ground(10);
+		
+		try {
+			droneHelper.getDronePhysics(config.getDroneID()).updateDrone(Utils.buildOutputs(-FloatMath.PI/2, -FloatMath.PI/2, 0, -FloatMath.PI/2, 0, 0, 0, 0));
+		} catch (PhysicsException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

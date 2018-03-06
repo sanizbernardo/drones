@@ -14,26 +14,26 @@ import world.World;
  */
 public class TestWorldFlyStraight extends World implements IWorldRules {
 
-	public TestWorldFlyStraight() {
-		super(1, true);
-	}
+    public TestWorldFlyStraight() {
+        super(1, true);
+    }
 
-	/**
-	 * Is called in the abstract class
-	 */
-	@Override
-	public void setup() {
-		config = Utils.createDefaultConfig();
+    /**
+     * Is called in the abstract class
+     */
+    @Override
+    public void setup() {
+    	config = Utils.createDefaultConfig();
+    	  
+    	addDrone(config, new Vector3f(0,100,0), new Vector3f(0,0,-10));
 
-		physics.init(config, new Vector3f(0, 100, 0), 10f);
+    	planner = new Pilot(new int[] {Pilot.FLYING});
+    	
+        worldObjects = new WorldObject[1];
+        worldObjects[0] = new WorldObject(Cubes.getCubes()[0].getMesh());
+        worldObjects[0].setPosition(0f,0f,-400f);
 
-		planner = new Pilot();
-
-		worldObjects = new WorldObject[1];
-		worldObjects[0] = new WorldObject(Cubes.getCubes()[0].getMesh());
-		worldObjects[0].setPosition(0f, 100f, -100f);
-
-	}
+    }
 
 	@Override
 	public String getDescription() {

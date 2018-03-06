@@ -1,14 +1,10 @@
 package world.premade;
 
-
 import engine.IWorldRules;
 import entities.WorldObject;
 import pilot.Pilot;
-import utils.Cubes;
 import utils.Utils;
 import world.World;
-
-import java.util.Random;
 
 import org.joml.Vector3f;
 
@@ -25,9 +21,13 @@ public class TestWorldPitch extends World implements IWorldRules {
     public void setup() {
         config = Utils.createDefaultConfig();
 
+<<<<<<< HEAD:src/world/premade/TestWorldPitch.java
         physics.init(config,  new Vector3f(0,100,0), 40);
+=======
+        addDrone(config, new Vector3f(0,100,0), new Vector3f(0,0,-50));
+>>>>>>> feature:src/world/premade/TestWorldTurn.java
 
-        planner = new Pilot();
+        planner = new Pilot(new int[] {Pilot.FLYING});
         
         worldObjects = new WorldObject[1];
 

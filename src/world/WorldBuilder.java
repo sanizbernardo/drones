@@ -26,7 +26,7 @@ public class WorldBuilder extends World implements IWorldRules {
 	public void setup() {
 		
 		//TODO: provide correct planner
-		if (wantPlanner) planner = new Pilot();
+		if (wantPlanner) planner = new Pilot(new int[] {});
 		
 		this.worldObjects = new WorldObject[cubes.size()];	
 		int i = 0;		
@@ -43,10 +43,10 @@ public class WorldBuilder extends World implements IWorldRules {
 		return "Internal hook for GUI world creation";
 	}
 	
-	public void setupDrone(AutopilotConfig config, Vector3f startPos, float startVel, Vector3f startOrientation) {
+	public void setupDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {
         this.config = config;
 		
-		physics.init(config, startPos, startVel, startOrientation.y, startOrientation.x, startOrientation.z);
+        addDrone(config, startPos, startVel);
 	}
 
 }

@@ -43,6 +43,8 @@ public class Constants {
     public static final int AUTOPILOT_GUI_HEIGHT = 407;
     public static final int AUTOPILOT_GUI_WIDTH = 508;
     
+    public static final float COLLISION_RANGE = 5;
+    
     /**
      * Renderer constants
      */
