@@ -58,7 +58,9 @@ public class TaxiPilot extends PilotPart {
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs input) {
 
-		float dt = input.getElapsedTime();
+
+
+		float dt = input.getElapsedTime() - this.time;
 
 		Vector3f pos = new Vector3f(input.getX(), input.getY(), input.getZ());
 
@@ -79,6 +81,30 @@ public class TaxiPilot extends PilotPart {
 		System.out.printf("Target heading: %s\t", targetHeading);
 		System.out.printf("Current speed: %s\t \n", speed);
 
+
+		if (targetHeading - input.getHeading() < -(Math.toRadians(2))) {
+			thrust = 100;
+			rBrake = maxBrakeForce;
+		}
+		else if (targetHeading - input.getHeading() > Math.toRadians(2)) {
+			thrust = 100;
+			lBrake = maxBrakeForce;
+		} else {
+			if (distance > 10) {taxispeed = 4;}
+			else {taxispeed = 1;}
+			if (speed <= taxispeed) {
+				thrustPID.setSetpoint(taxispeed);
+				thrust = (float)thrustPID.getOutput(speed);
+			} else {
+				thrust = 0;
+				lBrake = (float)0.2*maxBrakeForce;
+				rBrake = (float)0.2*maxBrakeForce;
+			}
+		}
+
+
+
+		/**
 		if (distance < 20) {
 			taxispeed = 1;
 		} else {
@@ -88,12 +114,13 @@ public class TaxiPilot extends PilotPart {
 		thrustPID.setSetpoint(taxispeed);
 		thrust = (float)thrustPID.getOutput(speed);
 
-		if (targetHeading - input.getHeading() < Math.toRadians(10)) {
+		if (targetHeading - input.getHeading() < -(Math.toRadians(10))) {
 			rBrake = turn(speed);
 		}
 		else if (targetHeading - input.getHeading() > Math.toRadians(10)) {
 			lBrake = turn(speed);
 		}
+		 */
 
 		this.time = input.getElapsedTime();
 

@@ -2,6 +2,8 @@ package world.premade;
 
 
 import entities.WorldObject;
+import entities.ground.Ground;
+import entities.tarmac.Tarmac;
 import org.joml.Vector3f;
 import physics.Physics;
 import pilot.Pilot;
@@ -18,13 +20,14 @@ public class TaxiWorld extends World {
     public void setup() {
         this.config = Utils.createDefaultConfig();
 
-        this.physics = new Physics(true);
+        addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0));
 
-        this.physics.init(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), 0);
+        this.planner = new Pilot(new int[] {Pilot.TAXIING});
 
-        this.planner = new Pilot();
+        this.worldObjects = new WorldObject[] {};
 
-        this.worldObjects = new WorldObject[40];
+        this.ground = new Ground(50);
+        this.tarmac = new Tarmac(new Vector3f(0,0,0), 50f, 300f, 0f);
     }
 
     @Override
