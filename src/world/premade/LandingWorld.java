@@ -24,7 +24,7 @@ public class LandingWorld extends World{
 		this.config = Utils.createDefaultConfig();
 		
 
-		addDrone(config, new Vector3f(0, 3, 0), new Vector3f(0,0,-40));
+		addDrone(config, new Vector3f(0, 10, 0), new Vector3f(0,0,-35));
 		
 		this.planner = new Pilot(new int[] {Pilot.LANDING});
 		

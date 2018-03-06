@@ -51,6 +51,10 @@ public class LandingPilot extends PilotPart {
 		rwIncl = input.getPitch() < FloatMath.toRadians(15) ? 4 : 6;
 		horStabIncl = (float) -pitchPID.getOutput(input.getPitch());		
 		thrust = 0;	
+		if(vel.y < -1){
+			System.out.println(vel.y);
+			thrust = maxThrust;
+		}
 		return Utils.buildOutputs(FloatMath.toRadians(lwIncl), FloatMath.toRadians(rwIncl), 0, horStabIncl, thrust, rMax/2, rMax/2, rMax/2);
 	}
 
