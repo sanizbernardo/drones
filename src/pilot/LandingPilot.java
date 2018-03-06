@@ -2,6 +2,8 @@ package pilot;
 
 import org.joml.Vector3f;
 
+import com.stormbots.MiniPID;
+
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
@@ -10,10 +12,20 @@ import utils.Utils;
 
 public class LandingPilot extends PilotPart {
 
-	private boolean ended;
 	private float maxThrust;
 	private float rMax;
-	private final float climbAngle = FloatMath.toRadians(20);
+	private final float dropAngle = FloatMath.toRadians(10);
+	private float time;
+	private MiniPID pitchPID;
+	
+	public LandingPilot() {
+		
+		this.time = 0;
+		
+		this.pitchPID = new MiniPID(1.1, 0, 0.3);
+		this.pitchPID.setSetpoint(dropAngle);
+		this.pitchPID.setOutputLimits(FloatMath.toRadians(10));
+	}
 	
 	@Override
 	public void initialize(AutopilotConfig config) {
@@ -27,101 +39,24 @@ public class LandingPilot extends PilotPart {
 	public AutopilotOutputs timePassed(AutopilotInputs input) {
 		Vector3f pos = new Vector3f(input.getX(), input.getY(), input.getZ());
 		
-		Vector3f vel = pos.sub(this.oldPos, new Vector3f()).mul(1/input.getElapsedTime());
-		float speed = FloatMath.norm(vel);
+		float dt = input.getElapsedTime() - this.time;
+		this.time = input.getElapsedTime();
+		
+		Vector3f vel = pos.sub(this.oldPos, new Vector3f()).mul(1/dt);
 		this.oldPos = pos;
-
-		float lwIncl, rwIncl, horStabIncl, thrust;
 		
-		if(pos.y < 1.6){
-			lwIncl = 7;
-			rwIncl = 7;
-			thrust = 0;
-		}
-		else if(pos.y < 3){
-			if(vel.y > -0.4){
-				lwIncl = -10;
-				rwIncl = -10;
-			}
-			else if(vel.y < -0.6){
-				lwIncl = 10;
-				rwIncl = 10;
-			}
-			else{
-				lwIncl = 0;
-				rwIncl = 0;				
-			}
-			thrust = 0;
-		}
-		else if (pos.y < 8){
-			if(vel.y > -1.5){
-				lwIncl = -10;
-				rwIncl = -10;
-			}
-			else if(vel.y < -1.7){
-				lwIncl = 10;
-				rwIncl = 10;
-			}
-			else{
-				lwIncl = 0;
-				rwIncl = 0;
-			}
-			if(vel.z < -40){
-				thrust = 0;
-			}
-			else{
-				thrust = this.maxThrust;
-			}
-		}else if (pos.y < 25){
-			if(vel.y > -2.9){
-				lwIncl = -10;
-				rwIncl = -10;
-			}
-			else if(vel.y < -3.1){
-				lwIncl = 10;
-				rwIncl = 10;
-			}
-			else{
-				lwIncl = 0;
-				rwIncl = 0;
-			}
-			if(speed > 40){
-				thrust = 0;
-			}
-			else{
-				thrust = this.maxThrust;
-			}
-		}
-		else{
-			if(vel.y > -19.9){
-				lwIncl = -10;
-				rwIncl = -10;
-			}
-			else if(vel.y < -20.1){
-				lwIncl = 10;
-				rwIncl = 10;
-			}
-			else{
-				lwIncl = 0;
-				rwIncl = 0;
-			}
-			if(speed > 40){
-				thrust = 0;
-			}
-			else{
-				thrust = this.maxThrust;
-			}
-		}
+		float lwIncl = 0, rwIncl = 0, horStabIncl = 0, thrust = 0;
 		
-		horStabIncl = -0.5f*(this.climbAngle + input.getPitch());		
-		horStabIncl = horStabIncl > 12 ? 12: horStabIncl;
-		
-		return Utils.buildOutputs(FloatMath.toRadians(lwIncl), FloatMath.toRadians(rwIncl), 0, FloatMath.toRadians(horStabIncl), thrust, rMax/2, rMax/2, rMax/2);
-		}
+		lwIncl = input.getPitch() < FloatMath.toRadians(15) ? 4 : 6;
+		rwIncl = input.getPitch() < FloatMath.toRadians(15) ? 4 : 6;
+		horStabIncl = (float) -pitchPID.getOutput(input.getPitch());		
+		thrust = 0;	
+		return Utils.buildOutputs(FloatMath.toRadians(lwIncl), FloatMath.toRadians(rwIncl), 0, horStabIncl, thrust, rMax/2, rMax/2, rMax/2);
+	}
 
 	@Override
 	public boolean ended() {
-		return ended;
+		return false;
 	}
 
 	@Override
