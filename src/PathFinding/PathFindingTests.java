@@ -9,8 +9,8 @@ public class PathFindingTests {
 	public static void main(String[] args) {
 		//Add some test-goal location
 		ArrayList<float[]> cubelocs = new ArrayList<float[]>();
-		cubelocs.add(new float[] {0,30,-400}); //Standard location
-		cubelocs.add(new float[] {100,30,-400}); //Not in reach of turn
+		cubelocs.add(new float[] {-100,30,0}); //Standard location
+		cubelocs.add(new float[] {500,30,300}); //Not in reach of turn
 		cubelocs.add(new float[] {100, 30, -500}); //Directly above current location
 		cubelocs.add(new float[] {60, 30, -40}); //Directly above current location
 		cubelocs.add(new float[] {10, 30, -0}); //Directly above current location
@@ -18,11 +18,11 @@ public class PathFindingTests {
 		//Add the starting location
 		float[] start = new float[] {0,0,0};
 		//Create a path object, this calls setPath() automatically
-		IPath path = new IPath(cubelocs, 0.1f, 0.1f, 100f, start, 0f);
+		IPath path = new IPath(cubelocs, 0.1f, 0.1f, 100f, start, 0.75f);
 		path.setPath();
 
 		//Draw the path
-		new PathDemo(path.getPathArray());
+		new PathDemo(path.getPathArray(), cubelocs);
 		
 	}
 	

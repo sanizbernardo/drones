@@ -102,20 +102,28 @@ public class IPath implements Path{
 			this.location = new float[] {newX, newY, newZ};			
 		}
 		
+		float temp = 0;
+		if(orientation(this.location, auxLocPlusMinZ(1), closestCube) == 1){
+			temp = this.turningRadius;
+		}
+		else{
+			temp = -this.turningRadius;
+		}
+		
 		//Cube behind current location
 		if(orientation(this.location, auxLocPlusX(1), closestCube) == 1){
-			float dm = (float)Math.sqrt(Math.pow(this.location[0] - auxLocPlusX(this.turningRadius)[0], 2) + Math.pow(this.location[2] - auxLocPlusX(this.turningRadius)[2], 2));
+			float dm = this.turningRadius;
 			float dg = (float)Math.sqrt(Math.pow(this.location[0] - closestCube[0], 2) + Math.pow(this.location[2] - closestCube[2], 2));
-			float mg = (float)Math.sqrt(Math.pow(auxLocPlusX(this.turningRadius)[0] - closestCube[0], 2) + Math.pow(auxLocPlusX(this.turningRadius)[2] - closestCube[2], 2));
+			float mg = (float)Math.sqrt(Math.pow(auxLocPlusX(temp)[0] - closestCube[0], 2) + Math.pow(auxLocPlusX(temp)[2] - closestCube[2], 2));
 			float bigCorner = (float)(2*Math.PI) - (float)Math.acos((dg*dg - dm*dm - mg*mg)/(-2*dm*mg));
 			float smallCorner = (float)Math.acos(turningRadius/mg);
 			corner = bigCorner - smallCorner;
 		}
 		//Cube in front of current location
 		else{
-			float dm = (float)Math.sqrt(Math.pow(this.location[0] - auxLocPlusX(this.turningRadius)[0], 2) + Math.pow(this.location[2] - auxLocPlusX(this.turningRadius)[2], 2));
+			float dm = this.turningRadius;
 			float dg = (float)Math.sqrt(Math.pow(this.location[0] - closestCube[0], 2) + Math.pow(this.location[2] - closestCube[2], 2));
-			float mg = (float)Math.sqrt(Math.pow(auxLocPlusX(this.turningRadius)[0] - closestCube[0], 2) + Math.pow(auxLocPlusX(this.turningRadius)[2] - closestCube[2], 2));
+			float mg = (float)Math.sqrt(Math.pow(auxLocPlusX(temp)[0] - closestCube[0], 2) + Math.pow(auxLocPlusX(temp)[2] - closestCube[2], 2));
 			float bigCorner = (float)Math.acos((dg*dg - dm*dm - mg*mg)/(-2*dm*mg));
 			float smallCorner = (float)Math.acos(turningRadius/mg);
 			corner = bigCorner - smallCorner;
@@ -160,10 +168,12 @@ public class IPath implements Path{
 	private Boolean turnable(float[] goalLocation, float turningRadius) {
 		float[] circleCentre1 = auxLocPlusX(turningRadius);
 		float[] circleCentre2 = auxLocPlusX(-1*turningRadius);
-		if (Math.sqrt(Math.pow(goalLocation[0]-circleCentre1[0], 2)+Math.pow(goalLocation[2]-circleCentre1[2], 2)) < turningRadius)
-			return false;		
-		if (Math.sqrt(Math.pow(goalLocation[0]-circleCentre2[0], 2)+Math.pow(goalLocation[2]-circleCentre2[2], 2)) < turningRadius)
+		if (Math.sqrt(Math.pow(goalLocation[0]-circleCentre1[0], 2)+Math.pow(goalLocation[2]-circleCentre1[2], 2)) < turningRadius){
+			return false;	
+		}
+		if (Math.sqrt(Math.pow(goalLocation[0]-circleCentre2[0], 2)+Math.pow(goalLocation[2]-circleCentre2[2], 2)) < turningRadius){
 			return false;
+		}
 		return true;
 	}
 	
@@ -180,7 +190,7 @@ public class IPath implements Path{
 		float[] newLoc = new float[3];
 		newLoc[0] = this.location[0] + (float)Math.cos(heading)*arg;
 		newLoc[1] = this.location[1];
-		newLoc[2] = this.location[2] - (float)Math.sin(heading)*arg;
+		newLoc[2] = this.location[2] + (float)Math.sin(heading)*arg;
 		return newLoc;
 		}
 	
