@@ -1,9 +1,10 @@
 package world.premade;
 
+import meshes.cube.Cube;
+
 import org.joml.Vector3f;
 
 import entities.WorldObject;
-import entities.meshes.cube.Cube;
 import recognition.ImgRecogPlanner;
 import utils.Utils;
 import utils.IO.MouseInput;
@@ -27,7 +28,7 @@ public class ImgRecogWorld extends World {
 	public void setup() {
 		config = Utils.createDefaultConfig();
 		
-		physics.init(config, new Vector3f(0, 0, 0), 0, 0, 0, 0);
+		addDrone(config, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
 		
 		planner = new ImgRecogPlanner(x, y, z, dx, dy, dz);
 		

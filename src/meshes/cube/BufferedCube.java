@@ -1,4 +1,4 @@
-package entities.meshes.cube;
+package meshes.cube;
 
 public class BufferedCube {
 	

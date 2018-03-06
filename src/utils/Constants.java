@@ -17,21 +17,32 @@ public class Constants {
      * Premade worlds that should show in the gui.
      */
 	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight",
-																"OrthoTestWorld", "RotationWorld", "YZWorld", "TestWorld2", 
-																"TakeOffWorld", "BounceWorld", "TaxiWorld"};
-
+																"OrthoTestWorld", "RotationWorld", "TestWorldTurn", "TestWorld2", 
+																"TakeOffWorld", "BounceWorld", "AirportSetupWorld", "TaxiWorld"};
+	
+	/**
+	 * Pilot constants
+	 */
     
+	public static float climbAngle = FloatMath.toRadians(10);
+
     /**
      * Drone pickup accuracy
      */
     public static final float PICKUP_DISTANCE = 3f;
 
 
+    /**
+     * GUI
+     */
+    
     public static final int TESTBED_GUI_HEIGHT = 350;  
     public static final int TESTBED_GUI_WIDTH = 200;  
     
     public static final int AUTOPILOT_GUI_HEIGHT = 407;
     public static final int AUTOPILOT_GUI_WIDTH = 508;
+    
+    public static final float COLLISION_RANGE = 5;
     
     /**
      * Renderer constants
@@ -39,7 +50,7 @@ public class Constants {
     //Field of View in Radians
     public static final float FOV = (float) Math.toRadians(90f);
     public static final float Z_NEAR = 0.01f;
-    public static final float Z_FAR = 1000.f;
+    public static final float Z_FAR = 10000.f;
     public static final float DRONE_THICKNESS = 0.1f;  //in meters
     public static final float DRONE_WHEEL_THICKNESS = 0.08f;
     public static final int DRONE_LEFT_WING = 0;
@@ -48,6 +59,8 @@ public class Constants {
     public static final int DRONE_WHEEL_FRONT = 3;
     public static final int DRONE_WHEEL_BACK_LEFT = 4;
     public static final int DRONE_WHEEL_BACK_RIGHT = 5;
+    
+    public static final int UBUNTU_SIDEBAR = 105;
     /**
      * Game engine
      */
@@ -61,7 +74,8 @@ public class Constants {
     public static final float MOUSE_SENSITIVITY = 0.4f;
 
     public static final float CAMERA_POS_STEP = 0.05f;
-          
+
+    public static final int TILE_SIZE = 100;
     /**
      * default config settings
      */

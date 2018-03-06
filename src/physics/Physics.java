@@ -20,14 +20,19 @@ public class Physics {
 				  lwIncl, rwIncl, hsIncl, vsIncl,
 				  thrust, weight,
 				  tyreRadius, tyreSlope, dampSlope,
-				  maxAOA, maxR, maxFC;
+				  maxAOA, maxR, maxFC, maxThrust;
 	
 	private Matrix3f transMat, transMatInv,
 					 inertia, inertiaInv;
 	
 	private Vector3f[] axisVectors, wingPositions, velProj, wheelPositions;
 	private float[] liftSlopes, dBuffer, brakeForce;
-
+	
+	private final String[] wingNames = new String[] {"Left wing", "Right wing", 
+													 "Horizontal Stabilizer", 
+													 "Vertical Stabilizer"};
+	private final String[] tyreNames = new String[] {"Left wheel", "Front wheel", "Right wheel"};
+	
 	private final boolean checkAOA;
 
 	private AutopilotConfig config;
@@ -44,7 +49,7 @@ public class Physics {
 	}
 	
 	public Physics() {
-		this(true);		
+		this(true);
 	}
 	
 	/**
@@ -55,6 +60,9 @@ public class Physics {
 		setupCalculations(config);
 		
 		this.config = config;
+		
+		this.lwIncl = FloatMath.toRadians(10);
+		this.rwIncl = FloatMath.toRadians(10);
 		
 		this.pos = new Vector3f(startPos);
 		this.vel = startVel;
@@ -176,6 +184,8 @@ public class Physics {
 		this.maxR = config.getRMax();
 		
 		this.maxFC = config.getFcMax();
+		
+		this.maxThrust = config.getMaxThrust();
 	}
 	
 	
@@ -216,7 +226,11 @@ public class Physics {
 	public float getVSInclination() {
 		return this.vsIncl;
 	}
-
+	
+	public float getThrust() {
+		return this.thrust;
+	}
+	
 	public Matrix3f getTransMat() {
 		return transMat;
 	}
@@ -241,6 +255,8 @@ public class Physics {
 		this.hsIncl = data.getHorStabInclination();
 		this.vsIncl = data.getVerStabInclination();
 		
+		if (thrust > maxThrust)
+			throw new PhysicsException("Illegal thrust force");
 		this.thrust = data.getThrust();
 		
 		this.brakeForce[0] = data.getLeftBrakeForce();
@@ -248,7 +264,7 @@ public class Physics {
 		this.brakeForce[2] = data.getRightBrakeForce();
 		for (int i = 0; i < 3; i++) {
 			if (brakeForce[i] < 0 || brakeForce[i] > this.maxR)
-				throw new PhysicsException("Illegal brake force on wheel nb " + i + ", " + brakeForce[i]);
+				throw new PhysicsException("Illegal brake force on " + wheelPositions[i] + " (" + FloatMath.round(brakeForce[i],2) + ")");
 		}
 	}
 	
@@ -326,30 +342,22 @@ public class Physics {
 				 new Vector3f(0, FloatMath.sin(this.hsIncl), -FloatMath.cos(this.hsIncl)),
 				 new Vector3f(-FloatMath.sin(this.vsIncl), 0, -FloatMath.cos(this.vsIncl))}; 
 		
-		float[] aoa = new float[4];
-		Vector3f wingForce = new Vector3f();
 		for (int i = 0; i < 4; i++) {
 			Vector3f normal = FloatMath.cross(axisVectors[i], attacks[i]);
 			
 			Vector3f veli = (new Vector3f()).add(FloatMath.transform(this.transMat, this.vel)).add(FloatMath.cross(this.angVel, this.wingPositions[i]));
 			veli.mul(this.velProj[i]); // projecteren op vlak loodrecht op axis
-			aoa[i] = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
+
+			float aoa = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
 			
-			Vector3f force = normal.mul(this.liftSlopes[i] * aoa[i] * FloatMath.squareNorm(veli));
+			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
+
+			if (checkAOA && dt != 0 && FloatMath.norm(force) > 50 && aoa > maxAOA)
+				throw new PhysicsException(wingNames[i] + " exceeded maximum aoa (" + FloatMath.round(FloatMath.toDegrees(aoa), 2) + "�)");
 			
-			wingForce.add(force);
+			totalForce.add(force);
 			totalTorque.add(FloatMath.cross(this.wingPositions[i], force));
 		}
-		
-		
-		if (FloatMath.norm(wingForce) > 50) {
-			for (int i = 0; i < 4; i++) {
-				if (checkAOA && Math.abs(aoa[i]) > maxAOA)
-					throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa : " + aoa[i]);
-			}
-		}
-		totalForce.add(wingForce);
-		
 		
 		// wheels
 		for (int i = 0; i < 3; i++) {
@@ -366,7 +374,7 @@ public class Physics {
 			Vector3f relPos = FloatMath.transform(this.transMat, worldWheelPos.sub(this.pos));
 						
 			if (d >= this.tyreRadius)
-				throw new PhysicsException("Tyre nb " + i + " went underground");
+				throw new PhysicsException(tyreNames[i] + " went underground. (" + FloatMath.round(d,2) + ")");
 			
 			if (d > 0) { // op de grond?
 				// lift

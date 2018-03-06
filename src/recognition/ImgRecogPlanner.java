@@ -26,6 +26,8 @@ public class ImgRecogPlanner implements Autopilot {
 		this.dx = dx;
 		this.dy = dy;
 		this.dz = dz;
+		this.imageProcess = new ImageProcessing();
+		
 	}
 
 	@Override
@@ -37,17 +39,17 @@ public class ImgRecogPlanner implements Autopilot {
 	private int i = 0;
 	private float x, y, z;
 	private double dx, dy, dz;
+	private final ImageProcessing imageProcess;
 	
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {		
 		//hier worden waarden van schattingen vergeleken met werkelijke waarde.
 		byte[] image = inputs.getImage();
-		ImageProcessing imageProcess = null;
 		if (z < -4){
 			float[] pos = {0,0,0};
-			imageProcess = new ImageProcessing(image, 0,0, 0f, pos);
+			this.imageProcess.addNewImage(image, 0, 0, 0f, pos);
 		}
-		if(imageProcess != null && !imageProcess.getObjects().isEmpty()){
+		if(this.imageProcess != null && !this.imageProcess.getObjects().isEmpty()){
 			Cube cube = imageProcess.getObjects().get(0);
 			//TODO: onderstaande statement zorgt ervoor dat afstandsschatting verkeerd is -> waarom?
 			//imageProcess.generateLocations();

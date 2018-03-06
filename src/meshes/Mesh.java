@@ -1,4 +1,4 @@
-package entities.meshes;
+package meshes;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;

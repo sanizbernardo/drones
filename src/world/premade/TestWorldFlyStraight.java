@@ -1,12 +1,13 @@
 package world.premade;
 
+import org.joml.Vector3f;
+
 import engine.IWorldRules;
 import entities.WorldObject;
-import physics.Motion;
+import pilot.Pilot;
 import utils.Cubes;
 import utils.Utils;
 import world.World;
-
 
 /**
  * Place where all the GameItem are to be placed in
@@ -23,27 +24,10 @@ public class TestWorldFlyStraight extends World implements IWorldRules {
     @Override
     public void setup() {
     	config = Utils.createDefaultConfig();
-
-//        config = new AutopilotConfig() {
-//            public float getGravity() {return 9.81f;}
-//            public float getWingX() {return 0.25f;}
-//            public float getTailSize() {return 0.5f;}
-//            public float getEngineMass() {return 3.5f;}
-//            public float getWingMass() {return 1.25f;}
-//            public float getTailMass() {return 1.5f;}
-//            public float getMaxThrust() {return 5000f;}
-//            public float getMaxAOA() {return (float) Math.toRadians(45);}
-//            public float getWingLiftSlope() {return 0.11f;}
-//            public float getHorStabLiftSlope() {return 0.11f;}
-//            public float getVerStabLiftSlope() {return 0.11f;}
-//            public float getHorizontalAngleOfView() {return (float) Math.toRadians(120f);}
-//            public float getVerticalAngleOfView() {return (float) Math.toRadians(120f);}
-//            public int getNbColumns() {return 200;}
-//            public int getNbRows() {return 200;}};
     	  
-    	physics.init(config, 36f);
+    	addDrone(config, new Vector3f(0,100,0), new Vector3f(0,0,-10));
 
-    	planner = new Motion();
+    	planner = new Pilot(new int[] {Pilot.FLYING});
     	
         worldObjects = new WorldObject[1];
         worldObjects[0] = new WorldObject(Cubes.getCubes()[0].getMesh());

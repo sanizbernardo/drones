@@ -1,4 +1,4 @@
-package entities.meshes.drone;
+package meshes.drone;
 
 import interfaces.AutopilotConfig;
 
@@ -6,9 +6,9 @@ public class LeftWing extends DroneComponent{
 
     private float thickness;
 
-    LeftWing(AutopilotConfig config, float thickness) {
+    public LeftWing(AutopilotConfig config, float thickness) {
         this.thickness = thickness;
-        finalize(config);
+        finalizer(config);
     }
 
     @Override

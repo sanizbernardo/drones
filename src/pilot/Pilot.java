@@ -1,5 +1,6 @@
 package pilot;
 
+import pilot.fly.FlyPilot;
 import gui.AutopilotGUI;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
@@ -10,28 +11,29 @@ import utils.Utils;
 
 public class Pilot implements Autopilot {
 	
-	private static final int STATE_TAKING_OFF = 0, 
-							 STATE_LANDING = 1,
-							 STATE_FLYING = 2,
-							 STATE_TAXIING = 3;
+	public static final int TAKING_OFF = 0, 
+							 LANDING = 1,
+							 FLYING = 2,
+							 TAXIING = 3,
+							 WAIT_PATH = -1;
 	
 	private int index;
-	private final int[] order;
+	private final int[] tasks;
 	
 	private AutopilotGUI gui;
 	
 	private PilotPart[] pilots;
 	
+	private Path path;
 	
-	public Pilot() {
+	public Pilot(int[] tasks) {
 		this.pilots = new PilotPart[4];
 		
-		this.pilots[STATE_TAKING_OFF] = new TakeOffPilot(250);
-		this.pilots[STATE_LANDING] = new LandingPilot();
-		this.pilots[STATE_FLYING] = new FlyPilot();
-		this.pilots[STATE_TAXIING] = new TaxiPilot();
-		
-		this.order = new int[] {STATE_TAXIING};
+		this.pilots[TAKING_OFF] = new TakeOffPilot(500);
+		this.pilots[LANDING] = new LandingPilot();
+		this.pilots[FLYING] = new FlyPilot();
+		this.pilots[TAXIING] = new TaxiPilot();
+		this.tasks = tasks;
 		this.index = 0;
 	}
 	
@@ -40,6 +42,7 @@ public class Pilot implements Autopilot {
 	public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 		this.gui = new AutopilotGUI(config);
 		this.gui.showGUI();
+		this.path = null;
 		
 		for (PilotPart pilot: this.pilots) {
 			pilot.initialize(config);
@@ -51,14 +54,23 @@ public class Pilot implements Autopilot {
 
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
+		this.gui.updateImage(inputs.getImage());
+		
 		if (this.gui.manualControl())
 			return this.gui.getOutputs();
 		
-		this.gui.updateImage(inputs.getImage());
-		
-		if (this.index >= this.order.length)
+		if (this.index >= this.tasks.length)
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 
+		if (state() == WAIT_PATH) {
+			if (this.path != null) {
+				//calculate path...
+				
+				this.index += 1;
+			}
+			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
+		}
+		
 		this.gui.setTask(currentPilot().taskName());
 		
 		AutopilotOutputs output = currentPilot().timePassed(inputs);
@@ -86,7 +98,7 @@ public class Pilot implements Autopilot {
 	}
 	
 	private int state() {
-		return this.order[this.index];
+		return this.tasks[this.index];
 	}
 	
 	private PilotPart currentPilot() {
@@ -96,7 +108,7 @@ public class Pilot implements Autopilot {
 
 	@Override
 	public void setPath(Path path) {
-
+		this.path = path;
 	}
 
 }
