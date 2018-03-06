@@ -32,7 +32,7 @@ public class Pilot implements Autopilot {
 		this.pilots[STATE_FLYING] = new FlyPilot();
 		this.pilots[STATE_TAXIING] = new TaxiPilot();
 		
-		this.order = new int[] {};
+		this.order = new int[] {STATE_FLYING};
 		this.index = 0;
 	}
 	
