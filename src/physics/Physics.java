@@ -342,32 +342,22 @@ public class Physics {
 				 new Vector3f(0, FloatMath.sin(this.hsIncl), -FloatMath.cos(this.hsIncl)),
 				 new Vector3f(-FloatMath.sin(this.vsIncl), 0, -FloatMath.cos(this.vsIncl))}; 
 		
-		float[] aoa = new float[4];
-		Vector3f wingForce = new Vector3f();
 		for (int i = 0; i < 4; i++) {
 			Vector3f normal = FloatMath.cross(axisVectors[i], attacks[i]);
 			
 			Vector3f veli = (new Vector3f()).add(FloatMath.transform(this.transMat, this.vel)).add(FloatMath.cross(this.angVel, this.wingPositions[i]));
 			veli.mul(this.velProj[i]); // projecteren op vlak loodrecht op axis
 
-			aoa[i] = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
+			float aoa = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
 			
-			Vector3f force = normal.mul(this.liftSlopes[i] * aoa[i] * FloatMath.squareNorm(veli));
+			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
 
+			if (checkAOA && dt != 0 && FloatMath.norm(force) > 50 && aoa > maxAOA)
+				throw new PhysicsException(wingNames[i] + " exceeded maximum aoa (" + FloatMath.round(FloatMath.toDegrees(aoa), 2) + "°)");
 			
-			wingForce.add(force);
+			totalForce.add(force);
 			totalTorque.add(FloatMath.cross(this.wingPositions[i], force));
-		}
-		
-		
-		if (dt != 0 && FloatMath.norm(wingForce) > 50) {
-			for (int i = 0; i < 4; i++) {
-				if (checkAOA && Math.abs(aoa[i]) > maxAOA)
-					throw new PhysicsException(wingNames[i] + " exceeded maximum aoa (" + FloatMath.round(FloatMath.toDegrees(aoa[i]), 2) + "°)");
-			}
-		}
-		totalForce.add(wingForce);
-		
+		}		
 		
 		// wheels
 		for (int i = 0; i < 3; i++) {
