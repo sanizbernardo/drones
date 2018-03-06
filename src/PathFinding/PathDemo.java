@@ -40,7 +40,6 @@ public class PathDemo extends JFrame {
 			float scale = 1.5f;
 			
 			for (int i=0;i<path.size()-1;i++) {
-				System.out.println(path.get(i)[0] + "                " + path.get(i)[1] + "              " + path.get(i)[2]);
 				Shape line = new Line2D.Float(path.get(i)[0]/scale+800, path.get(i)[2]/scale+500, 
 						path.get(i+1)[0]/scale+800, path.get(i+1)[2]/scale+500);
 				if (i == 0)
@@ -55,7 +54,6 @@ public class PathDemo extends JFrame {
 				g2.fillOval((int)(path.get(i)[0]/scale+800), (int)(path.get(i)[2]/scale+500), 5, 5);
 
 			}
-			System.out.println(cubeLocs.size());
 			for (int i=0;i<cubeLocs.size();i++){
 				g2.setPaint(Color.YELLOW);
 				g2.fillOval((int)(cubeLocs.get(i)[0]/scale+800), (int)(cubeLocs.get(i)[2]/scale+500), 5, 5);
