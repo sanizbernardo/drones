@@ -21,11 +21,8 @@ public class TestWorldPitch extends World implements IWorldRules {
     public void setup() {
         config = Utils.createDefaultConfig();
 
-<<<<<<< HEAD:src/world/premade/TestWorldPitch.java
-        physics.init(config,  new Vector3f(0,100,0), 40);
-=======
         addDrone(config, new Vector3f(0,100,0), new Vector3f(0,0,-50));
->>>>>>> feature:src/world/premade/TestWorldTurn.java
+
 
         planner = new Pilot(new int[] {Pilot.FLYING});
         

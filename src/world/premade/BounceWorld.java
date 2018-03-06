@@ -2,15 +2,11 @@ package world.premade;
 
 import org.joml.Vector3f;
 
+import pilot.Pilot;
 import entities.WorldObject;
 import entities.ground.Ground;
-<<<<<<< HEAD
-import physics.Physics;
-import pilot.Pilot;
-=======
 import utils.FloatMath;
 import utils.PhysicsException;
->>>>>>> feature
 import utils.Utils;
 import world.World;
 
