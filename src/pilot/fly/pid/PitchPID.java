@@ -2,8 +2,6 @@ package pilot.fly.pid;
 
 import interfaces.AutopilotInputs;
 
-import org.joml.Vector3f;
-
 import pilot.fly.FlyPilot;
 
 import com.stormbots.MiniPID;

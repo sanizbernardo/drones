@@ -1,8 +1,11 @@
 package pilot.fly.pid;
 
 import pilot.fly.FlyPilot;
+import utils.FloatMath;
 
 import com.stormbots.MiniPID;
+
+import interfaces.AutopilotInputs;
 
 public class RollPID {
 	
@@ -11,19 +14,19 @@ public class RollPID {
 	FlyPilot pilot;
 	
 	public RollPID(FlyPilot pilot) {
-		rollPID = new MiniPID(1, 0.000005, 0);
-		rollPID.setOutputLimits(Math.toRadians(30));
+		rollPID = new MiniPID(1, 0, 0);
+		rollPID.setOutputLimits(Math.toRadians(10));
 		
 		this.pilot = pilot;
 	}
 	
 
-	// private void adjustRoll(AutopilotInputs inputs, float target) {
-	// rollPID.setSetpoint(target);
-	// float actual = inputs.getRoll();
-	// float output = (float)rollPID.getOutput(actual);
-	// setLeftWingInclination(leftWingInclination - output);
-	// setRightWingInclination(rightWingInclination + output);
-	// }
+	 public void adjustRoll(AutopilotInputs inputs, float target) {
+		 rollPID.setSetpoint(target);
+		 float actual = inputs.getRoll();
+		 float output = (float)rollPID.getOutput(actual);
+		 pilot.setLeftWingInclination(FloatMath.toRadians(7) - output);
+		 pilot.setRightWingInclination(FloatMath.toRadians(7) + output);
+	 }
 
 }

@@ -85,7 +85,8 @@ public class FlyPilot extends PilotPart {
 		//float desiredHeight = recog.guess();
 
 		//TODO change 200 to desiredHeight
-		adjustHeight(inputs, 50);
+//		adjustHeight(inputs, 50);
+		turn(inputs);
 
 		AutopilotOutputs output = Utils.buildOutputs(leftWingInclination,
 				rightWingInclination, verStabInclination, horStabInclination,
@@ -102,8 +103,7 @@ public class FlyPilot extends PilotPart {
 	}
 
 
-	// Set wings to empirical values found by Flor. PIDs set pitch and thrust to
-	// fly straight.
+	// PIDs set pitch and thrust to fly straight.
 	private void flyStraightPID(AutopilotInputs input) {
 		pitchPID.adjustPitchClimb(input, 0f);
 		thrustPID.adjustThrustUp(input, 0.4f);
@@ -165,6 +165,12 @@ public class FlyPilot extends PilotPart {
 			flyStraightPID(input);
 			aoaManager.setInclNoAOA(input);
 		}
+	}
+	
+	private void turn(AutopilotInputs input) {
+		rollPID.adjustRoll(input, FloatMath.toRadians(5));
+		thrustPID.adjustThrustUp(input, 0.4f);
+		pitchPID.adjustPitchClimb(input, FloatMath.toRadians(4));
 	}
 
 

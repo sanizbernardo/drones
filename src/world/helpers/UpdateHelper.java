@@ -192,14 +192,14 @@ public class UpdateHelper {
     }
     
     private void rotateWings() {
-    	Vector3f leftWing = droneItems[Constants.DRONE_LEFT_WING].getRotation();
+//    	Vector3f leftWing = droneItems[Constants.DRONE_LEFT_WING].getRotation();
 //        leftWing = FloatMath.transform(physics.getTransMat(), leftWing);
-        Matrix3f rot = new Matrix3f().identity().rotateX(physics.getLWInclination());
-        System.out.println(leftWing);
-        Vector3f anderVec = FloatMath.transform(rot, leftWing);
-        System.out.println("after " + anderVec);
+//        Matrix3f rot = new Matrix3f().identity().rotateX(physics.getLWInclination());
+//        System.out.println(leftWing);
+//        Vector3f anderVec = FloatMath.transform(rot, leftWing);
+//        System.out.println("after " + anderVec);
 //        leftWing = FloatMath.transform(physics.getTransMatInv(), leftWing);
-        droneItems[Constants.DRONE_LEFT_WING].setRotation(leftWing.x, leftWing.y, leftWing.z);
+//        droneItems[Constants.DRONE_LEFT_WING].setRotation(leftWing.x, leftWing.y, leftWing.z);
     }
     
     private void translateWheels() {
