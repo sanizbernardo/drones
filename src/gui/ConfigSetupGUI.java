@@ -22,6 +22,7 @@ public class ConfigSetupGUI extends JDialog {
 	private static final long serialVersionUID = 1L;
 
 	private JPanel spinnerPanel;
+	
 	@SuppressWarnings("unused")
 	private JSpinner 	gravitySpinner, wingSizeSpinner, tailSizeSpinner, engineMassSpinner, 
 						wingMassSpinner, tailMassSpinner, maxThrustSpinner, maxAOASpinner, 
@@ -29,8 +30,6 @@ public class ConfigSetupGUI extends JDialog {
 						verFOVSpinner, horFOVSpinner, nbColsSpinner, nbRowsSpinner;
 
 	private JComboBox<String> genComboBox;
-
-	private JSpinner[] orientationSpinners;
 
 	private JSpinner[] velSpinners;
 
@@ -159,25 +158,6 @@ public class ConfigSetupGUI extends JDialog {
 		comboPanel.add(checkPanel, BorderLayout.SOUTH);
 		
 		
-		// create the config tab
-//		JPanel configPanel = new JPanel();
-//		tabbedPane.addTab("Config", configPanel);
-//		configPanel.setLayout(new BorderLayout(0, 0));
-//		
-//		JLabel lblConfig = new JLabel("Autopilot config settings");
-//		lblConfig.setFont(new Font("Tahoma", Font.BOLD, 13));
-//		configPanel.add(lblConfig, BorderLayout.NORTH);
-//		
-//		
-//		spinnerPanel = new JPanel();
-//		configPanel.add(spinnerPanel, BorderLayout.CENTER);
-//		GridBagLayout gbl_fieldsPanel = new GridBagLayout();
-//		gbl_fieldsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0};
-//		spinnerPanel.setLayout(gbl_fieldsPanel);
-//		
-//		buildSpinners();
-		
-		
 		// create the drone startup tap
 		JPanel dronePanel = new JPanel();
 		tabbedPane.addTab("Drone", dronePanel);
@@ -192,7 +172,7 @@ public class ConfigSetupGUI extends JDialog {
 		GridBagLayout gbl_drone = new GridBagLayout();
 		gbl_drone.columnWidths = new int[] {150};
 		gbl_drone.columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
-		gbl_drone.rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0};
+		gbl_drone.rowWeights = new double[] {0.0, 0.0, 0.0, 1.0};
 		startupPanel.setLayout(gbl_drone);
 		dronePanel.add(startupPanel, BorderLayout.CENTER);
 		
@@ -215,10 +195,6 @@ public class ConfigSetupGUI extends JDialog {
 		velSpinners = GuiUtils.buildTripleInputSpinner(startupPanel, "Starting velocity", "x: ", "y: ", "z: ", 3, 
 				Utils.buildIntArr(-1000, -1000, -1000), Utils.buildIntArr(1000, 1000, 1000), 
 				Utils.buildIntArr(0,0,0), Utils.buildIntArr(1,1,1,1));
-		
-		orientationSpinners = GuiUtils.buildTripleInputSpinner(startupPanel, "Starting orientation", "x: ", "y: ", "z: ", 4, 
-				Utils.buildIntArr(-1000, -1000, -1000), Utils.buildIntArr(1000, 1000, 1000), 
-				Utils.buildIntArr(0,0,0), Utils.buildIntArr(1,1,1,1));
 	}
 	
 	public World showDialog() throws Exception {
@@ -236,13 +212,9 @@ public class ConfigSetupGUI extends JDialog {
 		
 		if (world instanceof WorldBuilder) {
 			Vector3f pos = GuiUtils.buildVector(posSpinners),
-					 vel = GuiUtils.buildVector(velSpinners),
-					 orientationDeg = GuiUtils.buildVector(orientationSpinners);
-			Vector3f orientation = new Vector3f((float) Math.toRadians(orientationDeg.x),
-												(float) Math.toRadians(orientationDeg.y),
-												(float) Math.toRadians(orientationDeg.z));
+					 vel = GuiUtils.buildVector(velSpinners);
 			
-			((WorldBuilder) world).setupDrone(generateAutoPilotConfig(), pos, vel.z, orientation);
+			((WorldBuilder) world).setupDrone(generateAutoPilotConfig(), pos, vel);
 		}
 		
 		if (logCheck.isSelected())
@@ -253,34 +225,6 @@ public class ConfigSetupGUI extends JDialog {
 	
 	private AutopilotConfig generateAutoPilotConfig() {
 		return Utils.createDefaultConfig();
-		
-//		return new AutopilotConfig() {
-//			public float getWingX() {return (float) wingSizeSpinner.getValue() / 4f;};
-//			public float getWingMass() {return (float) wingMassSpinner.getValue();}
-//			public float getWingLiftSlope() {return (float) wingLiftslopeSpinner.getValue();}
-//			public float getVerticalAngleOfView() {return (float) (Math.toRadians((int) verFOVSpinner.getValue()));}
-//			public float getVerStabLiftSlope() {return (float) verStabLiftslopeSpinner.getValue();}
-//			public float getTailSize() {return (float) tailSizeSpinner.getValue();}
-//			public float getTailMass() {return (float) tailMassSpinner.getValue();}
-//			public int getNbRows() {return (int) nbRowsSpinner.getValue();}
-//			public int getNbColumns() {return (int) nbColsSpinner.getValue();}
-//			public float getMaxThrust() {return (float) maxThrustSpinner.getValue();}
-//			public float getMaxAOA() {return (float) (Math.toRadians((int) maxAOASpinner.getValue()));}
-//			public float getHorizontalAngleOfView() {return (float) (Math.toRadians((int) horFOVSpinner.getValue()));}
-//			public float getHorStabLiftSlope() {return (float) horStabLiftslopeSpinner.getValue();}
-//			public float getGravity() {return (float) gravitySpinner.getValue();}
-//			public float getEngineMass() {return (float) engineMassSpinner.getValue();}
-//			public String getDroneID() {return null;}
-//			public float getWheelY() {return 0;}
-//			public float getFrontWheelZ() {return 0;}
-//			public float getRearWheelZ() {return 0;}
-//			public float getRearWheelX() {return 0;}
-//			public float getTyreSlope() {return 0;}
-//			public float getDampSlope() {return 0;}
-//			public float getTyreRadius() {return 0;}
-//			public float getRMax() {return 0;}
-//			public float getFcMax() {return 0;}
-//		};
 	}
 	
 	
