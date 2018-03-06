@@ -4,7 +4,8 @@ import org.joml.Vector3f;
 
 import engine.IWorldRules;
 import entities.WorldObject;
-import physics.Motion;
+import physics.Physics;
+import pilot.Pilot;
 import utils.Cubes;
 import utils.FloatMath;
 import utils.Utils;
@@ -21,9 +22,9 @@ public class RotationWorld extends World implements IWorldRules{
 	public void setup() {
     	config = Utils.createDefaultConfig();
     	
-    	physics.init(config, 12);
+    	addDrone(config, new Vector3f(0,0,0), new Vector3f(0,0,-12));
     	
-    	planner = new Motion();
+    	planner = new Pilot(new int[] {});
         worldObjects = new WorldObject[] {new WorldObject(Cubes.getBlueCube().getMesh())};
 
         worldObjects[0].setPosition(new Vector3f(0,0,-20));
@@ -42,11 +43,12 @@ public class RotationWorld extends World implements IWorldRules{
 
 		float step = 0.005f;
 
+		Physics physics = droneHelper.getDronePhysics(config.getDroneID());
 		if (heading <= FloatMath.toRadians(45) && rollOn) {
 			heading += step;
 			pitch += step;
 			roll += step;
-
+			
 			System.out.println(physics.getHeading() + " " + physics.getPitch() + " "  + physics.getRoll());
 
 			physics.init(config, new Vector3f(0, 0, 0), 0, heading, pitch, roll);
@@ -62,8 +64,6 @@ public class RotationWorld extends World implements IWorldRules{
 			heading -= step;
 			physics.init(config, new Vector3f(0, 0, 0), 0, heading, pitch, roll);
 		}
-		
-		
 		
 		super.update(interval, mouseInput);
 	}

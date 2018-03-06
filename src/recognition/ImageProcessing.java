@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.imageio.ImageIO;
 
 import org.joml.Matrix3f;
@@ -14,6 +15,7 @@ import utils.FloatMath;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.OptionalDouble;
 
 /**
  * Created by Toon en Tomas on 31/10/17
@@ -24,16 +26,18 @@ public class ImageProcessing {
     private int imageHeight;
     private BufferedImage image;
     private double fieldOfView = 120;
-    private final float pitch;
-    private final float heading;
-    private final float roll;
+    private float pitch;
+    private float heading;
+    private float roll;
     private ArrayList<Cube> cubes;
-    private final Matrix3f transMat;
-    private final float[] dronePosition;
+    private Matrix3f transMat;
+    private float[] dronePosition;
 
     //constructor in case of a byte[]
-    public ImageProcessing(byte[] imageByte, float pitch, float heading, float roll, float[] dronePosition){  
-    	
+    public ImageProcessing(){  			 	
+    }
+    
+    public void addNewImage(byte[] imageByte, float pitch, float heading, float roll, float[] dronePosition){
     	//initializing
     	
     	this.imageHeight = 200;
@@ -56,7 +60,6 @@ public class ImageProcessing {
 		if (Math.abs(-this.roll) > 1E-6)
 			transMat.rotate(-this.roll, new Vector3f(0, 0, 1));
 		this.transMat.invert();
-			 	
     }
 
     //constructor for local images (mainly testing purposes)
@@ -186,6 +189,9 @@ public class ImageProcessing {
     				for(float[] color : touchesColors){
     					Cube otherCube = findCube(color);
     					//each cube has equal size -> the one with the biggest size is the closest one
+    					if(otherCube == null) {
+    						continue;
+    					}
     					if (otherCube.getNbPixels() < newCube.getNbPixels()){
     						ignoreList.add(otherCube);
     					}
@@ -308,11 +314,11 @@ public class ImageProcessing {
         double totAngle = Math.sqrt(angleX*angleX + angleY*angleY);
         
         if(same){
-        	double dist = (Math.sqrt(2)/2)/Math.tan(totAngle/2) + 0.5;
+        	double dist = (5*Math.sqrt(2)/2)/Math.tan(totAngle/2) + 2.5;
         	cube.setDist(dist);
         	return dist;
         }
-        double dist = (Math.sqrt(3)/2)/Math.tan(totAngle/2);
+        double dist = (5*Math.sqrt(3)/2)/Math.tan(totAngle/2);
     	cube.setDist(dist);
         return dist;        
     }
@@ -360,56 +366,56 @@ public class ImageProcessing {
             float[] hsv2 = rgbConversion(this.image.getRGB(pixel[0]-1, pixel[1]-1));
             float h2 = hsv2[0];
             float s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h != h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h != h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]-1, pixel[1]));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]-1, pixel[1]+1));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0], pixel[1]-1));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0], pixel[1]+1));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]+1, pixel[1]-1));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]+1, pixel[1]));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]+1, pixel[1]+1));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
@@ -418,6 +424,46 @@ public class ImageProcessing {
     	return retList;
     }
     
+	private float timePassedLastDesiredHeight = 0;
+	private int timePassedIterationCount = 0;
+	private ArrayList<Float> timePassedAverageList = new ArrayList<>();
+	private float timePassedDesiredHeight;
+	
+	public float guess() {
+		float guess = Float.NaN;
+
+		ArrayList<Cube> list = null;
+		timePassedIterationCount++;
+		if (timePassedIterationCount % 2 == 0) {
+			list = generateLocations();
+
+			if (list != null && !list.isEmpty()) {
+				timePassedAverageList.add(list.get(0).getLocation()[1]);
+
+				if (timePassedIterationCount >= 14 && !timePassedAverageList.isEmpty()) {
+
+					OptionalDouble t = timePassedAverageList.stream().mapToDouble(a -> a)
+							.average();
+					guess = (float) t.getAsDouble();
+
+					timePassedAverageList.clear();
+
+					timePassedIterationCount = 0;
+				}
+			}
+
+		}
+
+		if (!Float.isNaN(guess)) {
+			timePassedDesiredHeight = list.get(0).getLocation()[1];
+			timePassedLastDesiredHeight = timePassedDesiredHeight;
+
+		} else {
+			timePassedDesiredHeight = timePassedLastDesiredHeight;
+		}
+		
+		return timePassedDesiredHeight;
+	}
 
 	//some getters
     

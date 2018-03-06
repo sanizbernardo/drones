@@ -117,6 +117,9 @@ public class Engine implements Runnable {
                 update(interval);
                 accumulator -= interval;
             }
+            
+            if (shouldExit)
+            	break;
 
             render();
 

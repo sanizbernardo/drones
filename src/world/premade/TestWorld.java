@@ -1,8 +1,10 @@
 package world.premade;
 
+import org.joml.Vector3f;
+
 import engine.IWorldRules;
 import entities.WorldObject;
-import physics.Motion;
+import pilot.Pilot;
 import utils.Cubes;
 import utils.PhysicsException;
 import utils.Utils;
@@ -21,9 +23,9 @@ public class TestWorld extends World implements IWorldRules {
     public void setup() {
     	config = Utils.createDefaultConfig();
     	  
-    	physics.init(config, 12f);
+    	addDrone(config, new Vector3f(0,0,0), new Vector3f(0,0,-12f));
 
-    	planner = new Motion();
+    	planner = new Pilot(new int[] {});
 
         worldObjects = new WorldObject[5];
 
@@ -40,7 +42,7 @@ public class TestWorld extends World implements IWorldRules {
 
         float thrust = 20f;
         try {
-			physics.updateDrone(Utils.buildOutputs(0 ,0, 0, 0, thrust,0,0,0));
+        	droneHelper.getDronePhysics(config.getDroneID()).updateDrone(Utils.buildOutputs(0 ,0, 0, 0, thrust,0,0,0));
 		} catch (PhysicsException e) {
 			e.printStackTrace();
 		}

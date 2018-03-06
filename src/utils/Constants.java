@@ -17,21 +17,33 @@ public class Constants {
      * Premade worlds that should show in the gui.
      */
 	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight",
-																"OrthoTestWorld", "RotationWorld", "TestWorld2", 
+																"OrthoTestWorld", "RotationWorld", "TestWorldTurn", "TestWorld2", 
 																"TakeOffWorld", "BounceWorld", "AirportSetupWorld", "LandingWorld"};
 
+	
+	/**
+	 * Pilot constants
+	 */
     
+	public static float climbAngle = FloatMath.toRadians(10);
+	
     /**
      * Drone pickup accuracy
      */
     public static final float PICKUP_DISTANCE = 3f;
 
 
+    /**
+     * GUI
+     */
+    
     public static final int TESTBED_GUI_HEIGHT = 350;  
     public static final int TESTBED_GUI_WIDTH = 200;  
     
     public static final int AUTOPILOT_GUI_HEIGHT = 407;
     public static final int AUTOPILOT_GUI_WIDTH = 508;
+    
+    public static final float COLLISION_RANGE = 5;
     
     /**
      * Renderer constants

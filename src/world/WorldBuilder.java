@@ -9,7 +9,7 @@ import org.joml.Vector3f;
 import engine.IWorldRules;
 import entities.WorldObject;
 import interfaces.AutopilotConfig;
-import physics.Motion;
+import pilot.Pilot;
 
 public class WorldBuilder extends World implements IWorldRules {
 		
@@ -26,7 +26,7 @@ public class WorldBuilder extends World implements IWorldRules {
 	public void setup() {
 		
 		//TODO: provide correct planner
-		if (wantPlanner) planner = new Motion();
+		if (wantPlanner) planner = new Pilot(new int[] {});
 		
 		this.worldObjects = new WorldObject[cubes.size()];	
 		int i = 0;		
@@ -46,7 +46,7 @@ public class WorldBuilder extends World implements IWorldRules {
 	public void setupDrone(AutopilotConfig config, Vector3f startPos, float startVel, Vector3f startOrientation) {
         this.config = config;
 		
-		physics.init(config, startPos, startVel, startOrientation.y, startOrientation.x, startOrientation.z);
+        addDrone(config, startPos, new Vector3f(startVel));
 	}
 
 }
