@@ -64,7 +64,7 @@ public class FlyPilot extends PilotPart {
 		
 		this.aoaManager = new AOAManager(this);
 
-		this.order = new State[] {State.StrongUp};
+		this.order = new State[] {State.Left};
 		setCurrentState(0);
 		
 		climbAngle = Constants.climbAngle;
@@ -92,7 +92,7 @@ public class FlyPilot extends PilotPart {
 
 
 
-		adjustHeight(inputs, order[getCurrentState()]);
+		control(inputs, order[getCurrentState()]);
 
 		AutopilotOutputs output = Utils.buildOutputs(leftWingInclination,
 				rightWingInclination, verStabInclination, horStabInclination,
@@ -150,7 +150,7 @@ public class FlyPilot extends PilotPart {
 		thrustPID.adjustThrustDown(inputs, -1.5f);
 	}
 
-	private void adjustHeight(AutopilotInputs input, State state) {
+	private void control(AutopilotInputs input, State state) {
 
 		switch(state){
 			case StrongUp:
@@ -175,16 +175,23 @@ public class FlyPilot extends PilotPart {
 				aoaManager.setInclNoAOA(input);
 				break;
 			case Left:
+				turnLeft(input);
 				break;
 			case Right:
+				turnRight(input);
 				break;
 			default:
 				break;
 		}
-
 	}
 	
-	private void turn(AutopilotInputs input) {
+	private void turnRight(AutopilotInputs input) {
+		rollPID.adjustRoll(input, FloatMath.toRadians(-5));
+		thrustPID.adjustThrustUp(input, 0.4f);
+		pitchPID.adjustPitchClimb(input, FloatMath.toRadians(4));
+	}
+	
+	private void turnLeft(AutopilotInputs input) {
 		rollPID.adjustRoll(input, FloatMath.toRadians(5));
 		thrustPID.adjustThrustUp(input, 0.4f);
 		pitchPID.adjustPitchClimb(input, FloatMath.toRadians(4));
