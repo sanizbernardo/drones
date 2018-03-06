@@ -14,7 +14,7 @@ public class Tarmac {
     private RGBTuple colorTarmac = new RGBTuple();
     private RGBTuple colorStripes = new RGBTuple();
 
-    private float UP_DELTA = 0.001f;
+    private float UP_DELTA = 0.05f;
 
     public Tarmac(Vector3f position, float width, float length, float rotation) {
         this.position = position;

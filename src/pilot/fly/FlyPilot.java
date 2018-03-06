@@ -85,7 +85,7 @@ public class FlyPilot extends PilotPart {
 		//float desiredHeight = recog.guess();
 
 		//TODO change 200 to desiredHeight
-		adjustHeight(inputs, 200);
+		adjustHeight(inputs, 50);
 
 		AutopilotOutputs output = Utils.buildOutputs(leftWingInclination,
 				rightWingInclination, verStabInclination, horStabInclination,
@@ -105,14 +105,14 @@ public class FlyPilot extends PilotPart {
 	// Set wings to empirical values found by Flor. PIDs set pitch and thrust to
 	// fly straight.
 	private void flyStraightPID(AutopilotInputs input) {
-		pitchPID.adjustPitchUp(input, 0f);
-		thrustPID.adjustThrustUp(input, 0.2f);
+		pitchPID.adjustPitchClimb(input, 0f);
+		thrustPID.adjustThrustUp(input, 0.4f);
 	}
 
 	// causes drone to climb by changing pitch and using thrust to increase
 	// vertical velocity
 	private void climbPID(AutopilotInputs inputs) {
-		pitchPID.adjustPitchUp(inputs, climbAngle);
+		pitchPID.adjustPitchClimb(inputs, climbAngle);
 		thrustPID.adjustThrustUp(inputs, 4f);
 	}
 
@@ -124,9 +124,9 @@ public class FlyPilot extends PilotPart {
 	// causes drone to rise by increasing lift through higher speed.
 	private void risePID(AutopilotInputs inputs) {
 		// pitch op 0
-		pitchPID.adjustPitchUp(inputs, 0);
+		pitchPID.adjustPitchClimb(inputs, FloatMath.toRadians(4));
 		// thrust bijgeven
-		thrustPID.adjustThrustUp(inputs, 3f);
+		thrustPID.adjustThrustUp(inputs, 2f);
 	}
 
 	private void descendPID(AutopilotInputs inputs) {
@@ -140,23 +140,23 @@ public class FlyPilot extends PilotPart {
 		float actualHeight = input.getY();
 
 		// sterk stijgen
-		if (height - actualHeight > 2) {
+		if (height - actualHeight > 4) {
 			climbPID(input);
 			aoaManager.setInclNoAOA(input);
 		}
 		// stijgen
-		else if (height - actualHeight > 0.5) {
+		else if (height - actualHeight > 1) {
 			risePID(input);
 			aoaManager.setInclNoAOA(input);
 		}
 		// sterk dalen
-		else if (height - actualHeight < -2) {
+		else if (height - actualHeight < -4) {
 			dropPID(input);
 			setLeftWingInclination(FloatMath.toRadians(2));
 			setRightWingInclination(FloatMath.toRadians(2));
 		}
 		// dalen
-		else if (height - actualHeight < -0.5) {
+		else if (height - actualHeight < -1) {
 			descendPID(input);
 			aoaManager.setInclNoAOA(input);
 		}

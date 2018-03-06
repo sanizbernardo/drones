@@ -365,56 +365,56 @@ public class ImageProcessing {
             float[] hsv2 = rgbConversion(this.image.getRGB(pixel[0]-1, pixel[1]-1));
             float h2 = hsv2[0];
             float s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h != h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h != h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]-1, pixel[1]));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]-1, pixel[1]+1));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0], pixel[1]-1));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0], pixel[1]+1));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]+1, pixel[1]-1));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]+1, pixel[1]));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }
             hsv2 = rgbConversion(this.image.getRGB(pixel[0]+1, pixel[1]+1));
             h2 = hsv2[0];
             s2 = hsv2[1];
-            if(!checkBg(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
+            if(!checkBg(hsv2) && !checkGround(hsv2) && (h !=h2 || s < s2 - 0.01 || s > s2 + 0.01) && !contains2(retList, h2, s2)) {
             	float[] n = {h2, s2};
             	retList.add(n);
             }

@@ -52,11 +52,11 @@ public class Pilot implements Autopilot {
 
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
-		if (this.gui.manualControl())
-			return this.gui.getOutputs();
-		
 		this.gui.updateImage(inputs.getImage());
 		
+		if (this.gui.manualControl())
+			return this.gui.getOutputs();
+				
 		if (this.index >= this.order.length)
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 

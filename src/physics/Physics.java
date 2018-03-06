@@ -219,7 +219,11 @@ public class Physics {
 	public float getVSInclination() {
 		return this.vsIncl;
 	}
-
+	
+	public float getThrust() {
+		return this.thrust;
+	}
+	
 	public Matrix3f getTransMat() {
 		return transMat;
 	}
