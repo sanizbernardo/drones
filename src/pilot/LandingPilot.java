@@ -33,12 +33,17 @@ public class LandingPilot extends PilotPart {
 
 		float lwIncl, rwIncl, horStabIncl, thrust;
 		
-		if(pos.y < 3){
-			if(vel.y > 0){
+		if(pos.y < 1.6){
+			lwIncl = 7;
+			rwIncl = 7;
+			thrust = 0;
+		}
+		else if(pos.y < 3){
+			if(vel.y > -0.4){
 				lwIncl = -10;
 				rwIncl = -10;
 			}
-			else if(vel.y < -1.0){
+			else if(vel.y < -0.6){
 				lwIncl = 10;
 				rwIncl = 10;
 			}
@@ -48,7 +53,7 @@ public class LandingPilot extends PilotPart {
 			}
 			thrust = 0;
 		}
-		else if (pos.y < 4){
+		else if (pos.y < 8){
 			if(vel.y > -1.5){
 				lwIncl = -10;
 				rwIncl = -10;
@@ -67,13 +72,32 @@ public class LandingPilot extends PilotPart {
 			else{
 				thrust = this.maxThrust;
 			}
-		}
-		else{
+		}else if (pos.y < 25){
 			if(vel.y > -2.9){
 				lwIncl = -10;
 				rwIncl = -10;
 			}
 			else if(vel.y < -3.1){
+				lwIncl = 10;
+				rwIncl = 10;
+			}
+			else{
+				lwIncl = 0;
+				rwIncl = 0;
+			}
+			if(speed > 40){
+				thrust = 0;
+			}
+			else{
+				thrust = this.maxThrust;
+			}
+		}
+		else{
+			if(vel.y > -19.9){
+				lwIncl = -10;
+				rwIncl = -10;
+			}
+			else if(vel.y < -20.1){
 				lwIncl = 10;
 				rwIncl = 10;
 			}

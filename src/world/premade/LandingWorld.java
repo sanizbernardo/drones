@@ -24,11 +24,11 @@ public class LandingWorld extends World{
 		this.config = Utils.createDefaultConfig();
 		
 		this.physics = new Physics(true);
-		this.physics.init(config, new Vector3f(0, 20, 0), 35);
+		this.physics.init(config, new Vector3f(0, 100, 0), 35);
 		
 		this.planner = new Pilot();
 		
-		this.worldObjects = new WorldObject[40];
+		this.worldObjects = new WorldObject[500];
 		
 		for (int i = 0; i < this.worldObjects.length; i++) {
 			WorldObject cube = new WorldObject(Cubes.getPinkCube().getMesh());
