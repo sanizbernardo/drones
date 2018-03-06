@@ -6,6 +6,7 @@ import gui.TestbedGui;
 import interfaces.Autopilot;
 import interfaces.AutopilotOutputs;
 
+import org.joml.Matrix3f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -191,11 +192,14 @@ public class UpdateHelper {
     }
     
     private void rotateWings() {
-    	/*        Vector3f leftWing = droneItems[Constants.DRONE_LEFT_WING].getRotation();
-        leftWing = FloatMath.transform(physics.getTransMat(), leftWing);
+    	Vector3f leftWing = droneItems[Constants.DRONE_LEFT_WING].getRotation();
+//        leftWing = FloatMath.transform(physics.getTransMat(), leftWing);
         Matrix3f rot = new Matrix3f().identity().rotateX(physics.getLWInclination());
-        leftWing = FloatMath.transform(rot, leftWing);
-        leftWing = FloatMath.transform(physics.getTransMatInv(), leftWing);*/
+        System.out.println(leftWing);
+        Vector3f anderVec = FloatMath.transform(rot, leftWing);
+        System.out.println("after " + anderVec);
+//        leftWing = FloatMath.transform(physics.getTransMatInv(), leftWing);
+        droneItems[Constants.DRONE_LEFT_WING].setRotation(leftWing.x, leftWing.y, leftWing.z);
     }
     
     private void translateWheels() {
