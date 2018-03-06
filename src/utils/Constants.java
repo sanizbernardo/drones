@@ -18,7 +18,7 @@ public class Constants {
      */
 	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight",
 																"OrthoTestWorld", "RotationWorld", "YZWorld", "TestWorld2", 
-																"TakeOffWorld", "BounceWorld"};
+																"TakeOffWorld", "BounceWorld", "TaxiWorld"};
 
     
     /**

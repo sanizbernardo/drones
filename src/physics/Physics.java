@@ -248,7 +248,7 @@ public class Physics {
 		this.brakeForce[2] = data.getRightBrakeForce();
 		for (int i = 0; i < 3; i++) {
 			if (brakeForce[i] < 0 || brakeForce[i] > this.maxR)
-				throw new PhysicsException("Illegal brake force on wheel nb " + i);
+				throw new PhysicsException("Illegal brake force on wheel nb " + i + ", " + brakeForce[i]);
 		}
 	}
 	
@@ -345,7 +345,7 @@ public class Physics {
 		if (FloatMath.norm(wingForce) > 50) {
 			for (int i = 0; i < 4; i++) {
 				if (checkAOA && Math.abs(aoa[i]) > maxAOA)
-					throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa");
+					throw new PhysicsException("Wing nb " + i + " exceeded maximum aoa : " + aoa[i]);
 			}
 		}
 		totalForce.add(wingForce);
@@ -356,6 +356,10 @@ public class Physics {
 			Vector3f worldWheelPos = this.pos.add(FloatMath.transform(this.transMatInv, this.wheelPositions[i]),new Vector3f());
 			
 			float d = this.tyreRadius - worldWheelPos.y;
+
+			if (i == 2) {
+				System.out.println("Indrukking van het rechterwiel: " + d);
+			}
 			
 			worldWheelPos.y = 0;
 			
