@@ -5,6 +5,7 @@ import gui.TestbedGui;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotOutputs;
+import interfaces.Path;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -16,6 +17,8 @@ import utils.PhysicsException;
 import utils.IO.MouseInput;
 import utils.Utils;
 import utils.image.ImageCreator;
+
+import java.util.Random;
 
 import javax.swing.JOptionPane;
 
@@ -82,6 +85,8 @@ public class UpdateHelper {
 	 * Cube hit counter
 	 */
 	private int cubeoounter = 1;
+	
+	private boolean pathSet = false;
 
 
 	/**
@@ -172,7 +177,14 @@ public class UpdateHelper {
 	 * This line is only triggered if the specified world does indeed want a
 	 * motion planner
 	 */
-	private void plannerUpdate(Vector3f newDronePos) {		
+	private void plannerUpdate(Vector3f newDronePos) {
+		if (!pathSet && testbedGui.setPath()) {
+			Path path = buildPath();			
+			planner.setPath(path);
+			
+			pathSet = true;
+		}
+		
 		Physics physics = droneHelper.getDronePhysics(config.getDroneID());
 
 		AutopilotOutputs out = planner.timePassed(Utils.buildInputs(imageCreator.screenShot(), newDronePos.x,
@@ -185,6 +197,38 @@ public class UpdateHelper {
 					JOptionPane.ERROR_MESSAGE);
 			droneHelper.removeDrone(config.getDroneID());
 		}
+	}
+
+	private Path buildPath() {
+		float[] x = new float[worldObjects.length],
+				y = new float[worldObjects.length],
+				z = new float[worldObjects.length];
+		
+		
+		Random random = new Random();
+		int i = 0;
+		for (WorldObject cube: worldObjects) {
+			Vector3f pos = cube.getPosition();
+			
+			Vector3f rand = new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat());
+			rand.sub(new Vector3f(0.5f)).normalize();
+			rand.mul(Constants.PATH_ACCURACY);
+			
+			Vector3f guess = pos.add(rand, new Vector3f());
+			
+			x[i] = guess.x;
+			y[i] = guess.y;
+			z[i] = guess.z;
+			i ++;
+		}
+				
+		return new Path() {
+			public float[] getX() {return x;}
+
+			public float[] getY() {return y;}
+			
+			public float[] getZ() {return z;}
+		};
 	}
 
 }

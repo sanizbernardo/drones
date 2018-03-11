@@ -65,6 +65,10 @@ public class Pilot implements Autopilot {
 
 		if (state() == WAIT_PATH) {
 			if (this.path != null) {
+				for (int i = 0; i < path.getX().length; i++) {
+					System.out.println(path.getX()[i] + " " + path.getY()[i] + " " + path.getZ()[i]);
+				}
+				
 				//calculate path...
 				
 				this.index += 1;
