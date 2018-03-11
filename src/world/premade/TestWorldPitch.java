@@ -3,6 +3,8 @@ package world.premade;
 
 import engine.IWorldRules;
 import entities.WorldObject;
+import entities.ground.Ground;
+import entities.tarmac.Tarmac;
 import pilot.Pilot;
 import utils.Cubes;
 import utils.Utils;
@@ -30,6 +32,9 @@ public class TestWorldPitch extends World implements IWorldRules {
         planner = new Pilot();
         
         worldObjects = new WorldObject[1];
+        
+        this.ground = new Ground(50);
+		this.tarmac = new Tarmac(new Vector3f(0,0,0), 50f, 300f, 0f);
 
     }
 

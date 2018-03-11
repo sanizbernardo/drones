@@ -64,8 +64,8 @@ public class FlyPilot extends PilotPart {
 		
 		this.aoaManager = new AOAManager(this);
 
-		this.order = new State[] {State.Left};
-		setCurrentState(0);
+		this.order = new State[] {State.StrongDown,State.Down,State.Stable};
+		setCurrentState(2);
 		
 		climbAngle = Constants.climbAngle;
 	}
@@ -89,9 +89,19 @@ public class FlyPilot extends PilotPart {
 
 		
 		//float desiredHeight = recog.guess();
-
-
-
+		if(3 - inputs.getY() > 4) {
+			
+		}
+		else if(3 - inputs.getY() > 1) {
+			
+		}
+		else if(3 - inputs.getY() < -4) {
+			setCurrentState(0);
+		}else if(3 - inputs.getY() < -1) {
+			setCurrentState(1);
+		}else {
+			setCurrentState(2);
+		}
 		control(inputs, order[getCurrentState()]);
 
 		AutopilotOutputs output = Utils.buildOutputs(leftWingInclination,
@@ -149,6 +159,11 @@ public class FlyPilot extends PilotPart {
 		// val vertragen
 		thrustPID.adjustThrustDown(inputs, -1.5f);
 	}
+	
+//	sterk stijgen > 4
+//	stijgen > 1
+//	sterk dalen < -4
+//	dalen <-1
 
 	private void control(AutopilotInputs input, State state) {
 
