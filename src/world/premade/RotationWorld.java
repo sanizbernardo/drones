@@ -44,28 +44,28 @@ public class RotationWorld extends World implements IWorldRules{
 		float step = 0.005f;
 
 		Physics physics = droneHelper.getDronePhysics(config.getDroneID());
-		if (heading <= FloatMath.toRadians(45) && rollOn) {
-			heading += step;
-			pitch += step;
-			roll += step;
-			
-			System.out.println(physics.getHeading() + " " + physics.getPitch() + " "  + physics.getRoll());
-
-			physics.init(config, new Vector3f(0, 0, 0), 0, heading, pitch, roll);
-
-		} else if (roll >= 0) {
-			rollOn = false;
-			roll -= step;
-			physics.init(config, new Vector3f(0, 0, 0), 0, heading, pitch, roll);
-		}else if (pitch >= 0) {
-			pitch -= step;
-			physics.init(config, new Vector3f(0, 0, 0), 0, heading, pitch, roll);
-		}else if (heading >= 0) {
-			heading -= step;
-			physics.init(config, new Vector3f(0, 0, 0), 0, heading, pitch, roll);
-		}
-		
-		super.update(interval, mouseInput);
+//		if (heading <= FloatMath.toRadians(45) && rollOn) {
+//			heading += step;
+//			pitch += step;
+//			roll += step;
+//			
+//			System.out.println(physics.getHeading() + " " + physics.getPitch() + " "  + physics.getRoll());
+//
+//			physics.init(config, new Vector3f(0, 0, 0), 0, heading, pitch, roll);
+//
+//		} else if (roll >= 0) {
+//			rollOn = false;
+//			roll -= step;
+//			physics.init(config, new Vector3f(0, 0, 0), 0, heading, pitch, roll);
+//		}else if (pitch >= 0) {
+//			pitch -= step;
+//			physics.init(config, new Vector3f(0, 0, 0), 0, heading, pitch, roll);
+//		}else if (heading >= 0) {
+//			heading -= step;
+//			physics.init(config, new Vector3f(0, 0, 0), 0, heading, pitch, roll);
+//		}
+//		
+//		super.update(interval, mouseInput);
 	}
 
 	@Override
