@@ -2,6 +2,8 @@ package pilot;
 
 import org.joml.Vector3f;
 
+import com.stormbots.MiniPID;
+
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
@@ -11,20 +13,30 @@ import utils.Utils;
 public class TakeOffPilot extends PilotPart {
 	
 	private final float targetHeight,
-						takeOffSpeed = 120f/3.6f,
+						takeOffSpeed = 120/3.6f,
 						climbAngle = FloatMath.toRadians(20);
 	
 	private float maxThrust;
 	
-	private boolean ended;
+	private float time;
+	
+	private boolean takeoff, ended;
 	
 	private Vector3f oldPos = new Vector3f(0, 0, 0);
 		
+	private MiniPID pitchPID;
 	
 	public TakeOffPilot(float targetHeight) {
 		this.targetHeight = targetHeight;
 		
+		this.takeoff = false;
 		this.ended = false;
+		
+		this.time = 0;
+		
+		this.pitchPID = new MiniPID(1.1, 0, 0.3);
+		this.pitchPID.setSetpoint(climbAngle);
+		this.pitchPID.setOutputLimits(FloatMath.toRadians(10));
 	}
 	
 	
@@ -38,32 +50,28 @@ public class TakeOffPilot extends PilotPart {
 	public AutopilotOutputs timePassed(AutopilotInputs input) {
 		Vector3f pos = new Vector3f(input.getX(), input.getY(), input.getZ());
 		
-		Vector3f vel = pos.sub(this.oldPos, new Vector3f()).mul(1/input.getElapsedTime());
+		float dt = input.getElapsedTime() - this.time;
+		this.time = input.getElapsedTime();
+		
+		Vector3f vel = pos.sub(this.oldPos, new Vector3f()).mul(1/dt);
 		this.oldPos = pos;
 		
-		float lwIncl, rwIncl, horStabIncl, thrust;
-		float speed = FloatMath.norm(vel);
+		float lwIncl = 0, rwIncl = 0, horStabIncl = 0, thrust = 0;
 		
-		
-		if (speed < takeOffSpeed) {			
+		if (!takeoff) {			
 			lwIncl = 0;
 			rwIncl = 0;
 			horStabIncl = 0;
 			thrust = this.maxThrust;
+			if (FloatMath.norm(vel) >= takeOffSpeed)
+				takeoff = true;
 		} else {
-			lwIncl = 10;
-			rwIncl = 10;
-			horStabIncl = -0.5f*(this.climbAngle + input.getPitch());		
-			horStabIncl = horStabIncl > 12 ? 12: horStabIncl;
+			lwIncl = input.getPitch() < FloatMath.toRadians(15) ? 4 : 6;
+			rwIncl = input.getPitch() < FloatMath.toRadians(15) ? 4 : 6;
+			horStabIncl = (float) -pitchPID.getOutput(input.getPitch());		
 			thrust = this.maxThrust;
-		}
-		
-		if (pos.y > targetHeight) {
-			lwIncl = 0;
-			rwIncl = 0;
-			horStabIncl = 0;
-			thrust = 0;
-			this.ended = true;
+			if (pos.y > targetHeight)
+				ended = true;
 		}
 				
 		return Utils.buildOutputs(FloatMath.toRadians(lwIncl), FloatMath.toRadians(rwIncl), 0, horStabIncl, thrust, 0, 0, 0);

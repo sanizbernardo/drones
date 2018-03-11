@@ -43,13 +43,15 @@ public class Constants {
     public static final int AUTOPILOT_GUI_HEIGHT = 407;
     public static final int AUTOPILOT_GUI_WIDTH = 508;
     
+    public static final float COLLISION_RANGE = 5;
+    
     /**
      * Renderer constants
      */
     //Field of View in Radians
     public static final float FOV = (float) Math.toRadians(90f);
-    public static final float Z_NEAR = 0.01f;
-    public static final float Z_FAR = 10000.f;
+    public static final float Z_NEAR = 0.2f;
+    public static final float Z_FAR = 3000f;
     public static final float DRONE_THICKNESS = 0.1f;  //in meters
     public static final float DRONE_WHEEL_THICKNESS = 0.08f;
     public static final int DRONE_LEFT_WING = 0;

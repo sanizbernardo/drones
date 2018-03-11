@@ -26,16 +26,18 @@ public class ImageProcessing {
     private int imageHeight;
     private BufferedImage image;
     private double fieldOfView = 120;
-    private final float pitch;
-    private final float heading;
-    private final float roll;
+    private float pitch;
+    private float heading;
+    private float roll;
     private ArrayList<Cube> cubes;
-    private final Matrix3f transMat;
-    private final float[] dronePosition;
+    private Matrix3f transMat;
+    private float[] dronePosition;
 
     //constructor in case of a byte[]
-    public ImageProcessing(byte[] imageByte, float pitch, float heading, float roll, float[] dronePosition){  
-    	
+    public ImageProcessing(){  			 	
+    }
+    
+    public void addNewImage(byte[] imageByte, float pitch, float heading, float roll, float[] dronePosition){
     	//initializing
     	
     	this.imageHeight = 200;
@@ -58,7 +60,6 @@ public class ImageProcessing {
 		if (Math.abs(-this.roll) > 1E-6)
 			transMat.rotate(-this.roll, new Vector3f(0, 0, 1));
 		this.transMat.invert();
-			 	
     }
 
     //constructor for local images (mainly testing purposes)
@@ -313,11 +314,11 @@ public class ImageProcessing {
         double totAngle = Math.sqrt(angleX*angleX + angleY*angleY);
         
         if(same){
-        	double dist = (Math.sqrt(2)/2)/Math.tan(totAngle/2) + 0.5;
+        	double dist = (5*Math.sqrt(2)/2)/Math.tan(totAngle/2) + 2.5;
         	cube.setDist(dist);
         	return dist;
         }
-        double dist = (Math.sqrt(3)/2)/Math.tan(totAngle/2);
+        double dist = (5*Math.sqrt(3)/2)/Math.tan(totAngle/2);
     	cube.setDist(dist);
         return dist;        
     }

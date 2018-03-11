@@ -3,7 +3,6 @@ package engine;
 import static org.lwjgl.glfw.GLFW.*;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
 import utils.Constants;
@@ -95,8 +94,7 @@ public class Window {
             }
         });
 
-        // Get the resolution of the primary monitor
-        GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
         // Center our window
         glfwSetWindowPos(
                 windowHandle,
