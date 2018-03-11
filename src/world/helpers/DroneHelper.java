@@ -3,7 +3,6 @@ package world.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -42,7 +41,7 @@ public class DroneHelper {
 		this.wantPhysics = wantPhysics;
 	}
 
-	public void addDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {
+	public void addDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading) {
 		int i = 0;
 		while (droneIds.containsValue(i) && i < nbDrones) {
 			i += 1;
@@ -65,7 +64,7 @@ public class DroneHelper {
 		drones[i] = droneItems;
 
 		Physics physic = new Physics();
-		physic.init(config, startPos, startVel);
+		physic.init(config, startPos, startVel, startHeading);
 
 		physics[i] = physic;
 		
