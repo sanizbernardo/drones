@@ -2,6 +2,8 @@ package world.premade;
 
 import engine.IWorldRules;
 import entities.WorldObject;
+import entities.ground.Ground;
+import entities.tarmac.Tarmac;
 import pilot.Pilot;
 import utils.Utils;
 import world.World;
@@ -11,9 +13,9 @@ import org.joml.Vector3f;
 /**
  * Place where all the GameItem are to be placed in
  */
-public class TestWorldTurn extends World implements IWorldRules {
+public class TestWorldPitch extends World implements IWorldRules {
 
-    public TestWorldTurn() {
+    public TestWorldPitch() {
         super(1, true);
     }
 
@@ -23,9 +25,13 @@ public class TestWorldTurn extends World implements IWorldRules {
 
         addDrone(config, new Vector3f(0,100,0), new Vector3f(0,0,-50));
 
+
         planner = new Pilot(new int[] {Pilot.FLYING});
         
         worldObjects = new WorldObject[1];
+        
+        this.ground = new Ground(50);
+		this.tarmac = new Tarmac(new Vector3f(0,0,0), 50f, 300f, 0f);
 
     }
 

@@ -54,9 +54,9 @@ public class Physics {
 	
 	/**
 	 * Initialises the drone at the given position, with the given starting velocity,
-	 * and the given heading, pitch and roll.
+	 * and the given heading.
 	 */
-	public void init(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading, float startPitch, float startRoll) {
+	public void init(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading) {
 		setupCalculations(config);
 		
 		this.config = config;
@@ -73,10 +73,6 @@ public class Physics {
 		
 		if (Math.abs(startHeading) > 1E-6)
 			this.transMat.rotate(-startHeading, new Vector3f(0, 1, 0));
-		if (Math.abs(startPitch) > 1E-6)
-			this.transMat.rotate(-startPitch, new Vector3f(1, 0, 0));
-		if (Math.abs(startRoll) > 1E-6)
-			this.transMat.rotate(-startRoll, new Vector3f(0, 0, 1));
 
 		this.transMatInv = this.transMat.invert(new Matrix3f());
 				
@@ -88,44 +84,12 @@ public class Physics {
 		}
 	}
 	
-	public void init(AutopilotConfig config, Vector3f startPos, float startVel, float startHeading, float startPitch, float startRoll) {
-		init(config, startPos, new Vector3f(0,0,-startVel), startHeading, startPitch, startRoll);
-	}
-	
 	/**
-	 * Initialises the drone at the given position, with starting velocity of 10
-	 * and no starting orientation.  
+	 * Initialises the drone at the given position, with the given starting velocity,
+	 * and with heading 0.
 	 */
-	public void init(AutopilotConfig config, Vector3f startPos) {
-		init(config, startPos, 10f, 0f, 0f, 0f);
-	}
-	
-	/**
-	 * Initialises the drone at (0, 0, 0), with starting velocity of 10
-	 * and no starting orientation.  
-	 */
-	public void init(AutopilotConfig config) {
-		init(config, new Vector3f(0,0,0));
-	}
-	
-	/**
-	 * Initialises the drone at (0, 0, 0), with the given starting velocity
-	 * and no starting orientation.
-	 */
-	public void init(AutopilotConfig config, float startVelocity) {
-		init(config, new Vector3f(0,0,0), startVelocity);
-	}
-	
-	/**
-	 * Initialises the drone at the given position, with the given starting velocity
-	 * and no starting orientation.
-	 */
-	public void init(AutopilotConfig config, Vector3f startPos, float startVel) {
-		init(config, startPos, startVel, 0f, 0f, 0f);
-	}
-	
 	public void init(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {
-		init(config, startPos, startVel, 0f, 0f, 0f);
+		init(config, startPos, startVel, 0f);
 	}
 	
 	
@@ -292,7 +256,7 @@ public class Physics {
 	 * Updates the transformation matrix, it rotates with the drone's angular velocity.
 	 */
 	private void updateTransMat(float dt) {
-		Vector3f rotation = this.angVel.mul(dt, new Vector3f());
+		Vector3f rotation = FloatMath.transform(this.transMatInv, this.angVel.mul(dt, new Vector3f()));
 		
 		float norm = FloatMath.norm(rotation);
 		if (Math.abs(norm) > 1E-6) {

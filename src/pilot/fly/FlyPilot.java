@@ -30,7 +30,9 @@ public class FlyPilot extends PilotPart {
 	private float newThrust;
 	public Vector3f approxVel = new Vector3f(0f, 0f, 0f);
 	private float climbAngle;
-	private final ImageProcessing recog = new ImageProcessing();
+
+//	private ImageProcessing recog;
+
 
 	private Vector3f timePassedOldPos;
 
@@ -41,7 +43,10 @@ public class FlyPilot extends PilotPart {
 	private RollPID rollPID;
 	private AOAManager aoaManager;
 
+	private State[] order;
+	private int currentState;
 
+	private enum State{Left, Right, Stable, Up, Down, StrongUp, StrongDown}
 	
 	@Override
 	public void initialize(AutopilotConfig config) {
@@ -54,7 +59,9 @@ public class FlyPilot extends PilotPart {
 		
 		this.aoaManager = new AOAManager(this);
 
-	
+		this.order = new State[] {State.Left};
+		setCurrentState(0);
+		
 		climbAngle = Constants.climbAngle;
 	}
 	
@@ -62,9 +69,11 @@ public class FlyPilot extends PilotPart {
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
 
-		recog.addNewImage(inputs.getImage(), inputs.getPitch(),
-				inputs.getHeading(), inputs.getRoll(), new float[] {
-						inputs.getX(), inputs.getY(), inputs.getZ() });
+		//TODO: reenable
+//		recog = new ImageProcessing(inputs.getImage(), inputs.getPitch(),
+//				inputs.getHeading(), inputs.getRoll(), new float[] {
+//						inputs.getX(), inputs.getY(), inputs.getZ() });
+
 
 		Vector3f newPos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
 		
@@ -76,15 +85,35 @@ public class FlyPilot extends PilotPart {
 
 		
 		//float desiredHeight = recog.guess();
-
-		//TODO change 200 to desiredHeight
-		adjustHeight(inputs, 200);
+//		if(3 - inputs.getY() > 4) {
+//			
+//		}
+//		else if(3 - inputs.getY() > 1) {
+//			
+//		}
+//		else if(3 - inputs.getY() < -4) {
+//			setCurrentState(0);
+//		}else if(3 - inputs.getY() < -1) {
+//			setCurrentState(1);
+//		}else {
+//			setCurrentState(2);
+//		}
+		
+		control(inputs, order[getCurrentState()]);
 
 		AutopilotOutputs output = Utils.buildOutputs(leftWingInclination,
 				rightWingInclination, verStabInclination, horStabInclination,
 				getNewThrust(), 0, 0, 0);
 
 		return output;
+	}
+	
+	private void setCurrentState(int state) {
+		this.currentState = state;
+	}
+	
+	private int getCurrentState() {
+		return currentState;
 	}
 	
 
@@ -95,17 +124,16 @@ public class FlyPilot extends PilotPart {
 	}
 
 
-	// Set wings to empirical values found by Flor. PIDs set pitch and thrust to
-	// fly straight.
+	// PIDs set pitch and thrust to fly straight.
 	private void flyStraightPID(AutopilotInputs input) {
-		pitchPID.adjustPitchUp(input, 0f);
-		thrustPID.adjustThrustUp(input, 0.2f);
+		pitchPID.adjustPitchClimb(input, 0f);
+		thrustPID.adjustThrustUp(input, 0.4f);
 	}
 
 	// causes drone to climb by changing pitch and using thrust to increase
 	// vertical velocity
 	private void climbPID(AutopilotInputs inputs) {
-		pitchPID.adjustPitchUp(inputs, climbAngle);
+		pitchPID.adjustPitchClimb(inputs, climbAngle);
 		thrustPID.adjustThrustUp(inputs, 4f);
 	}
 
@@ -117,9 +145,9 @@ public class FlyPilot extends PilotPart {
 	// causes drone to rise by increasing lift through higher speed.
 	private void risePID(AutopilotInputs inputs) {
 		// pitch op 0
-		pitchPID.adjustPitchUp(inputs, 0);
+		pitchPID.adjustPitchClimb(inputs, FloatMath.toRadians(4));
 		// thrust bijgeven
-		thrustPID.adjustThrustUp(inputs, 3f);
+		thrustPID.adjustThrustUp(inputs, 2f);
 	}
 
 	private void descendPID(AutopilotInputs inputs) {
@@ -128,36 +156,57 @@ public class FlyPilot extends PilotPart {
 		// val vertragen
 		thrustPID.adjustThrustDown(inputs, -1.5f);
 	}
+	
+//	sterk stijgen > 4
+//	stijgen > 1
+//	sterk dalen < -4
+//	dalen <-1
 
-	private void adjustHeight(AutopilotInputs input, float height) {
-		float actualHeight = input.getY();
+	private void control(AutopilotInputs input, State state) {
 
-		// sterk stijgen
-		if (height - actualHeight > 2) {
-			climbPID(input);
-			aoaManager.setInclNoAOA(input);
+		switch(state){
+			case StrongUp:
+				climbPID(input);
+				aoaManager.setInclNoAOA(input);
+				break;
+			case Up:
+				risePID(input);
+				aoaManager.setInclNoAOA(input);
+				break;
+			case StrongDown:
+				dropPID(input);
+				setLeftWingInclination(FloatMath.toRadians(2));
+				setRightWingInclination(FloatMath.toRadians(2));
+				break;
+			case Down:
+				descendPID(input);
+				aoaManager.setInclNoAOA(input);
+				break;
+			case Stable:
+				flyStraightPID(input);
+				aoaManager.setInclNoAOA(input);
+				break;
+			case Left:
+				turnLeft(input);
+				break;
+			case Right:
+				turnRight(input);
+				break;
+			default:
+				break;
 		}
-		// stijgen
-		else if (height - actualHeight > 0.5) {
-			risePID(input);
-			aoaManager.setInclNoAOA(input);
-		}
-		// sterk dalen
-		else if (height - actualHeight < -2) {
-			dropPID(input);
-			setLeftWingInclination(FloatMath.toRadians(2));
-			setRightWingInclination(FloatMath.toRadians(2));
-		}
-		// dalen
-		else if (height - actualHeight < -0.5) {
-			descendPID(input);
-			aoaManager.setInclNoAOA(input);
-		}
-		// horizontaal blijven
-		else {
-			flyStraightPID(input);
-			aoaManager.setInclNoAOA(input);
-		}
+	}
+	
+	private void turnRight(AutopilotInputs input) {
+		rollPID.adjustRoll(input, FloatMath.toRadians(-5));
+		thrustPID.adjustThrustUp(input, 0.4f);
+		pitchPID.adjustPitchClimb(input, FloatMath.toRadians(4));
+	}
+	
+	private void turnLeft(AutopilotInputs input) {
+		rollPID.adjustRoll(input, FloatMath.toRadians(5));
+		thrustPID.adjustThrustUp(input, 0.4f);
+		pitchPID.adjustPitchClimb(input, FloatMath.toRadians(4));
 	}
 
 

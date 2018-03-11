@@ -155,6 +155,7 @@ public class ConfigSetupGUI extends JDialog {
 		checkPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		logCheck = new JCheckBox("Enable logging?");
 		checkPanel.add(logCheck);
+		logCheck.setSelected(true);
 		comboPanel.add(checkPanel, BorderLayout.SOUTH);
 		
 		

@@ -62,6 +62,7 @@ public class Renderer {
 
         shaderProgram.createUniform("projectionMatrix");
         shaderProgram.createUniform("modelViewMatrix");
+        
     }
 
     public void clear(Window window) {
