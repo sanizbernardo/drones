@@ -329,10 +329,6 @@ public class Physics {
 			
 			float d = this.tyreRadius - worldWheelPos.y;
 
-			if (i == 2) {
-				System.out.println("Indrukking van het rechterwiel: " + d);
-			}
-			
 			worldWheelPos.y = 0;
 			
 			Vector3f relPos = FloatMath.transform(this.transMat, worldWheelPos.sub(this.pos));
