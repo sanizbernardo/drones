@@ -122,7 +122,11 @@ public abstract class World implements IWorldRules {
 	}
 
 	public void addDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {
-		droneHelper.addDrone(config, startPos, startVel);
+		droneHelper.addDrone(config, startPos, startVel, 0f);
+	}
+	
+	public void addDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading) {
+		droneHelper.addDrone(config, startPos, startVel, startHeading);
 	}
 
 	@Override
