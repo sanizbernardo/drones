@@ -151,10 +151,12 @@ public class UpdateHelper {
 					FloatMath.toRadians(rotVec.y * Constants.MOUSE_SENSITIVITY), 0);
 		}
 		
+		
 		Physics physics = droneHelper.getDronePhysics(config.getDroneID());
 
 		cameraHelper.droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
-		cameraHelper.droneCamera.setRotation(-physics.getPitch(), -physics.getHeading(), -physics.getRoll());
+		Vector3f newRot = FloatMath.transform(physics.getTransMat(), new Vector3f(-physics.getPitch(), -physics.getHeading(), -physics.getRoll()));
+		cameraHelper.droneCamera.setRotation(newRot.x,newRot.y,newRot.z);
 
 		float offset = 10f;
 		cameraHelper.chaseCamera.setPosition(newDronePos.x + offset * (float) Math.sin(physics.getHeading()),
