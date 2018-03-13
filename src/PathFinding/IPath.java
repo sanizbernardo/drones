@@ -4,9 +4,13 @@ import java.util.ArrayList;
 
 import interfaces.Path;
 
-/*
- * This class contains the method setPath() which generates a path for the drone to follow.
- * This path contains all target locations it was given and takes several drone parameters into account to ensure it is valid.
+/**
+ *
+ * This class implements the method setPath() which generates a path for the drone to fly.
+ * The generated path contains all target locations and takes several drone parameters into account to ensure it is flyable.
+ *
+ * @author Willemot Toon, Tomas Geens
+ *
  */
 public class IPath implements Path{
 
@@ -17,26 +21,24 @@ public class IPath implements Path{
 		this.turningRadius = turningRadius;
 		this.heading = heading;
 		this.location = startLoc;
+		setPath();
 	}
 
-	//All cubes that have to visited
 	private final ArrayList<float[]> cubeLocations;
-	//Parameters defined by drone
 	private final float maxInclination;
 	private final float maxDeclination;
 	private final float turningRadius;
-	//Drone location and heading
 	private float heading;
 	private float[] location;
-	//Storage of path
 	private ArrayList<Float> x = new ArrayList<Float>();
 	private ArrayList<Float> y = new ArrayList<Float>();
 	private ArrayList<Float> z = new ArrayList<Float>();
 	private ArrayList<Float> s = new ArrayList<Float>();
-	private float p_state = 50;
 	
-	
-	public void setPath() {
+	/**
+	 * Generate the path.
+	 */
+	private void setPath() {
 		ArrayList<float[]> cubesInPath = new ArrayList<>();
 		addLiftOffPoint();
 		for(int i = 0; i<cubeLocations.size(); i++){
@@ -47,7 +49,9 @@ public class IPath implements Path{
 		s.add(-1f);
 	}
 	
-	//TODO alter method to take starting location and heading into account
+	/**
+	 * Add a liftOffPoint to the path
+	 */
 	private void addLiftOffPoint() {
 		float[] liftOffPoint = {0, 30, -100};
 		addLocation(liftOffPoint[0], liftOffPoint[1], liftOffPoint[2]);
@@ -68,7 +72,10 @@ public class IPath implements Path{
 		}
 		return currentClosest;
 	}
-	
+	/**
+	 * 	Add the closestCube to the path, generating the necessary subpath
+	 * @param closestCube
+	 */
 	private void addToPath(float[] closestCube) {
 		//Cube on lower y-level
 		if(closestCube[1] < this.location[1]){
@@ -165,7 +172,13 @@ public class IPath implements Path{
 		this.location = new float[] {closestCube[0], closestCube[1], closestCube[2]};
 	}
 		
-	//Check if a location is within turning radius
+	/**
+	 * 
+	 * @param goalLocation
+	 * @param turningRadius
+	 * @return 	Boolean
+	 * 			- wether or not the goalLocation lies within turning reach
+	 */
 	private Boolean turnable(float[] goalLocation, float turningRadius) {
 		float[] circleCentre1 = auxLocPlusX(turningRadius);
 		float[] circleCentre2 = auxLocPlusX(-1*turningRadius);
