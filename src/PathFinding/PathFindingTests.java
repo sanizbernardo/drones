@@ -9,10 +9,10 @@ public class PathFindingTests {
 	public static void main(String[] args) {
 		//Add some test-goal location
 		ArrayList<float[]> cubelocs = new ArrayList<float[]>();
-		cubelocs.add(new float[] {-100,30,0}); //Standard location
-		cubelocs.add(new float[] {500,30,300}); //Not in reach of turn
+		cubelocs.add(new float[] {-100, 30, 0}); //Standard location
+		cubelocs.add(new float[] {500, 30, 300}); //Not in reach of turn
 		cubelocs.add(new float[] {100, 30, -500}); //Directly above current location
-		cubelocs.add(new float[] {60, 30, -40}); //Directly above current location
+		cubelocs.add(new float[] {60, 60, -40}); //Directly above current location
 		cubelocs.add(new float[] {10, 30, -0}); //Directly above current location
 
 		//Add the starting location
