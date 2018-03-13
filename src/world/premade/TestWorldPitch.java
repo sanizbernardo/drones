@@ -11,9 +11,9 @@ import org.joml.Vector3f;
 /**
  * Place where all the GameItem are to be placed in
  */
-public class TestWorldTurn extends World implements IWorldRules {
+public class TestWorldPitch extends World implements IWorldRules {
 
-    public TestWorldTurn() {
+    public TestWorldPitch() {
         super(1, true);
     }
 

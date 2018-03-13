@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 
 import entities.WorldObject;
 import entities.ground.Ground;
+import pilot.Pilot;
 import utils.FloatMath;
 import utils.PhysicsException;
 import utils.Utils;
@@ -21,7 +22,7 @@ public class BounceWorld extends World {
 		
 		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,-1.8f,0));
 		
-		this.planner = null;
+		this.planner = new Pilot(new int[] {});
 		
 		this.worldObjects = new WorldObject[0];
 		

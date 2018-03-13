@@ -18,14 +18,12 @@ public class Constants {
      */
 	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight",
 																"OrthoTestWorld", "RotationWorld", "TestWorldTurn", "TestWorld2", 
-																"TakeOffWorld", "BounceWorld", "AirportSetupWorld"};
-	
+																"TakeOffWorld", "BounceWorld", "AirportSetupWorld", "LandingWorld"};
 	/**
 	 * Pilot constants
 	 */
     
 	public static float climbAngle = FloatMath.toRadians(10);
-	
 	
     /**
      * Drone pickup accuracy

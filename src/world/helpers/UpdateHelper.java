@@ -7,6 +7,7 @@ import interfaces.AutopilotConfig;
 import interfaces.AutopilotOutputs;
 import interfaces.Path;
 
+import org.joml.Matrix3f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 

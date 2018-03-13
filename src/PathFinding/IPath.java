@@ -4,9 +4,13 @@ import java.util.ArrayList;
 
 import interfaces.Path;
 
-/*
- * This class contains the method setPath() which generates a path for the drone to follow.
- * This path contains all target locations it was given and takes several drone parameters into account to ensure it is valid.
+/**
+ *
+ * This class implements the method setPath() which generates a path for the drone to fly.
+ * The generated path contains all target locations and takes several drone parameters into account to ensure it is flyable.
+ *
+ * @author Willemot Toon, Tomas Geens
+ *
  */
 public class IPath implements Path{
 
@@ -17,47 +21,43 @@ public class IPath implements Path{
 		this.turningRadius = turningRadius;
 		this.heading = heading;
 		this.location = startLoc;
+		setPath();
 	}
 
-	//All cubes that have to visited
 	private final ArrayList<float[]> cubeLocations;
-	//Parameters defined by drone
 	private final float maxInclination;
 	private final float maxDeclination;
 	private final float turningRadius;
-	//Drone location and heading
 	private float heading;
 	private float[] location;
-	//Storage of path
 	private ArrayList<Float> x = new ArrayList<Float>();
 	private ArrayList<Float> y = new ArrayList<Float>();
 	private ArrayList<Float> z = new ArrayList<Float>();
+	private ArrayList<Float> s = new ArrayList<Float>();
 	
-	
-	public void setPath() {
-		//ArrayList keeping track of already visited cubes
+	/**
+	 * Generate the path.
+	 */
+	private void setPath() {
 		ArrayList<float[]> cubesInPath = new ArrayList<>();
-		//Set an initial destination allowing lift-off
-		 addLiftOffPoint();
-		//Iterate over all cubes, for each cube:
+		addLiftOffPoint();
 		for(int i = 0; i<cubeLocations.size(); i++){
-			//Find the closest cube, ignoring already visited ones
 			float[] closestCube = findClosest(cubesInPath);
-			//Add the closest cube to the path
 			addToPath(closestCube);
-			//Add the closest cube to the already visited cubes
 			cubesInPath.add(closestCube);
 		}
+		s.add(-1f);
 	}
 	
-	//TODO alter method to take starting location and heading into account
+	/**
+	 * Add a liftOffPoint to the path
+	 */
 	private void addLiftOffPoint() {
 		float[] liftOffPoint = {0, 30, -100};
 		addLocation(liftOffPoint[0], liftOffPoint[1], liftOffPoint[2]);
-		this.location = liftOffPoint;		
+		this.location = liftOffPoint;
 	}
 	
-	//Find the cube closest to current location, which has not yet been visited
 	private float[] findClosest(ArrayList<float[]> cubesAlreadyInPath){
 		float[] currentClosest = null;
 		double currentDist = Float.MAX_VALUE;
@@ -72,8 +72,10 @@ public class IPath implements Path{
 		}
 		return currentClosest;
 	}
-	
-	//TODO All 1.5f are to be optimized
+	/**
+	 * 	Add the closestCube to the path, generating the necessary subpath
+	 * @param closestCube
+	 */
 	private void addToPath(float[] closestCube) {
 		//Cube on lower y-level
 		if(closestCube[1] < this.location[1]){
@@ -82,6 +84,7 @@ public class IPath implements Path{
 			float newZ = this.location[2] - 1.5f*(float)Math.cos(heading) * (this.location[1] - closestCube[1])/this.maxDeclination;
 			addLocation(newX, newY, newZ);
 			this.location = new float[] {newX, newY, newZ};
+			s.add(3f);
 		}
 		//Cube on higher y-level
 		else if(closestCube[1] > this.location[1]){
@@ -90,6 +93,7 @@ public class IPath implements Path{
 			float newZ = this.location[2] - 1.5f*(float)Math.cos(heading) * (closestCube[1] - this.location[1])/this.maxInclination;
 			addLocation(newX, newY, newZ);
 			this.location = new float[] {newX, newY, newZ};
+			s.add(4f);
 		}
 		
 		float corner = 0;
@@ -99,6 +103,7 @@ public class IPath implements Path{
 			float newY = closestCube[1];
 			float newZ = this.location[2] - 2*turningRadius*(float)Math.cos(heading);
 			addLocation(newX, newY, newZ);
+			s.add(0f);
 			this.location = new float[] {newX, newY, newZ};			
 		}
 		
@@ -141,6 +146,7 @@ public class IPath implements Path{
 				float newY = this.location[1];
 				float newZ = this.location[2] - (float)Math.cos(heading)*fwd + (float)Math.sin(heading)*rightd;
 				addLocation(newX, newY, newZ);
+				s.add(2f);
 				this.heading += cornerPiece;
 				this.location = new float[] {newX, newY, newZ};
 			}
@@ -154,6 +160,7 @@ public class IPath implements Path{
 				float newY = this.location[1];
 				float newZ = this.location[2] - (float)Math.cos(heading)*fwd - (float)Math.sin(heading)*leftd;
 				addLocation(newX, newY, newZ);
+				s.add(1f);
 				this.heading -= cornerPiece;
 				this.location = new float[] {newX, newY, newZ};
 			}
@@ -161,10 +168,17 @@ public class IPath implements Path{
 		
 		//done turning -> got to cube
 		addLocation(closestCube[0], closestCube[1], closestCube[2]);
+		s.add(0f);
 		this.location = new float[] {closestCube[0], closestCube[1], closestCube[2]};
 	}
 		
-	//Check if a location is within turning radius
+	/**
+	 * 
+	 * @param goalLocation
+	 * @param turningRadius
+	 * @return 	Boolean
+	 * 			- wether or not the goalLocation lies within turning reach
+	 */
 	private Boolean turnable(float[] goalLocation, float turningRadius) {
 		float[] circleCentre1 = auxLocPlusX(turningRadius);
 		float[] circleCentre2 = auxLocPlusX(-1*turningRadius);
@@ -237,11 +251,15 @@ public class IPath implements Path{
 		return z;
 	}
 	
+	/**
+	 * Returntype: ArrayList of float[] = [x, y, z, state]
+	 */
 	public ArrayList<float[]> getPathArray(){
 		ArrayList<float[]> path = new ArrayList<>();
 		for (int i=0; i<this.x.size();i++) {
-			float[] point = new float[3];
+			float[] point = new float[4];
 			point[0] = this.x.get(i);point[1] = this.y.get(i);point[2] = this.z.get(i);
+			point[3] = this.s.get(i);
 			path.add(point);
 		}
 		return path;
