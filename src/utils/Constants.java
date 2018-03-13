@@ -20,7 +20,7 @@ public class Constants {
 																"OrthoTestWorld", "RotationWorld", "TestWorldTurn", "TestWorld2",
 																"TakeOffWorld", "BounceWorld", "AirportSetupWorld", "LandingWorld", "TaxiWorld"};
 
-	
+
 	/**
 	 * Pilot constants
 	 */
