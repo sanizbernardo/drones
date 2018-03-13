@@ -367,7 +367,6 @@ public class Physics {
 				Vector3f brakeForce;
 				if (FloatMath.norm(droneVel) > 0) {
 					brakeForce = droneVel.normalize(new Vector3f()).mul(-this.brakeForce[i]);
-					System.out.println(tyreNames[i] + ": " + brakeForce);
 				} else {
 					Vector3f direction = totalForce.normalize(new Vector3f());
 					float norm = FloatMath.norm(totalForce);
