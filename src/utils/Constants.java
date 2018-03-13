@@ -17,8 +17,9 @@ public class Constants {
      * Premade worlds that should show in the gui.
      */
 	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight",
-																"OrthoTestWorld", "RotationWorld", "TestWorldTurn", "TestWorld2", 
-																"TakeOffWorld", "BounceWorld", "AirportSetupWorld"};
+																"OrthoTestWorld", "TestWorldTurn", "TestWorld2", 
+																"TakeOffWorld", "BounceWorld", "AirportSetupWorld", 
+																"DemoWorld1", "DemoWorld2", "DemoWorld3"};
 	
 	/**
 	 * Pilot constants
