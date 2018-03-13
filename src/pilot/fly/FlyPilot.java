@@ -28,13 +28,14 @@ public class FlyPilot extends PilotPart {
 	private float horStabInclination;
 	private float verStabInclination;
 	private float newThrust;
+	private float time = 0;
 	public Vector3f approxVel = new Vector3f(0f, 0f, 0f);
 	private float climbAngle;
 
 //	private ImageProcessing recog;
 
 
-	private Vector3f timePassedOldPos;
+	private Vector3f timePassedOldPos = new Vector3f(0, 0, 0);
 
 	
 	private PitchPID pitchPID;
@@ -42,7 +43,8 @@ public class FlyPilot extends PilotPart {
 	private YawPID yawPID;
 	private RollPID rollPID;
 	private AOAManager aoaManager;
-
+	private boolean ja = true;
+	private float i = 1;
 	private State[] order;
 	private int currentState;
 
@@ -59,7 +61,7 @@ public class FlyPilot extends PilotPart {
 		
 		this.aoaManager = new AOAManager(this);
 
-		this.order = new State[] {State.Left};
+		this.order = new State[] {State.Stable, State.Left, State.Stable, State.StrongUp, State.Stable, State.StrongDown, State.Stable};
 		setCurrentState(0);
 		
 		climbAngle = Constants.climbAngle;
@@ -73,16 +75,32 @@ public class FlyPilot extends PilotPart {
 //		recog = new ImageProcessing(inputs.getImage(), inputs.getPitch(),
 //				inputs.getHeading(), inputs.getRoll(), new float[] {
 //						inputs.getX(), inputs.getY(), inputs.getZ() });
-
-
-		Vector3f newPos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
+		Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
+		
+		float dt = inputs.getElapsedTime() - this.time;
+		this.time = inputs.getElapsedTime();
+		if (dt != 0)
+			this.approxVel = pos.sub(this.timePassedOldPos, new Vector3f()).mul(1/dt);
+		this.timePassedOldPos = pos;		
+		
+		if (inputs.getElapsedTime() > 25)
+			this.setCurrentState(1);
+		if (inputs.getElapsedTime() > 35)
+			this.setCurrentState(2);
+		if (inputs.getElapsedTime() > 45)
+			this.setCurrentState(3);
+		if (inputs.getElapsedTime() > 55)
+			this.setCurrentState(4);
+		if (inputs.getElapsedTime() > 65)
+			this.setCurrentState(5);
+		if (inputs.getElapsedTime() > 75)
+			this.setCurrentState(6);
 		
 		
-		if (timePassedOldPos != null)
-			approxVel = (newPos.sub(timePassedOldPos, new Vector3f()))
-			                   .mul(1 / inputs.getElapsedTime(), new Vector3f());
-		timePassedOldPos = new Vector3f(newPos);
-
+		if (inputs.getY() > 200 && ja == true) {
+			System.out.println(inputs.getElapsedTime());
+			ja = false;
+		}
 		
 		//float desiredHeight = recog.guess();
 //		if(3 - inputs.getY() > 4) {
@@ -126,6 +144,7 @@ public class FlyPilot extends PilotPart {
 
 	// PIDs set pitch and thrust to fly straight.
 	private void flyStraightPID(AutopilotInputs input) {
+		rollPID.adjustRoll(input, FloatMath.toRadians(0));
 		pitchPID.adjustPitchClimb(input, 0f);
 		thrustPID.adjustThrustUp(input, 0.4f);
 	}
@@ -134,7 +153,7 @@ public class FlyPilot extends PilotPart {
 	// vertical velocity
 	private void climbPID(AutopilotInputs inputs) {
 		pitchPID.adjustPitchClimb(inputs, climbAngle);
-		thrustPID.adjustThrustUp(inputs, 4f);
+		thrustPID.adjustThrustUp(inputs, 6f);
 	}
 
 	private void dropPID(AutopilotInputs inputs) {
@@ -184,7 +203,8 @@ public class FlyPilot extends PilotPart {
 				break;
 			case Stable:
 				flyStraightPID(input);
-				aoaManager.setInclNoAOA(input);
+				if (Math.abs(input.getRoll()) < 0.01)
+					aoaManager.setInclNoAOA(input);
 				break;
 			case Left:
 				turnLeft(input);
@@ -198,15 +218,15 @@ public class FlyPilot extends PilotPart {
 	}
 	
 	private void turnRight(AutopilotInputs input) {
-		rollPID.adjustRoll(input, FloatMath.toRadians(-5));
-		thrustPID.adjustThrustUp(input, 0.4f);
-		pitchPID.adjustPitchClimb(input, FloatMath.toRadians(4));
+		rollPID.adjustRoll(input, FloatMath.toRadians(-40));
+		thrustPID.adjustThrustUp(input, 0.37f);
+		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
 	
 	private void turnLeft(AutopilotInputs input) {
-		rollPID.adjustRoll(input, FloatMath.toRadians(5));
-		thrustPID.adjustThrustUp(input, 0.4f);
-		pitchPID.adjustPitchClimb(input, FloatMath.toRadians(4));
+		rollPID.adjustRoll(input, FloatMath.toRadians(20));
+		thrustPID.adjustThrustUp(input, 0.37f);
+		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
 
 

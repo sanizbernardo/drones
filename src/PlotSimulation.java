@@ -35,7 +35,9 @@ public class PlotSimulation {
 				dataHIncl = new DefaultCategoryDataset(),
 				dataRIncl = new DefaultCategoryDataset(),
 				dataVIncl = new DefaultCategoryDataset(),
-				dataThrust = new DefaultCategoryDataset();
+				dataThrust = new DefaultCategoryDataset(),
+				dataXZ = new DefaultCategoryDataset();
+		
 		try {
 			while ((line = reader.readLine()) != null) {
 				String[] floats = line.split(" ");
@@ -62,6 +64,7 @@ public class PlotSimulation {
 				dataRIncl.addValue(rIncl, "Right Incl", time + "");
 				dataVIncl.addValue(vIncl, "Vert Incl", time + "");
 				dataThrust.addValue(thrust, "Thrust", time + "");
+				dataXZ.addValue(-z, "XZ plot", x + "");
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			
@@ -79,7 +82,8 @@ public class PlotSimulation {
 				chartHIncl = ChartFactory.createLineChart("Horz Incl", null, null, dataHIncl, PlotOrientation.VERTICAL, true, false, false),
 				chartRIncl = ChartFactory.createLineChart("Right Incl", null, null, dataRIncl, PlotOrientation.VERTICAL, true, false, false),
 				chartVIncl = ChartFactory.createLineChart("Vert Incl", null, null, dataVIncl, PlotOrientation.VERTICAL, true, false, false),
-				chartThrust = ChartFactory.createLineChart("Thrust", null, null, dataThrust, PlotOrientation.VERTICAL, true, false, false);
+				chartThrust = ChartFactory.createLineChart("Thrust", null, null, dataThrust, PlotOrientation.VERTICAL, true, false, false),
+				chartXZ = ChartFactory.createLineChart("XZ", null, null, dataXZ, PlotOrientation.VERTICAL, true, false, false);
 		
 		ChartPanel panelX = new ChartPanel(chartX),
 				panelY = new ChartPanel(chartY),
@@ -91,7 +95,8 @@ public class PlotSimulation {
 				panelHIncl = new ChartPanel(chartHIncl),
 				panelRIncl = new ChartPanel(chartRIncl),
 				panelVIncl = new ChartPanel(chartVIncl),
-				panelThrust = new ChartPanel(chartThrust);
+				panelThrust = new ChartPanel(chartThrust),
+				panelXZ = new ChartPanel(chartXZ);
 		
 		panelX.setPreferredSize(new Dimension(600, 500));
 		panelY.setPreferredSize(new Dimension(600, 500));
@@ -104,6 +109,7 @@ public class PlotSimulation {
 		panelRIncl.setPreferredSize(new Dimension(600, 500));
 		panelVIncl.setPreferredSize(new Dimension(600, 500));
 		panelThrust.setPreferredSize(new Dimension(600, 500));
+		panelXZ.setPreferredSize(new Dimension(600, 500));
 		
 		ApplicationFrame frame = new ApplicationFrame("Simulation analysis");
 		JPanel panel = new JPanel();
@@ -123,6 +129,7 @@ public class PlotSimulation {
 		panel.add(panelRIncl,GuiUtils.buildGBC(2, 2, GridBagConstraints.CENTER));
 		panel.add(panelVIncl,GuiUtils.buildGBC(0, 3, GridBagConstraints.CENTER));
 		panel.add(panelThrust,GuiUtils.buildGBC(1, 3, GridBagConstraints.CENTER));
+		panel.add(panelXZ,GuiUtils.buildGBC(2, 3, GridBagConstraints.CENTER));
 		
 		frame.pack();
 		frame.setVisible(true);
