@@ -11,8 +11,9 @@ public class ThrustPID {
 	FlyPilot pilot;
 
 	public ThrustPID(FlyPilot pilot) {
-		thrustUpPID = new MiniPID(1, 0, 0);
-		thrustDownPID = new MiniPID(1, 0.05, 0.05);
+		thrustUpPID = new MiniPID(7, 0, 2);
+		thrustUpPID.setOutputLimits(2, pilot.getConfig().getMaxThrust()/200);
+		thrustDownPID = new MiniPID(1, 0, 0);
 		
 		this.pilot = pilot;
 	}
@@ -24,13 +25,13 @@ public class ThrustPID {
 		float output = (float) thrustUpPID.getOutput(actual);
 
 		// Check that received output is within bounds
-		if (output > pilot.getConfig().getMaxThrust()) {
-			pilot.setNewThrust(pilot.getConfig().getMaxThrust());
-		} else if (output < 0f) {
-			pilot.setNewThrust(0);
-		} else {
-			pilot.setNewThrust(output * 400);
-		}
+//		if (output * 200 > pilot.getConfig().getMaxThrust()) {
+//			pilot.setNewThrust(pilot.getConfig().getMaxThrust());
+//		} else if (output < 0f) {
+//			pilot.setNewThrust(400);
+//		} else {
+		pilot.setNewThrust(output * 200);
+//		}
 	}
 
 	public void adjustThrustDown(AutopilotInputs inputs, float target) {
@@ -39,12 +40,12 @@ public class ThrustPID {
 		float output = (float) thrustDownPID.getOutput(actual);
 
 		// Check that received output is within bounds
-		if (output > pilot.getConfig().getMaxThrust()) {
+		if (output * 200> pilot.getConfig().getMaxThrust()) {
 			pilot.setNewThrust(pilot.getConfig().getMaxThrust());
 		} else if (output < 0f) {
 			pilot.setNewThrust(0);
 		} else {
-			pilot.setNewThrust(output);
+			pilot.setNewThrust(output*200);
 		}
 	}
 

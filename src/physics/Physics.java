@@ -12,9 +12,14 @@ import utils.Utils;
 public class Physics {
 	
 	/**
-	 * pos and vel in world coordinates
+	 * in world coordinates
 	 */
-	private Vector3f pos, vel, angVel, weightWorld, enginePos;
+	private Vector3f pos, vel, weightWorld, enginePos;
+	
+	/**
+	 * in drone coordinates
+	 */
+	private Vector3f angVel; 
 	
 	private float heading, pitch, roll, 
 				  lwIncl, rwIncl, hsIncl, vsIncl,
@@ -54,9 +59,9 @@ public class Physics {
 	
 	/**
 	 * Initialises the drone at the given position, with the given starting velocity,
-	 * and the given heading, pitch and roll.
+	 * and the given heading.
 	 */
-	public void init(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading, float startPitch, float startRoll) {
+	public void init(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading) {
 		setupCalculations(config);
 		
 		this.config = config;
@@ -73,10 +78,6 @@ public class Physics {
 		
 		if (Math.abs(startHeading) > 1E-6)
 			this.transMat.rotate(-startHeading, new Vector3f(0, 1, 0));
-		if (Math.abs(startPitch) > 1E-6)
-			this.transMat.rotate(-startPitch, new Vector3f(1, 0, 0));
-		if (Math.abs(startRoll) > 1E-6)
-			this.transMat.rotate(-startRoll, new Vector3f(0, 0, 1));
 
 		this.transMatInv = this.transMat.invert(new Matrix3f());
 				
@@ -88,44 +89,12 @@ public class Physics {
 		}
 	}
 	
-	public void init(AutopilotConfig config, Vector3f startPos, float startVel, float startHeading, float startPitch, float startRoll) {
-		init(config, startPos, new Vector3f(0,0,-startVel), startHeading, startPitch, startRoll);
-	}
-	
 	/**
-	 * Initialises the drone at the given position, with starting velocity of 10
-	 * and no starting orientation.  
+	 * Initialises the drone at the given position, with the given starting velocity,
+	 * and with heading 0.
 	 */
-	public void init(AutopilotConfig config, Vector3f startPos) {
-		init(config, startPos, 10f, 0f, 0f, 0f);
-	}
-	
-	/**
-	 * Initialises the drone at (0, 0, 0), with starting velocity of 10
-	 * and no starting orientation.  
-	 */
-	public void init(AutopilotConfig config) {
-		init(config, new Vector3f(0,0,0));
-	}
-	
-	/**
-	 * Initialises the drone at (0, 0, 0), with the given starting velocity
-	 * and no starting orientation.
-	 */
-	public void init(AutopilotConfig config, float startVelocity) {
-		init(config, new Vector3f(0,0,0), startVelocity);
-	}
-	
-	/**
-	 * Initialises the drone at the given position, with the given starting velocity
-	 * and no starting orientation.
-	 */
-	public void init(AutopilotConfig config, Vector3f startPos, float startVel) {
-		init(config, startPos, startVel, 0f, 0f, 0f);
-	}
-	
 	public void init(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {
-		init(config, startPos, startVel, 0f, 0f, 0f);
+		init(config, startPos, startVel, 0f);
 	}
 	
 	
@@ -264,7 +233,7 @@ public class Physics {
 		this.brakeForce[2] = data.getRightBrakeForce();
 		for (int i = 0; i < 3; i++) {
 			if (brakeForce[i] < 0 || brakeForce[i] > this.maxR)
-				throw new PhysicsException("Illegal brake force on " + wheelPositions[i] + " (" + FloatMath.round(brakeForce[i],2) + ")");
+				throw new PhysicsException("Illegal brake force on " + tyreNames[i] + " (" + FloatMath.round(brakeForce[i],2) + ")");
 		}
 	}
 	
@@ -292,7 +261,7 @@ public class Physics {
 	 * Updates the transformation matrix, it rotates with the drone's angular velocity.
 	 */
 	private void updateTransMat(float dt) {
-		Vector3f rotation = this.angVel.mul(dt, new Vector3f());
+		Vector3f rotation = FloatMath.transform(this.transMatInv, this.angVel.mul(dt, new Vector3f()));
 		
 		float norm = FloatMath.norm(rotation);
 		if (Math.abs(norm) > 1E-6) {
@@ -345,7 +314,7 @@ public class Physics {
 		for (int i = 0; i < 4; i++) {
 			Vector3f normal = FloatMath.cross(axisVectors[i], attacks[i]);
 			
-			Vector3f veli = (new Vector3f()).add(FloatMath.transform(this.transMat, this.vel)).add(FloatMath.cross(this.angVel, this.wingPositions[i]));
+			Vector3f veli = FloatMath.transform(this.transMat, this.vel).add(FloatMath.cross(this.angVel, this.wingPositions[i]));
 			veli.mul(this.velProj[i]); // projecteren op vlak loodrecht op axis
 
 			float aoa = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
@@ -391,13 +360,13 @@ public class Physics {
 				
 				// remmen
 				
-				Vector3f worldVel = this.vel.add(FloatMath.cross(this.angVel, this.wheelPositions[i]), new Vector3f());
+				Vector3f worldVel = this.vel.add(FloatMath.transform(this.transMatInv, FloatMath.cross(this.angVel, this.wheelPositions[i])), new Vector3f());
 				worldVel.y = 0;
+				Vector3f droneVel = FloatMath.transform(this.transMat, worldVel);
 				
 				Vector3f brakeForce;
-				if (FloatMath.norm(worldVel) > 0) {
-					brakeForce = worldVel.normalize(new Vector3f()).mul(-this.brakeForce[i]);
-					
+				if (FloatMath.norm(droneVel) > 0) {
+					brakeForce = droneVel.normalize(new Vector3f()).mul(-this.brakeForce[i]);
 				} else {
 					Vector3f direction = totalForce.normalize(new Vector3f());
 					float norm = FloatMath.norm(totalForce);
@@ -441,7 +410,7 @@ public class Physics {
 	private Vector3f calculateAlfa(Vector3f torque) {
 		
 		Vector3f part1 = FloatMath.cross(this.angVel, FloatMath.transform(this.inertia, this.angVel));
-		Vector3f alfa = FloatMath.transform(this.inertiaInv, torque.add(part1, new Vector3f())); 
+		Vector3f alfa = FloatMath.transform(this.inertiaInv, torque.add(part1, new Vector3f()));
 		return alfa;
 	}
 	
