@@ -31,7 +31,7 @@ public class FlyPilot extends PilotPart {
 	public Vector3f approxVel = new Vector3f(0f, 0f, 0f);
 	private float climbAngle;
 
-//	private ImageProcessing recog;
+	private final ImageProcessing recog = new ImageProcessing();
 
 
 	private Vector3f timePassedOldPos;
@@ -69,11 +69,10 @@ public class FlyPilot extends PilotPart {
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
 
-		//TODO: reenable
-//		recog = new ImageProcessing(inputs.getImage(), inputs.getPitch(),
-//				inputs.getHeading(), inputs.getRoll(), new float[] {
-//						inputs.getX(), inputs.getY(), inputs.getZ() });
 
+		recog.addNewImage(inputs.getImage(), inputs.getPitch(),
+				inputs.getHeading(), inputs.getRoll(), new float[] {
+						inputs.getX(), inputs.getY(), inputs.getZ() });
 
 		Vector3f newPos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
 		

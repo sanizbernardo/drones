@@ -34,6 +34,7 @@ public class Pilot implements Autopilot {
 		this.pilots[FLYING] = new FlyPilot();
 		this.pilots[TAXIING] = new TaxiPilot();
 		
+
 		this.tasks = tasks;
 		this.index = 0;
 	}
