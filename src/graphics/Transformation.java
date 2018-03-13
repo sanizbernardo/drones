@@ -2,6 +2,8 @@ package graphics;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+
+import utils.FloatMath;
 import entities.WorldObject;
 
 public class Transformation {
@@ -48,7 +50,6 @@ public class Transformation {
         Vector3f rotation = camera.getRotation();
 
         viewMatrix.identity();
-        
 		if (Math.abs(rotation.y) > 1E-6)
 			viewMatrix.rotate(rotation.y, new Vector3f(0, 1, 0));
 		if (Math.abs(rotation.x) > 1E-6)
@@ -56,7 +57,6 @@ public class Transformation {
 		if (Math.abs(rotation.z) > 1E-6)
 			viewMatrix.rotate(rotation.z, new Vector3f(0, 0, 1));
         
-//        viewMatrix.rotateXYZ((float)Math.toRadians(rotation.x),(float)Math.toRadians(rotation.y),(float)Math.toRadians(rotation.z));
         // Then do the translation
         viewMatrix.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
         return viewMatrix;
@@ -70,7 +70,6 @@ public class Transformation {
         viewMatrixY.identity();
 		if (Math.abs(rotation.y) > 1E-6)
 			viewMatrix.rotate(rotation.y, new Vector3f(0, 1, 0));
-//        viewMatrix.rotateXYZ((float)Math.toRadians(rotation.x),(float)Math.toRadians(rotation.y),(float)Math.toRadians(rotation.z));
         // Then do the translation
         viewMatrixY.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z - 1);
         return viewMatrixY;

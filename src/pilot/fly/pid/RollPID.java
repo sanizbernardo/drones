@@ -14,7 +14,7 @@ public class RollPID {
 	FlyPilot pilot;
 	
 	public RollPID(FlyPilot pilot) {
-		rollPID = new MiniPID(1, 0, 0);
+		rollPID = new MiniPID(0.2, 0, 0);
 		rollPID.setOutputLimits(Math.toRadians(10));
 		
 		this.pilot = pilot;

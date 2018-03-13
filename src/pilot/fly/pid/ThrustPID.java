@@ -7,13 +7,16 @@ import com.stormbots.MiniPID;
 
 public class ThrustPID {
 
-	MiniPID thrustUpPID, thrustDownPID;
+	MiniPID thrustUpPID, thrustDownPID, thrustTurnPID;
 	FlyPilot pilot;
 
 	public ThrustPID(FlyPilot pilot) {
-		thrustUpPID = new MiniPID(7, 0, 2);
+		thrustUpPID = new MiniPID(8, 0, 3);
 		thrustUpPID.setOutputLimits(2, pilot.getConfig().getMaxThrust()/200);
 		thrustDownPID = new MiniPID(1, 0, 0);
+		thrustDownPID.setOutputLimits(0, pilot.getConfig().getMaxThrust()/200);
+		thrustTurnPID = new MiniPID(4, 0, 0);
+		thrustTurnPID.setOutputLimits(0.5, pilot.getConfig().getMaxThrust()/200);
 		
 		this.pilot = pilot;
 	}
@@ -24,14 +27,7 @@ public class ThrustPID {
 		float actual = pilot.approxVel.y();
 		float output = (float) thrustUpPID.getOutput(actual);
 
-		// Check that received output is within bounds
-//		if (output * 200 > pilot.getConfig().getMaxThrust()) {
-//			pilot.setNewThrust(pilot.getConfig().getMaxThrust());
-//		} else if (output < 0f) {
-//			pilot.setNewThrust(400);
-//		} else {
-		pilot.setNewThrust(output * 200);
-//		}
+		pilot.setNewThrust(output*200);
 	}
 
 	public void adjustThrustDown(AutopilotInputs inputs, float target) {
@@ -39,14 +35,15 @@ public class ThrustPID {
 		float actual = pilot.approxVel.y();
 		float output = (float) thrustDownPID.getOutput(actual);
 
-		// Check that received output is within bounds
-		if (output * 200> pilot.getConfig().getMaxThrust()) {
-			pilot.setNewThrust(pilot.getConfig().getMaxThrust());
-		} else if (output < 0f) {
-			pilot.setNewThrust(0);
-		} else {
-			pilot.setNewThrust(output*200);
-		}
+		pilot.setNewThrust(output*200);
+	}
+
+	public void adjustThrustTurn(AutopilotInputs inputs, float target) {
+		thrustTurnPID.setSetpoint(target);
+		float actual = pilot.approxVel.y();
+		float output = (float) thrustTurnPID.getOutput(actual);
+
+		pilot.setNewThrust(output*200);
 	}
 
 }

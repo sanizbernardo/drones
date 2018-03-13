@@ -8,15 +8,17 @@ import com.stormbots.MiniPID;
 
 public class PitchPID {
 	
-	MiniPID pitchClimbPID, pitchDownPID;
+	MiniPID pitchClimbPID, pitchDownPID, pitchTurnPID;
 	FlyPilot pilot;
 	
 	public PitchPID(FlyPilot pilot) {
 
-		pitchClimbPID = new MiniPID(2.5, 0, 0.5);
+		pitchClimbPID = new MiniPID(2, 0, 1.5);
 		pitchClimbPID.setOutputLimits(Math.toRadians(10));
 		pitchDownPID = new MiniPID(3, 0, 0.5);
 		pitchDownPID.setOutputLimits(Math.toRadians(10));
+		pitchTurnPID = new MiniPID(3, 0, 0.5);
+		pitchTurnPID.setOutputLimits(Math.toRadians(10));
 		
 		this.pilot = pilot;
 	}
@@ -24,12 +26,6 @@ public class PitchPID {
 	// PID uses horizontal stabiliser to adjust pitch.
 	public void adjustPitchClimb(AutopilotInputs input, float target) {
 		pitchClimbPID.setSetpoint(target);
-
-//		Vector3f rel = pilot.getRelVel(input);
-//		float climb = (float) Math.atan2(rel.y(), -rel.z());
-//		float min = climb - input.getPitch() + pilot.getConfig().getMaxAOA();
-//		float max = climb - input.getPitch() - pilot.getConfig().getMaxAOA();
-//		pitchUpPID.setOutputLimits(min, max);
 
 		float actual = input.getPitch();
 		float output = (float) pitchClimbPID.getOutput(actual);
@@ -40,14 +36,17 @@ public class PitchPID {
 	public void adjustPitchDown(AutopilotInputs input, float target) {
 		pitchDownPID.setSetpoint(target);
 
-//		Vector3f rel = pilot.getRelVel(input);
-//		float climb = (float) Math.atan2(rel.y(), -rel.z());
-//		float min = climb - input.getPitch() + pilot.getConfig().getMaxAOA();
-//		float max = climb - input.getPitch() - pilot.getConfig().getMaxAOA();
-//		pitchDownPID.setOutputLimits(min, max);
-
 		float actual = input.getPitch();
 		float output = (float) pitchDownPID.getOutput(actual);
+
+		pilot.setHorStabInclination(-output);
+	}
+	
+	public void adjustPitchTurn(AutopilotInputs input, float target) {
+		pitchTurnPID.setSetpoint(target);
+
+		float actual = input.getPitch();
+		float output = (float) pitchTurnPID.getOutput(actual);
 
 		pilot.setHorStabInclination(-output);
 	}

@@ -2,6 +2,7 @@ package world.premade;
 
 import org.joml.Vector3f;
 
+import pilot.Pilot;
 import entities.WorldObject;
 import entities.ground.Ground;
 import pilot.Pilot;
