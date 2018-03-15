@@ -8,9 +8,13 @@ import org.joml.Vector3f;
 import utils.FloatMath;
 import utils.Utils;
 
+import java.util.List;
+
 public class TaxiPilot extends PilotPart {
 
 	private Vector3f targetPos;
+
+	private List<Vector3f> targetlist;
 
 	private MiniPID thrustPID, brakePID, turnPID;
 
@@ -23,6 +27,16 @@ public class TaxiPilot extends PilotPart {
 
 	public TaxiPilot() {
 		this.targetPos = new Vector3f(100, 0, -100);
+		thrustPID = new MiniPID(70, 0.1, 0.1);
+		brakePID = new MiniPID(30,0.1,0.1);
+		turnPID = new MiniPID(30, 0.02, 0);
+
+		this.ended = false;
+	}
+
+	public TaxiPilot(List<Vector3f> targetlist) {
+		this.targetlist = targetlist;
+		this.targetPos = targetlist.iterator().next();
 		thrustPID = new MiniPID(70, 0.1, 0.1);
 		brakePID = new MiniPID(30,0.1,0.1);
 		turnPID = new MiniPID(30, 0.02, 0);
@@ -99,8 +113,11 @@ public class TaxiPilot extends PilotPart {
 				rBrake = (float)0.2*maxBrakeForce;
 				fBrake = (float)0.2*maxBrakeForce;
 			} else {
-				System.out.println("Destination reached");
-				this.targetPos = new Vector3f(-100, 0, -200);
+				this.targetPos = targetlist.iterator().next();
+				if (targetPos == null) {
+					System.out.println("Destination reached");
+					this.ended = true;
+				}
 			}
 		}
 		else if ( headingerror < -(turnaccuracy) || headingerror > Math.toRadians(179)) {
