@@ -322,18 +322,18 @@ public class Physics {
 			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
 
 			if (checkAOA && dt != 0 && FloatMath.norm(force) > 50 && aoa > maxAOA)
-				throw new PhysicsException(wingNames[i] + " exceeded maximum aoa (" + FloatMath.round(FloatMath.toDegrees(aoa), 2) + "°)");
+				throw new PhysicsException(wingNames[i] + " exceeded maximum aoa (" + FloatMath.round(FloatMath.toDegrees(aoa), 2) + "ï¿½)");
 			
 			totalForce.add(force);
 			totalTorque.add(FloatMath.cross(this.wingPositions[i], force));
-		}		
+		}
 		
 		// wheels
 		for (int i = 0; i < 3; i++) {
 			Vector3f worldWheelPos = this.pos.add(FloatMath.transform(this.transMatInv, this.wheelPositions[i]),new Vector3f());
 			
 			float d = this.tyreRadius - worldWheelPos.y;
-			
+
 			worldWheelPos.y = 0;
 			
 			Vector3f relPos = FloatMath.transform(this.transMat, worldWheelPos.sub(this.pos));
