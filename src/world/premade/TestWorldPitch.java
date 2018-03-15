@@ -22,7 +22,7 @@ public class TestWorldPitch extends World implements IWorldRules {
     @Override
     public void setup() {
         config = Utils.createDefaultConfig();
-        
+
         addDrone(config, new Vector3f(0,100,0), new Vector3f(0,0,-40));
 
         planner = new Pilot(new int[] {Pilot.FLYING});
