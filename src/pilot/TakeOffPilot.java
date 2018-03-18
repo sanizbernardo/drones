@@ -65,7 +65,7 @@ public class TakeOffPilot extends PilotPart {
 			thrust = this.maxThrust;
 			if (FloatMath.norm(vel) >= takeOffSpeed)
 				takeoff = true;
-		} else {
+		} else {	
 			lwIncl = input.getPitch() < FloatMath.toRadians(15) ? 4 : 6;
 			rwIncl = input.getPitch() < FloatMath.toRadians(15) ? 4 : 6;
 			horStabIncl = (float) -pitchPID.getOutput(input.getPitch());		

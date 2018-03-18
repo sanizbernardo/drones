@@ -56,6 +56,13 @@ public class FloatMath {
 	}
 	
 	/**
+	 * Calculates sqrt(a)
+	 */
+	public static float sqrt(float a) {
+		return (float) Math.sqrt(a);
+	}
+	
+	/**
 	 * Converts the given angle from degrees to radians.
 	 */
 	public static float toRadians(float deg) {

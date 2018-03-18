@@ -6,8 +6,6 @@ import org.joml.Vector3f;
 import entities.WorldObject;
 import entities.ground.Ground;
 import entities.tarmac.Tarmac;
-import interfaces.Autopilot;
-import physics.Physics;
 import pilot.Pilot;
 import utils.Cubes;
 import utils.FloatMath;

@@ -7,6 +7,7 @@ import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
 import interfaces.Path;
+import utils.FloatMath;
 import utils.Utils;
 
 public class Pilot implements Autopilot {
@@ -29,7 +30,7 @@ public class Pilot implements Autopilot {
 	public Pilot(int[] tasks) {
 		this.pilots = new PilotPart[4];
 		
-		this.pilots[TAKING_OFF] = new TakeOffPilot(100);
+		this.pilots[TAKING_OFF] = new TakeOffPilot(800);
 		this.pilots[LANDING] = new LandingPilot();
 		this.pilots[FLYING] = new FlyPilot();
 		this.pilots[TAXIING] = new TaxiPilot();
@@ -101,6 +102,11 @@ public class Pilot implements Autopilot {
 		this.gui.dispose();
 	}
 	
+	@Override
+	public void setPath(Path path) {
+		this.path = path;
+	}
+	
 	private int state() {
 		return this.tasks[this.index];
 	}
@@ -108,11 +114,16 @@ public class Pilot implements Autopilot {
 	private PilotPart currentPilot() {
 		return this.pilots[state()];
 	}
+	
+	
+	private float getTakeoffDist(float height) {
+		if (height > 150)
+			return (height - 150f) / 0.1365f;
 
-
-	@Override
-	public void setPath(Path path) {
-		this.path = path;
+		if (height > 20 )
+			return (-0.0766f + FloatMath.sqrt(0.0059f + 2.4069f*height)) / (2f*height);
+		
+		return Float.NaN;
 	}
 
 }
