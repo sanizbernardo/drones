@@ -50,12 +50,14 @@ public class Transformation {
         Vector3f rotation = camera.getRotation();
 
         viewMatrix.identity();
-		if (Math.abs(rotation.y) > 1E-6)
-			viewMatrix.rotate(rotation.y, new Vector3f(0, 1, 0));
-		if (Math.abs(rotation.x) > 1E-6)
-			viewMatrix.rotate(rotation.x, new Vector3f(1, 0, 0));
 		if (Math.abs(rotation.z) > 1E-6)
 			viewMatrix.rotate(rotation.z, new Vector3f(0, 0, 1));
+		if (Math.abs(rotation.x) > 1E-6)
+			viewMatrix.rotate(rotation.x, new Vector3f(1, 0, 0));
+		if (Math.abs(rotation.y) > 1E-6)
+			viewMatrix.rotate(rotation.y, new Vector3f(0, 1, 0));
+
+
         
         // Then do the translation
         viewMatrix.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
