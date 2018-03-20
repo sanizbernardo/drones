@@ -17,14 +17,9 @@ public class Constants {
      * Premade worlds that should show in the gui.
      */
 	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight",
-<<<<<<< HEAD
-																"OrthoTestWorld", "RotationWorld", "TestWorld2", 
-																"TakeOffWorld", "BounceWorld", "AirportSetupWorld", "LandingWorld"};
-=======
 																"OrthoTestWorld", "TestWorld2", "LandingWorld", 
 																"TakeOffWorld", "BounceWorld", "AirportSetupWorld", 
 																"DemoWorld1", "DemoWorld2", "DemoWorld3",  "TestWorldPitch", "TaxiWorld"};
->>>>>>> f8fd0bb4bd4eab8068bd82937827ca6614660bad
 	/**
 	 * Pilot constants
 	 */
@@ -58,7 +53,7 @@ public class Constants {
     public static final float FOV = (float) Math.toRadians(90f);
     public static final float Z_NEAR = 0.7f;
     public static final float Z_FAR = 10000.f;
-    public static final float DRONE_THICKNESS = 0.2f;  //in meters
+    public static final float DRONE_THICKNESS = 0.25f;  //in meters
     public static final float DRONE_WHEEL_THICKNESS = 0.08f;
     public static final int DRONE_LEFT_WING = 0;
     public static final int DRONE_RIGHT_WING = 1;
