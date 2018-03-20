@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -189,7 +190,8 @@ premade {
 		
 
 		classNames = Constants.PREMADE_WORLDS;
-
+		Arrays.sort(classNames);
+		
 		worlds = new HashMap<>();
 		for (String className: classNames) {
 			try {

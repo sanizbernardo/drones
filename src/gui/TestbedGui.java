@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -17,16 +18,19 @@ import utils.FloatMath;
 import javax.swing.JLabel;
 
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class TestbedGui extends JFrame {
 
-
 	private static final long serialVersionUID = 1L;
+	private final int precision;
 	
 	private JPanel contentPane;
 	private JLabel[] position, velocity, orientation;
-
-	private final int precision;
+	private JButton pathBtn;
+	
+	private boolean setPath;
 	
 	/**
 	 * Launch the application.
@@ -49,6 +53,7 @@ public class TestbedGui extends JFrame {
 	 */
 	public TestbedGui() {
 		this.precision = 2;
+		this.setPath = false;
 		
 		setTitle("Testbed GUI");
 		
@@ -83,7 +88,17 @@ public class TestbedGui extends JFrame {
 		velocity = buildVectorLbl("Velocity", new String[] {"x", "y", "z"} , 6, true);
 		
 		orientation = buildVectorLbl("Orientation", new String[] {"pitch", "heading", "roll"}, 11, false);
-
+		
+		pathBtn = new JButton("Set path");
+		GridBagConstraints gbc_btn = GuiUtils.buildGBC(0, 15, GridBagConstraints.CENTER, new Insets(0, 0, 5, 0));
+		gbc_btn.gridwidth = 3;
+		contentPane.add(pathBtn, gbc_btn);
+		
+		pathBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setPath = true;
+			}
+		});
 	}
 	
 	
@@ -118,6 +133,9 @@ public class TestbedGui extends JFrame {
 	}
 	
 	
+	public boolean setPath() {
+		return this.setPath;
+	}
 	
 	
 	public void showGUI() {

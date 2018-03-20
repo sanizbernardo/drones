@@ -12,9 +12,14 @@ import utils.Utils;
 public class Physics {
 	
 	/**
-	 * pos and vel in world coordinates
+	 * in world coordinates
 	 */
-	private Vector3f pos, vel, angVel, weightWorld, enginePos;
+	private Vector3f pos, vel, weightWorld, enginePos;
+	
+	/**
+	 * in drone coordinates
+	 */
+	private Vector3f angVel; 
 	
 	private float heading, pitch, roll, 
 				  lwIncl, rwIncl, hsIncl, vsIncl,
@@ -228,7 +233,7 @@ public class Physics {
 		this.brakeForce[2] = data.getRightBrakeForce();
 		for (int i = 0; i < 3; i++) {
 			if (brakeForce[i] < 0 || brakeForce[i] > this.maxR)
-				throw new PhysicsException("Illegal brake force on " + wheelPositions[i] + " (" + FloatMath.round(brakeForce[i],2) + ")");
+				throw new PhysicsException("Illegal brake force on " + tyreNames[i] + " (" + FloatMath.round(brakeForce[i],2) + ")");
 		}
 	}
 	
@@ -309,7 +314,7 @@ public class Physics {
 		for (int i = 0; i < 4; i++) {
 			Vector3f normal = FloatMath.cross(axisVectors[i], attacks[i]);
 			
-			Vector3f veli = (new Vector3f()).add(FloatMath.transform(this.transMat, this.vel)).add(FloatMath.cross(this.angVel, this.wingPositions[i]));
+			Vector3f veli = FloatMath.transform(this.transMat, this.vel).add(FloatMath.cross(this.angVel, this.wingPositions[i]));
 			veli.mul(this.velProj[i]); // projecteren op vlak loodrecht op axis
 
 			float aoa = - FloatMath.atan2(veli.dot(normal), veli.dot(attacks[i]));
@@ -317,18 +322,18 @@ public class Physics {
 			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
 
 			if (checkAOA && dt != 0 && FloatMath.norm(force) > 50 && aoa > maxAOA)
-				throw new PhysicsException(wingNames[i] + " exceeded maximum aoa (" + FloatMath.round(FloatMath.toDegrees(aoa), 2) + "°)");
+				throw new PhysicsException(wingNames[i] + " exceeded maximum aoa (" + FloatMath.round(FloatMath.toDegrees(aoa), 2) + "ï¿½)");
 			
 			totalForce.add(force);
 			totalTorque.add(FloatMath.cross(this.wingPositions[i], force));
-		}		
+		}
 		
 		// wheels
 		for (int i = 0; i < 3; i++) {
 			Vector3f worldWheelPos = this.pos.add(FloatMath.transform(this.transMatInv, this.wheelPositions[i]),new Vector3f());
 			
 			float d = this.tyreRadius - worldWheelPos.y;
-			
+
 			worldWheelPos.y = 0;
 			
 			Vector3f relPos = FloatMath.transform(this.transMat, worldWheelPos.sub(this.pos));
@@ -355,13 +360,13 @@ public class Physics {
 				
 				// remmen
 				
-				Vector3f worldVel = this.vel.add(FloatMath.cross(this.angVel, this.wheelPositions[i]), new Vector3f());
+				Vector3f worldVel = this.vel.add(FloatMath.transform(this.transMatInv, FloatMath.cross(this.angVel, this.wheelPositions[i])), new Vector3f());
 				worldVel.y = 0;
+				Vector3f droneVel = FloatMath.transform(this.transMat, worldVel);
 				
 				Vector3f brakeForce;
-				if (FloatMath.norm(worldVel) > 0) {
-					brakeForce = worldVel.normalize(new Vector3f()).mul(-this.brakeForce[i]);
-					
+				if (FloatMath.norm(droneVel) > 0) {
+					brakeForce = droneVel.normalize(new Vector3f()).mul(-this.brakeForce[i]);
 				} else {
 					Vector3f direction = totalForce.normalize(new Vector3f());
 					float norm = FloatMath.norm(totalForce);
@@ -405,7 +410,7 @@ public class Physics {
 	private Vector3f calculateAlfa(Vector3f torque) {
 		
 		Vector3f part1 = FloatMath.cross(this.angVel, FloatMath.transform(this.inertia, this.angVel));
-		Vector3f alfa = FloatMath.transform(this.inertiaInv, torque.add(part1, new Vector3f())); 
+		Vector3f alfa = FloatMath.transform(this.inertiaInv, torque.add(part1, new Vector3f()));
 		return alfa;
 	}
 	

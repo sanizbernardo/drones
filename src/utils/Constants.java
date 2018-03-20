@@ -17,14 +17,21 @@ public class Constants {
      * Premade worlds that should show in the gui.
      */
 	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight",
+<<<<<<< HEAD
 																"OrthoTestWorld", "RotationWorld", "TestWorld2", 
 																"TakeOffWorld", "BounceWorld", "AirportSetupWorld", "LandingWorld"};
+=======
+																"OrthoTestWorld", "TestWorld2", "LandingWorld", 
+																"TakeOffWorld", "BounceWorld", "AirportSetupWorld", 
+																"DemoWorld1", "DemoWorld2", "DemoWorld3",  "TestWorldPitch", "TaxiWorld"};
+>>>>>>> f8fd0bb4bd4eab8068bd82937827ca6614660bad
 	/**
 	 * Pilot constants
 	 */
     
 	public static float climbAngle = FloatMath.toRadians(10);
-	
+
+
     /**
      * Drone pickup accuracy
      */
@@ -41,15 +48,16 @@ public class Constants {
     public static final int AUTOPILOT_GUI_HEIGHT = 407;
     public static final int AUTOPILOT_GUI_WIDTH = 508;
     
-    public static final float COLLISION_RANGE = 5;
+    public static final float COLLISION_RANGE = 5f;
+    public static final float PATH_ACCURACY = 5f;
     
     /**
      * Renderer constants
      */
     //Field of View in Radians
     public static final float FOV = (float) Math.toRadians(90f);
-    public static final float Z_NEAR = 0.2f;
-    public static final float Z_FAR = 3000f;
+    public static final float Z_NEAR = 0.7f;
+    public static final float Z_FAR = 10000.f;
     public static final float DRONE_THICKNESS = 0.1f;  //in meters
     public static final float DRONE_WHEEL_THICKNESS = 0.08f;
     public static final int DRONE_LEFT_WING = 0;

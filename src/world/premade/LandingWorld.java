@@ -6,10 +6,9 @@ import org.joml.Vector3f;
 import entities.WorldObject;
 import entities.ground.Ground;
 import entities.tarmac.Tarmac;
-import interfaces.Autopilot;
-import physics.Physics;
 import pilot.Pilot;
 import utils.Cubes;
+import utils.FloatMath;
 import utils.Utils;
 import world.World;
 
@@ -24,7 +23,7 @@ public class LandingWorld extends World{
 		this.config = Utils.createDefaultConfig();
 		
 
-		addDrone(config, new Vector3f(0, 10, 0), new Vector3f(0,0,-35));
+		addDrone(config, new Vector3f(0, 10, 0), new Vector3f(-35,0,0), FloatMath.toRadians(90));
 		
 		this.planner = new Pilot(new int[] {Pilot.LANDING});
 		

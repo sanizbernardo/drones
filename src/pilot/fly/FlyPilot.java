@@ -31,7 +31,6 @@ public class FlyPilot extends PilotPart {
 	private float time = 0;
 	public Vector3f approxVel = new Vector3f(0f, 0f, 0f);
 	private float climbAngle;
-
 	private final ImageProcessing recog = new ImageProcessing();
 
 
@@ -62,6 +61,7 @@ public class FlyPilot extends PilotPart {
 		this.aoaManager = new AOAManager(this);
 
 		this.order = new State[] {State.Stable, State.Left};
+
 		setCurrentState(0);
 		
 		climbAngle = Constants.climbAngle;
@@ -70,14 +70,11 @@ public class FlyPilot extends PilotPart {
 
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
+		recog.addNewImage(inputs.getImage(), inputs.getPitch(),
+				inputs.getHeading(), inputs.getRoll(), new float[] {
+						inputs.getX(), inputs.getY(), inputs.getZ() });
 
-
-		//TODO: reenable
-//		recog = new ImageProcessing(inputs.getImage(), inputs.getPitch(),
-//				inputs.getHeading(), inputs.getRoll(), new float[] {
-//						inputs.getX(), inputs.getY(), inputs.getZ() });
 		Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
-
 		
 		float dt = inputs.getElapsedTime() - this.time;
 		this.time = inputs.getElapsedTime();
@@ -87,6 +84,7 @@ public class FlyPilot extends PilotPart {
 		
 		if (inputs.getElapsedTime() > 25)
 			this.setCurrentState(1);
+
 //		if (inputs.getElapsedTime() > 35)
 //			this.setCurrentState(2);
 //		if (inputs.getElapsedTime() > 45)
@@ -97,6 +95,7 @@ public class FlyPilot extends PilotPart {
 //			this.setCurrentState(5);
 //		if (inputs.getElapsedTime() > 75)
 //			this.setCurrentState(6);
+
 		
 		
 		if (inputs.getY() > 200 && ja == true) {
@@ -175,7 +174,7 @@ public class FlyPilot extends PilotPart {
 		// pitch op 0
 		pitchPID.adjustPitchDown(inputs, 0);
 		// val vertragen
-		thrustPID.adjustThrustDown(inputs, -1.5f);
+//		thrustPID.adjustThrustDown(inputs, -1.5f);
 	}
 	
 //	sterk stijgen > 4

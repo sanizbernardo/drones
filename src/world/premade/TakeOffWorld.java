@@ -21,11 +21,12 @@ public class TakeOffWorld extends World {
 	public void setup() {
 		this.config = Utils.createDefaultConfig();
 		
-		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0), FloatMath.toRadians(-180));
+		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0), FloatMath.toRadians(90));
 		
-		this.planner = new Pilot(new int[] {Pilot.TAKING_OFF});
+		this.planner = new Pilot(new int[] {Pilot.WAIT_PATH, Pilot.TAKING_OFF});
 		
-		this.worldObjects = new WorldObject[] {};
+		this.worldObjects = new WorldObject[] {new WorldObject(Cubes.getBlueCube().getMesh())};
+		this.worldObjects[0].setPosition(0, 10, -10);
 		
 		this.ground = new Ground(50);
 		this.tarmac = new Tarmac(new Vector3f(0,0,0), 50f, 300f, 0f);

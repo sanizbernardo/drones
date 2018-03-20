@@ -140,8 +140,8 @@ public class Utils {
 			public float getFrontWheelZ() {return -2.1f;}
 			public float getRearWheelZ() {return 1f;}
 			public float getRearWheelX() {return 1.39f;}
-			public float getTyreSlope() {return 25000f;}
-			public float getDampSlope() {return 500f;}
+			public float getTyreSlope() {return 50000f;}
+			public float getDampSlope() {return 5000f;}
 			public float getTyreRadius() {return 0.2f;}
 			public float getRMax() {return 2000;}
 			public float getFcMax() {return 0.7f;}
