@@ -23,7 +23,7 @@ public class LandingWorld extends World{
 		this.config = Utils.createDefaultConfig();
 		
 
-		addDrone(config, new Vector3f(0, 10, 0), new Vector3f(-35,0,0), FloatMath.toRadians(90));
+		addDrone(config, new Vector3f(0, 10, 0), new Vector3f(0,0,-65), 0);
 		
 		this.planner = new Pilot(new int[] {Pilot.LANDING});
 		

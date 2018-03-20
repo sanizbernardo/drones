@@ -118,10 +118,10 @@ public class Pilot implements Autopilot {
 	
 	private float getTakeoffDist(float height) {
 		if (height > 150)
-			return (height - 150f) / 0.1365f;
+			return 343.0420f + 3.0874f * height;
 
-		if (height > 20 )
-			return (-0.0766f + FloatMath.sqrt(0.0059f + 2.4069f*height)) / (2f*height);
+		if (height > 50 )
+			return 254.0966f + 3.5519f * height;
 		
 		return Float.NaN;
 	}
