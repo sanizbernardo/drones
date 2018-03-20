@@ -47,6 +47,18 @@ public class FlyPilot extends PilotPart {
 	private State[] order;
 	private int currentState;
 
+	private float z1 = 24446;
+
+	private boolean check = true;
+
+	private boolean check2 = true;
+
+	private boolean check3 = true;
+
+	private float rMax;
+
+	private boolean ja2 = true;
+
 	private enum State{Left, Right, Stable, Up, Down, StrongUp, StrongDown, SlowDown}
 	
 	@Override
@@ -57,10 +69,10 @@ public class FlyPilot extends PilotPart {
 		this.thrustPID = new ThrustPID(this);
 		this.yawPID = new YawPID(this);
 		this.rollPID = new RollPID(this);
-		
+		this.rMax = config.getRMax();
 		this.aoaManager = new AOAManager(this);
 
-		this.order = new State[] {State.Stable, State.Left};
+		this.order = new State[] {State.Stable, State.StrongDown, State.SlowDown};
 
 		setCurrentState(0);
 		
@@ -82,8 +94,13 @@ public class FlyPilot extends PilotPart {
 			this.approxVel = pos.sub(this.timePassedOldPos, new Vector3f()).mul(1/dt);
 		this.timePassedOldPos = pos;		
 		
-		if (inputs.getElapsedTime() > 25)
+		if (inputs.getElapsedTime() > 35 && check2) {
 			this.setCurrentState(1);
+			check2 = false;
+		}
+		
+		if (inputs.getY() < 10)
+			this.setCurrentState(2);
 
 //		if (inputs.getElapsedTime() > 35)
 //			this.setCurrentState(2);
@@ -95,13 +112,26 @@ public class FlyPilot extends PilotPart {
 //			this.setCurrentState(5);
 //		if (inputs.getElapsedTime() > 75)
 //			this.setCurrentState(6);
-
+//		
+//		if (this.getCurrentState() == 1 && check) {
+//			System.out.println("Z1" + inputs.getZ());
+//			z1 = inputs.getZ();
+//			System.out.println("Y1" + inputs.getY());
+//			check  = false;
+//
+//		}if (Math.abs(inputs.getZ() - z1 + 100) < 0.1 ) {
+//			System.out.println("Z2" + inputs.getZ());
+//			System.out.println("Y2" + inputs.getY());
+//		}
+			
 		
 		
-		if (inputs.getY() > 200 && ja == true) {
-			System.out.println(inputs.getElapsedTime());
+		if (inputs.getY() < 1.57 && ja == true) {
+//			System.out.println(inputs.getElapsedTime());
+			System.out.println("Z1: " + inputs.getZ());
 			ja = false;
 		}
+		
 		
 		//float desiredHeight = recog.guess();
 //		if(3 - inputs.getY() > 4) {
@@ -122,7 +152,7 @@ public class FlyPilot extends PilotPart {
 
 		AutopilotOutputs output = Utils.buildOutputs(leftWingInclination,
 				rightWingInclination, verStabInclination, horStabInclination,
-				getNewThrust(), 0, 0, 0);
+				getNewThrust(), rMax, rMax, rMax);
 
 		return output;
 	}
@@ -215,7 +245,8 @@ public class FlyPilot extends PilotPart {
 				break;
 			case SlowDown:
 				slowDown(input);
-				aoaManager.setInclNoAOA(input);
+				setLeftWingInclination(FloatMath.toRadians(2));
+				setRightWingInclination(FloatMath.toRadians(2));
 				break;
 			default:
 				break;
