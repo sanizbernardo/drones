@@ -26,7 +26,7 @@ public class Trail {
     private void makeTrail(Vector3f pos) {
         WorldObject cube = new WorldObject(Cubes.getYellowCube().getMesh());
         cube.setPosition(pos);
-        cube.setScale(0.1f);
+        cube.setScale(0.3f);
         cube.setRotation(45, 45, 0);
         pathObjects.add(cube);
         last = pos;

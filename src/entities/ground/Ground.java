@@ -1,6 +1,8 @@
 package entities.ground;
 
+import java.util.ArrayList;
 import java.util.List;
+
 import entities.WorldObject;
 import utils.Constants;
 
@@ -18,6 +20,10 @@ public class Ground {
 
 	public List<WorldObject> getTiles() {
 		return tm.getTileList();
+	}
+	
+	public List<WorldObject> getCombined() {
+		return tm.getCombinedList();
 	}
 
 }

@@ -54,7 +54,7 @@ public class Constants {
     public static final float FOV = (float) Math.toRadians(90f);
     public static final float Z_NEAR = 0.7f;
     public static final float Z_FAR = 10000.f;
-    public static final float DRONE_THICKNESS = 0.1f;  //in meters
+    public static final float DRONE_THICKNESS = 0.25f;  //in meters
     public static final float DRONE_WHEEL_THICKNESS = 0.08f;
     public static final int DRONE_LEFT_WING = 0;
     public static final int DRONE_RIGHT_WING = 1;
