@@ -30,7 +30,7 @@ public class Pilot implements Autopilot {
 	public Pilot(int[] tasks) {
 		this.pilots = new PilotPart[4];
 		
-		this.pilots[TAKING_OFF] = new TakeOffPilot(800);
+		this.pilots[TAKING_OFF] = new TakeOffPilot(100);
 		this.pilots[LANDING] = new LandingPilot();
 		this.pilots[FLYING] = new FlyPilot();
 		this.pilots[TAXIING] = new TaxiPilot();
