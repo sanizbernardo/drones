@@ -1,6 +1,10 @@
 package pilot;
 
 import pilot.fly.FlyPilot;
+
+import java.util.ArrayList;
+
+import PathFinding.IPath;
 import gui.AutopilotGUI;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
@@ -31,13 +35,14 @@ public class Pilot implements Autopilot {
 		this.pilots = new PilotPart[4];
 		
 		this.pilots[TAKING_OFF] = new TakeOffPilot(100);
-		this.pilots[LANDING] = new LandingPilot();
 		this.pilots[FLYING] = new FlyPilot();
+		this.pilots[LANDING] = new LandingPilot();
 		this.pilots[TAXIING] = new TaxiPilot();
 		this.tasks = tasks;
 		this.index = 0;
 	}
 	
+	ArrayList<float[]> points;
 	
 	@Override
 	public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
@@ -69,7 +74,11 @@ public class Pilot implements Autopilot {
 					System.out.println(path.getX()[i] + " " + path.getY()[i] + " " + path.getZ()[i]);
 				}
 				
-				//calculate path...
+				float[] start = new float[] {inputs.getX(), inputs.getY(), inputs.getZ()};
+				IPath padplanner = new IPath(path, 0.1053f, 0.1095f, 1145.8f, start, inputs.getHeading());
+				points = padplanner.getPathArray();
+				
+				//TODO change states based on pad
 				
 				this.index += 1;
 			}
@@ -116,7 +125,7 @@ public class Pilot implements Autopilot {
 	}
 	
 	
-	private float getTakeoffDist(float height) {
+	public static float getTakeoffDist(float height) {
 		if (height > 150)
 			return 343.0420f + 3.0874f * height;
 

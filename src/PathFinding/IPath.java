@@ -3,6 +3,7 @@ package PathFinding;
 import java.util.ArrayList;
 
 import interfaces.Path;
+import pilot.Pilot;
 
 /**
  *
@@ -14,11 +15,18 @@ import interfaces.Path;
  */
 public class IPath implements Path{
 
-	public IPath(ArrayList<float[]> cubeLocations, float maxInclination, float maxDeclination, float turningRadius, float[] startLoc, float heading){
-		this.cubeLocations = cubeLocations;
-		this.maxInclination = maxInclination;
-		this.maxDeclination = maxDeclination;
-		this.turningRadius = turningRadius;
+	public IPath(Path path, float d, float e, float f, float[] startLoc, float heading){
+		this.cubeLocations = new ArrayList<float[]>();
+		float[] x = path.getX();
+		float[] y = path.getY();
+		float[] z = path.getZ();
+		for(int i = 0; i < x.length; i++){
+			float[] newLoc = new float[] {x[i], y[i], z[i]};
+			this.cubeLocations.add(newLoc);
+		}
+		this.maxInclination = d;
+		this.maxDeclination = e;
+		this.turningRadius = f;
 		this.heading = heading;
 		this.location = startLoc;
 		setPath();
@@ -53,7 +61,8 @@ public class IPath implements Path{
 	 * Add a liftOffPoint to the path
 	 */
 	private void addLiftOffPoint() {
-		float[] liftOffPoint = {0, 30, -100};
+		float dist = Pilot.getTakeoffDist(100);//TODO met eerste kubus
+		float[] liftOffPoint = {0, 100, -dist};//TODO met heading 
 		addLocation(liftOffPoint[0], liftOffPoint[1], liftOffPoint[2]);
 		this.location = liftOffPoint;
 	}
