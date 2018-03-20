@@ -48,7 +48,7 @@ public class FlyPilot extends PilotPart {
 	private State[] order;
 	private int currentState;
 
-	private enum State{Left, Right, Stable, Up, Down, StrongUp, StrongDown}
+	private enum State{Left, Right, Stable, Up, Down, StrongUp, StrongDown, SlowDown}
 	
 	@Override
 	public void initialize(AutopilotConfig config) {
@@ -61,7 +61,7 @@ public class FlyPilot extends PilotPart {
 		
 		this.aoaManager = new AOAManager(this);
 
-		this.order = new State[] {State.Stable, State.Left, State.Stable, State.StrongUp, State.Stable, State.StrongDown, State.Stable};
+		this.order = new State[] {State.Stable, State.Left};
 		setCurrentState(0);
 		
 		climbAngle = Constants.climbAngle;
@@ -87,16 +87,16 @@ public class FlyPilot extends PilotPart {
 		
 		if (inputs.getElapsedTime() > 25)
 			this.setCurrentState(1);
-		if (inputs.getElapsedTime() > 35)
-			this.setCurrentState(2);
-		if (inputs.getElapsedTime() > 45)
-			this.setCurrentState(3);
-		if (inputs.getElapsedTime() > 55)
-			this.setCurrentState(4);
-		if (inputs.getElapsedTime() > 65)
-			this.setCurrentState(5);
-		if (inputs.getElapsedTime() > 75)
-			this.setCurrentState(6);
+//		if (inputs.getElapsedTime() > 35)
+//			this.setCurrentState(2);
+//		if (inputs.getElapsedTime() > 45)
+//			this.setCurrentState(3);
+//		if (inputs.getElapsedTime() > 55)
+//			this.setCurrentState(4);
+//		if (inputs.getElapsedTime() > 65)
+//			this.setCurrentState(5);
+//		if (inputs.getElapsedTime() > 75)
+//			this.setCurrentState(6);
 		
 		
 		if (inputs.getY() > 200 && ja == true) {
@@ -214,13 +214,24 @@ public class FlyPilot extends PilotPart {
 			case Right:
 				turnRight(input);
 				break;
+			case SlowDown:
+				slowDown(input);
+				aoaManager.setInclNoAOA(input);
+				break;
 			default:
 				break;
 		}
 	}
 	
+	private void slowDown(AutopilotInputs input) {
+		rollPID.adjustRoll(input, FloatMath.toRadians(0));	
+		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
+		setNewThrust(0);
+	}
+
+
 	private void turnRight(AutopilotInputs input) {
-		rollPID.adjustRoll(input, FloatMath.toRadians(-40));
+		rollPID.adjustRoll(input, FloatMath.toRadians(-20));
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
