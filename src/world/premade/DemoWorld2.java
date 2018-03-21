@@ -1,5 +1,7 @@
 package world.premade;
 
+import java.util.Arrays;
+
 import org.joml.Vector3f;
 
 import entities.WorldObject;
@@ -38,6 +40,8 @@ public class DemoWorld2 extends World {
 		this.worldObjects[2].setPosition(new Vector3f(700, 800, 900));
 		this.worldObjects[3].setPosition(new Vector3f(000, 100, 200));
 		this.worldObjects[4].setPosition(new Vector3f(300, 400, 500));
+		
+		Arrays.asList(worldObjects).stream().forEach(c -> c.setScale(5));
 		
 		this.ground = new Ground(50);
 		this.tarmac = new Tarmac(new Vector3f(0,0,10), 30f, 300f, 0f);

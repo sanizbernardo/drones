@@ -63,8 +63,8 @@ public class IPath implements Path{
 	 * Add a liftOffPoint to the path
 	 */
 	private void addLiftOffPoint() {
-		float dist = Pilot.getTakeoffDist(100); //TODO met eerste kubus
-		float[] liftOffPoint = {0, 100, -dist}; //TODO met heading 
+		float dist = Pilot.getTakeoffDist(108); //TODO met eerste kubus
+		float[] liftOffPoint = {0, 108, -dist}; //TODO met heading 
 		addLocation(liftOffPoint[0], liftOffPoint[1], liftOffPoint[2]);
 		this.location = liftOffPoint;
 	}

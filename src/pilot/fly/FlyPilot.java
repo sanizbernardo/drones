@@ -85,7 +85,7 @@ public class FlyPilot extends PilotPart {
 		this.timePassedOldPos = pos;
 		
 		
-		if (pos.distance(this.positions[getCurrentState()]) < 1) {
+		if (pos.distance(this.positions[getCurrentState() + 1]) < 10) {
 			setCurrentState(getCurrentState() + 1);
 			
 			if (getCurrentState() == order.length) {

@@ -3,6 +3,7 @@ package pilot;
 import pilot.fly.FlyPilot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.joml.Vector3f;
 
@@ -34,6 +35,8 @@ public class Pilot implements Autopilot {
 	
 	private Path path;
 	
+	private AutopilotConfig config;
+	
 	public Pilot(int[] tasks) {
 		this.pilots = new PilotPart[4];
 		
@@ -52,6 +55,7 @@ public class Pilot implements Autopilot {
 		this.gui = new AutopilotGUI(config);
 		this.gui.showGUI();
 		this.path = null;
+		this.config = config;
 		
 		for (PilotPart pilot: this.pilots) {
 			pilot.initialize(config);
@@ -78,7 +82,13 @@ public class Pilot implements Autopilot {
 				IPath pathPlanner = new IPath(path, 0.1053f, 0.1095f, 1145.8f, start, inputs.getHeading());
 				
 				this.pilots[FLYING] = new FlyPilot(pathPlanner.getFlyStates(), pathPlanner.getPositions());
-				
+
+				for (int i = 0; i < pathPlanner.getFlyStates().length; i++) {
+					System.out.println(pathPlanner.getFlyStates()[i].name());
+					System.out.println(pathPlanner.getPositions()[i+1]);
+				}
+
+				this.pilots[FLYING].initialize(this.config);
 				this.index += 1;
 			}
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
