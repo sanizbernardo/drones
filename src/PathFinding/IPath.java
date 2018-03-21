@@ -2,8 +2,11 @@ package PathFinding;
 
 import java.util.ArrayList;
 
+import org.joml.Vector3f;
+
 import interfaces.Path;
 import pilot.Pilot;
+import pilot.fly.State;
 
 /**
  *
@@ -41,7 +44,7 @@ public class IPath implements Path{
 	private ArrayList<Float> x = new ArrayList<Float>();
 	private ArrayList<Float> y = new ArrayList<Float>();
 	private ArrayList<Float> z = new ArrayList<Float>();
-	private ArrayList<Float> s = new ArrayList<Float>();
+	private ArrayList<State> s = new ArrayList<State>();
 	
 	/**
 	 * Generate the path.
@@ -54,15 +57,14 @@ public class IPath implements Path{
 			addToPath(closestCube);
 			cubesInPath.add(closestCube);
 		}
-		s.add(-1f);
 	}
 	
 	/**
 	 * Add a liftOffPoint to the path
 	 */
 	private void addLiftOffPoint() {
-		float dist = Pilot.getTakeoffDist(100);//TODO met eerste kubus
-		float[] liftOffPoint = {0, 100, -dist};//TODO met heading 
+		float dist = Pilot.getTakeoffDist(100); //TODO met eerste kubus
+		float[] liftOffPoint = {0, 100, -dist}; //TODO met heading 
 		addLocation(liftOffPoint[0], liftOffPoint[1], liftOffPoint[2]);
 		this.location = liftOffPoint;
 	}
@@ -93,7 +95,7 @@ public class IPath implements Path{
 			float newZ = this.location[2] - 1.5f*(float)Math.cos(heading) * (this.location[1] - closestCube[1])/this.maxDeclination;
 			addLocation(newX, newY, newZ);
 			this.location = new float[] {newX, newY, newZ};
-			s.add(3f);
+			s.add(State.StrongDown);
 		}
 		//Cube on higher y-level
 		else if(closestCube[1] > this.location[1]){
@@ -102,7 +104,7 @@ public class IPath implements Path{
 			float newZ = this.location[2] - 1.5f*(float)Math.cos(heading) * (closestCube[1] - this.location[1])/this.maxInclination;
 			addLocation(newX, newY, newZ);
 			this.location = new float[] {newX, newY, newZ};
-			s.add(4f);
+			s.add(State.StrongUp);
 		}
 		
 		float corner = 0;
@@ -112,7 +114,7 @@ public class IPath implements Path{
 			float newY = closestCube[1];
 			float newZ = this.location[2] - 2*turningRadius*(float)Math.cos(heading);
 			addLocation(newX, newY, newZ);
-			s.add(0f);
+			s.add(State.Stable);
 			this.location = new float[] {newX, newY, newZ};			
 		}
 		
@@ -155,7 +157,7 @@ public class IPath implements Path{
 				float newY = this.location[1];
 				float newZ = this.location[2] - (float)Math.cos(heading)*fwd + (float)Math.sin(heading)*rightd;
 				addLocation(newX, newY, newZ);
-				s.add(2f);
+				s.add(State.Right);
 				this.heading += cornerPiece;
 				this.location = new float[] {newX, newY, newZ};
 			}
@@ -169,7 +171,7 @@ public class IPath implements Path{
 				float newY = this.location[1];
 				float newZ = this.location[2] - (float)Math.cos(heading)*fwd - (float)Math.sin(heading)*leftd;
 				addLocation(newX, newY, newZ);
-				s.add(1f);
+				s.add(State.Left);
 				this.heading -= cornerPiece;
 				this.location = new float[] {newX, newY, newZ};
 			}
@@ -177,7 +179,7 @@ public class IPath implements Path{
 		
 		//done turning -> got to cube
 		addLocation(closestCube[0], closestCube[1], closestCube[2]);
-		s.add(0f);
+		s.add(State.Stable);
 		this.location = new float[] {closestCube[0], closestCube[1], closestCube[2]};
 	}
 		
@@ -260,18 +262,32 @@ public class IPath implements Path{
 		return z;
 	}
 	
-	/**
-	 * Returntype: ArrayList of float[] = [x, y, z, state]
-	 */
-	public ArrayList<float[]> getPathArray(){
-		ArrayList<float[]> path = new ArrayList<>();
-		for (int i=0; i<this.x.size();i++) {
-			float[] point = new float[4];
-			point[0] = this.x.get(i);point[1] = this.y.get(i);point[2] = this.z.get(i);
-			point[3] = this.s.get(i);
-			path.add(point);
-		}
-		return path;
+//	/**
+//	 * Returntype: ArrayList of float[] = [x, y, z, state]
+//	 */
+//	public ArrayList<float[]> getPathArray(){
+//		ArrayList<float[]> path = new ArrayList<>();
+//		for (int i=0; i<this.x.size();i++) {
+//			float[] point = new float[4];
+//			point[0] = this.x.get(i);point[1] = this.y.get(i);point[2] = this.z.get(i);
+//			point[3] = this.s.get(i);
+//			path.add(point);
+//		}
+//		return path;
+//	}
+	
+	
+	public State[] getFlyStates() {
+		return this.s.toArray(new State[0]);
 	}
-
+	
+	public Vector3f[] getPositions() {
+		Vector3f[] pos = new Vector3f[this.x.size()];
+		
+		for (int i = 0; i < this.x.size(); i++) {
+			pos[i] = new Vector3f(this.x.get(i), this.y.get(i), this.z.get(i));
+		}
+		
+		return pos;
+	}
 }

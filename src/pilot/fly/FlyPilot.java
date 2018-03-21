@@ -42,24 +42,16 @@ public class FlyPilot extends PilotPart {
 	private YawPID yawPID;
 	private RollPID rollPID;
 	private AOAManager aoaManager;
-	private boolean ja = true;
 	private float i = 1;
 	private State[] order;
+	private Vector3f[] positions;
 	private int currentState;
-
-	private float z1 = 24446;
-
-	private boolean check = true;
-
-	private boolean check2 = true;
-
-	private boolean check3 = true;
-
 	private float rMax;
 
-	private boolean ja2 = true;
-
-	private enum State{Left, Right, Stable, Up, Down, StrongUp, StrongDown, SlowDown}
+	public FlyPilot(State[] order, Vector3f[] positions) {
+		this.order = order;
+		this.positions = positions;
+	}
 	
 	@Override
 	public void initialize(AutopilotConfig config) {
@@ -71,9 +63,7 @@ public class FlyPilot extends PilotPart {
 		this.rollPID = new RollPID(this);
 		this.rMax = config.getRMax();
 		this.aoaManager = new AOAManager(this);
-
-		this.order = new State[] {State.Stable, State.StrongDown, State.SlowDown};
-
+		
 		setCurrentState(0);
 		
 		climbAngle = Constants.climbAngle;
@@ -92,61 +82,19 @@ public class FlyPilot extends PilotPart {
 		this.time = inputs.getElapsedTime();
 		if (dt != 0)
 			this.approxVel = pos.sub(this.timePassedOldPos, new Vector3f()).mul(1/dt);
-		this.timePassedOldPos = pos;		
+		this.timePassedOldPos = pos;
 		
-		if (inputs.getElapsedTime() > 35 && check2) {
-			this.setCurrentState(1);
-			check2 = false;
-		}
 		
-		if (inputs.getY() < 10)
-			this.setCurrentState(2);
-
-//		if (inputs.getElapsedTime() > 35)
-//			this.setCurrentState(2);
-//		if (inputs.getElapsedTime() > 45)
-//			this.setCurrentState(3);
-//		if (inputs.getElapsedTime() > 55)
-//			this.setCurrentState(4);
-//		if (inputs.getElapsedTime() > 65)
-//			this.setCurrentState(5);
-//		if (inputs.getElapsedTime() > 75)
-//			this.setCurrentState(6);
-//		
-//		if (this.getCurrentState() == 1 && check) {
-//			System.out.println("Z1" + inputs.getZ());
-//			z1 = inputs.getZ();
-//			System.out.println("Y1" + inputs.getY());
-//			check  = false;
-//
-//		}if (Math.abs(inputs.getZ() - z1 + 100) < 0.1 ) {
-//			System.out.println("Z2" + inputs.getZ());
-//			System.out.println("Y2" + inputs.getY());
-//		}
+		if (pos.distance(this.positions[getCurrentState()]) < 1) {
+			setCurrentState(getCurrentState() + 1);
 			
-		
-		
-		if (inputs.getY() < 1.57 && ja == true) {
-//			System.out.println(inputs.getElapsedTime());
-			System.out.println("Z1: " + inputs.getZ());
-			ja = false;
+			if (getCurrentState() == order.length) {
+				ended = true;
+				return Utils.buildOutputs(leftWingInclination,
+						rightWingInclination, verStabInclination, horStabInclination,
+						getNewThrust(), rMax, rMax, rMax);
+			}
 		}
-		
-		
-		//float desiredHeight = recog.guess();
-//		if(3 - inputs.getY() > 4) {
-//			
-//		}
-//		else if(3 - inputs.getY() > 1) {
-//			
-//		}
-//		else if(3 - inputs.getY() < -4) {
-//			setCurrentState(0);
-//		}else if(3 - inputs.getY() < -1) {
-//			setCurrentState(1);
-//		}else {
-//			setCurrentState(2);
-//		}
 		
 		control(inputs, order[getCurrentState()]);
 

@@ -4,6 +4,8 @@ import pilot.fly.FlyPilot;
 
 import java.util.ArrayList;
 
+import org.joml.Vector3f;
+
 import PathFinding.IPath;
 import gui.AutopilotGUI;
 import interfaces.Autopilot;
@@ -13,6 +15,7 @@ import interfaces.AutopilotOutputs;
 import interfaces.Path;
 import utils.FloatMath;
 import utils.Utils;
+import pilot.fly.State;
 
 public class Pilot implements Autopilot {
 	
@@ -35,7 +38,7 @@ public class Pilot implements Autopilot {
 		this.pilots = new PilotPart[4];
 		
 		this.pilots[TAKING_OFF] = new TakeOffPilot(100);
-		this.pilots[FLYING] = new FlyPilot();
+		this.pilots[FLYING] = new FlyPilot(new State[0], new Vector3f[0]);
 		this.pilots[LANDING] = new LandingPilot();
 		this.pilots[TAXIING] = new TaxiPilot();
 		this.tasks = tasks;
@@ -70,15 +73,11 @@ public class Pilot implements Autopilot {
 
 		if (state() == WAIT_PATH) {
 			if (this.path != null) {
-				for (int i = 0; i < path.getX().length; i++) {
-					System.out.println(path.getX()[i] + " " + path.getY()[i] + " " + path.getZ()[i]);
-				}
 				
 				float[] start = new float[] {inputs.getX(), inputs.getY(), inputs.getZ()};
-				IPath padplanner = new IPath(path, 0.1053f, 0.1095f, 1145.8f, start, inputs.getHeading());
-				points = padplanner.getPathArray();
+				IPath pathPlanner = new IPath(path, 0.1053f, 0.1095f, 1145.8f, start, inputs.getHeading());
 				
-				//TODO change states based on pad
+				this.pilots[FLYING] = new FlyPilot(pathPlanner.getFlyStates(), pathPlanner.getPositions());
 				
 				this.index += 1;
 			}
