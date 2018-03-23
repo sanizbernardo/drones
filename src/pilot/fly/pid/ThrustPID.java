@@ -12,11 +12,11 @@ public class ThrustPID {
 
 	public ThrustPID(FlyPilot pilot) {
 		thrustUpPID = new MiniPID(8, 0, 3);
-		thrustUpPID.setOutputLimits(2, pilot.getConfig().getMaxThrust()/200);
+		thrustUpPID.setOutputLimits(2, pilot.getMaxThrust()/200);
 		thrustDownPID = new MiniPID(1, 0, 0);
-		thrustDownPID.setOutputLimits(0, pilot.getConfig().getMaxThrust()/200);
+		thrustDownPID.setOutputLimits(0, pilot.getMaxThrust()/200);
 		thrustTurnPID = new MiniPID(4, 0, 0);
-		thrustTurnPID.setOutputLimits(0.5, pilot.getConfig().getMaxThrust()/200);
+		thrustTurnPID.setOutputLimits(0.5, pilot.getMaxThrust()/200);
 		
 		this.pilot = pilot;
 	}

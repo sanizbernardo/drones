@@ -228,9 +228,9 @@ public class Physics {
 		this.hsIncl = data.getHorStabInclination();
 		this.vsIncl = data.getVerStabInclination();
 		
-		if (thrust > maxThrust)
-			throw new PhysicsException("Illegal thrust force");
 		this.thrust = data.getThrust();
+		if (thrust > maxThrust || thrust < 0)
+			throw new PhysicsException("Illegal thrust force: " + thrust);
 		
 		this.brakeForce[0] = data.getLeftBrakeForce();
 		this.brakeForce[1] = data.getFrontBrakeForce();

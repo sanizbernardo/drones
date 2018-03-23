@@ -29,17 +29,13 @@ public class DemoWorld2 extends World {
 		
 		this.worldObjects = new WorldObject[] {new WorldObject(Cubes.getBlueCube().getMesh()),
 											   new WorldObject(Cubes.getGreenCube().getMesh()),
-											   new WorldObject(Cubes.getYellowCube().getMesh()),
-											   new WorldObject(Cubes.getRedCube().getMesh()),
-											   new WorldObject(Cubes.getCyanCube().getMesh())};
+											   new WorldObject(Cubes.getYellowCube().getMesh())};
 		
 		// TODO: realistische posities
 		
-		this.worldObjects[0].setPosition(new Vector3f(100, 200, 300));
-		this.worldObjects[1].setPosition(new Vector3f(400, 500, 600));
+		this.worldObjects[0].setPosition(new Vector3f(-200, 150, -1200));
+		this.worldObjects[1].setPosition(new Vector3f(-800, 200, 0));
 		this.worldObjects[2].setPosition(new Vector3f(700, 800, 900));
-		this.worldObjects[3].setPosition(new Vector3f(000, 100, 200));
-		this.worldObjects[4].setPosition(new Vector3f(300, 400, 500));
 		
 		Arrays.asList(worldObjects).stream().forEach(c -> c.setScale(5));
 		

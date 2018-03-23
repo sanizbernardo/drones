@@ -3,20 +3,15 @@ package pilot;
 import pilot.fly.FlyPilot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.joml.Vector3f;
 
-import PathFinding.IPath;
 import gui.AutopilotGUI;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
 import interfaces.Path;
-import utils.FloatMath;
 import utils.Utils;
-import pilot.fly.State;
 
 public class Pilot implements Autopilot {
 	
@@ -41,7 +36,7 @@ public class Pilot implements Autopilot {
 		this.pilots = new PilotPart[4];
 		
 		this.pilots[TAKING_OFF] = new TakeOffPilot(100);
-		this.pilots[FLYING] = new FlyPilot(new State[0], new Vector3f[0]);
+		this.pilots[FLYING] = new FlyPilot(null);
 		this.pilots[LANDING] = new LandingPilot();
 		this.pilots[TAXIING] = new TaxiPilot();
 		this.tasks = tasks;
@@ -78,17 +73,14 @@ public class Pilot implements Autopilot {
 		if (state() == WAIT_PATH) {
 			if (this.path != null) {
 				
-				float[] start = new float[] {inputs.getX(), inputs.getY(), inputs.getZ()};
-				IPath pathPlanner = new IPath(path, 0.1053f, 0.1095f, 1145.8f, start, inputs.getHeading());
+				Vector3f[] cubes = pathToCubes(this.path);
 				
-				this.pilots[FLYING] = new FlyPilot(pathPlanner.getFlyStates(), pathPlanner.getPositions());
-
-				for (int i = 0; i < pathPlanner.getFlyStates().length; i++) {
-					System.out.println(pathPlanner.getFlyStates()[i].name());
-					System.out.println(pathPlanner.getPositions()[i+1]);
-				}
-
+				this.pilots[TAKING_OFF] = new TakeOffPilot(cubes[0].y-10);
+				this.pilots[FLYING] = new FlyPilot(cubes);
+				
+				this.pilots[TAKING_OFF].initialize(this.config);
 				this.pilots[FLYING].initialize(this.config);
+				
 				this.index += 1;
 			}
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
@@ -108,6 +100,7 @@ public class Pilot implements Autopilot {
 		this.gui.updateOutputs(output);
 		return output;
 	}
+
 
 	@Override
 	public void simulationEnded() {
@@ -131,6 +124,17 @@ public class Pilot implements Autopilot {
 	
 	private PilotPart currentPilot() {
 		return this.pilots[state()];
+	}
+	
+	
+	private Vector3f[] pathToCubes(Path path) {
+		Vector3f[] cubes = new Vector3f[path.getX().length];
+		
+		for (int i = 0; i < path.getX().length; i++) {
+			cubes[i] = new Vector3f(path.getX()[i], path.getY()[i], path.getZ()[i]);
+		}
+		
+		return cubes;
 	}
 	
 	

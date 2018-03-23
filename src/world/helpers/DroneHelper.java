@@ -6,9 +6,6 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import meshes.drone.LeftWing;
-
-import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
 import entities.WorldObject;
