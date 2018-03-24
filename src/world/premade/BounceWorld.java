@@ -5,6 +5,7 @@ import org.joml.Vector3f;
 import pilot.Pilot;
 import entities.WorldObject;
 import entities.ground.Ground;
+import utils.Cubes;
 import utils.FloatMath;
 import utils.PhysicsException;
 import utils.Utils;
@@ -20,11 +21,13 @@ public class BounceWorld extends World {
 	public void setup() {
 		this.config = Utils.createDefaultConfig();
 		
-		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,-1.8f,0));
+		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0));
 		
 		this.planner = new Pilot(new int[] {});
 		
-		this.worldObjects = new WorldObject[0];
+		this.worldObjects = new WorldObject[] {new WorldObject(Cubes.getBlueCube().getMesh())};
+		this.worldObjects[0].setPosition(0, 0, -120);
+		this.worldObjects[0].setScale(5f);
 		
 		this.ground = new Ground(10);
 		

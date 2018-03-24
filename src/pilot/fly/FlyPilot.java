@@ -23,6 +23,8 @@ public class FlyPilot extends PilotPart {
 
 	private int cubeNb;
 	private Vector3f[] cubes;
+	
+	public static enum State{Left, Right, Stable, Up, Down, StrongUp, StrongDown, SlowDown};
 	private State currentState;
 	
 	private float climbAngle;
@@ -59,7 +61,7 @@ public class FlyPilot extends PilotPart {
 		this.climbAngle = Constants.climbAngle;
 		this.rMax = config.getRMax();
 		this.maxThrust = config.getMaxThrust();
-		this.turnRadius = 1145f;
+		this.turnRadius = 1145f/2f;
 		
 		this.pitchPID = new PitchPID(this);
 		this.thrustPID = new ThrustPID(this);
@@ -75,11 +77,7 @@ public class FlyPilot extends PilotPart {
 
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
-//		Alleen indien nodig.	
-//		recog.addNewImage(inputs.getImage(), inputs.getPitch(),
-//				inputs.getHeading(), inputs.getRoll(), new float[] {
-//						inputs.getX(), inputs.getY(), inputs.getZ() });
-
+		
 		Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
 		
 		float dt = inputs.getElapsedTime() - this.time;
@@ -90,6 +88,7 @@ public class FlyPilot extends PilotPart {
 		
 		// cube geraakt? zo ja, volgende selecteren
 		if (getCurrentCube().distance(pos) < 5) {
+			System.out.println("cube hit");
 			this.cubeNb ++;
 
 			// alle cubes geraakt?
@@ -100,6 +99,21 @@ public class FlyPilot extends PilotPart {
 						getNewThrust(), rMax, rMax, rMax); 
 			}
 		}
+		
+		// update pos met imagerecog
+		if (getCurrentCube().distance(pos) < 100) {
+			recog.addNewImage(inputs.getImage(), inputs.getPitch(),
+					inputs.getHeading(), inputs.getRoll(), new float[] {
+							inputs.getX(), inputs.getY(), inputs.getZ() });
+			
+			float[] cubePos = recog.generateLocations().get(0).getLocation();
+			Vector3f cubePosition = new Vector3f(cubePos[0], cubePos[1], cubePos[2]);
+			System.out.println("old: " + getCurrentCube());
+			getCurrentCube().add(cubePosition).mul(0.5f);
+			System.out.println("new: " + getCurrentCube());
+		}
+		
+		
 		
 		// moeten we omhoog?
 		if ((getCurrentCube().y - pos.y) > 3)
@@ -113,10 +127,10 @@ public class FlyPilot extends PilotPart {
 			Vector3f diff = getCurrentCube().sub(pos, new Vector3f());
 			float targetHeading = FloatMath.atan2(-diff.z, -diff.x);
 			Boolean side = null; // null: nee, true: links, false: rechts
-			
-			if (targetHeading - inputs.getHeading() > FloatMath.toRadians(5))
+			System.out.println("heading: " + inputs.getHeading() + ", target: " + targetHeading);
+			if (targetHeading - inputs.getHeading() > FloatMath.toRadians(3))
 				side = true;
-			else if (targetHeading - inputs.getHeading() < - FloatMath.toRadians(5))
+			else if (targetHeading - inputs.getHeading() < - FloatMath.toRadians(3))
 				side = false;
 			
 			// bocht haalbaar?
@@ -346,5 +360,5 @@ public class FlyPilot extends PilotPart {
 	public String taskName() {
 		return "Fly: " + (this.currentState == null? "" :this.currentState.name());
 	}
-
+	
 }

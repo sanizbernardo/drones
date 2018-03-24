@@ -6,7 +6,7 @@ import org.joml.Vector3f;
 
 import interfaces.Path;
 import pilot.Pilot;
-import pilot.fly.State;
+import pilot.fly.FlyPilot.State;
 
 /**
  *
