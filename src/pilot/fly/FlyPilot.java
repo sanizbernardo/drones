@@ -90,7 +90,7 @@ public class FlyPilot extends PilotPart {
 		this.timePassedOldPos = pos;
 		
 		// cube geraakt? zo ja, volgende selecteren
-		System.out.println(getCurrentCube().distance(pos));
+//		System.out.println(getCurrentCube().distance(pos));
 		if (getCurrentCube().distance(pos) < 5) {
 			System.out.println("Cube hit" + pos);
 			this.cubeNb ++;
@@ -103,29 +103,41 @@ public class FlyPilot extends PilotPart {
 						getNewThrust(), rMax, rMax, rMax); 
 			}
 		}
-		
+		System.out.println(getCurrentCube());
 		// update pos met imagerecog
-		if (getCurrentCube().distance(pos) < 100) {
-			recog.addNewImage(inputs.getImage(), inputs.getPitch(),
-					inputs.getHeading(), inputs.getRoll(), new float[] {
-							inputs.getX(), inputs.getY(), inputs.getZ() });
-			
-			ArrayList<Cube> locs = recog.generateLocations();
-			if (locs.size() > 0) {
-				float[] cubePos = locs.get(0).getLocation();
-				Vector3f cubePosition = new Vector3f(cubePos[0], cubePos[1], cubePos[2]);
-				getCurrentCube().add(cubePosition).mul(0.5f);
-			}
-		}
+//		if (getCurrentCube().distance(pos) < 100) {
+//			recog.addNewImage(inputs.getImage(), inputs.getPitch(),
+//					inputs.getHeading(), inputs.getRoll(), new float[] {
+//							inputs.getX(), inputs.getY(), inputs.getZ() });
+//			
+//			ArrayList<Cube> locs = recog.generateLocations();
+//			if (locs.size() > 0) {
+//				float[] cubePos = locs.get(0).getLocation();
+//				Vector3f cubePosition = new Vector3f(cubePos[0], cubePos[1], cubePos[2]);
+//				getCurrentCube().add(cubePosition).mul(0.5f);
+//			}
+//		}
 		
 		
 		
 		// moeten we omhoog?
-		if ((getCurrentCube().y - pos.y) > 3)
-			setCurrentState(State.StrongUp);
+		if ((getCurrentCube().y - pos.y) > 3) {
+			if (inputs.getRoll() > FloatMath.toRadians(5))
+				setCurrentState(State.Stable);
+			else
+				setCurrentState(State.StrongUp);
+		}
 		// moeten we omlaag?
-		else if (pos.y - getCurrentCube().y > 3)
-			setCurrentState(State.StrongDown);
+		else if (pos.y - getCurrentCube().y > 3) {
+			if (inputs.getRoll() > FloatMath.toRadians(5))
+				setCurrentState(State.Stable);
+			else
+				setCurrentState(State.StrongDown);
+		}
+		// iets meer stijgen
+		else if (getCurrentState() == State.StrongUp && (getCurrentCube().y - pos.y) > 1) {
+			
+		}
 		else {
 			
 			// draaien nodig?
@@ -143,9 +155,9 @@ public class FlyPilot extends PilotPart {
 			if (side != null) {
 				if (turnable(pos, inputs.getHeading(), getCurrentCube(), this.turnRadius)) {
 					setCurrentState(side? State.Left: State.Right);
-				} //else
-//					// bocht niet haalbaar, rechtdoor gaan. 
-//					setCurrentState(State.Stable);
+				} else
+				// bocht niet haalbaar, rechtdoor gaan. 
+				setCurrentState(State.Stable);
 			} else {
 				setCurrentState(State.Stable);
 			}
@@ -163,6 +175,11 @@ public class FlyPilot extends PilotPart {
 		this.currentState = state;
 	}
 	
+	public State getCurrentState() {
+		return currentState;
+	}
+
+
 	private Vector3f getCurrentCube() {
 		return this.cubes[this.cubeNb];
 	}
@@ -172,25 +189,25 @@ public class FlyPilot extends PilotPart {
 		switch(state){
 			case StrongUp:
 				climbPID(input);
-				aoaManager.setInclNoAOA(input);
+//				aoaManager.setInclNoAOA(input);
 				break;
 			case Up:
 				risePID(input);
-				aoaManager.setInclNoAOA(input);
+//				aoaManager.setInclNoAOA(input);
 				break;
 			case StrongDown:
 				dropPID(input);
-				setLeftWingInclination(FloatMath.toRadians(2));
-				setRightWingInclination(FloatMath.toRadians(2));
+//				setLeftWingInclination(FloatMath.toRadians(2));
+//				setRightWingInclination(FloatMath.toRadians(2));
 				break;
 			case Down:
 				descendPID(input);
-				aoaManager.setInclNoAOA(input);
+//				aoaManager.setInclNoAOA(input);
 				break;
 			case Stable:
 				flyStraightPID(input);
-				if (Math.abs(input.getRoll()) < 0.01)
-					aoaManager.setInclNoAOA(input);
+//				if (Math.abs(input.getRoll()) < 0.01)
+//					aoaManager.setInclNoAOA(input);
 				break;
 			case Left:
 				turnLeft(input);
@@ -213,7 +230,7 @@ public class FlyPilot extends PilotPart {
 	 * PIDs set pitch and thrust to fly straight.
 	 */
 	private void flyStraightPID(AutopilotInputs input) {
-		rollPID.adjustRoll(input, FloatMath.toRadians(0));
+		rollPID.adjustRoll(input, FloatMath.toRadians(0), State.Stable);
 		pitchPID.adjustPitchClimb(input, 0f);
 		thrustPID.adjustThrustUp(input, 0.4f);
 	}
@@ -223,13 +240,13 @@ public class FlyPilot extends PilotPart {
 	 * vertical velocity
 	 */
 	private void climbPID(AutopilotInputs inputs) {
-		rollPID.adjustRoll(inputs, FloatMath.toRadians(0));
+		rollPID.adjustRoll(inputs, FloatMath.toRadians(0), State.StrongUp);
 		pitchPID.adjustPitchClimb(inputs, climbAngle);
 		thrustPID.adjustThrustUp(inputs, 6f);
 	}
 
 	private void dropPID(AutopilotInputs inputs) {
-		rollPID.adjustRoll(inputs, FloatMath.toRadians(0));
+		rollPID.adjustRoll(inputs, FloatMath.toRadians(0), State.StrongDown);
 		pitchPID.adjustPitchDown(inputs, FloatMath.toRadians(-3f));
 		thrustPID.adjustThrustDown(inputs, -2f);
 	}
@@ -252,19 +269,19 @@ public class FlyPilot extends PilotPart {
 	}
 	
 	private void slowDown(AutopilotInputs input) {
-		rollPID.adjustRoll(input, FloatMath.toRadians(0));	
+		rollPID.adjustRoll(input, FloatMath.toRadians(0), State.SlowDown);	
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 		setNewThrust(0);
 	}
 
 	private void turnRight(AutopilotInputs input) {
-		rollPID.adjustRoll(input, FloatMath.toRadians(-20));
+		rollPID.adjustRoll(input, FloatMath.toRadians(-20), State.Right);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
 	
 	private void turnLeft(AutopilotInputs input) {
-		rollPID.adjustRoll(input, FloatMath.toRadians(20));
+		rollPID.adjustRoll(input, FloatMath.toRadians(20), State.Left);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
