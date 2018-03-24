@@ -87,8 +87,9 @@ public class FlyPilot extends PilotPart {
 		this.timePassedOldPos = pos;
 		
 		// cube geraakt? zo ja, volgende selecteren
+		System.out.println(getCurrentCube().distance(pos));
 		if (getCurrentCube().distance(pos) < 5) {
-			System.out.println("cube hit");
+			System.out.println("Cube hit" + pos);
 			this.cubeNb ++;
 
 			// alle cubes geraakt?
@@ -125,7 +126,7 @@ public class FlyPilot extends PilotPart {
 			
 			// draaien nodig?
 			Vector3f diff = getCurrentCube().sub(pos, new Vector3f());
-			float targetHeading = FloatMath.atan2(-diff.z, -diff.x);
+			float targetHeading = FloatMath.atan2(-diff.x, -diff.z);
 			Boolean side = null; // null: nee, true: links, false: rechts
 			System.out.println("heading: " + inputs.getHeading() + ", target: " + targetHeading);
 			if (targetHeading - inputs.getHeading() > FloatMath.toRadians(3))
@@ -137,9 +138,9 @@ public class FlyPilot extends PilotPart {
 			if (side != null) {
 				if (turnable(pos, inputs.getHeading(), getCurrentCube(), this.turnRadius)) {
 					setCurrentState(side? State.Left: State.Right);
-				} else
-					// bocht niet haalbaar, rechtdoor gaan. 
-					setCurrentState(State.Stable);
+				} //else
+//					// bocht niet haalbaar, rechtdoor gaan. 
+//					setCurrentState(State.Stable);
 			} else {
 				setCurrentState(State.Stable);
 			}
@@ -217,11 +218,13 @@ public class FlyPilot extends PilotPart {
 	 * vertical velocity
 	 */
 	private void climbPID(AutopilotInputs inputs) {
+		rollPID.adjustRoll(inputs, FloatMath.toRadians(0));
 		pitchPID.adjustPitchClimb(inputs, climbAngle);
 		thrustPID.adjustThrustUp(inputs, 6f);
 	}
 
 	private void dropPID(AutopilotInputs inputs) {
+		rollPID.adjustRoll(inputs, FloatMath.toRadians(0));
 		pitchPID.adjustPitchDown(inputs, FloatMath.toRadians(-3f));
 		thrustPID.adjustThrustDown(inputs, -2f);
 	}
