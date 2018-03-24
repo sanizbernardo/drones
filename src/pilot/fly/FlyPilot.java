@@ -1,5 +1,7 @@
 package pilot.fly;
 
+import java.util.ArrayList;
+
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
@@ -8,6 +10,7 @@ import pilot.fly.pid.PitchPID;
 import pilot.fly.pid.RollPID;
 import pilot.fly.pid.ThrustPID;
 import pilot.fly.pid.YawPID;
+import recognition.Cube;
 import recognition.ImageProcessing;
 import utils.Constants;
 import utils.FloatMath;
@@ -107,11 +110,12 @@ public class FlyPilot extends PilotPart {
 					inputs.getHeading(), inputs.getRoll(), new float[] {
 							inputs.getX(), inputs.getY(), inputs.getZ() });
 			
-			float[] cubePos = recog.generateLocations().get(0).getLocation();
-			Vector3f cubePosition = new Vector3f(cubePos[0], cubePos[1], cubePos[2]);
-			System.out.println("old: " + getCurrentCube());
-			getCurrentCube().add(cubePosition).mul(0.5f);
-			System.out.println("new: " + getCurrentCube());
+			ArrayList<Cube> locs = recog.generateLocations();
+			if (locs.size() > 0) {
+				float[] cubePos = locs.get(0).getLocation();
+				Vector3f cubePosition = new Vector3f(cubePos[0], cubePos[1], cubePos[2]);
+				getCurrentCube().add(cubePosition).mul(0.5f);
+			}
 		}
 		
 		
@@ -127,11 +131,12 @@ public class FlyPilot extends PilotPart {
 			// draaien nodig?
 			Vector3f diff = getCurrentCube().sub(pos, new Vector3f());
 			float targetHeading = FloatMath.atan2(-diff.x, -diff.z);
-			Boolean side = null; // null: nee, true: links, false: rechts
-			System.out.println("heading: " + inputs.getHeading() + ", target: " + targetHeading);
-			if (targetHeading - inputs.getHeading() > FloatMath.toRadians(3))
+			
+			Boolean side = null;
+			// null: nee, true: links, false: rechts
+			if (targetHeading - inputs.getHeading() > FloatMath.toRadians(4))
 				side = true;
-			else if (targetHeading - inputs.getHeading() < - FloatMath.toRadians(3))
+			else if (targetHeading - inputs.getHeading() < - FloatMath.toRadians(4))
 				side = false;
 			
 			// bocht haalbaar?
