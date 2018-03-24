@@ -18,6 +18,7 @@ public class LandingPilot extends PilotPart {
 	private float time;
 	private MiniPID pitchPID;
 	private boolean braking = false;
+	private boolean start = true;
 	
 	public LandingPilot() {
 		
@@ -46,9 +47,9 @@ public class LandingPilot extends PilotPart {
 		Vector3f vel = pos.sub(this.oldPos, new Vector3f()).mul(1/dt);
 		this.oldPos = pos;
 		
-		if(FloatMath.norm(vel) > 60) this.pitchPID.setSetpoint(FloatMath.toRadians(1));
-		else if(FloatMath.norm(vel) > 50) this.pitchPID.setSetpoint(FloatMath.toRadians(2));
-		else this.pitchPID.setSetpoint(FloatMath.toRadians(5));
+		if(FloatMath.norm(vel) > 60) this.pitchPID.setSetpoint(FloatMath.toRadians(2));
+		else if(FloatMath.norm(vel) > 50) this.pitchPID.setSetpoint(FloatMath.toRadians(5.5f));
+		else this.pitchPID.setSetpoint(FloatMath.toRadians(8));
 		
 		float lwIncl = 0, rwIncl = 0, horStabIncl = 0, thrust = 0;
 		
@@ -56,7 +57,13 @@ public class LandingPilot extends PilotPart {
 		rwIncl = input.getPitch() < FloatMath.toRadians(5) ? 2 : 3;
 		horStabIncl = (float) -pitchPID.getOutput(input.getPitch());		
 		thrust = 0;	
-		if(vel.y < -1 && pos.y > 2.5){
+		if(vel.y < -3 && pos.y > 13 && pos.y < 25){
+			thrust = maxThrust;
+		}
+		else if(vel.y < -2 && pos.y > 7 && pos.y < 13){
+			thrust = maxThrust;
+		}
+		else if(vel.y < -1 && pos.y > 2.5 && pos.y < 7){
 			thrust = maxThrust;
 		}
 		if(vel.y > 0 && pos.y < 2) braking = true;
