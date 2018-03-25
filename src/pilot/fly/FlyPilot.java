@@ -90,8 +90,7 @@ public class FlyPilot extends PilotPart {
 		this.timePassedOldPos = pos;
 		
 		// cube geraakt? zo ja, volgende selecteren
-//		System.out.println(getCurrentCube().distance(pos));
-		if (getCurrentCube().distance(pos) < 5) {
+		if (getCurrentCube().distance(pos) < Constants.PICKUP_DISTANCE) {
 			System.out.println("Cube hit" + pos);
 			this.cubeNb ++;
 
@@ -103,7 +102,7 @@ public class FlyPilot extends PilotPart {
 						getNewThrust(), rMax, rMax, rMax); 
 			}
 		}
-		System.out.println(getCurrentCube());
+
 		// update pos met imagerecog
 //		if (getCurrentCube().distance(pos) < 100) {
 //			recog.addNewImage(inputs.getImage(), inputs.getPitch(),
@@ -143,7 +142,7 @@ public class FlyPilot extends PilotPart {
 			// draaien nodig?
 			Vector3f diff = getCurrentCube().sub(pos, new Vector3f());
 			float targetHeading = FloatMath.atan2(-diff.x, -diff.z);
-			
+			System.out.println("target: " + targetHeading + " own: " + inputs.getHeading());
 			Boolean side = null;
 			// null: nee, true: links, false: rechts
 			if (targetHeading - inputs.getHeading() > FloatMath.toRadians(4))

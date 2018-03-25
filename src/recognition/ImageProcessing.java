@@ -53,12 +53,12 @@ public class ImageProcessing {
 		//transformation matrix for axial system from drone (z in view direction) to world
 		
 		this.transMat = new Matrix3f().identity();
-		if (Math.abs(-this.heading) > 1E-6)
-			transMat.rotate(-this.heading, new Vector3f(0, 1, 0));
-		if (Math.abs(-this.pitch) > 1E-6)
-			transMat.rotate(-this.pitch, new Vector3f(1, 0, 0));
 		if (Math.abs(-this.roll) > 1E-6)
 			transMat.rotate(-this.roll, new Vector3f(0, 0, 1));
+		if (Math.abs(-this.pitch) > 1E-6)
+			transMat.rotate(-this.pitch, new Vector3f(1, 0, 0));
+		if (Math.abs(-this.heading) > 1E-6)
+			transMat.rotate(-this.heading, new Vector3f(0, 1, 0));
 		this.transMat.invert();
     }
 
