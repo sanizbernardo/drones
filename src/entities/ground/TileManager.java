@@ -25,7 +25,7 @@ public class TileManager {
 		RGBTuple groundDark = new RGBTuple(col2[0], col2[1], col2[2]);
 		
 		float[] colAir1 = Utils.toRGB(-155, 0.5f, 1f);
-		float[] colAir2 = Utils.toRGB(-155, 0.5f, 0.8f);
+		float[] colAir2 = Utils.toRGB(-155, 0.5f, 0.9f);
 		
 		RGBTuple airLight = new RGBTuple(colAir1[0], colAir1[1], colAir1[2]);
 		RGBTuple airDark = new RGBTuple(colAir2[0], colAir2[1], colAir2[2]);

@@ -162,7 +162,7 @@ public class UpdateHelper {
 //		Vector3f newRot = FloatMath.transform(physics.getTransMat(), new Vector3f(-physics.getPitch(), -physics.getHeading(), -physics.getRoll()));
 		cameraHelper.droneCamera.setRotation(-physics.getPitch(),-physics.getHeading(),-physics.getRoll());
 
-		float offset = 10f;
+		float offset = 17.5f;
 		cameraHelper.chaseCamera.setPosition(newDronePos.x + offset * (float) Math.sin(physics.getHeading()),
 				newDronePos.y, newDronePos.z + offset * (float) Math.cos(physics.getHeading()));
 		cameraHelper.chaseCamera.setRotation(0, -physics.getHeading(), 0);

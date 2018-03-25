@@ -18,7 +18,7 @@ public class Trail {
     }
     
     public void leaveTrail(Vector3f pos) {
-        if(Utils.euclDistance(last, pos, 1)) {
+        if(Utils.euclDistance(last, pos, 5)) {
             makeTrail(pos);
         }
     }
@@ -26,7 +26,7 @@ public class Trail {
     private void makeTrail(Vector3f pos) {
         WorldObject cube = new WorldObject(Cubes.getYellowCube().getMesh());
         cube.setPosition(pos);
-        cube.setScale(0.3f);
+        cube.setScale(0.8f);
         cube.setRotation(45, 45, 0);
         pathObjects.add(cube);
         last = pos;

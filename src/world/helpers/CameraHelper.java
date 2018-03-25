@@ -34,7 +34,7 @@ public class CameraHelper {
     }
     
     public void updateRightCam(Vector3f pos) {
-    	rightOrthoCamera.setPosition(pos.x + 500, pos.y, pos.z);
+    	rightOrthoCamera.setPosition(pos.x + 500, pos.y + 25, pos.z);
     }
     
     public Vector3f getCameraInc() {

@@ -22,11 +22,12 @@ public class Tarmac {
         this.rotation = rotation;
         this.length = length;
 
-        this.colorTarmac.set(Utils.toRGB(231, 0.05f, 0.60f));
+        this.colorTarmac.set(Utils.toRGB(250, 0.1f, 0.7f));
         this.colorStripes.set(Utils.toRGB(0,0,1f));
 
         this.object = new WorldObject(new TarmacMesh(width, length, UP_DELTA, colorTarmac, colorStripes).getMesh());
         this.object.setPosition(position);
+        this.object.setRotation(0, -rotation, 0);
     }
 
     public Vector3f getPosition() {
