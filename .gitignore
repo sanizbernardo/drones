@@ -1,9 +1,15 @@
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
+# Intellij .iml files
+lib/MiniPID-Java/MiniPID-Java.iml
+lib/jfreechart/src/main/main.iml
+lib/jfreechart/src/test/test.iml
+p_en_o_cw_2017/p_en_o_cw_2017.iml
 
 # project specific
 ss.png
+position.log
 
 # Mac specific stuff
 .DS_Store

@@ -83,4 +83,10 @@ public class AutopilotClient<T extends Autopilot> implements Autopilot{
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public void setPath(Path path) {
+		// TODO Auto-generated method stub
+		
+	}
 }

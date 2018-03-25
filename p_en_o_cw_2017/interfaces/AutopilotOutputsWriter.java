@@ -1,5 +1,6 @@
-package p_en_o_cw_2017;
+package interfaces;
 
+@SuppressWarnings("unused")
 public class AutopilotOutputsWriter {
     private static void writeByteArray(java.io.DataOutputStream stream, byte[] array) throws java.io.IOException {
         stream.writeInt(array.length);
