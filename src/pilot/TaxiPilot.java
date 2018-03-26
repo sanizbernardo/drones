@@ -26,7 +26,7 @@ public class TaxiPilot extends PilotPart {
 	private Vector3f oldPos = new Vector3f(0, 0, 0);
 
 	public TaxiPilot() {
-		this.targetPos = new Vector3f(100, 0, -100);
+		this.targetPos = new Vector3f(0, 0, 100);
 		thrustPID = new MiniPID(70, 0.1, 0.1);
 		brakePID = new MiniPID(30,0.1,0.1);
 		turnPID = new MiniPID(30, 0.02, 0);
@@ -74,7 +74,7 @@ public class TaxiPilot extends PilotPart {
 		float fBrake = 0, lBrake = 0 , rBrake = 0, thrust, taxispeed;
 		float speed = FloatMath.norm(vel);
 		float distance = pos.distance(getTarget());
-		float targetHeading = (float) Math.atan2(pos.x() - getTarget().x(), pos.z() - getTarget().z());
+		float targetHeading = FloatMath.atan2(pos.x() - getTarget().x(), pos.z() - getTarget().z());
 		float headingerror = targetHeading - input.getHeading();
 
 		if (Float.isNaN(speed)) {
@@ -87,40 +87,62 @@ public class TaxiPilot extends PilotPart {
 		System.out.printf("Current speed: %s\t \n", speed);
 
 		float turnaccuracy;
-		if (distance < 15) {
-			turnaccuracy = (float)Math.toRadians(3);
-			taxispeed = 1;
+		if (distance < 15f) {
+			turnaccuracy = FloatMath.toRadians(2);
+			taxispeed = 1f;
 		} else {
-			turnaccuracy = (float)Math.toRadians(7);
-			taxispeed = 5;
+			turnaccuracy = FloatMath.toRadians(4);
+			taxispeed = 5f;
 		}
 
 		thrustPID.setSetpoint(taxispeed);
 
 		if (speed <= taxispeed) {
 			thrust = (float)thrustPID.getOutput(speed);
-			fBrake = 0;
+			fBrake = 0f;
 		} else {
 			fBrake = (float)brakePID.getOutput(taxispeed - speed);
-			thrust = 0;
-
+			thrust = 0f;
 		}
 
-		if (distance < 1) {
-			thrust = 0;
-			if (speed > 1) {
-				lBrake = (float)0.2*maxBrakeForce;
-				rBrake = (float)0.2*maxBrakeForce;
-				fBrake = (float)0.2*maxBrakeForce;
+		if (distance < 3f) {
+			thrust = 0f;
+			if (speed > 1f) {
+				lBrake = 0.2f*maxBrakeForce;
+				rBrake = 0.2f*maxBrakeForce;
+				fBrake = 0.2f*maxBrakeForce;
 			} else {
-				this.targetPos = targetlist.iterator().next();
+				this.targetPos = new Vector3f(-100, 0, -100);
+				//this.targetPos = targetlist.iterator().next();
 				if (targetPos == null) {
 					System.out.println("Destination reached");
 					this.ended = true;
 				}
 			}
+		} else {
+//			System.out.println("target: " + targetHeading + " own: " + inputs.getHeading());
+			Boolean side = null;
+			// null: nee, true: links, false: rechts
+			Vector3f result = new Vector3f(FloatMath.cos(input.getHeading()),0,-FloatMath.sin(input.getHeading())).cross(new Vector3f(FloatMath.cos(targetHeading),0,-FloatMath.sin(targetHeading)), new Vector3f());
+			System.out.println(result.normalize().y >= 0 ? "left" : "right");
+			if (result.normalize().y >= 0 && Math.abs(headingerror) > turnaccuracy)
+				side = true;
+			else if (result.normalize().y < 0 && Math.abs(headingerror) > turnaccuracy) {;
+				side = false;
+			}
+			if (side != null) {
+				thrust = 70f;
+				fBrake = 0;
+				if (side) {
+					lBrake = 0.5f*maxBrakeForce;
+				} else {
+					rBrake = 0.5f*maxBrakeForce;
+				}
+
+			}
 		}
-		else if ( headingerror < -(turnaccuracy) || headingerror > Math.toRadians(179)) {
+
+/*		else if ( headingerror < -(turnaccuracy) || headingerror > Math.toRadians(179)) {
 			thrust = (float)turnPID.getOutput(-Math.abs(headingerror));
 			rBrake = (float)0.5*maxBrakeForce;
 			fBrake = 0;
@@ -130,7 +152,7 @@ public class TaxiPilot extends PilotPart {
 			lBrake = (float)0.5*maxBrakeForce;
 			fBrake = 0;
 		}
-
+*/
 		this.time = input.getElapsedTime();
 
 		return Utils.buildOutputs(0, 0, 0, 0, thrust, lBrake, fBrake, rBrake);
