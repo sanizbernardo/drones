@@ -76,7 +76,7 @@ public class Constants {
      */
     public static final float MOUSE_SENSITIVITY = 0.4f;
 
-    public static final float CAMERA_POS_STEP = 0.05f;
+    public static final float CAMERA_POS_STEP = 0.5f;
 
     public static final int TILE_SIZE = 75;
     /**
