@@ -93,7 +93,7 @@ public class FlyPilot extends PilotPart {
 		if (this.stableTime > 0) {
 			setCurrentState(State.Stable);
 			this.stableTime -=  dt;
-			System.out.println(stableTime);
+
 			control(inputs, currentState);
 
 			if(stableTime <= 0 && this.cubeNb == this.cubes.length) {
@@ -157,12 +157,9 @@ public class FlyPilot extends PilotPart {
 			// draaien nodig?
 			Vector3f diff = getCurrentCube().sub(pos, new Vector3f());
 			float targetHeading = FloatMath.atan2(-diff.x, -diff.z);
-//			System.out.println("target: " + targetHeading + " own: " + inputs.getHeading());
 			Boolean side = null;
 			// null: nee, true: links, false: rechts
 			Vector3f result = new Vector3f(FloatMath.cos(inputs.getHeading()),0,-FloatMath.sin(inputs.getHeading())).cross(new Vector3f(FloatMath.cos(targetHeading),0,-FloatMath.sin(targetHeading)), new Vector3f());
-			System.out.println(result.normalize().y >= 0 ? "left" : "right");
-			System.out.println(result.y);
 			if (result.normalize().y >= 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(4))
 				side = true;
 			else if (result.normalize().y < 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(4)) {;
@@ -302,7 +299,7 @@ public class FlyPilot extends PilotPart {
 		rollPID.adjustRoll(input, FloatMath.toRadians(30), State.Left);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
-	}
+	}  
 
 	
 	public Vector3f horProjVel(AutopilotInputs inputs) {
