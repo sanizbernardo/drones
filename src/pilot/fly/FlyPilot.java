@@ -142,13 +142,17 @@ public class FlyPilot extends PilotPart {
 			// draaien nodig?
 			Vector3f diff = getCurrentCube().sub(pos, new Vector3f());
 			float targetHeading = FloatMath.atan2(-diff.x, -diff.z);
-			System.out.println("target: " + targetHeading + " own: " + inputs.getHeading());
+//			System.out.println("target: " + targetHeading + " own: " + inputs.getHeading());
 			Boolean side = null;
 			// null: nee, true: links, false: rechts
-			if (targetHeading - inputs.getHeading() > FloatMath.toRadians(4))
+			Vector3f result = new Vector3f(FloatMath.cos(inputs.getHeading()),0,-FloatMath.sin(inputs.getHeading())).cross(new Vector3f(FloatMath.cos(targetHeading),0,-FloatMath.sin(targetHeading)), new Vector3f());
+			System.out.println(result.normalize().y >= 0 ? "left" : "right");
+			System.out.println(result.y);
+			if (result.normalize().y >= 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(4))
 				side = true;
-			else if (targetHeading - inputs.getHeading() < - FloatMath.toRadians(4))
+			else if (result.normalize().y < 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(4)) {;
 				side = false;
+			}
 			
 			// bocht haalbaar?
 			if (side != null) {
