@@ -290,13 +290,13 @@ public class FlyPilot extends PilotPart {
 	}
 
 	private void turnRight(AutopilotInputs input) {
-		rollPID.adjustRoll(input, FloatMath.toRadians(-30), State.Right);
+		rollPID.adjustRoll(input, FloatMath.toRadians(-20), State.Right);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
 	
 	private void turnLeft(AutopilotInputs input) {
-		rollPID.adjustRoll(input, FloatMath.toRadians(30), State.Left);
+		rollPID.adjustRoll(input, FloatMath.toRadians(20), State.Left);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}  

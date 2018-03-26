@@ -25,9 +25,9 @@ public class RollPID {
 		rollPID.setSetpoint(target);
 		float actual = inputs.getRoll();
 		float output = (float) rollPID.getOutput(actual);
-//		if (state == State.StrongUp) {
-//			output = 0.5f*output;
-//		}
+		if (state == State.StrongUp) {
+			output = 0.5f*output;
+		}
 			pilot.setLeftWingInclination(FloatMath.toRadians(7) - output);
 			pilot.setRightWingInclination(FloatMath.toRadians(7) + output);
 	}
