@@ -333,7 +333,7 @@ public class Physics {
 			
 			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
 
-			if (checkAOA && dt != 0 && FloatMath.norm(force) > 50 && aoa > maxAOA)
+			if (checkAOA && dt != 0 && FloatMath.norm(force) > 50 && Math.abs(aoa) > maxAOA)
 				throw new PhysicsException(wingNames[i] + " exceeded maximum aoa (" + FloatMath.round(FloatMath.toDegrees(aoa), 2) + "�)");
 			
 			totalForce.add(force);

@@ -1,8 +1,10 @@
 package entities.trail;
 
 import entities.WorldObject;
+import meshes.cube.TrailCube;
+
 import org.joml.Vector3f;
-import utils.Cubes;
+
 import utils.Utils;
 
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ public class Trail {
     }
 
     private void makeTrail(Vector3f pos) {
-        WorldObject cube = new WorldObject(Cubes.getYellowCube().getMesh());
+        WorldObject cube = new WorldObject(new TrailCube().getMesh());
         cube.setPosition(pos);
         cube.setScale(0.8f);
         cube.setRotation(45, 45, 0);
