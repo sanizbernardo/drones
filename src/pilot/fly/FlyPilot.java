@@ -65,7 +65,7 @@ public class FlyPilot extends PilotPart {
 		this.climbAngle = Constants.climbAngle;
 		this.rMax = config.getRMax();
 		this.maxThrust = config.getMaxThrust();
-		this.turnRadius = 1145f/2f;
+		this.turnRadius = 675f;
 		
 		this.pitchPID = new PitchPID(this);
 		this.thrustPID = new ThrustPID(this);
@@ -119,7 +119,7 @@ public class FlyPilot extends PilotPart {
 					newThrust, rMax, rMax, rMax);
 		}
 
-		// update pos met imagerecog
+////		 update pos met imagerecog
 //		if (getCurrentCube().distance(pos) < 100) {
 //			recog.addNewImage(inputs.getImage(), inputs.getPitch(),
 //					inputs.getHeading(), inputs.getRoll(), new float[] {
@@ -135,14 +135,14 @@ public class FlyPilot extends PilotPart {
 		
 
 		// moeten we omhoog?
-		if ((getCurrentCube().y - pos.y) > 3) {
+		if ((getCurrentCube().y - pos.y) > 2.5) {
 			if (inputs.getRoll() > FloatMath.toRadians(5))
 				setCurrentState(State.Stable);
 			else
 				setCurrentState(State.StrongUp);
 		}
 		// moeten we omlaag?
-		else if (pos.y - getCurrentCube().y > 3) {
+		else if (pos.y - getCurrentCube().y > 2.5) {
 			if (inputs.getRoll() > FloatMath.toRadians(5))
 				setCurrentState(State.Stable);
 			else
@@ -160,9 +160,9 @@ public class FlyPilot extends PilotPart {
 			Boolean side = null;
 			// null: nee, true: links, false: rechts
 			Vector3f result = new Vector3f(FloatMath.cos(inputs.getHeading()),0,-FloatMath.sin(inputs.getHeading())).cross(new Vector3f(FloatMath.cos(targetHeading),0,-FloatMath.sin(targetHeading)), new Vector3f());
-			if (result.normalize().y >= 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(4))
+			if (result.normalize().y >= 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(2))
 				side = true;
-			else if (result.normalize().y < 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(4)) {;
+			else if (result.normalize().y < 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(2)) {;
 				side = false;
 			}
 			

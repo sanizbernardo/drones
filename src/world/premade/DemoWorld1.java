@@ -1,5 +1,7 @@
 package world.premade;
 
+import java.util.Arrays;
+
 import org.joml.Vector3f;
 
 import entities.WorldObject;
@@ -21,7 +23,7 @@ public class DemoWorld1 extends World {
 	public void setup() {
 		this.config = Utils.createDefaultConfig();
 		
-		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0), FloatMath.toRadians(90));
+		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0), FloatMath.toRadians(0));
 		
 		this.planner = new Pilot(new int[] {Pilot.WAIT_PATH, Pilot.TAKING_OFF, Pilot.FLYING});
 		
@@ -33,11 +35,13 @@ public class DemoWorld1 extends World {
 		
 		// TODO: realistische posities
 		
-		this.worldObjects[0].setPosition(new Vector3f(1, 2, 3));
-		this.worldObjects[1].setPosition(new Vector3f(4, 5, 6));
-		this.worldObjects[2].setPosition(new Vector3f(7, 8, 9));
-		this.worldObjects[3].setPosition(new Vector3f(0, 1, 2));
-		this.worldObjects[4].setPosition(new Vector3f(3, 4, 5));
+		this.worldObjects[0].setPosition(new Vector3f(-50, 100, -1200));
+		this.worldObjects[1].setPosition(new Vector3f(-800, 150, -500));
+		this.worldObjects[2].setPosition(new Vector3f(0,125,500));
+		this.worldObjects[3].setPosition(new Vector3f(1400, 100, -200));
+		this.worldObjects[4].setPosition(new Vector3f(100, 75, -300));
+		
+		Arrays.asList(worldObjects).stream().forEach(c -> c.setScale(5));
 		
 		this.ground = new Ground(50);
 		this.tarmac = new Tarmac(new Vector3f(0,0,10), 30f, 300f, 0f);

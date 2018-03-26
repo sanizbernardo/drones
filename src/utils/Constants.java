@@ -31,7 +31,7 @@ public class Constants {
     /**
      * Drone pickup accuracy
      */
-    public static final float PICKUP_DISTANCE = 3f;
+    public static final float PICKUP_DISTANCE = 5f;
 
 
     /**
@@ -45,7 +45,7 @@ public class Constants {
     public static final int AUTOPILOT_GUI_WIDTH = 508;
     
     public static final float COLLISION_RANGE = 5f;
-    public static final float PATH_ACCURACY = 5f;
+    public static final float PATH_ACCURACY = 0f;
     
     /**
      * Renderer constants

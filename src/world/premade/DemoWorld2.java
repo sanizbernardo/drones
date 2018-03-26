@@ -33,9 +33,9 @@ public class DemoWorld2 extends World {
 		
 		// TODO: realistische posities
 		
-		this.worldObjects[0].setPosition(new Vector3f(-200, 150, -1500));
-		this.worldObjects[1].setPosition(new Vector3f(-800, 200, 0));
-		this.worldObjects[2].setPosition(new Vector3f(0,100,0));
+		this.worldObjects[0].setPosition(new Vector3f(-200, 30, -1500));
+		this.worldObjects[1].setPosition(new Vector3f(-800, 70, 0));
+		this.worldObjects[2].setPosition(new Vector3f(0,20,0));
 		
 		Arrays.asList(worldObjects).stream().forEach(c -> c.setScale(5));
 		
