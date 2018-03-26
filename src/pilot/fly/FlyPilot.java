@@ -172,7 +172,7 @@ public class FlyPilot extends PilotPart {
 			// bocht haalbaar?
 			if (side != null) {
 				if (turnable(pos, inputs.getHeading(), getCurrentCube(), this.turnRadius)) {
-					setCurrentState(side? State.Left: State.Right);
+						setCurrentState(side? State.Left: State.Right);
 				} else
 				// bocht niet haalbaar, rechtdoor gaan. 
 				setCurrentState(State.Stable);
@@ -293,13 +293,13 @@ public class FlyPilot extends PilotPart {
 	}
 
 	private void turnRight(AutopilotInputs input) {
-		rollPID.adjustRoll(input, FloatMath.toRadians(-20), State.Right);
+		rollPID.adjustRoll(input, FloatMath.toRadians(-30), State.Right);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
 	
 	private void turnLeft(AutopilotInputs input) {
-		rollPID.adjustRoll(input, FloatMath.toRadians(20), State.Left);
+		rollPID.adjustRoll(input, FloatMath.toRadians(30), State.Left);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}

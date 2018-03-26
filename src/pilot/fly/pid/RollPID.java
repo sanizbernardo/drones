@@ -15,8 +15,8 @@ public class RollPID {
 	FlyPilot pilot;
 
 	public RollPID(FlyPilot pilot) {
-		rollPID = new MiniPID(0.2, 0, 0);
-		rollPID.setOutputLimits(Math.toRadians(30));
+		rollPID = new MiniPID(0.1, 0, 0.1);
+		rollPID.setOutputLimits(Math.toRadians(10));
 
 		this.pilot = pilot;
 	}
@@ -25,9 +25,9 @@ public class RollPID {
 		rollPID.setSetpoint(target);
 		float actual = inputs.getRoll();
 		float output = (float) rollPID.getOutput(actual);
-		if (state == State.StrongUp) {
-			output = 0.5f*output;
-		}
+//		if (state == State.StrongUp) {
+//			output = 0.5f*output;
+//		}
 			pilot.setLeftWingInclination(FloatMath.toRadians(7) - output);
 			pilot.setRightWingInclination(FloatMath.toRadians(7) + output);
 	}
