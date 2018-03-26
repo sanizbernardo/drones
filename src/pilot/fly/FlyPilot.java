@@ -40,10 +40,11 @@ public class FlyPilot extends PilotPart {
 	private float horStabInclination;
 	private float verStabInclination;
 	private float newThrust;
+	private float stableTime = 0f;
 	
 	private Vector3f timePassedOldPos = new Vector3f(0, 0, 0);
 	public Vector3f approxVel = new Vector3f(0f, 0f, 0f);
-	private float time = 0;
+	private float time = 0f;
 	
 	private PitchPID pitchPID;
 	private ThrustPID thrustPID;
@@ -89,18 +90,33 @@ public class FlyPilot extends PilotPart {
 			this.approxVel = pos.sub(this.timePassedOldPos, new Vector3f()).mul(1/dt);
 		this.timePassedOldPos = pos;
 		
+		if (this.stableTime > 0) {
+			setCurrentState(State.Stable);
+			this.stableTime -=  dt;
+			System.out.println(stableTime);
+			control(inputs, currentState);
+
+			if(stableTime <= 0 && this.cubeNb == this.cubes.length) {
+				this.ended = true;
+			}
+			
+			return Utils.buildOutputs(leftWingInclination,
+					rightWingInclination, verStabInclination, horStabInclination,
+					newThrust, rMax, rMax, rMax);
+		}
+		
 		// cube geraakt? zo ja, volgende selecteren
 		if (getCurrentCube().distance(pos) < Constants.PICKUP_DISTANCE) {
 			System.out.println("Cube hit" + pos);
 			this.cubeNb ++;
-
-			// alle cubes geraakt?
-			if (this.cubeNb == this.cubes.length) {
-				this.ended = true;
-				return Utils.buildOutputs(leftWingInclination,
-						rightWingInclination, verStabInclination, horStabInclination,
-						getNewThrust(), rMax, rMax, rMax); 
-			}
+			this.stableTime = 1.5f;
+			
+			setCurrentState(State.Stable);
+			control(inputs, currentState);
+			
+			return Utils.buildOutputs(leftWingInclination,
+					rightWingInclination, verStabInclination, horStabInclination,
+					newThrust, rMax, rMax, rMax);
 		}
 
 		// update pos met imagerecog
@@ -117,8 +133,7 @@ public class FlyPilot extends PilotPart {
 //			}
 //		}
 		
-		
-		
+
 		// moeten we omhoog?
 		if ((getCurrentCube().y - pos.y) > 3) {
 			if (inputs.getRoll() > FloatMath.toRadians(5))

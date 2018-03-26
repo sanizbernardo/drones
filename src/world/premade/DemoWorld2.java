@@ -23,7 +23,7 @@ public class DemoWorld2 extends World {
 	public void setup() {
 		this.config = Utils.createDefaultConfig();
 		
-		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0), FloatMath.toRadians(90));
+		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0), FloatMath.toRadians(0));
 		
 		this.planner = new Pilot(new int[] {Pilot.WAIT_PATH, Pilot.TAKING_OFF, Pilot.FLYING, Pilot.LANDING});
 		
@@ -40,7 +40,7 @@ public class DemoWorld2 extends World {
 		Arrays.asList(worldObjects).stream().forEach(c -> c.setScale(5));
 		
 		this.ground = new Ground(50);
-		this.tarmac = new Tarmac(new Vector3f(0,0,0), 30f, 300f, FloatMath.toRadians(90));
+		this.tarmac = new Tarmac(new Vector3f(0,0,0), 30f, 300f, FloatMath.toRadians(0));
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import entities.ground.Ground;
 import entities.tarmac.Tarmac;
 import pilot.Pilot;
 import utils.Cubes;
+import utils.FloatMath;
 import utils.Utils;
 import world.World;
 
@@ -20,7 +21,7 @@ public class DemoWorld3 extends World {
 	public void setup() {
 		this.config = Utils.createDefaultConfig();
 		
-		addDrone(config, new Vector3f(), new Vector3f());
+		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0), FloatMath.toRadians(90));
 		
 		this.planner = new Pilot(new int[] {Pilot.WAIT_PATH, Pilot.TAKING_OFF, Pilot.FLYING, Pilot.TAXIING});
 		
