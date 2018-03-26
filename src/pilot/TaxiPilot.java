@@ -8,7 +8,7 @@ import org.joml.Vector3f;
 import utils.FloatMath;
 import utils.Utils;
 
-import java.util.List;
+import java.util.*;
 
 public class TaxiPilot extends PilotPart {
 
@@ -16,30 +16,30 @@ public class TaxiPilot extends PilotPart {
 
 	private List<Vector3f> targetlist;
 
-	private MiniPID thrustPID, brakePID, turnPID;
+	private MiniPID thrustPID;
 
 	private boolean ended;
 
 	private float time, maxThrust, maxBrakeForce;
 
-	//private Vector3f oldPos = new Vector3f(0, 0, 0);
+	private int counter;
+
 	private Vector3f oldPos = new Vector3f(0, 0, 0);
 
 	public TaxiPilot() {
-		this.targetPos = new Vector3f(0, 0, 100);
-		thrustPID = new MiniPID(70, 0.1, 0.1);
-		brakePID = new MiniPID(30,0.1,0.1);
-		turnPID = new MiniPID(30, 0.02, 0);
+		thrustPID = new MiniPID(100, 0.1, 0.1);
+
+		targetlist = new ArrayList<Vector3f>();
+		targetlist.add(new Vector3f(0,0,-1000));
+		targetlist.add(new Vector3f(0,0,0));
 
 		this.ended = false;
 	}
 
 	public TaxiPilot(List<Vector3f> targetlist) {
+		thrustPID = new MiniPID(100, 0.1, 0.1);
+
 		this.targetlist = targetlist;
-		this.targetPos = targetlist.iterator().next();
-		thrustPID = new MiniPID(70, 0.1, 0.1);
-		brakePID = new MiniPID(30,0.1,0.1);
-		turnPID = new MiniPID(30, 0.02, 0);
 
 		this.ended = false;
 	}
@@ -54,11 +54,10 @@ public class TaxiPilot extends PilotPart {
 		this.maxThrust = config.getMaxThrust();
 		this.maxBrakeForce = config.getRMax();
 
-		brakePID.setOutputLimits(0, maxBrakeForce);
 		thrustPID.setOutputLimits(0, maxThrust);
-		turnPID.setOutputLimits(0, maxThrust);
-		brakePID.setSetpoint(0);
-		turnPID.setSetpoint(0);
+
+		counter = 0;
+		this.targetPos = targetlist.get(counter);
 	}
 
 
@@ -89,10 +88,13 @@ public class TaxiPilot extends PilotPart {
 		float turnaccuracy;
 		if (distance < 15f) {
 			turnaccuracy = FloatMath.toRadians(2);
-			taxispeed = 1f;
+			taxispeed = 3f;
+		} else if (distance < 120f) {
+			turnaccuracy = FloatMath.toRadians(4);
+			taxispeed = 10f;
 		} else {
 			turnaccuracy = FloatMath.toRadians(4);
-			taxispeed = 5f;
+			taxispeed = 30f;
 		}
 
 		thrustPID.setSetpoint(taxispeed);
@@ -101,58 +103,53 @@ public class TaxiPilot extends PilotPart {
 			thrust = (float)thrustPID.getOutput(speed);
 			fBrake = 0f;
 		} else {
-			fBrake = (float)brakePID.getOutput(taxispeed - speed);
+			fBrake = maxBrakeForce;
+			lBrake = maxBrakeForce;
+			rBrake = maxBrakeForce;
 			thrust = 0f;
 		}
 
 		if (distance < 3f) {
-			thrust = 0f;
 			if (speed > 1f) {
-				lBrake = 0.2f*maxBrakeForce;
-				rBrake = 0.2f*maxBrakeForce;
-				fBrake = 0.2f*maxBrakeForce;
+				thrust = 0f;
+				lBrake = maxBrakeForce;
+				rBrake = maxBrakeForce;
+				fBrake = maxBrakeForce;
 			} else {
-				this.targetPos = new Vector3f(-100, 0, -100);
-				//this.targetPos = targetlist.iterator().next();
-				if (targetPos == null) {
-					System.out.println("Destination reached");
+				System.out.println("Next position");
+				counter += 1;
+				if (counter < targetlist.size()) {
+					this.targetPos = targetlist.get(counter);
+				} else {
+					System.out.println("Final destination reached");
+					System.out.println("Elapsed time: " + input.getElapsedTime());
 					this.ended = true;
 				}
 			}
 		} else {
-//			System.out.println("target: " + targetHeading + " own: " + inputs.getHeading());
 			Boolean side = null;
-			// null: nee, true: links, false: rechts
 			Vector3f result = new Vector3f(FloatMath.cos(input.getHeading()),0,-FloatMath.sin(input.getHeading())).cross(new Vector3f(FloatMath.cos(targetHeading),0,-FloatMath.sin(targetHeading)), new Vector3f());
-			System.out.println(result.normalize().y >= 0 ? "left" : "right");
 			if (result.normalize().y >= 0 && Math.abs(headingerror) > turnaccuracy)
 				side = true;
 			else if (result.normalize().y < 0 && Math.abs(headingerror) > turnaccuracy) {;
 				side = false;
 			}
+
 			if (side != null) {
 				thrust = 70f;
 				fBrake = 0;
+				lBrake = 0;
+				rBrake = 0;
 				if (side) {
-					lBrake = 0.5f*maxBrakeForce;
+					System.out.println("left");
+					lBrake = 500f;
 				} else {
-					rBrake = 0.5f*maxBrakeForce;
+					System.out.println("right");
+					rBrake = 500f;
 				}
-
 			}
 		}
 
-/*		else if ( headingerror < -(turnaccuracy) || headingerror > Math.toRadians(179)) {
-			thrust = (float)turnPID.getOutput(-Math.abs(headingerror));
-			rBrake = (float)0.5*maxBrakeForce;
-			fBrake = 0;
-		}
-		else if (headingerror > turnaccuracy || headingerror < -Math.toRadians(179)) {
-			thrust = (float)turnPID.getOutput(-Math.abs(headingerror));
-			lBrake = (float)0.5*maxBrakeForce;
-			fBrake = 0;
-		}
-*/
 		this.time = input.getElapsedTime();
 
 		return Utils.buildOutputs(0, 0, 0, 0, thrust, lBrake, fBrake, rBrake);
