@@ -18,6 +18,7 @@ import utils.IO.MouseInput;
 import utils.Utils;
 import utils.image.ImageCreator;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import javax.swing.JOptionPane;
@@ -114,10 +115,13 @@ public class UpdateHelper {
 
 		updatePlanner(newDronePos);
 
-		testbedGui.update(droneHelper.getDronePhysics(config.getDroneID()).getVelocity(), newDronePos, 
-						  droneHelper.getDronePhysics(config.getDroneID()).getHeading(), 
+		testbedGui.update(droneHelper.getDronePhysics(config.getDroneID()).getVelocity(), newDronePos,
+						  droneHelper.getDronePhysics(config.getDroneID()).getHeading(),
 						  droneHelper.getDronePhysics(config.getDroneID()).getPitch(),
 						  droneHelper.getDronePhysics(config.getDroneID()).getRoll());
+		
+		testbedGui.setDrone(newDronePos, droneHelper.getDronePhysics(config.getDroneID()).getHeading());
+		testbedGui.setCubes(worldObjects);
 	}
 
 	private void updateTouchedCubes(Vector3f pos) {

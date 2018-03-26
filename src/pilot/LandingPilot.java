@@ -7,6 +7,8 @@ import com.stormbots.MiniPID;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
+import pilot.fly.FlyPilot.State;
+import pilot.fly.pid.RollPID;
 import utils.FloatMath;
 import utils.Utils;
 
@@ -17,22 +19,29 @@ public class LandingPilot extends PilotPart {
 	private final float dropAngle = FloatMath.toRadians(5);
 	private float time;
 	private MiniPID pitchPID;
+	private MiniPID rollPID;
 	private boolean braking = false;
 	private boolean start = true;
+	private boolean hasEnded = false;
 	
 	public LandingPilot() {
 		
 		this.time = 0;
 		
-		this.pitchPID = new MiniPID(1.1, 0, 0.3);
-		this.pitchPID.setSetpoint(dropAngle);
-		this.pitchPID.setOutputLimits(FloatMath.toRadians(10));
 	}
 	
 	@Override
 	public void initialize(AutopilotConfig config) {
 		this.maxThrust = config.getMaxThrust();
 		this.rMax = config.getRMax();
+		
+		this.pitchPID = new MiniPID(1.1, 0, 0.3);
+		this.pitchPID.setSetpoint(dropAngle);
+		this.pitchPID.setOutputLimits(FloatMath.toRadians(10));
+
+		this.rollPID = new MiniPID(5.2, 0, 0);
+		rollPID.setSetpoint(0);
+		this.rollPID.setOutputLimits(Math.toRadians(30));
 	}
 
 	private Vector3f oldPos = new Vector3f(0, 0, 0);
@@ -46,6 +55,11 @@ public class LandingPilot extends PilotPart {
 		
 		Vector3f vel = pos.sub(this.oldPos, new Vector3f()).mul(1/dt);
 		this.oldPos = pos;
+		
+		if (FloatMath.norm(vel) < 1) {
+			hasEnded = true;
+		}
+			
 		
 		if(FloatMath.norm(vel) > 60) this.pitchPID.setSetpoint(FloatMath.toRadians(2));
 		else if(FloatMath.norm(vel) > 50) this.pitchPID.setSetpoint(FloatMath.toRadians(5.5f));
@@ -69,12 +83,20 @@ public class LandingPilot extends PilotPart {
 		if(vel.y > 0 && pos.y < 2) braking = true;
 		float brakes = 0f;
 		if(braking)brakes = rMax;
+		
+		//stabelize roll
+		float actual = input.getRoll();
+		float output = (float) rollPID.getOutput(actual);
+		
+		lwIncl -= output;
+		rwIncl += output;
+			
 		return Utils.buildOutputs(FloatMath.toRadians(lwIncl), FloatMath.toRadians(rwIncl), 0, horStabIncl, thrust, brakes, brakes, brakes);
 	}
 
 	@Override
 	public boolean ended() {
-		return false;
+		return hasEnded;
 	}
 
 	@Override
