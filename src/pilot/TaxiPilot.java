@@ -25,8 +25,8 @@ public class TaxiPilot extends PilotPart {
 	//private Vector3f oldPos = new Vector3f(0, 0, 0);
 	private Vector3f oldPos = new Vector3f(0, 0, 0);
 
-	public TaxiPilot() {
-		this.targetPos = new Vector3f(100, 0, -100);
+	public TaxiPilot(Vector3f target) {
+		this.targetPos = target;
 		thrustPID = new MiniPID(70, 0.1, 0.1);
 		brakePID = new MiniPID(30,0.1,0.1);
 		turnPID = new MiniPID(30, 0.02, 0);
@@ -81,10 +81,10 @@ public class TaxiPilot extends PilotPart {
 			speed = 0;
 		}
 
-		System.out.printf("Current distance: %s\t", distance);
-		System.out.printf("Current heading: %s\t", Math.toDegrees(input.getHeading()));
-		System.out.printf("Target heading: %s\t", Math.toDegrees(targetHeading));
-		System.out.printf("Current speed: %s\t \n", speed);
+//		System.out.printf("Current distance: %s\t", distance);
+//		System.out.printf("Current heading: %s\t", Math.toDegrees(input.getHeading()));
+//		System.out.printf("Target heading: %s\t", Math.toDegrees(targetHeading));
+//		System.out.printf("Current speed: %s\t \n", speed);
 
 		float turnaccuracy;
 		if (distance < 15) {
@@ -113,10 +113,16 @@ public class TaxiPilot extends PilotPart {
 				rBrake = (float)0.2*maxBrakeForce;
 				fBrake = (float)0.2*maxBrakeForce;
 			} else {
+				if (targetlist == null) {
+					System.out.println("Destination reached");
+					this.ended = true;
+					return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
+				}
 				this.targetPos = targetlist.iterator().next();
 				if (targetPos == null) {
 					System.out.println("Destination reached");
 					this.ended = true;
+					return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 				}
 			}
 		}

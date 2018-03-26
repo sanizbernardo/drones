@@ -32,9 +32,7 @@ public class DemoWorld1 extends World {
 											   new WorldObject(Cubes.getYellowCube().getMesh()),
 											   new WorldObject(Cubes.getRedCube().getMesh()),
 											   new WorldObject(Cubes.getCyanCube().getMesh())};
-		
-		// TODO: realistische posities
-		
+				
 		this.worldObjects[0].setPosition(new Vector3f(-50, 100, -1200));
 		this.worldObjects[1].setPosition(new Vector3f(-800, 150, -500));
 		this.worldObjects[2].setPosition(new Vector3f(0,125,500));

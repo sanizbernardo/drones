@@ -164,7 +164,7 @@ public class UpdateHelper {
 
 		float offset = 17.5f;
 		cameraHelper.chaseCamera.setPosition(newDronePos.x + offset * (float) Math.sin(physics.getHeading()),
-				newDronePos.y + 2.5f, newDronePos.z + offset * (float) Math.cos(physics.getHeading()));
+				newDronePos.y, newDronePos.z + offset * (float) Math.cos(physics.getHeading()));
 		cameraHelper.chaseCamera.setRotation(0, -physics.getHeading(), 0);
 	}
 

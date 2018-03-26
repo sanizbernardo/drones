@@ -22,6 +22,7 @@ public class LandingPilot extends PilotPart {
 	private MiniPID rollPID;
 	private boolean braking = false;
 	private boolean start = true;
+	private boolean hasEnded = false;
 	
 	public LandingPilot() {
 		
@@ -54,6 +55,11 @@ public class LandingPilot extends PilotPart {
 		
 		Vector3f vel = pos.sub(this.oldPos, new Vector3f()).mul(1/dt);
 		this.oldPos = pos;
+		
+		if (FloatMath.norm(vel) < 1) {
+			hasEnded = true;
+		}
+			
 		
 		if(FloatMath.norm(vel) > 60) this.pitchPID.setSetpoint(FloatMath.toRadians(2));
 		else if(FloatMath.norm(vel) > 50) this.pitchPID.setSetpoint(FloatMath.toRadians(5.5f));
@@ -90,7 +96,7 @@ public class LandingPilot extends PilotPart {
 
 	@Override
 	public boolean ended() {
-		return false;
+		return hasEnded;
 	}
 
 	@Override
