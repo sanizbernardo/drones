@@ -1,6 +1,5 @@
-Clean git, we're not going to use submodules.
+### Setup:
 
-MacOS VM options:
--XstartOnFirstThread -Djava.awt.headless=true
-
-java -cp ProvidedTestbed.jar:joml-1.9.3.jar:Untitled.jar testbed.TestbedGUI
+- Mark resources as resources (IntelliJ), Mark as source (Eclipse)
+- Add all libraries to your path
+- Mark all non '.jar' files as sources root

@@ -1,4 +1,4 @@
-package datatypes;
+package interfaces;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -83,6 +83,7 @@ class CompilationUnit {
 	}
 }
 
+@SuppressWarnings("serial")
 class ParserException extends RuntimeException {
 	int lineno;
 	String message;

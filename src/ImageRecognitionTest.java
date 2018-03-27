@@ -1,7 +1,7 @@
 import engine.Engine;
 import engine.IWorldRules;
 import utils.Constants;
-import world.ImgRecogWorld;
+import world.premade.ImgRecogWorld;
 
 public class ImageRecognitionTest {
 	public static void main(String[] args) {
@@ -19,7 +19,7 @@ public class ImageRecognitionTest {
             //IWorldRules worldRules = new TestWorld();
         	
             //create a game engine
-            Engine gameEng = new Engine(Constants.TITLE, Constants.WIDTH, Constants.HEIGHT, Constants.VSYNC, worldRules);
+            Engine gameEng = new Engine(Constants.TITLE, Constants.VSYNC, worldRules);
             //start the game loop
             gameEng.start();
         } catch (Exception excp) {

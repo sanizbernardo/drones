@@ -1,5 +1,6 @@
-package p_en_o_cw_2017;
+package interfaces;
 
+@SuppressWarnings("unused")
 public class PathWriter {
     private static void writeByteArray(java.io.DataOutputStream stream, byte[] array) throws java.io.IOException {
         stream.writeInt(array.length);

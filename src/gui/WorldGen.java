@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +37,11 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import meshes.cube.BufferedCube;
+
 import org.joml.Vector3f;
 
-import entities.meshes.cube.BufferedCube;
+import utils.Constants;
 import utils.Cubes;
 import utils.Utils;
 import world.World;
@@ -185,11 +188,14 @@ premade {
 		
 		JPanel inputPanel = buildBase(panel, "Load one of the premade worlds", 2, 2);
 		
-		classNames = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight", "OrthoTestWorld", "LogWorld", "RotationWorld", "YZWorld", "TestWorld2"};
+
+		classNames = Constants.PREMADE_WORLDS;
+		Arrays.sort(classNames);
+		
 		worlds = new HashMap<>();
 		for (String className: classNames) {
 			try {
-				World world = (World)Class.forName("world." + className).newInstance();
+				World world = (World)Class.forName("world.premade." + className).newInstance();
 				worlds.put(className, world);
 			} catch (Exception e) {
 				e.printStackTrace();

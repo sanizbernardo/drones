@@ -1,10 +1,11 @@
 package engine;
 
 import static org.lwjgl.glfw.GLFW.*;
+
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
+import utils.Constants;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -93,13 +94,12 @@ public class Window {
             }
         });
 
-        // Get the resolution of the primary monitor
-        GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
         // Center our window
         glfwSetWindowPos(
                 windowHandle,
-                (vidmode.width() - width) / 2,
-                (vidmode.height() - height) / 2
+                System.getProperty("os.name").equals("Linux") ? Constants.AUTOPILOT_GUI_WIDTH + Constants.UBUNTU_SIDEBAR : Constants.AUTOPILOT_GUI_WIDTH,
+                System.getProperty("os.name").contains("Windows") ? 40 : 0
         );
 
         // Make the OpenGL context current

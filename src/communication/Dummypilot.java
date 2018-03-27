@@ -3,6 +3,7 @@ import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
+import interfaces.Path;
 
 public class Dummypilot implements Autopilot {
 
@@ -27,6 +28,18 @@ public class Dummypilot implements Autopilot {
 			}
 			@Override
 			public float getHorStabInclination() {
+				return -1;
+			}
+			@Override
+			public float getFrontBrakeForce() {
+				return -1;
+			}
+			@Override
+			public float getLeftBrakeForce() {
+				return -1;
+			}
+			@Override
+			public float getRightBrakeForce() {
 				return -1;
 			}
 		};
@@ -55,12 +68,30 @@ public class Dummypilot implements Autopilot {
 			public float getHorStabInclination() {
 				return -1*inputs.getElapsedTime();
 			}
+			@Override
+			public float getFrontBrakeForce() {
+				return -1*inputs.getElapsedTime();
+			}
+			@Override
+			public float getLeftBrakeForce() {
+				return -1*inputs.getElapsedTime();
+			}
+			@Override
+			public float getRightBrakeForce() {
+				return -1*inputs.getElapsedTime();
+			}
 		};
 	}
 
 	@Override
 	public void simulationEnded() {
 		System.out.println("exiting");
+	}
+
+	@Override
+	public void setPath(Path path) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

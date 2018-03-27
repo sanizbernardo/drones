@@ -1,5 +1,8 @@
 package engine;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 import utils.IO.MouseInput;
 import utils.Constants;
 import utils.Timer;
@@ -36,9 +39,18 @@ public class Engine implements Runnable {
      * @throws Exception
      *         If something goes wrong
      */
-    public Engine(String windowTitle, int width, int height, boolean vSync, IWorldRules worldRules) throws Exception {
+    public Engine(String windowTitle, boolean vSync, IWorldRules worldRules) throws Exception {
         gameLoopThread = new Thread(this, "GAME_LOOP_THREAD");
+        
+        int ubuntuSiderBar = 0, windowsToolBar = 0;
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        if (System.getProperty("os.name").equals("Linux")) {ubuntuSiderBar = Constants.UBUNTU_SIDEBAR;}
+        if (System.getProperty("os.name").contains("Windows")) {windowsToolBar = 80;}
+        int width = screenSize.width - Constants.AUTOPILOT_GUI_WIDTH - ubuntuSiderBar;
+        int height = screenSize.height - windowsToolBar;
+        
         window = new Window(windowTitle, width, height, vSync);
+        
         mouseInput = new MouseInput();
         this.worldRules = worldRules;
         timer = new Timer();
@@ -105,6 +117,9 @@ public class Engine implements Runnable {
                 update(interval);
                 accumulator -= interval;
             }
+            
+            if (shouldExit)
+            	break;
 
             render();
 

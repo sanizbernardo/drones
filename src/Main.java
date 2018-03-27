@@ -12,7 +12,7 @@ public class Main {
         	IWorldRules worldRules = gui.showDialog();
             
             //create a game engine
-            Engine gameEng = new Engine(Constants.TITLE, Constants.WIDTH, Constants.HEIGHT, Constants.VSYNC, worldRules);
+            Engine gameEng = new Engine(Constants.TITLE, Constants.VSYNC, worldRules);
             //start the game loop
             gameEng.start();
         } catch (Exception excp) {
