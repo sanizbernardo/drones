@@ -18,6 +18,7 @@ public class Pilot implements Autopilot {
 							 LANDING = 1,
 							 FLYING = 2,
 							 TAXIING = 3,
+							 HANDBRAKE = 4,
 							 WAIT_PATH = -1;
 	
 	private int index;
@@ -32,12 +33,14 @@ public class Pilot implements Autopilot {
 	private AutopilotConfig config;
 	
 	public Pilot(int[] tasks) {
-		this.pilots = new PilotPart[4];
+		this.pilots = new PilotPart[5];
 		
 		this.pilots[TAKING_OFF] = new TakeOffPilot(100);
 		this.pilots[FLYING] = new FlyPilot(null);
 		this.pilots[LANDING] = new LandingPilot();
 		this.pilots[TAXIING] = new TaxiPilot();
+		this.pilots[HANDBRAKE] = new HandbrakePilot();  
+		
 		this.tasks = tasks;
 		this.index = 0;
 	}
@@ -149,4 +152,38 @@ public class Pilot implements Autopilot {
 		return Float.NaN;
 	}
 
+	
+	private static class HandbrakePilot extends PilotPart {
+		private float maxR;
+		private boolean ended;
+		private float time;
+
+		@Override
+		public AutopilotOutputs timePassed(AutopilotInputs input) {
+			if (this.time == -1f)
+				this.time = input.getElapsedTime() + 2f;
+			
+			if (input.getElapsedTime() < this.time)
+				return Utils.buildOutputs(0, 0, 0, 0, 0, maxR, maxR, maxR);
+			
+			this.ended = true;
+			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
+		}
+
+		@Override
+		public String taskName() { return "Handbrake"; }
+
+		@Override
+		public void initialize(AutopilotConfig config) {
+			this.maxR = config.getRMax();
+			this.ended = false;
+			this.time = -1f;
+		}
+
+		@Override
+		public boolean ended() { return ended; }
+
+		@Override
+		public void close() { }
+	}
 }
