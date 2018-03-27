@@ -2,7 +2,6 @@ package pilot;
 
 import pilot.fly.FlyPilot;
 
-import java.util.ArrayList;
 import org.joml.Vector3f;
 
 import gui.AutopilotGUI;
@@ -38,13 +37,11 @@ public class Pilot implements Autopilot {
 		this.pilots[TAKING_OFF] = new TakeOffPilot(100);
 		this.pilots[FLYING] = new FlyPilot(null);
 		this.pilots[LANDING] = new LandingPilot();
-		this.pilots[TAXIING] = new TaxiPilot();
+		this.pilots[TAXIING] = new TaxiPilot(new Vector3f());
 		this.tasks = tasks;
 		this.index = 0;
 	}
-	
-	ArrayList<float[]> points;
-	
+		
 	@Override
 	public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 		this.gui = new AutopilotGUI(config);
@@ -67,8 +64,10 @@ public class Pilot implements Autopilot {
 		if (this.gui.manualControl())
 			return this.gui.getOutputs();
 		
-		if (this.index >= this.tasks.length)
+		if (this.index >= this.tasks.length) {
+			this.gui.setTask("Done");
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
+		}
 
 		if (state() == WAIT_PATH) {
 			if (this.path != null) {
@@ -77,9 +76,11 @@ public class Pilot implements Autopilot {
 				
 				this.pilots[TAKING_OFF] = new TakeOffPilot(cubes[0].y-10);
 				this.pilots[FLYING] = new FlyPilot(cubes);
+				this.pilots[TAXIING] = new TaxiPilot(new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ()));
 				
 				this.pilots[TAKING_OFF].initialize(this.config);
 				this.pilots[FLYING].initialize(this.config);
+				this.pilots[TAXIING].initialize(this.config);
 				
 				this.index += 1;
 			}

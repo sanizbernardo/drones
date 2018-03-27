@@ -10,6 +10,10 @@ p_en_o_cw_2017/p_en_o_cw_2017.iml
 # project specific
 ss.png
 position.log
+provided_testbed/W2.txt
+provided_testbed/autopilot.jar
+provided_testbed/joml-1.9.3.jar
+
 
 # Mac specific stuff
 .DS_Store

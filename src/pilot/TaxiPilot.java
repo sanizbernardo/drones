@@ -80,10 +80,10 @@ public class TaxiPilot extends PilotPart {
 			speed = 0;
 		}
 
-		System.out.printf("Current distance: %s\t", distance);
-		System.out.printf("Current heading: %s\t", Math.toDegrees(input.getHeading()));
-		System.out.printf("Target heading: %s\t", Math.toDegrees(targetHeading));
-		System.out.printf("Current speed: %s\t \n", speed);
+//		System.out.printf("Current distance: %s\t", distance);
+//		System.out.printf("Current heading: %s\t", Math.toDegrees(input.getHeading()));
+//		System.out.printf("Target heading: %s\t", Math.toDegrees(targetHeading));
+//		System.out.printf("Current speed: %s\t \n", speed);
 
 		float turnaccuracy;
 		if (distance < 15f) {
@@ -124,6 +124,7 @@ public class TaxiPilot extends PilotPart {
 					System.out.println("Final destination reached");
 					System.out.println("Elapsed time: " + input.getElapsedTime());
 					this.ended = true;
+					return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 				}
 			}
 		} else {

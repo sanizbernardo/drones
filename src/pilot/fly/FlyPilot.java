@@ -1,7 +1,5 @@
 package pilot.fly;
 
-import java.util.ArrayList;
-
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
@@ -9,9 +7,6 @@ import pilot.PilotPart;
 import pilot.fly.pid.PitchPID;
 import pilot.fly.pid.RollPID;
 import pilot.fly.pid.ThrustPID;
-import pilot.fly.pid.YawPID;
-import recognition.Cube;
-import recognition.ImageProcessing;
 import utils.Constants;
 import utils.FloatMath;
 import utils.Utils;
@@ -40,19 +35,16 @@ public class FlyPilot extends PilotPart {
 	private float horStabInclination;
 	private float verStabInclination;
 	private float newThrust;
+	private float stableTime = 0f;
 	
 	private Vector3f timePassedOldPos = new Vector3f(0, 0, 0);
 	public Vector3f approxVel = new Vector3f(0f, 0f, 0f);
-	private float time = 0;
+	private float time = 0f;
 	
 	private PitchPID pitchPID;
 	private ThrustPID thrustPID;
-	private YawPID yawPID;
 	private RollPID rollPID;
-
-	private ImageProcessing recog;
-	private AOAManager aoaManager;
-
+	
 	
 	public FlyPilot(Vector3f[] cubes) {
 		this.cubes = cubes;
@@ -64,16 +56,12 @@ public class FlyPilot extends PilotPart {
 		this.climbAngle = Constants.climbAngle;
 		this.rMax = config.getRMax();
 		this.maxThrust = config.getMaxThrust();
-		this.turnRadius = 1145f/2f;
+		this.turnRadius = 675f;
 		
 		this.pitchPID = new PitchPID(this);
 		this.thrustPID = new ThrustPID(this);
-		this.yawPID = new YawPID(this);
 		this.rollPID = new RollPID(this);
-		
-		this.aoaManager = new AOAManager(this);
-		this.recog = new ImageProcessing();
-		
+				
 		this.cubeNb = 0;
 	}
 	
@@ -89,21 +77,36 @@ public class FlyPilot extends PilotPart {
 			this.approxVel = pos.sub(this.timePassedOldPos, new Vector3f()).mul(1/dt);
 		this.timePassedOldPos = pos;
 		
+		if (this.stableTime > 0) {
+			setCurrentState(State.Stable);
+			this.stableTime -=  dt;
+
+			control(inputs, currentState);
+
+			if(stableTime <= 0 && this.cubeNb == this.cubes.length) {
+				this.ended = true;
+			}
+			
+			return Utils.buildOutputs(leftWingInclination,
+					rightWingInclination, verStabInclination, horStabInclination,
+					newThrust, rMax, rMax, rMax);
+		}
+		
 		// cube geraakt? zo ja, volgende selecteren
 		if (getCurrentCube().distance(pos) < Constants.PICKUP_DISTANCE) {
 			System.out.println("Cube hit" + pos);
 			this.cubeNb ++;
-
-			// alle cubes geraakt?
-			if (this.cubeNb == this.cubes.length) {
-				this.ended = true;
-				return Utils.buildOutputs(leftWingInclination,
-						rightWingInclination, verStabInclination, horStabInclination,
-						getNewThrust(), rMax, rMax, rMax); 
-			}
+			this.stableTime = 1.5f;
+			
+			setCurrentState(State.Stable);
+			control(inputs, currentState);
+			
+			return Utils.buildOutputs(leftWingInclination,
+					rightWingInclination, verStabInclination, horStabInclination,
+					newThrust, rMax, rMax, rMax);
 		}
 
-		// update pos met imagerecog
+////		 update pos met imagerecog
 //		if (getCurrentCube().distance(pos) < 100) {
 //			recog.addNewImage(inputs.getImage(), inputs.getPitch(),
 //					inputs.getHeading(), inputs.getRoll(), new float[] {
@@ -117,17 +120,16 @@ public class FlyPilot extends PilotPart {
 //			}
 //		}
 		
-		
-		
+
 		// moeten we omhoog?
-		if ((getCurrentCube().y - pos.y) > 3) {
+		if ((getCurrentCube().y - pos.y) > 2.5) {
 			if (inputs.getRoll() > FloatMath.toRadians(5))
 				setCurrentState(State.Stable);
 			else
 				setCurrentState(State.StrongUp);
 		}
 		// moeten we omlaag?
-		else if (pos.y - getCurrentCube().y > 3) {
+		else if (pos.y - getCurrentCube().y > 2.5) {
 			if (inputs.getRoll() > FloatMath.toRadians(5))
 				setCurrentState(State.Stable);
 			else
@@ -142,22 +144,19 @@ public class FlyPilot extends PilotPart {
 			// draaien nodig?
 			Vector3f diff = getCurrentCube().sub(pos, new Vector3f());
 			float targetHeading = FloatMath.atan2(-diff.x, -diff.z);
-//			System.out.println("target: " + targetHeading + " own: " + inputs.getHeading());
 			Boolean side = null;
 			// null: nee, true: links, false: rechts
 			Vector3f result = new Vector3f(FloatMath.cos(inputs.getHeading()),0,-FloatMath.sin(inputs.getHeading())).cross(new Vector3f(FloatMath.cos(targetHeading),0,-FloatMath.sin(targetHeading)), new Vector3f());
-			System.out.println(result.normalize().y >= 0 ? "left" : "right");
-			System.out.println(result.y);
-			if (result.normalize().y >= 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(4))
+			if (result.normalize().y >= 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(2))
 				side = true;
-			else if (result.normalize().y < 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(4)) {;
+			else if (result.normalize().y < 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(2)) {;
 				side = false;
 			}
 			
 			// bocht haalbaar?
 			if (side != null) {
 				if (turnable(pos, inputs.getHeading(), getCurrentCube(), this.turnRadius)) {
-					setCurrentState(side? State.Left: State.Right);
+						setCurrentState(side? State.Left: State.Right);
 				} else
 				// bocht niet haalbaar, rechtdoor gaan. 
 				setCurrentState(State.Stable);
@@ -192,25 +191,18 @@ public class FlyPilot extends PilotPart {
 		switch(state){
 			case StrongUp:
 				climbPID(input);
-//				aoaManager.setInclNoAOA(input);
 				break;
 			case Up:
 				risePID(input);
-//				aoaManager.setInclNoAOA(input);
 				break;
 			case StrongDown:
 				dropPID(input);
-//				setLeftWingInclination(FloatMath.toRadians(2));
-//				setRightWingInclination(FloatMath.toRadians(2));
 				break;
 			case Down:
 				descendPID(input);
-//				aoaManager.setInclNoAOA(input);
 				break;
 			case Stable:
 				flyStraightPID(input);
-//				if (Math.abs(input.getRoll()) < 0.01)
-//					aoaManager.setInclNoAOA(input);
 				break;
 			case Left:
 				turnLeft(input);
@@ -287,7 +279,7 @@ public class FlyPilot extends PilotPart {
 		rollPID.adjustRoll(input, FloatMath.toRadians(20), State.Left);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
-	}
+	}  
 
 	
 	public Vector3f horProjVel(AutopilotInputs inputs) {
@@ -381,7 +373,7 @@ public class FlyPilot extends PilotPart {
 
 	@Override
 	public void close() {
-		// TODO: maybe add imageRecog .close()
+		
 	}
 
 	@Override
