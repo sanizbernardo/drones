@@ -115,7 +115,7 @@ public class TaxiPilot extends PilotPart {
 				rBrake = maxBrakeForce;
 				fBrake = maxBrakeForce;
 			} else {
-				System.out.println("Next position");
+//				System.out.println("Next position");
 				counter += 1;
 				if (counter < targetlist.size()) {
 					this.targetPos = targetlist.get(counter);
@@ -141,10 +141,10 @@ public class TaxiPilot extends PilotPart {
 				lBrake = 0;
 				rBrake = 0;
 				if (side) {
-					System.out.println("left");
+//					System.out.println("left");
 					lBrake = 500f;
 				} else {
-					System.out.println("right");
+//					System.out.println("right");
 					rBrake = 500f;
 				}
 			}
