@@ -25,7 +25,7 @@ public class DemoWorld3 extends World {
 		
 		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0), FloatMath.toRadians(0));
 		
-		this.planner = new Pilot(new int[] {Pilot.WAIT_PATH, Pilot.TAKING_OFF, Pilot.FLYING, Pilot.LANDING, Pilot.TAXIING});
+		this.planner = new Pilot(new int[] {Pilot.WAIT_PATH, Pilot.TAKING_OFF, Pilot.FLYING, Pilot.LANDING, Pilot.TAXIING, Pilot.HANDBRAKE});
 		
 		this.worldObjects = new WorldObject[] {new WorldObject(Cubes.getBlueCube().getMesh()),
 											   new WorldObject(Cubes.getGreenCube().getMesh()),

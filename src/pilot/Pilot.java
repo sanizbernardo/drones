@@ -2,7 +2,6 @@ package pilot;
 
 import pilot.fly.FlyPilot;
 
-import java.util.ArrayList;
 import org.joml.Vector3f;
 
 import gui.AutopilotGUI;
@@ -19,6 +18,7 @@ public class Pilot implements Autopilot {
 							 LANDING = 1,
 							 FLYING = 2,
 							 TAXIING = 3,
+							 HANDBRAKE = 4,
 							 WAIT_PATH = -1;
 	
 	private int index;
@@ -33,18 +33,18 @@ public class Pilot implements Autopilot {
 	private AutopilotConfig config;
 	
 	public Pilot(int[] tasks) {
-		this.pilots = new PilotPart[4];
+		this.pilots = new PilotPart[5];
 		
 		this.pilots[TAKING_OFF] = new TakeOffPilot(100);
 		this.pilots[FLYING] = new FlyPilot(null);
 		this.pilots[LANDING] = new LandingPilot();
-		this.pilots[TAXIING] = new TaxiPilot(new Vector3f());
+		this.pilots[TAXIING] = new TaxiPilot();
+		this.pilots[HANDBRAKE] = new HandbrakePilot();  
+		
 		this.tasks = tasks;
 		this.index = 0;
 	}
-	
-	ArrayList<float[]> points;
-	
+		
 	@Override
 	public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 		this.gui = new AutopilotGUI(config);
@@ -67,8 +67,10 @@ public class Pilot implements Autopilot {
 		if (this.gui.manualControl())
 			return this.gui.getOutputs();
 		
-		if (this.index >= this.tasks.length)
+		if (this.index >= this.tasks.length) {
+			this.gui.setTask("Done");
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
+		}
 
 		if (state() == WAIT_PATH) {
 			if (this.path != null) {
@@ -77,13 +79,11 @@ public class Pilot implements Autopilot {
 				
 				this.pilots[TAKING_OFF] = new TakeOffPilot(cubes[0].y-10);
 				this.pilots[FLYING] = new FlyPilot(cubes);
-				this.pilots[TAXIING] = new TaxiPilot(new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ()));
+				this.pilots[TAXIING] = new TaxiPilot();
 				
 				this.pilots[TAKING_OFF].initialize(this.config);
 				this.pilots[FLYING].initialize(this.config);
 				this.pilots[TAXIING].initialize(this.config);
-				
-				
 				
 				this.index += 1;
 			}
@@ -152,4 +152,38 @@ public class Pilot implements Autopilot {
 		return Float.NaN;
 	}
 
+	
+	private static class HandbrakePilot extends PilotPart {
+		private float maxR;
+		private boolean ended;
+		private float time;
+
+		@Override
+		public AutopilotOutputs timePassed(AutopilotInputs input) {
+			if (this.time == -1f)
+				this.time = input.getElapsedTime() + 2f;
+			
+			if (input.getElapsedTime() < this.time)
+				return Utils.buildOutputs(0, 0, 0, 0, 0, maxR, maxR, maxR);
+			
+			this.ended = true;
+			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
+		}
+
+		@Override
+		public String taskName() { return "Handbrake"; }
+
+		@Override
+		public void initialize(AutopilotConfig config) {
+			this.maxR = config.getRMax();
+			this.ended = false;
+			this.time = -1f;
+		}
+
+		@Override
+		public boolean ended() { return ended; }
+
+		@Override
+		public void close() { }
+	}
 }

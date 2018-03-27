@@ -112,7 +112,7 @@ public class TestbedGui extends JFrame {
 			}
 		});
 		
-		this.minimap = new MiniMap(500, 300, 1500, 2000);
+		this.minimap = new MiniMap(500, 300, 1500, 2100);
 		GridBagConstraints gbc_mm = GuiUtils.buildGBC(0, 16, GridBagConstraints.CENTER);
 		gbc_mm.gridwidth = 5;
 		contentPane.add(minimap, gbc_mm);
@@ -239,8 +239,11 @@ public class TestbedGui extends JFrame {
 			
 			g2.drawRect(0, 0, prefSize.width-1, prefSize.height-1);
 			
-			g2.drawLine(prefSize.width/2 - 20, prefSize.height/2, prefSize.width/2 + 20, prefSize.height/2);
-			g2.drawLine(prefSize.width/2, prefSize.height/2 - 20, prefSize.width/2, prefSize.height/2 +20);
+			int xAxis = 20,
+				yAxis = (int) (xAxis * this.maxY / this.maxX);
+			
+			g2.drawLine(prefSize.width/2 - xAxis, prefSize.height/2, prefSize.width/2 + xAxis, prefSize.height/2);
+			g2.drawLine(prefSize.width/2, prefSize.height/2 - yAxis, prefSize.width/2, prefSize.height/2 + yAxis);
 			
 			g2.setColor(Color.BLUE);
 			g2.setStroke(new BasicStroke(1));

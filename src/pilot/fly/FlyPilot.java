@@ -1,7 +1,5 @@
 package pilot.fly;
 
-import java.util.ArrayList;
-
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
@@ -9,9 +7,6 @@ import pilot.PilotPart;
 import pilot.fly.pid.PitchPID;
 import pilot.fly.pid.RollPID;
 import pilot.fly.pid.ThrustPID;
-import pilot.fly.pid.YawPID;
-import recognition.Cube;
-import recognition.ImageProcessing;
 import utils.Constants;
 import utils.FloatMath;
 import utils.Utils;
@@ -48,12 +43,8 @@ public class FlyPilot extends PilotPart {
 	
 	private PitchPID pitchPID;
 	private ThrustPID thrustPID;
-	private YawPID yawPID;
 	private RollPID rollPID;
-
-	private ImageProcessing recog;
-	private AOAManager aoaManager;
-
+	
 	
 	public FlyPilot(Vector3f[] cubes) {
 		this.cubes = cubes;
@@ -69,12 +60,8 @@ public class FlyPilot extends PilotPart {
 		
 		this.pitchPID = new PitchPID(this);
 		this.thrustPID = new ThrustPID(this);
-		this.yawPID = new YawPID(this);
 		this.rollPID = new RollPID(this);
-		
-		this.aoaManager = new AOAManager(this);
-		this.recog = new ImageProcessing();
-		
+				
 		this.cubeNb = 0;
 	}
 	
@@ -106,7 +93,7 @@ public class FlyPilot extends PilotPart {
 		}
 		
 		// cube geraakt? zo ja, volgende selecteren
-		if (getCurrentCube().distance(pos) < Constants.PICKUP_DISTANCE) {
+		if (getCurrentCube().distance(pos) < Constants.DRONE_PICKUP_DISTANCE) {
 			System.out.println("Cube hit" + pos);
 			this.cubeNb ++;
 			this.stableTime = 1.5f;
@@ -204,25 +191,18 @@ public class FlyPilot extends PilotPart {
 		switch(state){
 			case StrongUp:
 				climbPID(input);
-//				aoaManager.setInclNoAOA(input);
 				break;
 			case Up:
 				risePID(input);
-//				aoaManager.setInclNoAOA(input);
 				break;
 			case StrongDown:
 				dropPID(input);
-//				setLeftWingInclination(FloatMath.toRadians(2));
-//				setRightWingInclination(FloatMath.toRadians(2));
 				break;
 			case Down:
 				descendPID(input);
-//				aoaManager.setInclNoAOA(input);
 				break;
 			case Stable:
 				flyStraightPID(input);
-//				if (Math.abs(input.getRoll()) < 0.01)
-//					aoaManager.setInclNoAOA(input);
 				break;
 			case Left:
 				turnLeft(input);
@@ -393,7 +373,7 @@ public class FlyPilot extends PilotPart {
 
 	@Override
 	public void close() {
-		// TODO: maybe add imageRecog .close()
+		
 	}
 
 	@Override

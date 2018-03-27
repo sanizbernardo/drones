@@ -18,7 +18,6 @@ import utils.IO.MouseInput;
 import utils.Utils;
 import utils.image.ImageCreator;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import javax.swing.JOptionPane;

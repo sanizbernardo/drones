@@ -54,9 +54,7 @@ public class AOAManager {
 	}
 
 	void setInclNoAOA(AutopilotInputs inputs) {
-		float rAOA = rightWingAOA(inputs);
-		float lAOA = leftWingAOA(inputs);
-//		if (pilot.approxVel.z() == 0) {
+		//		if (pilot.approxVel.z() == 0) {
 			pilot.setRightWingInclination(FloatMath.toRadians(7));
 			pilot.setLeftWingInclination(FloatMath.toRadians(7));
 //		} else {
