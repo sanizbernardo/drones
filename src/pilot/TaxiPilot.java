@@ -30,7 +30,6 @@ public class TaxiPilot extends PilotPart {
 		thrustPID = new MiniPID(100, 0.1, 0.1);
 
 		targetlist = new ArrayList<Vector3f>();
-		targetlist.add(new Vector3f(0,0,-1000));
 		targetlist.add(new Vector3f(0,0,0));
 
 		this.ended = false;

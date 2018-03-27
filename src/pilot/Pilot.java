@@ -37,7 +37,7 @@ public class Pilot implements Autopilot {
 		this.pilots[TAKING_OFF] = new TakeOffPilot(100);
 		this.pilots[FLYING] = new FlyPilot(null);
 		this.pilots[LANDING] = new LandingPilot();
-		this.pilots[TAXIING] = new TaxiPilot(new Vector3f());
+		this.pilots[TAXIING] = new TaxiPilot();
 		this.tasks = tasks;
 		this.index = 0;
 	}
@@ -76,7 +76,7 @@ public class Pilot implements Autopilot {
 				
 				this.pilots[TAKING_OFF] = new TakeOffPilot(cubes[0].y-10);
 				this.pilots[FLYING] = new FlyPilot(cubes);
-				this.pilots[TAXIING] = new TaxiPilot(new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ()));
+				this.pilots[TAXIING] = new TaxiPilot();
 				
 				this.pilots[TAKING_OFF].initialize(this.config);
 				this.pilots[FLYING].initialize(this.config);
