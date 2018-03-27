@@ -1,2 +1,0 @@
-* https://stackoverflow.com/questions/36695614/exporting-an-utils.image-from-screenviewport-in-java-opengl
-* https://stackoverflow.com/questions/13819030/how-to-make-a-simple-screenshot-method-using-lwjgl

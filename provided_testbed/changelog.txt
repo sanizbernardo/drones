@@ -13,3 +13,10 @@ v1.3
 
 v2.0
 - Updated the provided testbed for the second semester assignment.
+v2.1
+- Fixed ProvidedTestbed.jar (forgot to remove some packages).
+- Updated readme with explanation for finite ground.
+v2.2
+- Added option to fix rear wheel braking axis to projection of plane's Z-axis (this used to be the only implementation, now it's opt-in).
+v2.3
+- Slightly changed freeing of resources, hopefully this fixes some crash-y behavior (credits to Joa Oris).

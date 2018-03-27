@@ -126,6 +126,12 @@ The main thing to note about this view is that it simply shows the last image th
 
 
 
+Ground
+
+The ground is represented by a grid of 10m by 10m cells. Unfortunately, since I'm not experienced enough with JOGL to render an infinite surface with a repeating textures, the ground model is finite (and not even very large to prevent lagg) and simply stays roughly under the plane (while always staying aligned to the same grid, so you can still use the ground as a static point of reference of course).
+
+
+
 Control panel
 
 Since there's a lot of fields, not all will be discussed separately in this document. Here are the most important things to know:
@@ -137,12 +143,21 @@ Some further info on specific control panel components:
 - Time rate: The ratio inWorldTime/realTime.
 - Initial velocity: Will set the velocity of the drone, but only if no time has passed yet.
 - Use new Euler angles: Whether or not to use the Euler angles as defined here: https://github.com/p-en-o-cw-2017/p-en-o-cw-2017/blob/master/Autopilot_v2.datatypes This is recommended since this is the fixed version, this option is mainly provided for backward compatibility.
+- Fix rear braking axis: If this option is off, the brake force on the rear wheels will be oriented along the projection of the center of the wheel's velocity on the ground (like the front wheel). If this option is on, the brake force on the rear wheels will be oriented along the projection of the drone's Z-axis on the ground. Due to some confusion over this part of the assignment, we decided to include this option.
 - Camera height: Although this value is part of AutopilotConfig, you can't set it since it's already fully determined by the other three camera variables (this one was picked arbitrarily).
 - Show normalized vectors: Show the drone's "active" vectors as vectors of constant length (10m). This is useful since they have different dimensions and their "absolute" size (relative to their respective unit) is fairly meaningless.
 - Set path (in the "Cubes" tab): this calls the setPath method in the Autopilot interface with approximations of all cubes currently present in the world.
 - Add cube: adds a single cube at the specified coordinate ("Center X/Y/Z").
 - Generate cube: generates a specified amount of cubes at random positions (uniform distribution) within a specified radius around a specified coordinate ("Center X/Y/Z"). If "Space out cubes" is on, cubes will only be generated at positions where they don't overlap and aren't within 4m of the drone (this is done by trail-and-error, if the generation fails too often it will be aborted and reported to the standard output stream).
 - Generate cubes in cylinder: Generates cubes as specified in M2.3 from the second assignment of the first semester.
+
+
+
+Known issues
+
+At the moment there are a couple of known issues which I don't plan to fix for reasons explained below. I'm sorry for any inconvenience this may cause.
+- Various crashes when exiting the program, causes by low-level libraries. My only guess is that this is caused by the rendering library I use (JOGL), although I'm not aware of any changes I've made to my rendering pipeline, so I have no clue what is causing these issues. Luckily, they don't seem to hinder the program during execution, only when terminating, so the best remedy may be to simply run the provided testbed from a script which automatically removes any unwanted crash logs, suppresses unwanted error output, ...
+- There seems to be a bug on Mac systems when you go to the orthographic view and then back to any other view. However, I can't seem to reproduce this myself (it may be OS-specific) and the orthographic view isn't important in the second semester as far as I know (especially considering how it hasn't been scaled like most other parts of the assignment).
 
 
 

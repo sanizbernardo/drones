@@ -1,4 +1,0 @@
-* http://www.codinglabs.net/article_world_view_projection_matrix.aspx
-* https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/
-* http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-9-vbo-indexing/
-* https://www.khronos.org/opengl/wiki/Tutorial2:_VAOs,_VBOs,_Vertex_and_Fragment_Shaders_(C_/_SDL)
