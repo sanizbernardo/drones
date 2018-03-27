@@ -15,10 +15,6 @@ public class PathFindingTests {
 		cubelocs.add(new float[] {100, 30, -500});
 		cubelocs.add(new float[] {60, 60, -40}); 
 		cubelocs.add(new float[] {10, 30, -0});
-
-		float[] start = new float[] {0,0,0};
-//		IPath path = new IPath(cubelocs, 0.1f, 0.1f, 100f, start, 0.75f);
-//		new PathDemo(path.getPathArray(), cubelocs);
 		
 	}
 	

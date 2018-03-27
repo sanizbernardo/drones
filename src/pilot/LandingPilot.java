@@ -7,8 +7,6 @@ import com.stormbots.MiniPID;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
-import pilot.fly.FlyPilot.State;
-import pilot.fly.pid.RollPID;
 import utils.FloatMath;
 import utils.Utils;
 
@@ -21,13 +19,11 @@ public class LandingPilot extends PilotPart {
 	private MiniPID pitchPID;
 	private MiniPID rollPID;
 	private boolean braking = false;
-	private boolean start = true;
 	private boolean hasEnded = false;
+	private Vector3f oldPos = new Vector3f(0, 0, 0);
 	
 	public LandingPilot() {
-		
 		this.time = 0;
-		
 	}
 	
 	@Override
@@ -43,8 +39,7 @@ public class LandingPilot extends PilotPart {
 		rollPID.setSetpoint(0);
 		this.rollPID.setOutputLimits(Math.toRadians(30));
 	}
-
-	private Vector3f oldPos = new Vector3f(0, 0, 0);
+	
 
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs input) {
@@ -60,7 +55,6 @@ public class LandingPilot extends PilotPart {
 			hasEnded = true;
 		}
 			
-		
 		if(FloatMath.norm(vel) > 60) this.pitchPID.setSetpoint(FloatMath.toRadians(2));
 		else if(FloatMath.norm(vel) > 50) this.pitchPID.setSetpoint(FloatMath.toRadians(5.5f));
 		else this.pitchPID.setSetpoint(FloatMath.toRadians(8));

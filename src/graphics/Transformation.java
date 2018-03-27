@@ -3,7 +3,6 @@ package graphics;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import utils.FloatMath;
 import entities.WorldObject;
 
 public class Transformation {
