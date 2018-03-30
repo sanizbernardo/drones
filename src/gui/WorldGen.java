@@ -37,15 +37,16 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import meshes.cube.BufferedCube;
+import testbed.meshes.cube.BufferedCube;
+import testbed.world.World;
+import testbed.world.WorldBuilder;
 
 import org.joml.Vector3f;
 
 import utils.Constants;
 import utils.Cubes;
+import utils.GuiUtils;
 import utils.Utils;
-import world.World;
-import world.WorldBuilder;
 
 public enum WorldGen {
 	
@@ -195,7 +196,7 @@ premade {
 		worlds = new HashMap<>();
 		for (String className: classNames) {
 			try {
-				World world = (World)Class.forName("world.premade." + className).newInstance();
+				World world = (World)Class.forName("testbed.world.premade." + className).newInstance();
 				worlds.put(className, world);
 			} catch (Exception e) {
 				e.printStackTrace();

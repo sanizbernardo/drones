@@ -1,7 +1,7 @@
-import engine.Engine;
-import engine.IWorldRules;
+import testbed.engine.Engine;
+import testbed.engine.IWorldRules;
+import testbed.world.premade.ImgRecogWorld;
 import utils.Constants;
-import world.premade.ImgRecogWorld;
 
 public class ImageRecognitionTest {
 	public static void main(String[] args) {

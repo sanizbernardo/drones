@@ -34,6 +34,7 @@ import javax.swing.JToggleButton;
 
 import utils.Constants;
 import utils.FloatMath;
+import utils.GuiUtils;
 import utils.Utils;
 
 public class AutopilotGUI extends JFrame {

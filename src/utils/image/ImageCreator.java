@@ -2,7 +2,7 @@ package utils.image;
 
 import javax.imageio.ImageIO;
 
-import engine.Window;
+import testbed.engine.Window;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

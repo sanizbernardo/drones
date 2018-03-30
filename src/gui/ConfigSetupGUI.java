@@ -11,10 +11,11 @@ import javax.swing.border.EmptyBorder;
 import org.joml.Vector3f;
 
 import interfaces.AutopilotConfig;
+import testbed.world.World;
+import testbed.world.WorldBuilder;
 import utils.Constants;
+import utils.GuiUtils;
 import utils.Utils;
-import world.World;
-import world.WorldBuilder;
 
 
 public class ConfigSetupGUI extends JDialog {
@@ -219,7 +220,7 @@ public class ConfigSetupGUI extends JDialog {
 		}
 		
 		if (logCheck.isSelected())
-			world.initLogging();
+			world.initLogging(generateAutoPilotConfig().getDroneID());
 		
 		return world; 
 	}

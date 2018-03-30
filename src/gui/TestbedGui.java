@@ -17,9 +17,10 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import org.joml.Vector3f;
 
-import entities.WorldObject;
+import testbed.entities.WorldObject;
 import utils.Constants;
 import utils.FloatMath;
+import utils.GuiUtils;
 
 import javax.swing.JLabel;
 
