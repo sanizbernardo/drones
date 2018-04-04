@@ -266,6 +266,8 @@ public class AutopilotGUI extends JFrame {
 	}
 	
 	public void updateImage(byte[] image) {
+		if (image == null)
+			return;
 		BufferedImage img = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR);
 		img.getRaster().setDataElements(0, 0, imgWidth, imgHeight, image);
 		lblImage.setIcon(new ImageIcon(img));

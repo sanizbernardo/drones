@@ -226,7 +226,7 @@ public class ConfigSetupGUI extends JDialog {
 	}
 	
 	private AutopilotConfig generateAutoPilotConfig() {
-		return Utils.createDefaultConfig();
+		return Utils.createDefaultConfig("drone1");
 	}
 	
 	

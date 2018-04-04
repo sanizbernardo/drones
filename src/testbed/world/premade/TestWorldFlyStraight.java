@@ -3,6 +3,7 @@ package testbed.world.premade;
 import org.joml.Vector3f;
 
 import autopilot.Pilot;
+import interfaces.AutopilotConfig;
 import testbed.engine.IWorldRules;
 import testbed.entities.WorldObject;
 import testbed.world.World;
@@ -15,7 +16,7 @@ import utils.Utils;
 public class TestWorldFlyStraight extends World implements IWorldRules {
 
     public TestWorldFlyStraight() {
-        super(1, true);
+        super(1, true, 1);
     }
 
     /**
@@ -23,8 +24,8 @@ public class TestWorldFlyStraight extends World implements IWorldRules {
      */
     @Override
     public void setup() {
-    	config = Utils.createDefaultConfig();
-    	  
+		AutopilotConfig config = Utils.createDefaultConfig("drone1");
+				    	  
     	addDrone(config, new Vector3f(0,100,0), new Vector3f(0,0,-10));
 
     	planner = new Pilot(new int[] {Pilot.FLYING});

@@ -30,12 +30,14 @@ public class Airport {
 		this.direction = new Vector3f(-FloatMath.sin(heading), 0, -FloatMath.cos(heading));
 		this.directionPerp = new Vector3f(-FloatMath.cos(heading), 0, FloatMath.sin(heading));
 		
-		this.tarmac0 = new Tarmac(position.add(direction.mul(width/2f, new Vector3f()), new Vector3f()), 2*width, length, heading);
-		this.tarmac1 = new Tarmac(position.sub(direction.mul(width/2f, new Vector3f()), new Vector3f()), 2*width, length, 
+		this.tarmac0 = new Tarmac(position.add(direction.mul(width/2f, new Vector3f()), new Vector3f()), 2f*width, length, heading);
+		this.tarmac1 = new Tarmac(position.sub(direction.mul(width/2f, new Vector3f()), new Vector3f()), 2f*width, length, 
 																	 heading > 0 ? heading - FloatMath.PI: heading + FloatMath.PI);
 		
-		this.gate0 = new Gate(position.add(directionPerp.mul(width/2f, new Vector3f()), new Vector3f()), width, heading);
-		this.gate1 = new Gate(position.sub(directionPerp.mul(width/2f, new Vector3f()), new Vector3f()), width, heading);
+		this.gate0 = new Gate(position.add(directionPerp.mul(width/2f, new Vector3f())
+									  .sub(direction.mul(width/2f, new Vector3f()), new Vector3f()), new Vector3f()), width, heading);
+		this.gate1 = new Gate(position.sub(directionPerp.mul(width/2f, new Vector3f())
+									  .add(direction.mul(width/2f, new Vector3f()), new Vector3f()), new Vector3f()), width, heading);
 	}
 	
 	

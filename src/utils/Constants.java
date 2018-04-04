@@ -11,10 +11,10 @@ public class Constants {
     /**
      * Premade worlds that should show in the gui.
      */
-	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "StopWorld", "TestWorld", "TestWorldFlyStraight",
-																"OrthoTestWorld", "TestWorld2", "LandingWorld", 
-																"TakeOffWorld", "BounceWorld", "AirportSetupWorld", 
-																"DemoWorld1", "DemoWorld2", "DemoWorld3",  "TestWorldPitch", "TaxiWorld"};
+	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "TestWorldFlyStraight", "OrthoTestWorld",
+																"LandingWorld", "TakeOffWorld", "AirportSetupWorld", 
+																"DemoWorld1", "DemoWorld2", "DemoWorld3",  "TestWorldPitch",
+																"TaxiWorld"};
 
 	/**
 	 * Autopilot constants

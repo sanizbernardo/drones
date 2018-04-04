@@ -16,7 +16,7 @@ public class WorldBuilder extends World implements IWorldRules {
 	private boolean wantPlanner;
 	
 	public WorldBuilder(int tSM, boolean wantPhysicsEngine, boolean wantPlanner, Map<Vector3f, BufferedCube> cubes) {
-		super(tSM, wantPhysicsEngine);
+		super(tSM, wantPhysicsEngine, 1);
 		this.cubes = cubes;
 		this.wantPlanner = wantPlanner;
 	}
@@ -42,9 +42,7 @@ public class WorldBuilder extends World implements IWorldRules {
 		return "Internal hook for GUI world creation";
 	}
 	
-	public void setupDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {
-        this.config = config;
-		
+	public void setupDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {		
         addDrone(config, startPos, startVel);
 	}
 

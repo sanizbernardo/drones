@@ -1,7 +1,6 @@
 package testbed.world.premade;
 
 
-import testbed.engine.IWorldRules;
 import testbed.entities.WorldObject;
 import testbed.world.World;
 import utils.Cubes;
@@ -12,20 +11,22 @@ import java.util.Random;
 
 import org.joml.Vector3f;
 
+import interfaces.AutopilotConfig;
+
 /**
  * Place where all the GameItem are to be placed in
  */
-public class CubeWorld extends World implements IWorldRules {
+public class CubeWorld extends World {
 
     public CubeWorld() {
-        super(1, true);
+        super(1, false, 1);
     }
 
     @Override
     public void setup() {
-    	config = Utils.createDefaultConfig();
+    	AutopilotConfig config = Utils.createDefaultConfig("drone1");
   
-    	addDrone(config, new Vector3f(0, 100, 0), new Vector3f(0, 0, 0));
+    	addDrone(config, new Vector3f(0, 100, 0), new Vector3f(0, 40, 0));
 
     	planner = null;
     	
@@ -38,7 +39,7 @@ public class CubeWorld extends World implements IWorldRules {
             WorldObject cube = new WorldObject(Cubes.getCubes()[rand.nextInt(Cubes.getCubes().length)].getMesh());
             cube.setScale(0.5f);
             int x1 = rand.nextInt(100)-50,
-            		y = rand.nextInt(100)-50,
+            		y = rand.nextInt(100)+50,
             		z = rand.nextInt(100)-50;
 
             cube.setPosition(x1, y, z);

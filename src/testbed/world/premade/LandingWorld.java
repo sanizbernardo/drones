@@ -3,8 +3,9 @@ package testbed.world.premade;
 import org.joml.Vector3f;
 
 import autopilot.Pilot;
+import interfaces.AutopilotConfig;
 import testbed.entities.WorldObject;
-import testbed.entities.airport.Tarmac;
+import testbed.entities.airport.Airport;
 import testbed.entities.ground.Ground;
 import testbed.world.World;
 import utils.Cubes;
@@ -13,13 +14,14 @@ import utils.Utils;
 public class LandingWorld extends World{
 
 	public LandingWorld() {
-		super(1,true);
+		super(1, true, 1);
 	}
 
 	@Override
 	public void setup() {
-		this.config = Utils.createDefaultConfig();
+		AutopilotConfig config = Utils.createDefaultConfig("drone1");
 		
+		this.airports = new Airport[] {new Airport(20, 200, new Vector3f(0, 0, -400), 0)}; 		
 
 		addDrone(config, new Vector3f(0, 200, 0), new Vector3f(0,0,-45), 0);
 		
@@ -36,7 +38,6 @@ public class LandingWorld extends World{
 		}
 		
 		this.ground = new Ground(50);
-		this.tarmac = new Tarmac(new Vector3f(0,0,-200), 50f, 300f, 0f);
 		
 	}
 

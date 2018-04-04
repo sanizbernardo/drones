@@ -27,7 +27,6 @@ public abstract class World implements IWorldRules {
 	private UpdateHelper updateHelper;
 	private LogHelper logHelper;
 	private String logDrone;
-	private DroneHelper droneHelper;
 	private float time;
 
 	/* These are to be directly called in the world classes */
@@ -36,7 +35,9 @@ public abstract class World implements IWorldRules {
 	protected Engine gameEngine;
 	protected Airport[] airports;
 	protected Ground ground;
+	protected DroneHelper droneHelper;
 
+	
 	public World(int tSM, boolean wantPhysicsEngine, int nbDrones) {
 		this.cameraHelper = new CameraHelper();
 
@@ -64,6 +65,9 @@ public abstract class World implements IWorldRules {
     public void init(Window window, Engine engine) throws Exception {
     	this.gameEngine = engine; 
     	this.time = 0;
+    	
+    	this.airports = new Airport[0];
+    	this.worldObjects = new WorldObject[0]; 
     	
     	setup();
     	

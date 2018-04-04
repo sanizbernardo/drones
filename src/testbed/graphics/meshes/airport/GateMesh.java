@@ -21,10 +21,10 @@ public class GateMesh extends AbstractMesh {
     protected void setPositions() {
         this.positions = new float[]{
                 0     , height, 0,
-                width , height, 0,
-                -width, height, 0,
-                width , height, -width,
-                -width, height, -width,
+                width/2 , height, 0,
+                -width/2 , height, 0,
+                width/2 , height, -width,
+                -width/2, height, -width,
         };
     }
 
