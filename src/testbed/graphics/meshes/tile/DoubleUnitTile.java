@@ -1,7 +1,7 @@
-package testbed.meshes.tile;
+package testbed.graphics.meshes.tile;
 
-import testbed.meshes.AbstractMesh;
-import utils.RGBTuple;
+import testbed.graphics.meshes.AbstractMesh;
+import utils.graphics.RGBTuple;
 
 public class DoubleUnitTile extends AbstractMesh {
 

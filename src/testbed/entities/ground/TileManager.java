@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import utils.FloatMath;
-import utils.RGBTuple;
 import utils.Utils;
+import utils.graphics.RGBTuple;
 import testbed.entities.WorldObject;
-import testbed.meshes.tile.DoubleUnitTile;
+import testbed.graphics.meshes.tile.DoubleUnitTile;
 
 public class TileManager {
 

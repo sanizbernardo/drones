@@ -2,8 +2,8 @@ package testbed.world.premade;
 
 import testbed.engine.IWorldRules;
 import testbed.entities.WorldObject;
+import testbed.entities.airport.Tarmac;
 import testbed.entities.ground.Ground;
-import testbed.entities.tarmac.Tarmac;
 import testbed.world.World;
 import utils.Utils;
 

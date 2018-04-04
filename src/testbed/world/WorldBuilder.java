@@ -8,7 +8,7 @@ import autopilot.Pilot;
 import interfaces.AutopilotConfig;
 import testbed.engine.IWorldRules;
 import testbed.entities.WorldObject;
-import testbed.meshes.cube.*;
+import testbed.graphics.meshes.cube.*;
 
 public class WorldBuilder extends World implements IWorldRules {
 		

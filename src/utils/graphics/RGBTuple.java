@@ -1,12 +1,11 @@
-package utils;
+package utils.graphics;
 
 public class RGBTuple {
 	
 	float red, blue, green;
 
-	public RGBTuple() {
-
-	}
+	public RGBTuple() {}
+	
 	public RGBTuple(float red, float blue, float green) {
 		this.red = red;
 		this.blue = blue;

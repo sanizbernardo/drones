@@ -7,7 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import testbed.engine.Physics;
+import testbed.Physics;
 
 public class LogHelper {
 

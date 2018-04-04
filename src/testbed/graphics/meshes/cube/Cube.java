@@ -1,10 +1,9 @@
-package testbed.meshes.cube;
+package testbed.graphics.meshes.cube;
 
-import testbed.meshes.Mesh;
+import testbed.graphics.meshes.Mesh;
 import utils.Utils;
 
 public class Cube {
-
 
     private float[] positions;
     private float[] colours;

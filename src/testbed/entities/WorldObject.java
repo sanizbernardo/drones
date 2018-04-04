@@ -2,7 +2,7 @@ package testbed.entities;
 
 import org.joml.Vector3f;
 
-import testbed.meshes.Mesh;
+import testbed.graphics.meshes.Mesh;
 
 public class WorldObject {
 

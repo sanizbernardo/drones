@@ -1,4 +1,4 @@
-package testbed.meshes.drone;
+package testbed.graphics.meshes.drone;
 
 import interfaces.AutopilotConfig;
 import utils.Utils;

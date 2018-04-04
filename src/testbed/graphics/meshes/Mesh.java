@@ -1,4 +1,4 @@
-package testbed.meshes;
+package testbed.graphics.meshes;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -113,6 +113,6 @@ public class Mesh {
 
         // Delete the VAO
         glBindVertexArray(0);
-        glDeleteVertexArrays(vaoId);
+        glDeleteVertexArrays(getVaoId());
     }
 }

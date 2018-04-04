@@ -1,4 +1,4 @@
-package testbed.meshes.cube;
+package testbed.graphics.meshes.cube;
 
 public class BufferedCube {
 	

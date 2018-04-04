@@ -1,4 +1,4 @@
-package gui;
+package testbed.gui;
 
 import java.awt.*;
 import javax.swing.*;

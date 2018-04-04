@@ -1,7 +1,7 @@
-package testbed.meshes.drone;
+package testbed.graphics.meshes.drone;
 
 import interfaces.AutopilotConfig;
-import testbed.meshes.AbstractMesh;
+import testbed.graphics.meshes.AbstractMesh;
 
 public abstract class DroneComponent extends AbstractMesh {
 

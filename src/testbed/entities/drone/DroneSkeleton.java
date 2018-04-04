@@ -1,11 +1,11 @@
 package testbed.entities.drone;
 
 import interfaces.AutopilotConfig;
-import testbed.meshes.Mesh;
-import testbed.meshes.drone.Body;
-import testbed.meshes.drone.LeftWing;
-import testbed.meshes.drone.RightWing;
-import testbed.meshes.drone.Wheel;
+import testbed.graphics.meshes.Mesh;
+import testbed.graphics.meshes.drone.Body;
+import testbed.graphics.meshes.drone.LeftWing;
+import testbed.graphics.meshes.drone.RightWing;
+import testbed.graphics.meshes.drone.Wheel;
 import utils.Constants;
 
 public class DroneSkeleton {

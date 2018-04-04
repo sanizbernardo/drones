@@ -1,4 +1,4 @@
-package gui;
+package testbed.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -37,7 +37,7 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import testbed.meshes.cube.BufferedCube;
+import testbed.graphics.meshes.cube.BufferedCube;
 import testbed.world.World;
 import testbed.world.WorldBuilder;
 

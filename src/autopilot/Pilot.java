@@ -6,7 +6,6 @@ import autopilot.pilots.FlyPilot;
 import autopilot.pilots.LandingPilot;
 import autopilot.pilots.TakeOffPilot;
 import autopilot.pilots.TaxiPilot;
-import gui.AutopilotGUI;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;

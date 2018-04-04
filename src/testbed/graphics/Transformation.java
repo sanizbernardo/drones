@@ -7,21 +7,6 @@ import testbed.entities.WorldObject;
 
 public class Transformation {
 
-    private final Matrix4f projectionMatrix;
-
-    private final Matrix4f modelViewMatrix;
-
-    private final Matrix4f viewMatrix, viewMatrixY;
-    /**
-     * Define all the transformations to be applied to GameObjects
-     */
-    public Transformation() {
-        projectionMatrix = new Matrix4f();
-        modelViewMatrix = new Matrix4f();
-        viewMatrix = new Matrix4f();
-        viewMatrixY = new Matrix4f();
-    }
-
     /**
      * Returns a correctly set projection matrix. This will make objects that
      * are further to appear a lot smaller. Also height and Z-value clashing
@@ -29,9 +14,9 @@ public class Transformation {
      * We add this as a uniform to the vertexShader so that we can further use the advantages
      * given by the GPU. As this matrix wont change often the performance will get a huge boost.
      */
-    public final Matrix4f getProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
+    public static Matrix4f getProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
         float aspectRatio = width / height;
-        projectionMatrix.identity();
+        Matrix4f projectionMatrix = new Matrix4f().identity();
         projectionMatrix.perspective(fov, aspectRatio, zNear, zFar);
         return projectionMatrix;
     }
@@ -44,33 +29,30 @@ public class Transformation {
      * @return
      *        The new viewMatrix to which potential new camera changes have been applied.
      */
-    public Matrix4f getViewMatrix(Camera camera) {
+    public static Matrix4f getViewMatrix(Camera camera) {
         Vector3f cameraPos = camera.getPosition();
         Vector3f rotation = camera.getRotation();
 
-        viewMatrix.identity();
+        Matrix4f viewMatrix = new Matrix4f().identity();
 		if (Math.abs(rotation.z) > 1E-6)
 			viewMatrix.rotate(rotation.z, new Vector3f(0, 0, 1));
 		if (Math.abs(rotation.x) > 1E-6)
 			viewMatrix.rotate(rotation.x, new Vector3f(1, 0, 0));
 		if (Math.abs(rotation.y) > 1E-6)
 			viewMatrix.rotate(rotation.y, new Vector3f(0, 1, 0));
-
-
         
         // Then do the translation
         viewMatrix.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
         return viewMatrix;
     }
     
-    public Matrix4f getViewMatrixY(Camera camera) {
+    public static Matrix4f getViewMatrixY(Camera camera) {
         Vector3f cameraPos = camera.getPosition();
         Vector3f rotation = camera.getRotation();
 
-        
-        viewMatrixY.identity();
+        Matrix4f viewMatrixY = new Matrix4f().identity();
 		if (Math.abs(rotation.y) > 1E-6)
-			viewMatrix.rotate(rotation.y, new Vector3f(0, 1, 0));
+			viewMatrixY.rotate(rotation.y, new Vector3f(0, 1, 0));
         // Then do the translation
         viewMatrixY.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z - 1);
         return viewMatrixY;
@@ -89,9 +71,9 @@ public class Transformation {
      * @return
      *        The modelViewMatrix
      */
-    public Matrix4f getModelViewMatrix(WorldObject gameItem, Matrix4f viewMatrix) {
+    public static Matrix4f getModelViewMatrix(WorldObject gameItem, Matrix4f viewMatrix) {
         Vector3f rotation = gameItem.getRotation();
-        modelViewMatrix.identity().translate(gameItem.getPosition());
+        Matrix4f modelViewMatrix = new Matrix4f().identity().translate(gameItem.getPosition());
         
 		if (Math.abs(rotation.y) > 1E-6)
 			modelViewMatrix.rotate(-rotation.y, new Vector3f(0, 1, 0));

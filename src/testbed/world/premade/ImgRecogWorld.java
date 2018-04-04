@@ -4,7 +4,7 @@ import org.joml.Vector3f;
 
 import autopilot.recognition.ImgRecogPlanner;
 import testbed.entities.WorldObject;
-import testbed.meshes.cube.Cube;
+import testbed.graphics.meshes.cube.Cube;
 import testbed.world.World;
 import utils.Utils;
 import utils.IO.MouseInput;

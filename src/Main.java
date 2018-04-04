@@ -1,6 +1,6 @@
-import gui.ConfigSetupGUI;
 import testbed.engine.Engine;
 import testbed.engine.IWorldRules;
+import testbed.gui.ConfigSetupGUI;
 import utils.Constants;
 
 

@@ -1,6 +1,5 @@
 package utils;
 
-
 public class Constants {
 
     /**
@@ -8,10 +7,6 @@ public class Constants {
      */
     public static final String TITLE = "PnO Drone Simulation";
     public static final boolean VSYNC = true;
-    //only for initialization!
-//    public static final int WIDTH = 1500;
-    //only for initialization!
-//    public static final int HEIGHT = 750;
     
     /**
      * Premade worlds that should show in the gui.
@@ -22,9 +17,8 @@ public class Constants {
 																"DemoWorld1", "DemoWorld2", "DemoWorld3",  "TestWorldPitch", "TaxiWorld"};
 
 	/**
-	 * Pilot constants
+	 * Autopilot constants
 	 */
-    
 	public static float climbAngle = FloatMath.toRadians(10);
 
 
@@ -47,8 +41,7 @@ public class Constants {
     /**
      * Renderer constants
      */
-    //Field of View in Radians
-    public static final float FOV = (float) Math.toRadians(90f);
+    public static final float FOV = FloatMath.toRadians(90);
     public static final float Z_NEAR = 0.7f;
     public static final float Z_FAR = 10000.f;
     public static final float DRONE_THICKNESS = 0.35f;  //in meters
@@ -61,51 +54,37 @@ public class Constants {
     public static final int DRONE_WHEEL_BACK_RIGHT = 5;
     
     public static final int UBUNTU_SIDEBAR = 105;
+    
     /**
      * Game engine
      */
     public static final int TARGET_FPS = 75;
-
     public static final int TARGET_UPS = 100;
 
     /**
-     * physics.World constants
+     * Camera constants
      */
     public static final float MOUSE_SENSITIVITY = 0.4f;
-
     public static final float CAMERA_POS_STEP = 0.5f;
-
     public static final int TILE_SIZE = 75;
+    public static final float ORTHO_OFFSET = 500f;
+    
     /**
-     * default config settings
+     * Default config settings
      */
     public static final float DEFAULT_GRAVITY = 9.81f;
-    
     public static final float DEFAULT_WINGX = 4.2f;
-    
     public static final float DEFAULT_TAILSIZE = 4.2f;
-    
     public static final float DEFAULT_ENGINE_MASS = 180f;
-    
     public static final float DEFAULT_WING_MASS = 100f;
-    
     public static final float DEFAULT_TAIL_MASS = 100f;
-    
     public static final float DEFAULT_MAX_THRUST = 2000f;
-    
     public static final int DEFAULT_MAX_AOA = 15;
-    
     public static final float DEFAULT_WING_LIFTSLOPE = 10f;
-    
     public static final float DEFAULT_VER_STAB_LIFTSLOPE = 5f;
-    
     public static final float DEFAULT_HOR_STAB_LIFTSLOPE = 5f;
-    
     public static final int DEFAULT_VER_FOV = 120;
-    
     public static final int DEFAULT_HOR_FOV = 120;
-    
     public static final int DEFAULT_NB_COLS = 200;
-    
     public static final int DEFAULT_NB_ROWS = 200;
 }

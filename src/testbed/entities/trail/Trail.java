@@ -1,7 +1,7 @@
 package testbed.entities.trail;
 
 import testbed.entities.WorldObject;
-import testbed.meshes.cube.TrailCube;
+import testbed.graphics.meshes.cube.TrailCube;
 
 import org.joml.Vector3f;
 

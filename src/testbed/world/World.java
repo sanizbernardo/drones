@@ -1,18 +1,18 @@
 package testbed.world;
 
-import gui.TestbedGui;
 import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
+import testbed.Physics;
 import testbed.engine.*;
 import testbed.entities.WorldObject;
+import testbed.entities.airport.Airport;
 import testbed.entities.ground.Ground;
-import testbed.entities.tarmac.Tarmac;
 import testbed.graphics.Renderer;
+import testbed.gui.TestbedGui;
 import testbed.world.helpers.*;
 import utils.Utils;
 import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
-import utils.image.ImageCreator;
 
 import org.joml.Vector3f;
 
@@ -21,26 +21,23 @@ public abstract class World implements IWorldRules {
 	private CameraHelper cameraHelper;
 
 	private Renderer renderer;
-	private ImageCreator imageCreator;
 	private int TIME_SLOWDOWN_MULTIPLIER;
 	private KeyboardInput keyboardInput;
 	private TestbedGui testbedGui;
 	private UpdateHelper updateHelper;
 	private LogHelper logHelper;
 	private String logDrone;
+	private DroneHelper droneHelper;
 	private float time;
 
 	/* These are to be directly called in the world classes */
 	protected Autopilot planner;
 	protected WorldObject[] worldObjects;
-	protected AutopilotConfig config;
 	protected Engine gameEngine;
-	protected DroneHelper droneHelper;
-	
+	protected Airport[] airports;
 	protected Ground ground;
-	protected Tarmac tarmac;
 
-	public World(int tSM, boolean wantPhysicsEngine) {
+	public World(int tSM, boolean wantPhysicsEngine, int nbDrones) {
 		this.cameraHelper = new CameraHelper();
 
 		this.TIME_SLOWDOWN_MULTIPLIER = tSM;
@@ -49,7 +46,7 @@ public abstract class World implements IWorldRules {
 
 		this.testbedGui = new TestbedGui();
 
-		this.droneHelper = new DroneHelper(wantPhysicsEngine, 1, testbedGui);
+		this.droneHelper = new DroneHelper(wantPhysicsEngine, nbDrones, testbedGui);
 	}
 
 	/**
@@ -62,6 +59,7 @@ public abstract class World implements IWorldRules {
 
 	public abstract String getDescription();
 
+	
 	@Override
     public void init(Window window, Engine engine) throws Exception {
     	this.gameEngine = engine; 
@@ -70,27 +68,26 @@ public abstract class World implements IWorldRules {
     	setup();
     	
     	try {
-			this.renderer = new Renderer(config);
+			this.renderer = new Renderer();
 		    this.renderer.init(window);
 		} catch (Exception e) {
 		    System.out.println("Abstract class World (render.init(window)) gave this error: " + e.getMessage());
 		    e.printStackTrace();
 		}
-		
-		this.imageCreator = new ImageCreator(config.getNbColumns(), config.getNbRows(), window);
-		
+				
 		if (planner != null) {
-			Physics physics = droneHelper.getDronePhysics(config.getDroneID());
-			planner.simulationStarted(config, Utils.buildInputs(imageCreator.screenShot(),
+			Physics physics = droneHelper.getDronePhysics(0);
+			planner.simulationStarted(physics.getConfig(), Utils.buildInputs(null,
 				physics.getPosition(), physics.getHeading(), physics.getPitch(), physics.getRoll(), 0));
 		}
 		
 		testbedGui.showGUI();
 
-		this.updateHelper = new UpdateHelper(droneHelper, config, TIME_SLOWDOWN_MULTIPLIER, cameraHelper,
-											 worldObjects, planner, testbedGui, imageCreator);
+		this.updateHelper = new UpdateHelper(droneHelper, TIME_SLOWDOWN_MULTIPLIER, cameraHelper,
+											 worldObjects, planner, testbedGui);
     }
 
+	
 	public void addDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {
 		droneHelper.addDrone(config, startPos, startVel, 0f);
 	}
@@ -99,16 +96,19 @@ public abstract class World implements IWorldRules {
 		droneHelper.addDrone(config, startPos, startVel, startHeading);
 	}
 
+	
 	public void initLogging(String droneId) {
 		this.logHelper = new LogHelper();
 		this.logDrone = droneId;
 	}
 	
+	
 	@Override
 	public void input(Window window, MouseInput mouseInput) {
-		keyboardInput.worldInput(cameraHelper.getCameraInc(), window, imageCreator, renderer);
+		keyboardInput.worldInput(cameraHelper.getCameraInc(), window, renderer);
 	}
 
+	
 	/**
 	 * Handle the game objects internally
 	 */
@@ -118,7 +118,7 @@ public abstract class World implements IWorldRules {
 		
 		updateHelper.updateCycle(interval, mouseInput);
 		
-		if (droneHelper.getNbDrones() == 0) {
+		if (droneHelper.droneIds.isEmpty()) {
 			gameEngine.setLoopShouldExit();
 			return;
 		}
@@ -127,11 +127,13 @@ public abstract class World implements IWorldRules {
 			logHelper.log(time, droneHelper.getDronePhysics(logDrone));
 	}
 
+	
 	@Override
 	public void render(Window window) {
-		renderer.render(window, cameraHelper, worldObjects, droneHelper, ground, tarmac);
+		renderer.render(window, cameraHelper, worldObjects, droneHelper, ground, airports);
 	}
 
+	
 	/**
 	 * Delete VBO and VAO objects
 	 */
@@ -144,6 +146,7 @@ public abstract class World implements IWorldRules {
 		}
 	}
 
+	
 	@Override
 	public void endSimulation() {
 		testbedGui.dispose();

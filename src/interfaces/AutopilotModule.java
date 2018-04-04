@@ -21,6 +21,9 @@ public interface AutopilotModule {
      */
 	public void startTimeHasPassed(int drone, AutopilotInputs inputs); 
     
+	/**
+	 * Called with drone = 0 through N - 1, in that order, if N drones have been defined.
+	 */
 	public AutopilotOutputs completeTimeHasPassed(int drone); 
     
 	/**

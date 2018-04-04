@@ -1,4 +1,4 @@
-package utils.image;
+package utils.graphics;
 
 import javax.imageio.ImageIO;
 

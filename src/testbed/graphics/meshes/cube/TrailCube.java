@@ -1,6 +1,6 @@
-package testbed.meshes.cube;
+package testbed.graphics.meshes.cube;
 
-import testbed.meshes.Mesh;
+import testbed.graphics.meshes.Mesh;
 
 public class TrailCube {
 

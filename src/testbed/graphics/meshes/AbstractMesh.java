@@ -1,4 +1,4 @@
-package testbed.meshes;
+package testbed.graphics.meshes;
 
 public abstract class AbstractMesh {
 	

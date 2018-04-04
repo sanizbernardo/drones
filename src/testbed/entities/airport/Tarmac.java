@@ -1,12 +1,12 @@
-package testbed.entities.tarmac;
+package testbed.entities.airport;
 
 import testbed.entities.WorldObject;
-import testbed.meshes.tarmac.TarmacMesh;
+import testbed.graphics.meshes.airport.TarmacMesh;
 
 import org.joml.Vector3f;
 
-import utils.RGBTuple;
 import utils.Utils;
+import utils.graphics.RGBTuple;
 
 public class Tarmac {
 

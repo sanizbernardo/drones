@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import org.joml.Vector3f;
 
 import interfaces.AutopilotConfig;
-import testbed.engine.Physics;
+import testbed.Physics;
 import testbed.entities.WorldObject;
 import testbed.entities.drone.DroneSkeleton;
 import testbed.entities.trail.Trail;
@@ -19,37 +19,75 @@ import utils.PhysicsException;
 
 public class DroneHelper {
 
-	private int nbDrones;
-	private Map<String, Integer> droneIds;
+	private final int nbDrones;
+	private int index;
+	public Map<String, Integer> droneIds;
 
-	private WorldObject[][] drones;
+	private WorldObject[][] droneModels;
 	private Physics[] physics;
 	private Trail[] trails;
-	private JFrame rootFrame;
-
+	
+	private final JFrame rootFrame;
 	private final boolean wantPhysics;
 
 	public DroneHelper(boolean wantPhysics, int nbDrones, JFrame rootFrame) {
 		this.nbDrones = nbDrones;
+		this.index = -1;
 		this.droneIds = new HashMap<>();
 
-		this.drones = new WorldObject[nbDrones][];
+		this.droneModels = new WorldObject[nbDrones][];
 		this.physics = new Physics[nbDrones];
 		this.trails = new Trail[nbDrones];
 
 		this.rootFrame = rootFrame;
 		this.wantPhysics = wantPhysics;
 	}
+	
+	
+	public Physics getDronePhysics(String droneId) {
+		return droneIds.containsKey(droneId) ? physics[droneIds.get(droneId)]: null;
+	}
 
-	public void addDrone(AutopilotConfig config, Vector3f startPos,
-			Vector3f startVel, float startHeading) {
-		int i = 0;
-		while (droneIds.containsValue(i) && i < nbDrones) {
-			i += 1;
-		}
-		if (i == nbDrones)
+	public Physics getDronePhysics(int droneId) {
+		return droneIds.containsValue(droneId) ? physics[droneId]: null;
+	}
+
+	
+	public Trail getDroneTrail(String droneId) {
+		return droneIds.containsKey(droneId) ? trails[droneIds.get(droneId)]: null;
+	}
+
+	public Trail getDroneTrail(int droneId) {
+		return droneIds.containsValue(droneId) ? trails[droneId]: null;
+	}
+	
+	
+	public WorldObject[] getDroneItems(String droneId) {
+		return droneIds.containsKey(droneId) ? droneModels[droneIds.get(droneId)]: null;
+	}
+	
+	public WorldObject[] getDroneItems(int droneId) {
+		return droneIds.containsValue(droneId) ? droneModels[droneId]: null;
+	}
+	
+	
+	public AutopilotConfig getDroneConfig(String droneId) {
+		return droneIds.containsKey(droneId) ? physics[droneIds.get(droneId)].getConfig(): null;
+	}
+
+	public AutopilotConfig getDroneConfig(int droneId) {
+		return droneIds.containsValue(droneId) ? physics[droneId].getConfig(): null;
+	}
+	
+
+	public void addDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading) {
+		
+		this.index ++;
+		
+		if (index == nbDrones)
 			throw new IllegalArgumentException("Max amount of drones reached");
-		droneIds.put(config.getDroneID(), i);
+		
+		droneIds.put(config.getDroneID(), index);
 
 		DroneSkeleton droneMesh = new DroneSkeleton(config);
 		WorldObject left = new WorldObject(droneMesh.getLeft());
@@ -63,30 +101,36 @@ public class DroneHelper {
 		WorldObject[] droneItems = new WorldObject[] { left, right, body,
 				wheelFront, wheelBackLeft, wheelBackRight };
 
-		drones[i] = droneItems;
+		droneModels[index] = droneItems;
 
 		Physics physic = new Physics();
 		physic.init(config, startPos, startVel, startHeading);
 
-		physics[i] = physic;
+		physics[index] = physic;
 
-		trails[i] = new Trail();
+		trails[index] = new Trail();
 	}
 
+	
 	public void removeDrone(String droneId) {
 		int index = droneIds.remove(droneId);
 
-		WorldObject[] droneItems = drones[index];
+		WorldObject[] droneItems = droneModels[index];
 
 		for (WorldObject droneItem : droneItems) {
 			droneItem.getMesh().cleanUp();
 		}
 
-		drones[index] = null;
+		droneModels[index] = null;
 		physics[index] = null;
 		trails[index] = null;
 	}
 
+	public void removeDrone(int droneId) {
+		removeDrone(physics[droneId].getConfig().getDroneID());
+	}
+	
+	
 	public void update(float interval) {
 		updatePhysics(interval);
 
@@ -95,42 +139,23 @@ public class DroneHelper {
 		updateDroneItems();
 	}
 
+	
 	private void updatePhysics(float interval) {
-		if (wantPhysics) {
-			for (String droneId : droneIds.keySet()) {
-				try {
-					getDronePhysics(droneId).update(interval);
-				} catch (PhysicsException e) {
-					JOptionPane.showMessageDialog(rootFrame,
-							"A physics error occured for drone " + droneId
-									+ ": " + e.getMessage(),
-							"Physics Exception", JOptionPane.ERROR_MESSAGE);
-					removeDrone(droneId);
-				} catch (NullPointerException e) {
-				}
-			}
+		if (!wantPhysics)
+			return;
+		
+		for (String droneId : droneIds.keySet()) {
+			try {
+				getDronePhysics(droneId).update(interval);
+			} catch (PhysicsException e) {
+				JOptionPane.showMessageDialog(rootFrame,
+						"A physics error occured for drone " + droneId
+								+ ": " + e.getMessage(),
+						"Physics Exception", JOptionPane.ERROR_MESSAGE);
+				removeDrone(droneId);
+			} catch (NullPointerException e) { }
 		}
-
 		checkCollision();
-	}
-
-	private void checkCollision() {
-		for (String droneId1 : droneIds.keySet()) {
-			int i = droneIds.get(droneId1);
-			for (String droneId2 : droneIds.keySet()) {
-				int j = droneIds.get(droneId2);
-				if (i < j)
-					if (FloatMath.norm(physics[i].getPosition().sub(
-							physics[j].getPosition())) <= Constants.COLLISION_RANGE) {
-						JOptionPane.showMessageDialog(rootFrame, "Drone "
-								+ droneId1 + " and drone " + droneId2
-								+ " collided.", "Collision Exception",
-								JOptionPane.ERROR_MESSAGE);
-						removeDrone(droneId1);
-						removeDrone(droneId2);
-					}
-			}
-		}
 	}
 
 	private void updateTrails() {
@@ -145,7 +170,7 @@ public class DroneHelper {
 			Physics physics = getDronePhysics(droneId);
 			Vector3f dronePos = physics.getPosition();
 			// Update the position of each drone item
-			for (WorldObject droneItem : drones[droneIds.get(droneId)]) {
+			for (WorldObject droneItem : droneModels[droneIds.get(droneId)]) {
 				droneItem.setPosition(dronePos.x, dronePos.y, dronePos.z);
 				droneItem.setRotation(-physics.getPitch(),
 						-physics.getHeading(), -physics.getRoll());
@@ -179,34 +204,31 @@ public class DroneHelper {
 	}
 
 	private void setWheel(String droneId, int id, float x, float y, float z) {
-		Vector3f wheel = drones[droneIds.get(droneId)][id].getPosition();
+		Vector3f wheel = droneModels[droneIds.get(droneId)][id].getPosition();
 		Vector3f wheelT = FloatMath.transform(getDronePhysics(droneId)
 				.getTransMat(), wheel);
 
 		wheelT.add(new Vector3f(x, y, z));
 		Physics physics = getDronePhysics(droneId);
 		wheelT = FloatMath.transform(physics.getTransMatInv(), wheelT);
-		drones[droneIds.get(droneId)][id].setPosition(wheelT.x, wheelT.y,
-				wheelT.z);
+		droneModels[droneIds.get(droneId)][id].setPosition(wheelT.x, wheelT.y, wheelT.z);
 	}
 
-	public Physics getDronePhysics(String droneId) {
-		return droneIds.containsKey(droneId) ? physics[droneIds.get(droneId)]
-				: null;
+	
+	private void checkCollision() {
+		for (int i: droneIds.values()) {
+			for (int j: droneIds.values()) {
+				if (i < j)
+					if (FloatMath.norm(physics[i].getPosition().sub(
+							physics[j].getPosition())) <= Constants.COLLISION_RANGE) {
+						JOptionPane.showMessageDialog(rootFrame, "Drone "
+								+ i + " and drone " + j
+								+ " collided.", "Collision Exception",
+								JOptionPane.ERROR_MESSAGE);
+						removeDrone(i);
+						removeDrone(j);
+					}
+			}
+		}
 	}
-
-	public Trail getDroneTrail(String droneId) {
-		return droneIds.containsKey(droneId) ? trails[droneIds.get(droneId)]
-				: null;
-	}
-
-	public WorldObject[] getDroneItems(String droneId) {
-		return droneIds.containsKey(droneId) ? drones[droneIds.get(droneId)]
-				: null;
-	}
-
-	public int getNbDrones() {
-		return droneIds.size();
-	}
-
 }

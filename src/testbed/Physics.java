@@ -1,4 +1,4 @@
-package testbed.engine;
+package testbed;
 
 import org.joml.Matrix3f;
 import org.joml.Vector3f;

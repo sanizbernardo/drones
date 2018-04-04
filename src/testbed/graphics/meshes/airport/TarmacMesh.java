@@ -1,7 +1,7 @@
-package testbed.meshes.tarmac;
+package testbed.graphics.meshes.airport;
 
-import testbed.meshes.AbstractMesh;
-import utils.RGBTuple;
+import testbed.graphics.meshes.AbstractMesh;
+import utils.graphics.RGBTuple;
 
 public class TarmacMesh extends AbstractMesh{
 
