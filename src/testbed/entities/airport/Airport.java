@@ -19,6 +19,8 @@ public class Airport {
 	 */
 	private final Vector3f directionPerp; 
 	
+	private final float width, length;
+	
 	private Tarmac tarmac0, tarmac1;
 	
 	private Gate gate0, gate1;
@@ -26,6 +28,9 @@ public class Airport {
 	
 	public Airport(float width, float length, Vector3f position, float heading) {
 		this.position = position;
+		
+		this.width = width;
+		this.length = length;
 		
 		this.direction = new Vector3f(-FloatMath.sin(heading), 0, -FloatMath.cos(heading));
 		this.directionPerp = new Vector3f(-FloatMath.cos(heading), 0, FloatMath.sin(heading));
@@ -56,5 +61,13 @@ public class Airport {
 	
 	public Vector3f getPerpDirection() {
 		return directionPerp;
+	}
+	
+	public float getWidth() {
+		return width;
+	}
+	
+	public float getLength() {
+		return length;
 	}
 }

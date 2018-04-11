@@ -1,7 +1,10 @@
 package testbed.world.helpers;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -11,6 +14,7 @@ import org.joml.Vector3f;
 import interfaces.AutopilotConfig;
 import testbed.Physics;
 import testbed.entities.WorldObject;
+import testbed.entities.airport.Airport;
 import testbed.entities.drone.DroneSkeleton;
 import testbed.entities.trail.Trail;
 import utils.Constants;
@@ -80,8 +84,7 @@ public class DroneHelper {
 	}
 	
 
-	public void addDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading) {
-		
+	public void addDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading, List<Airport> airports) {
 		this.index ++;
 		
 		if (index == nbDrones)
@@ -104,7 +107,7 @@ public class DroneHelper {
 		droneModels[index] = droneItems;
 
 		Physics physic = new Physics();
-		physic.init(config, startPos, startVel, startHeading);
+		physic.init(config, startPos, startVel, startHeading, airports);
 
 		physics[index] = physic;
 
@@ -216,19 +219,24 @@ public class DroneHelper {
 
 	
 	private void checkCollision() {
+		Set<Integer> dronesToRemove = new HashSet<>();
 		for (int i: droneIds.values()) {
 			for (int j: droneIds.values()) {
 				if (i < j)
 					if (FloatMath.norm(physics[i].getPosition().sub(
 							physics[j].getPosition())) <= Constants.COLLISION_RANGE) {
 						JOptionPane.showMessageDialog(rootFrame, "Drone "
-								+ i + " and drone " + j
+								+ getDroneConfig(i).getDroneID() + " and drone " + getDroneConfig(j).getDroneID()
 								+ " collided.", "Collision Exception",
 								JOptionPane.ERROR_MESSAGE);
-						removeDrone(i);
-						removeDrone(j);
+						dronesToRemove.add(i);
+						dronesToRemove.add(j);
 					}
 			}
+		}
+		
+		for (int i: dronesToRemove) {
+			removeDrone(i);
 		}
 	}
 }

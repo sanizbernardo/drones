@@ -87,4 +87,7 @@ public class Constants {
     public static final int DEFAULT_HOR_FOV = 120;
     public static final int DEFAULT_NB_COLS = 200;
     public static final int DEFAULT_NB_ROWS = 200;
+    
+    public static final float DEFAULT_AIRPORT_LENGTH = 250f;
+    public static final float DEFAULT_AIRPORT_WIDTH = 25f;
 }

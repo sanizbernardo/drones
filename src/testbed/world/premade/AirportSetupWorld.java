@@ -1,42 +1,41 @@
 package testbed.world.premade;
 
-import testbed.engine.IWorldRules;
 import testbed.entities.WorldObject;
-import testbed.entities.airport.Airport;
 import testbed.entities.ground.Ground;
 import testbed.world.World;
 import utils.FloatMath;
-import utils.Utils;
-
 import org.joml.Vector3f;
 
-import interfaces.AutopilotConfig;
+import autopilot.Pilot;
 
-public class AirportSetupWorld extends World implements IWorldRules {
+public class AirportSetupWorld extends World {
 
     public AirportSetupWorld() {
-        super(1, true, 1);
+        super(1, true, 2, 25, 250);
     }
 
     @Override
-    public void setup() {
-    	
-    	this.airports = new Airport[] {new Airport(20, 200, new Vector3f(0, 0, 0), FloatMath.toRadians(-120))};
-    	
-    	AutopilotConfig config = Utils.createDefaultConfig("drone1");
+    public void setupAirports() {
+    	addAirport(new Vector3f(0, 0, 0), FloatMath.toRadians(0));
+    }
+    
+	@Override
+	public void setupDrones() {
+        addDrone("drone1", 0, 0, 0);
+        addDrone("drone2", 0, 1, 1);
+	}
 
-        addDrone(config,  new Vector3f(0,-config.getWheelY()+config.getTyreRadius(),0), new Vector3f(0, 0, 0), FloatMath.toRadians(-120));
-
-        planner = null;
+	@Override
+	public void setupWorld() {
+        planner = new Pilot(new int[0]);
 
         worldObjects = new WorldObject[0]; 
 
-        this.ground = new Ground(50);
-    }
-
+        this.ground = new Ground(50);		
+	}
+	
     @Override
     public String getDescription() {
         return "A test for the airport setup";
     }
-    
 }

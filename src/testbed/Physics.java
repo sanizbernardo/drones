@@ -1,15 +1,31 @@
 package testbed;
 
+import java.util.List;
+
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotOutputs;
+import testbed.entities.airport.Airport;
 import utils.FloatMath;
 import utils.PhysicsException;
 import utils.Utils;
 
 public class Physics {
+	
+	/**
+	 * Drone position constants
+	 */
+	public static final int LANE_0 = -1;
+	public static final int LANE_1 = -2;
+	public static final int GATE_0 = 1;
+	public static final int GATE_1 = 2;
+	public static final int NONE = 0;
+	
+	private static final String[] WING_NAMES = new String[] {"Left wing", "Right wing","Horizontal Stabilizer", 
+	 "Vertical Stabilizer"};
+	private static final String[] WHEEL_NAMES = new String[] {"Left wheel", "Front wheel", "Right wheel"};
 	
 	/**
 	 * in world coordinates
@@ -33,18 +49,14 @@ public class Physics {
 	private Vector3f[] axisVectors, wingPositions, velProj, wheelPositions;
 	private float[] liftSlopes, dBuffer, brakeForce;
 	
-	private final String[] wingNames = new String[] {"Left wing", "Right wing", 
-													 "Horizontal Stabilizer", 
-													 "Vertical Stabilizer"};
-	private final String[] tyreNames = new String[] {"Left wheel", "Front wheel", "Right wheel"};
-	
 	private final boolean checkAOA;
 
 	private AutopilotConfig config;
 
-	private boolean check = false;
-
-	private boolean check2 = true;
+	private List<Airport> airports;
+	private Airport lastAirport;
+	private int airportPos;
+	
 	
 	public Physics(boolean checkAOA) {
 		this.checkAOA = checkAOA;
@@ -61,11 +73,12 @@ public class Physics {
 		this(true);
 	}
 	
+	
 	/**
 	 * Initialises the drone at the given position, with the given starting velocity,
 	 * and the given heading.
 	 */
-	public void init(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading) {
+	public void init(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading, List<Airport> airports) {
 		setupCalculations(config);
 		
 		this.config = config;
@@ -77,6 +90,8 @@ public class Physics {
 		this.vel = startVel;
 		
 		this.angVel = new Vector3f();
+		
+		this.airports = airports;
 		
 		this.transMat = new Matrix3f().identity();
 		
@@ -93,77 +108,66 @@ public class Physics {
 		}
 	}
 	
+	
 	/**
 	 * Initialises the drone at the given position, with the given starting velocity,
 	 * and with heading 0.
 	 */
-	public void init(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {
-		init(config, startPos, startVel, 0f);
+	public void init(AutopilotConfig config, Vector3f startPos, Vector3f startVel, List<Airport> airports) {
+		init(config, startPos, startVel, 0f, airports);
 	}
 	
 	
 	/**
-	 * Initialisation constants for calculations
+	 * Initialisation of constants for calculations
 	 */
 	private void setupCalculations(AutopilotConfig config) {
 		this.axisVectors = new Vector3f[] {new Vector3f(1, 0, 0),
 										   new Vector3f(1, 0, 0),
 										   new Vector3f(1, 0, 0),
 										   new Vector3f(0, 1, 0)};
-		
 		this.wingPositions = new Vector3f[] {new Vector3f(-config.getWingX(), 0, 0),
 											 new Vector3f(config.getWingX(), 0, 0),
 											 new Vector3f(0, 0, config.getTailSize()),
 											 new Vector3f(0, 0, config.getTailSize())};
-		
 		this.wheelPositions = new Vector3f[] {new Vector3f(-config.getRearWheelX(), config.getWheelY(), config.getRearWheelZ()),
 											  new Vector3f(0, config.getWheelY(), config.getFrontWheelZ()),
 											  new Vector3f(config.getRearWheelX(), config.getWheelY(), config.getRearWheelZ())};
-		
 		this.velProj = new Vector3f[] {new Vector3f(0, 1, 1),
 									   new Vector3f(0, 1, 1),
 									   new Vector3f(0, 1, 1),
 									   new Vector3f(1, 0, 1)};
 		
-		this.weight = (config.getEngineMass() + 2*config.getWingMass() + config.getTailMass());
-		
-		this.weightWorld = new Vector3f(0, - config.getGravity() * this.weight, 0);
-		
-		this.liftSlopes = new float[] {config.getWingLiftSlope(), config.getWingLiftSlope(), config.getHorStabLiftSlope(), config.getVerStabLiftSlope()};
-		
 		this.dBuffer = new float[] {0,0,0};
 		
+		this.tyreRadius = config.getTyreRadius();
+		this.tyreSlope = config.getTyreSlope();
+		this.dampSlope = config.getDampSlope();
+		this.maxAOA = config.getMaxAOA();
+		this.maxR = config.getRMax();
+		this.maxFC = config.getFcMax();
+		this.maxThrust = config.getMaxThrust();
+		this.weight = (config.getEngineMass() + 2*config.getWingMass() + config.getTailMass());
+		this.weightWorld = new Vector3f(0, - config.getGravity() * this.weight, 0);
+		this.liftSlopes = new float[] {config.getWingLiftSlope(), config.getWingLiftSlope(), config.getHorStabLiftSlope(), config.getVerStabLiftSlope()};
 		float engineZ = config.getTailMass() / config.getEngineMass() * config.getTailSize();
 		this.enginePos = new Vector3f(0, 0, -engineZ);
 		
 		float Ixx = FloatMath.square(engineZ) * config.getEngineMass() + 
-					FloatMath.square(config.getTailSize()) * config.getTailMass(),
-			  Izz = 2f * FloatMath.square(config.getWingX()) * config.getWingMass();
+				FloatMath.square(config.getTailSize()) * config.getTailMass(),
+		  Izz = 2f * FloatMath.square(config.getWingX()) * config.getWingMass();
 		this.inertia = new Matrix3f(Ixx, 0,         0,
 									0,   Ixx + Izz, 0, 
 									0,   0,         Izz);
 		this.inertiaInv = new Matrix3f(1/Ixx, 0,             0,
 									   0,     1/(Ixx + Izz), 0,
 									   0,     0,             1/Izz);
-		
-		this.tyreRadius = config.getTyreRadius();
-		
-		this.tyreSlope = config.getTyreSlope();
-		
-		this.dampSlope = config.getDampSlope();
-		
-		this.maxAOA = config.getMaxAOA();
-		
-		this.maxR = config.getRMax();
-		
-		this.maxFC = config.getFcMax();
-		
-		this.maxThrust = config.getMaxThrust();
+			
+		this.lastAirport = null;		
+		this.airportPos = NONE;
 	}
 	
-	
 	// getters voor de eigenschappen van de drone
-	
 	public Vector3f getPosition() {
 		return new Vector3f(this.pos);
 	}
@@ -217,7 +221,19 @@ public class Physics {
 	}
 	
 	
+	public boolean onGround() {
+		return dBuffer[0] > 0 || dBuffer[1] > 0 || dBuffer[2] > 0; 
+	}
+	
+	public Airport getAirport() {
+		return lastAirport;
+	}
+	
+	public int getAirportLocation() {
+		return airportPos;
+	}
 
+	
 	/**
 	 * Updates the wing inclinations and thrust of the drone
 	 * @throws PhysicsException 
@@ -237,7 +253,7 @@ public class Physics {
 		this.brakeForce[2] = data.getRightBrakeForce();
 		for (int i = 0; i < 3; i++) {
 			if (brakeForce[i] < 0 || brakeForce[i] > this.maxR)
-				throw new PhysicsException("Illegal brake force on " + tyreNames[i] + " (" + FloatMath.round(brakeForce[i],2) + ")");
+				throw new PhysicsException("Illegal brake force on " + WHEEL_NAMES[i] + " (" + FloatMath.round(brakeForce[i],2) + ")");
 		}
 	}
 	
@@ -250,16 +266,10 @@ public class Physics {
 	public void update(float dt) throws PhysicsException {
 		updateTransMat(dt);
 		updateHPR();
-		if (this.getPosition().z<-1000 && check2) {
-			check  = true;
-			check2 = false;
-		}
-			
-		if (-this.getVelocity().z() < 0.1 && check) {
-			System.out.println("Z2: " + this.getPosition().z);
-			check  = false;
-		}
+
 		Vector3f[] forceTorque = calculateForce(dt);
+		
+		updateAirportPos();
 		
 		// forward euler
 		this.pos.add(vel.mul(dt, new Vector3f()));
@@ -269,6 +279,7 @@ public class Physics {
 		checkCrash();
 	}
 
+	
 	/**
 	 * Updates the transformation matrix, it rotates with the drone's angular velocity.
 	 */
@@ -300,6 +311,25 @@ public class Physics {
 		this.roll = FloatMath.atan2(R.dot(U0), R.dot(R0));
 	}
 	
+	private void updateAirportPos() {
+		if (onGround()) {
+			Vector3f diff = this.pos.sub(lastAirport.getPosition(), new Vector3f());
+			float len = diff.dot(lastAirport.getDirection()),
+					wid = diff.dot(lastAirport.getPerpDirection());
+			
+			if (len > lastAirport.getWidth() / 2)
+				airportPos = LANE_0;
+			else if (len < - lastAirport.getWidth() / 2)
+				airportPos = LANE_1;
+			else if (wid > 0)
+				airportPos = GATE_0;
+			else
+				airportPos = GATE_1;
+		} else {
+			airportPos = NONE;
+		}
+		
+	}
 	
 	/**
 	 * Calculates total force and torque, in drone coordinates
@@ -334,11 +364,12 @@ public class Physics {
 			Vector3f force = normal.mul(this.liftSlopes[i] * aoa * FloatMath.squareNorm(veli));
 
 			if (checkAOA && dt != 0 && FloatMath.norm(force) > 50 && Math.abs(aoa) > maxAOA)
-				throw new PhysicsException(wingNames[i] + " exceeded maximum aoa (" + FloatMath.round(FloatMath.toDegrees(aoa), 2) + "�)");
+				throw new PhysicsException(WING_NAMES[i] + " exceeded maximum aoa (" + FloatMath.round(FloatMath.toDegrees(aoa), 2) + "�)");
 			
 			totalForce.add(force);
 			totalTorque.add(FloatMath.cross(this.wingPositions[i], force));
 		}
+		
 		
 		// wheels
 		for (int i = 0; i < 3; i++) {
@@ -348,10 +379,10 @@ public class Physics {
 
 			worldWheelPos.y = 0;
 			
-			Vector3f relPos = FloatMath.transform(this.transMat, worldWheelPos.sub(this.pos));
+			Vector3f relPos = FloatMath.transform(this.transMat, worldWheelPos.sub(this.pos, new Vector3f()));
 						
 			if (d >= this.tyreRadius)
-				throw new PhysicsException(tyreNames[i] + " went underground. (" + FloatMath.round(d,2) + ")");
+				throw new PhysicsException(WHEEL_NAMES[i] + " went underground. (" + FloatMath.round(d,2) + ")");
 			
 			if (d > 0) { // op de grond?
 				// lift
@@ -371,7 +402,6 @@ public class Physics {
 				}
 				
 				// remmen
-				
 				Vector3f worldVel = this.vel.add(FloatMath.transform(this.transMatInv, FloatMath.cross(this.angVel, this.wheelPositions[i])), new Vector3f());
 				worldVel.y = 0;
 				Vector3f droneVel = FloatMath.transform(this.transMat, worldVel);
@@ -408,6 +438,31 @@ public class Physics {
 					totalForce.add(frictionForce);
 					totalTorque.add(FloatMath.cross(relPos, frictionForce));
 				}
+				
+				// landingsbaan
+				boolean groundCheck = false;
+				if (lastAirport == null) {
+					for (Airport airport: airports) {
+						Vector3f diff = worldWheelPos.sub(airport.getPosition(), new Vector3f());
+						
+						if (Math.abs(diff.dot(airport.getDirection())) <= airport.getWidth() + airport.getLength() && 
+								Math.abs(diff.dot(airport.getPerpDirection())) <= airport.getWidth()) {
+							lastAirport = airport;
+							groundCheck = true;
+							break;
+						}
+					}
+				} else {
+					Vector3f diff = worldWheelPos.sub(lastAirport.getPosition(), new Vector3f());
+					
+					if (Math.abs(diff.dot(lastAirport.getDirection())) <= lastAirport.getWidth() + lastAirport.getLength() && 
+							Math.abs(diff.dot(lastAirport.getPerpDirection())) <= lastAirport.getWidth())
+						groundCheck = true;
+				}
+				
+				if (!groundCheck)
+					throw new PhysicsException(WHEEL_NAMES[i] + " hit grass.");
+				
 			} else {
 				dBuffer[i] = 0;
 			}
@@ -416,15 +471,16 @@ public class Physics {
 		return new Vector3f[] {totalForce, totalTorque};
 	}
 	
+	
 	/**
 	 * Calulates the rotational acceleration, in drone coordinates
 	 */
 	private Vector3f calculateAlfa(Vector3f torque) {
-		
 		Vector3f part1 = FloatMath.cross(this.angVel, FloatMath.transform(this.inertia, this.angVel));
 		Vector3f alfa = FloatMath.transform(this.inertiaInv, torque.add(part1, new Vector3f()));
 		return alfa;
 	}
+	
 	
 	/**
 	 * Checks if the plane hits the ground.

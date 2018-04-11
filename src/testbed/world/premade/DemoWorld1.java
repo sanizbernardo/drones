@@ -7,29 +7,34 @@ import org.joml.Vector3f;
 import autopilot.Pilot;
 import interfaces.AutopilotConfig;
 import testbed.entities.WorldObject;
-import testbed.entities.airport.Airport;
 import testbed.entities.ground.Ground;
 import testbed.world.World;
 import utils.Cubes;
-import utils.FloatMath;
 import utils.Utils;
 
 public class DemoWorld1 extends World {
 	
 	public DemoWorld1() {
-		super(1, true, 1);
+		super(1, true, 1, 20, 200);
 	}
 	
 	@Override
-	public void setup() {
+	public void setupAirports() {
+		addAirport(new Vector3f(0, 0, 0), 0); 
+	}
+	
+	@SuppressWarnings("deprecation")
+	@Override
+	public void setupDrones() {
 		AutopilotConfig config = Utils.createDefaultConfig("drone1");
 		
-		this.airports = new Airport[] {new Airport(20, 200, new Vector3f(0, 0, 0), 0)}; 
-		
-		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0), FloatMath.toRadians(0));
+		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0), 0);
 		
 		this.planner = new Pilot(new int[] {Pilot.WAIT_PATH, Pilot.TAKING_OFF, Pilot.FLYING});
-		
+	}
+
+	@Override
+	public void setupWorld() {
 		this.worldObjects = new WorldObject[] {new WorldObject(Cubes.getBlueCube().getMesh()),
 											   new WorldObject(Cubes.getGreenCube().getMesh()),
 											   new WorldObject(Cubes.getYellowCube().getMesh()),
@@ -44,7 +49,7 @@ public class DemoWorld1 extends World {
 		
 		Arrays.asList(worldObjects).stream().forEach(c -> c.setScale(5));
 		
-		this.ground = new Ground(50);
+		this.ground = new Ground(50);		
 	}
 
 	@Override
@@ -52,4 +57,6 @@ public class DemoWorld1 extends World {
 		return "World for demonstrating the first task in the "
 				+ "first demo in the second semester.";
 	}
+
+
 }

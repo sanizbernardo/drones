@@ -13,51 +13,51 @@ import org.joml.Vector3f;
 
 import interfaces.AutopilotConfig;
 
-/**
- * Place where all the GameItem are to be placed in
- */
 public class CubeWorld extends World {
 
     public CubeWorld() {
         super(1, false, 1);
     }
+	@Override
+	public void setupAirports() { }
 
-    @Override
-    public void setup() {
+	@SuppressWarnings("deprecation")
+	@Override
+    public void setupDrones() {
     	AutopilotConfig config = Utils.createDefaultConfig("drone1");
   
-    	addDrone(config, new Vector3f(0, 100, 0), new Vector3f(0, 40, 0));
-
-    	planner = null;
+    	addDrone(config, new Vector3f(0, 100, 0), new Vector3f(0, 40, 0), 0);
+    	
+        float leftWingInc = (float)Math.toRadians(5f);
+    	
+    	try {
+        	droneHelper.getDronePhysics(0).updateDrone(Utils.buildOutputs(leftWingInc,0, 0, 0, 0, 0, 0, 0));
+		} catch (PhysicsException e) {}
+    }
+    
+	@Override
+	public void setupWorld() {
+		planner = null;
     	
         Random rand = new Random();
 
-        //World specifics
         worldObjects = new WorldObject[2000];
 
         for(int i = 0; i < worldObjects.length; i++) {
             WorldObject cube = new WorldObject(Cubes.getCubes()[rand.nextInt(Cubes.getCubes().length)].getMesh());
             cube.setScale(0.5f);
-            int x1 = rand.nextInt(100)-50,
+            int x = rand.nextInt(100)-50,
             		y = rand.nextInt(100)+50,
             		z = rand.nextInt(100)-50;
 
-            cube.setPosition(x1, y, z);
+            cube.setPosition(x, y, z);
             worldObjects[i] = cube;
         }
-
-        float leftWingInc = (float)Math.toRadians(5f);
-        float thrust = 0f;
-        try {
-        	droneHelper.getDronePhysics(config.getDroneID()).updateDrone(Utils.buildOutputs(leftWingInc,0, 0, 0, thrust, 0, 0, 0));
-		} catch (PhysicsException e) {}
-
-        
-    }
+	}
 
 	@Override
 	public String getDescription() {
-		return "Generates a world filled with 7000 cubes, randomly generated from -50 to 50 on all axes." +
+		return "Generates a world filled with 2000 cubes, randomly generated from -50 to 50 on all axes." +
 				" The drone has no autopilot attached, and is set up to start spinning around after a few seconds" +
 				"<br> This world is made for testing rendering";
 	}

@@ -95,7 +95,7 @@ public class Renderer {
     }
 
     public void render(Window window, CameraHelper cameraHelper, WorldObject[] gameItems,
-    				   DroneHelper droneHelper, Ground ground, Airport[] airports) {
+    				   DroneHelper droneHelper, Ground ground, List<Airport> airports) {
 		clear(window);
 		
         drawChaseCam(window, cameraHelper, gameItems, droneHelper, ground, airports);
@@ -115,7 +115,7 @@ public class Renderer {
 
     
 	private void drawChaseCam(Window window, CameraHelper cameraHelper, WorldObject[] gameItems,
-			DroneHelper droneHelper, Ground ground, Airport[] airports) {
+			DroneHelper droneHelper, Ground ground, List<Airport> airports) {
 		Matrix4f projectionMatrix;
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
@@ -159,7 +159,7 @@ public class Renderer {
 //	}
 
 	private void drawFreeCam(Window window, CameraHelper cameraHelper, WorldObject[] gameItems,
-			DroneHelper droneHelper, Ground ground, Airport[] airports) {
+			DroneHelper droneHelper, Ground ground, List<Airport> airports) {
 		Matrix4f projectionMatrix;
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
@@ -184,7 +184,7 @@ public class Renderer {
 	}
 	
 	private void drawTopOrthoCam(Window window, CameraHelper cameraHelper, WorldObject[] gameItems,
-			DroneHelper droneHelper, int size, Ground ground, Airport[] airports) {
+			DroneHelper droneHelper, int size, Ground ground, List<Airport> airports) {
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
 		topOrthoCamX = chaseCamWidth;     
@@ -210,7 +210,7 @@ public class Renderer {
 	}
 	
 	private void drawRightOrthCam(Window window, CameraHelper cameraHelper, WorldObject[] gameItems,
-			DroneHelper droneHelper, int size, Ground ground, Airport[] airports) {
+			DroneHelper droneHelper, int size, Ground ground, List<Airport> airports) {
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
 
@@ -249,7 +249,7 @@ public class Renderer {
         }
     }
 
-    private void renderAirports(Airport[] airports, Matrix4f viewMatrix) {
+    private void renderAirports(List<Airport> airports, Matrix4f viewMatrix) {
     	for (Airport airp: airports) {
     		for (WorldObject obj: airp.getObjects()) {
     			if (obj == null || obj.getMesh() == null) continue;

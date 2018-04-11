@@ -22,11 +22,18 @@ public class WorldBuilder extends World implements IWorldRules {
 	}
 
 	@Override
-	public void setup() {
+	public void setupAirports() {
 		
+	}
+
+	@Override
+	public void setupDrones() {
 		//TODO: provide correct planner
 		if (wantPlanner) planner = new Pilot(new int[] {});
-		
+	}
+
+	@Override
+	public void setupWorld() {
 		this.worldObjects = new WorldObject[cubes.size()];	
 		int i = 0;		
 		for (Vector3f pos: cubes.keySet()) {
@@ -36,14 +43,15 @@ public class WorldBuilder extends World implements IWorldRules {
 			i++;
 		}
 	}
-
+	
 	@Override
 	public String getDescription() {
 		return "Internal hook for GUI world creation";
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void setupDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel) {		
-        addDrone(config, startPos, startVel);
+        addDrone(config, startPos, startVel, 0);
 	}
 
 }
