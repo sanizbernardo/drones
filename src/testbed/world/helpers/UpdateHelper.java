@@ -1,5 +1,7 @@
 package testbed.world.helpers;
 
+import java.util.Map.Entry;
+
 import interfaces.Autopilot;
 import interfaces.AutopilotOutputs;
 import testbed.Physics;
@@ -68,6 +70,20 @@ public class UpdateHelper {
         this.time = 0;
         this.followDrone = 0;
     }
+	
+	public void nextFollowDrone() {
+		boolean found = false;
+		for (Entry<String, Integer> a : droneHelper.droneIds.entrySet()) {
+			if(found) {
+				this.followDrone = a.getValue();
+				return;
+			}
+			if(a.getValue() == followDrone) found = true;
+		}
+		
+		this.followDrone = droneHelper.droneIds.entrySet().iterator().next().getValue();
+		
+	}
 
 	/**
 	 * This function will cycle through all the to update variables
@@ -75,18 +91,19 @@ public class UpdateHelper {
 	 * @param interval
 	 *            The passed time (delta time)
 	 * @param mouseInput
-	 *            This is an artefact of how we set up the update classes at the
+	 *            This is an artifact of how we set up the update classes at the
 	 *            start
 	 */
 	public void updateCycle(float interval, MouseInput mouseInput) {
 		this.time += interval / TIME_SLOWDOWN_MULTIPLIER;
 
-		droneHelper.update(interval/TIME_SLOWDOWN_MULTIPLIER);
+		droneHelper.update(interval/TIME_SLOWDOWN_MULTIPLIER, this);
 		
-		if (droneHelper.droneIds.isEmpty())
-			return;
+		if (droneHelper.droneIds.isEmpty()) return;
 		
-		Vector3f newDronePos = droneHelper.getDronePhysics(0).getPosition();
+		System.out.println(droneHelper);
+		
+		Vector3f newDronePos = droneHelper.getDronePhysics(followDrone).getPosition();
 		
 		updateCameraPositions(mouseInput, newDronePos, followDrone);
 
@@ -114,7 +131,7 @@ public class UpdateHelper {
 		}
 		
 		
-		Physics physics = droneHelper.getDronePhysics(0);
+		Physics physics = droneHelper.getDronePhysics(followDrone);
 
 		cameraHelper.droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
 		cameraHelper.droneCamera.setRotation(-physics.getPitch(),-physics.getHeading(),-physics.getRoll());
@@ -150,7 +167,7 @@ public class UpdateHelper {
 		} catch (PhysicsException e) {
 			JOptionPane.showMessageDialog(testbedGui, "An illegal force was entered for the drone: " + e.getMessage(), "Physics Exception",
 					JOptionPane.ERROR_MESSAGE);
-			droneHelper.removeDrone(0);
+			droneHelper.removeDrone(0, this);
 		}
 	}
 

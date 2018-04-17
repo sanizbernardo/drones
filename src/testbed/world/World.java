@@ -114,6 +114,10 @@ public abstract class World implements IWorldRules {
 		this.updateHelper = new UpdateHelper(droneHelper, TIME_SLOWDOWN_MULTIPLIER, cameraHelper,
 											 worldObjects, planner, testbedGui);
     }
+	
+	public void nextFollowDrone() {
+		updateHelper.nextFollowDrone();
+	}
 
 	
 	public void addDrone(String droneId, int airportId, int gate, int facing) {
@@ -151,7 +155,7 @@ public abstract class World implements IWorldRules {
 	
 	@Override
 	public void input(Window window, MouseInput mouseInput) {
-		keyboardInput.worldInput(cameraHelper.getCameraInc(), window, renderer);
+		keyboardInput.worldInput(cameraHelper.getCameraInc(), window, renderer, this);
 	}
 
 	

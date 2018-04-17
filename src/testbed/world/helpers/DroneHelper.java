@@ -17,6 +17,7 @@ import testbed.entities.WorldObject;
 import testbed.entities.airport.Airport;
 import testbed.entities.drone.DroneSkeleton;
 import testbed.entities.trail.Trail;
+import testbed.world.World;
 import utils.Constants;
 import utils.FloatMath;
 import utils.PhysicsException;
@@ -115,7 +116,7 @@ public class DroneHelper {
 	}
 
 	
-	public void removeDrone(String droneId) {
+	public void removeDrone(String droneId, UpdateHelper updateHelper) {
 		int index = droneIds.remove(droneId);
 
 		WorldObject[] droneItems = droneModels[index];
@@ -127,15 +128,17 @@ public class DroneHelper {
 		droneModels[index] = null;
 		physics[index] = null;
 		trails[index] = null;
+		
+		updateHelper.nextFollowDrone();
 	}
 
-	public void removeDrone(int droneId) {
-		removeDrone(physics[droneId].getConfig().getDroneID());
+	public void removeDrone(int droneId, UpdateHelper updateHelper) {
+		removeDrone(physics[droneId].getConfig().getDroneID(), updateHelper);
 	}
 	
 	
-	public void update(float interval) {
-		updatePhysics(interval);
+	public void update(float interval, UpdateHelper updateHelper) {
+		updatePhysics(interval, updateHelper);
 
 		updateTrails();
 
@@ -143,7 +146,7 @@ public class DroneHelper {
 	}
 
 	
-	private void updatePhysics(float interval) {
+	private void updatePhysics(float interval, UpdateHelper updateHelper) {
 		if (!wantPhysics)
 			return;
 		
@@ -155,10 +158,10 @@ public class DroneHelper {
 						"A physics error occured for drone " + droneId
 								+ ": " + e.getMessage(),
 						"Physics Exception", JOptionPane.ERROR_MESSAGE);
-				removeDrone(droneId);
+				removeDrone(droneId, updateHelper);
 			} catch (NullPointerException e) { }
 		}
-		checkCollision();
+		checkCollision(updateHelper);
 	}
 
 	private void updateTrails() {
@@ -218,7 +221,7 @@ public class DroneHelper {
 	}
 
 	
-	private void checkCollision() {
+	private void checkCollision(UpdateHelper updateHelper) {
 		Set<Integer> dronesToRemove = new HashSet<>();
 		for (int i: droneIds.values()) {
 			for (int j: droneIds.values()) {
@@ -236,7 +239,7 @@ public class DroneHelper {
 		}
 		
 		for (int i: dronesToRemove) {
-			removeDrone(i);
+			removeDrone(i, updateHelper);
 		}
 	}
 }
