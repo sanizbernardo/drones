@@ -4,6 +4,7 @@ import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
 import autopilot.PilotPart;
+import autopilot.pilots.FlyPilot.State;
 import autopilot.pilots.fly.pid.PitchPID;
 import autopilot.pilots.fly.pid.RollPID;
 import autopilot.pilots.fly.pid.ThrustPID;
@@ -93,18 +94,18 @@ public class FlyPilot extends PilotPart {
 		}
 		
 		// cube geraakt? zo ja, volgende selecteren
-		if (getCurrentCube().distance(pos) < Constants.DRONE_PICKUP_DISTANCE) {
-			System.out.println("Cube hit" + pos);
-			this.cubeNb ++;
-			this.stableTime = 1.5f;
-			
-			setCurrentState(State.Stable);
-			control(inputs, currentState);
-			
-			return Utils.buildOutputs(leftWingInclination,
-					rightWingInclination, verStabInclination, horStabInclination,
-					newThrust, rMax, rMax, rMax);
-		}
+//		if (getCurrentCube().distance(pos) < Constants.DRONE_PICKUP_DISTANCE) {
+//			System.out.println("Cube hit" + pos);
+//			this.cubeNb ++;
+//			this.stableTime = 1.5f;
+//			
+//			setCurrentState(State.Stable);
+//			control(inputs, currentState);
+//			
+//			return Utils.buildOutputs(leftWingInclination,
+//					rightWingInclination, verStabInclination, horStabInclination,
+//					newThrust, rMax, rMax, rMax);
+//		}
 
 ////		 update pos met imagerecog
 //		if (getCurrentCube().distance(pos) < 100) {
@@ -122,28 +123,28 @@ public class FlyPilot extends PilotPart {
 		
 
 		// moeten we omhoog?
-		if ((getCurrentCube().y - pos.y) > 2.5) {
+		if ((100 - pos.y) > 5) {
 			if (inputs.getRoll() > FloatMath.toRadians(5))
 				setCurrentState(State.Stable);
 			else
 				setCurrentState(State.StrongUp);
 		}
 		// moeten we omlaag?
-		else if (pos.y - getCurrentCube().y > 2.5) {
+		else if (pos.y - 100 > 5) {
 			if (inputs.getRoll() > FloatMath.toRadians(5))
 				setCurrentState(State.Stable);
 			else
 				setCurrentState(State.StrongDown);
 		}
 		// iets meer stijgen
-		else if (getCurrentState() == State.StrongUp && (getCurrentCube().y - pos.y) > 1) {
+		else if (getCurrentState() == State.StrongUp && (100 - pos.y) > 2) {
 			
 		}
 		else {
-			
 			// draaien nodig?
-			Vector3f diff = getCurrentCube().sub(pos, new Vector3f());
-			float targetHeading = FloatMath.atan2(-diff.x, -diff.z);
+			//Vector3f diff = getCurrentCube().sub(pos, new Vector3f());
+			float targetHeading = makeNormal(getTargetHeading(inputs));
+			System.out.println(targetHeading);
 			Boolean side = null;
 			// null: nee, true: links, false: rechts
 			Vector3f result = new Vector3f(FloatMath.cos(inputs.getHeading()),0,-FloatMath.sin(inputs.getHeading())).cross(new Vector3f(FloatMath.cos(targetHeading),0,-FloatMath.sin(targetHeading)), new Vector3f());
@@ -155,11 +156,11 @@ public class FlyPilot extends PilotPart {
 			
 			// bocht haalbaar?
 			if (side != null) {
-				if (turnable(pos, inputs.getHeading(), getCurrentCube(), this.turnRadius)) {
+//				if (turnable(pos, inputs.getHeading(), getCurrentCube(), this.turnRadius)) {
 						setCurrentState(side? State.Left: State.Right);
-				} else
-				// bocht niet haalbaar, rechtdoor gaan. 
-				setCurrentState(State.Stable);
+//				} else
+//				// bocht niet haalbaar, rechtdoor gaan. 
+//				setCurrentState(State.Stable);
 			} else {
 				setCurrentState(State.Stable);
 			}
@@ -173,6 +174,8 @@ public class FlyPilot extends PilotPart {
 	}
 	
 	
+
+
 	private void setCurrentState(State state) {
 		this.currentState = state;
 	}
@@ -381,4 +384,113 @@ public class FlyPilot extends PilotPart {
 		return "Fly: " + (this.currentState == null? "" :this.currentState.name());
 	}
 	
+	
+	
+	private boolean part1Complete = false;
+	
+	private float getTargetHeading(AutopilotInputs inputs){
+		float[] pointBeforeRunway = {-1500f, 100f, 1500f}; //TODO
+		float headingRunwayToPoint = (float) Math.PI/2; //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180° (centerToRunway1)
+		if(!part1Complete){
+			Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
+			Vector3f pBR = new Vector3f(pointBeforeRunway[0], pointBeforeRunway[1], pointBeforeRunway[2]);
+			if(pos.distance(pBR) < 10){
+				part1Complete = true;
+			}
+			return getTargetHeadingPart1(inputs, pointBeforeRunway, headingRunwayToPoint);
+
+		}
+		else{
+			return getTargetHeadingPart2(inputs, pointBeforeRunway, headingRunwayToPoint);
+		}
+	}
+	
+	private float getTargetHeadingPart1(AutopilotInputs inputs, float[] pointBeforeRunway, float headingRunwayToPoint){
+		float[] planePosition = {inputs.getX(), inputs.getY(), inputs.getZ()};
+		
+		
+		float temp = 0;
+		if(orientation(pointBeforeRunway, auxLocPlusMinZ(pointBeforeRunway, headingRunwayToPoint, 1), planePosition) == 1){
+			temp = -this.turnRadius;
+		}
+		else{
+			temp = this.turnRadius;
+		}
+		
+		float corner = 0;
+		
+		//plane behind the pointBeforeRunway
+		if(orientation(pointBeforeRunway, auxLocPlusX(pointBeforeRunway, headingRunwayToPoint, 1), planePosition) == 1){
+			float dm = this.turnRadius;
+			float dg = (float)Math.sqrt(Math.pow(pointBeforeRunway[0] - planePosition[0], 2) + Math.pow(pointBeforeRunway[2] - planePosition[2], 2));
+			float mg = (float)Math.sqrt(Math.pow(auxLocPlusX(pointBeforeRunway, headingRunwayToPoint, temp)[0] - planePosition[0], 2) + Math.pow(auxLocPlusX(pointBeforeRunway, headingRunwayToPoint, temp)[2] - planePosition[2], 2));
+			float bigCorner = (float)(2*Math.PI) - (float)Math.acos((dg*dg - dm*dm - mg*mg)/(-2*dm*mg));
+			float smallCorner = (float)Math.acos(turnRadius/mg);
+			corner = bigCorner - smallCorner;
+			System.out.println("test123");
+		}
+		//Plane in front of the pointBeforeRunway
+		else{
+			float dm = this.turnRadius;
+			float dg = (float)Math.sqrt(Math.pow(pointBeforeRunway[0] - planePosition[0], 2) + Math.pow(pointBeforeRunway[2] - planePosition[2], 2));
+			float mg = (float)Math.sqrt(Math.pow(auxLocPlusX(pointBeforeRunway, headingRunwayToPoint, temp)[0] - planePosition[0], 2) + Math.pow(auxLocPlusX(pointBeforeRunway, headingRunwayToPoint, temp)[2] - planePosition[2], 2));
+			float bigCorner = (float)Math.acos((dg*dg - dm*dm - mg*mg)/(-2*dm*mg));
+			float smallCorner = (float)Math.acos(turnRadius/mg);
+			corner = bigCorner - smallCorner;
+		}
+		//Plane to the right of the pointBeforeRunway
+		if(orientation(pointBeforeRunway, auxLocPlusMinZ(pointBeforeRunway, headingRunwayToPoint, 1), planePosition) == 1){
+			return headingRunwayToPoint + corner + (float) Math.PI; //TODO nog iets voor als dit groter is dan 180°
+		}
+		//Plane to the left of the pointBeforeRunway
+		else if(orientation(pointBeforeRunway, auxLocPlusMinZ(pointBeforeRunway, headingRunwayToPoint, 1), planePosition) == 2){
+			System.out.println("test");
+			return headingRunwayToPoint - corner + (float) Math.PI;
+		}
+		
+		return headingRunwayToPoint + (float) Math.PI;
+	}
+	
+	private float getTargetHeadingPart2(AutopilotInputs inputs, float[] pointBeforeRunway, float headingRunwayToPoint){
+		//TODO
+		return headingRunwayToPoint;
+		
+	}
+	
+	//Helper functions
+	private float[] auxLocPlusMinZ(float[] planePosition, float heading, float arg) {
+		float[] newLoc = new float[3];
+		newLoc[0] = planePosition[0] + (float)Math.sin(-heading)*arg;
+		newLoc[1] = planePosition[1];
+		newLoc[2] = planePosition[2] - (float)Math.cos(-heading)*arg;
+		return newLoc;
+	}
+	
+	private float[] auxLocPlusX(float[] planePosition, float heading, float arg){
+		float[] newLoc = new float[3];
+		newLoc[0] = planePosition[0] + (float)Math.cos(-heading)*arg;
+		newLoc[1] = planePosition[1];
+		newLoc[2] = planePosition[2] + (float)Math.sin(-heading)*arg;
+		return newLoc;
+		}
+
+	private int orientation(float[] p, float[] q, float[] r) {
+    	float val = (-q[2] + p[2]) * (r[0] - q[0]) -
+                (q[0] - p[0]) * (-r[2] + q[2]);
+
+        if (val == 0) return 0;
+        return (val > 0)? 1: 2;	//Clock - Counterclockwise
+	}
+	
+
+	private float makeNormal(float targetHeading) {
+		float ret = targetHeading;
+		while(ret > Math.PI){
+			ret -= (float) Math.PI * 2;
+		}
+		while(ret < -Math.PI){
+			ret += (float) Math.PI * 2;
+		}
+		return ret;
+	}
 }
