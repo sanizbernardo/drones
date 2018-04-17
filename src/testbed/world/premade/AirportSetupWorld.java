@@ -9,7 +9,7 @@ import org.joml.Vector3f;
 public class AirportSetupWorld extends World {
 
     public AirportSetupWorld() {
-        super(1, true, 2, 25, 250);
+        super(1, true, 4, 25, 250);
     }
 
     @Override
@@ -20,12 +20,18 @@ public class AirportSetupWorld extends World {
     @Override
     public void setupAirports() {
     	addAirport(new Vector3f(0, 0, 0), FloatMath.toRadians(0));
+    	
+    	addAirport(new Vector3f(450, 0, -450), FloatMath.toRadians(45));
+
     }
     
 	@Override
 	public void setupDrones() {
         addDrone("drone1", 0, 0, 0);
         addDrone("drone2", 0, 1, 1);
+        addDrone("drone3", 1, 0, 0);
+        addDrone("drone4", 1, 1, 1);
+       
 	}
 
 	@Override
