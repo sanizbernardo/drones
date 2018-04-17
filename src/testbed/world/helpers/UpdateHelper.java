@@ -1,8 +1,8 @@
 package testbed.world.helpers;
 
-import java.util.Map.Entry;
 
-import interfaces.Autopilot;
+import java.util.Map.Entry;
+import interfaces.AutopilotModule;
 import interfaces.AutopilotOutputs;
 import testbed.Physics;
 import testbed.entities.WorldObject;
@@ -40,7 +40,7 @@ public class UpdateHelper {
 	/**
 	 * Autopilot update
 	 */
-	private Autopilot planner;
+	private AutopilotModule autopilotModule;
 
 	/**
 	 * TestbedGUI update
@@ -59,17 +59,21 @@ public class UpdateHelper {
 	
 	
 	public UpdateHelper(DroneHelper droneHelper, int TIME_SLOWDOWN_MULTIPLIER, CameraHelper cameraHelper,
-					    WorldObject[] worldObjects, Autopilot planner, TestbedGui testbedGui) {
+					    WorldObject[] worldObjects, AutopilotModule module, TestbedGui testbedGui) {
 
     	this.droneHelper = droneHelper;
         this.TIME_SLOWDOWN_MULTIPLIER = TIME_SLOWDOWN_MULTIPLIER;
         this.cameraHelper = cameraHelper;
         this.worldObjects = worldObjects;
-        this.planner = planner;
+        this.autopilotModule = module;
         this.testbedGui = testbedGui;
         this.time = 0;
         this.followDrone = 0;
     }
+	
+	public int getFollowDrone() {
+		return this.followDrone;
+	}
 	
 	public void nextFollowDrone() {
 		boolean found = false;
@@ -100,14 +104,12 @@ public class UpdateHelper {
 		droneHelper.update(interval/TIME_SLOWDOWN_MULTIPLIER, this);
 		
 		if (droneHelper.droneIds.isEmpty()) return;
-		
-		System.out.println(droneHelper);
-		
+			
 		Vector3f newDronePos = droneHelper.getDronePhysics(followDrone).getPosition();
 		
 		updateCameraPositions(mouseInput, newDronePos, followDrone);
 
-		updatePlanner(newDronePos);
+		updateModule();
 
 		testbedGui.update(droneHelper.getDronePhysics(followDrone).getVelocity(), newDronePos,
 						  droneHelper.getDronePhysics(followDrone).getHeading(),
@@ -146,29 +148,27 @@ public class UpdateHelper {
 	}
 
 
-	private void updatePlanner(Vector3f newDronePos) {
-		if (planner != null)
-			plannerUpdate(newDronePos);
-	}
-
-
-	/**
-	 * This line is only triggered if the specified world does indeed want a
-	 * motion planner
-	 */
-	private void plannerUpdate(Vector3f newDronePos) {
-		Physics physics = droneHelper.getDronePhysics(0);
-
-		AutopilotOutputs out = planner.timePassed(Utils.buildInputs(null, newDronePos.x,
-				newDronePos.y, newDronePos.z, physics.getHeading(), physics.getPitch(), physics.getRoll(), time));
-
-		try {
-			physics.updateDrone(out);
-		} catch (PhysicsException e) {
-			JOptionPane.showMessageDialog(testbedGui, "An illegal force was entered for the drone: " + e.getMessage(), "Physics Exception",
-					JOptionPane.ERROR_MESSAGE);
-			droneHelper.removeDrone(0, this);
+	private void updateModule() {
+		if (autopilotModule == null)
+			return;
+		
+		for (int droneId: droneHelper.droneIds.values()) {
+			Physics physics = droneHelper.getDronePhysics(droneId);
+			autopilotModule.startTimeHasPassed(droneId, Utils.buildInputs(null, physics.getPosition(),
+												physics.getHeading(), physics.getPitch(), physics.getRoll(), this.time));
 		}
+		
+		for (int droneId: droneHelper.droneIds.values()) {
+			AutopilotOutputs output = autopilotModule.completeTimeHasPassed(droneId);
+			
+			try {
+				droneHelper.getDronePhysics(droneId).updateDrone(output);
+			} catch (PhysicsException e) {
+				JOptionPane.showMessageDialog(testbedGui, "An illegal force was entered for drone " + 
+						droneHelper.getDroneConfig(droneId).getDroneID() + ": " + e.getMessage(),
+						"Physics Exception", JOptionPane.ERROR_MESSAGE);
+				droneHelper.removeDrone(droneId, this);
+			}
+		}	
 	}
-
 }

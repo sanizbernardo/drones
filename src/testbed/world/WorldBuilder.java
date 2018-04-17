@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.joml.Vector3f;
 
-import autopilot.Pilot;
 import interfaces.AutopilotConfig;
 import testbed.engine.IWorldRules;
 import testbed.entities.WorldObject;
@@ -13,14 +12,17 @@ import testbed.graphics.meshes.cube.*;
 public class WorldBuilder extends World implements IWorldRules {
 		
 	private Map<Vector3f, BufferedCube> cubes;
-	private boolean wantPlanner;
 	
 	public WorldBuilder(int tSM, boolean wantPhysicsEngine, boolean wantPlanner, Map<Vector3f, BufferedCube> cubes) {
 		super(tSM, wantPhysicsEngine, 1);
 		this.cubes = cubes;
-		this.wantPlanner = wantPlanner;
 	}
 
+	@Override
+	public void setupAutopilotModule() {
+//		if (wantPlanner) planner = new Pilot(new int[] {});
+	}
+	
 	@Override
 	public void setupAirports() {
 		
@@ -28,8 +30,7 @@ public class WorldBuilder extends World implements IWorldRules {
 
 	@Override
 	public void setupDrones() {
-		//TODO: provide correct planner
-		if (wantPlanner) planner = new Pilot(new int[] {});
+		
 	}
 
 	@Override

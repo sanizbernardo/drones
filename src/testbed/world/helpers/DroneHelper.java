@@ -17,7 +17,6 @@ import testbed.entities.WorldObject;
 import testbed.entities.airport.Airport;
 import testbed.entities.drone.DroneSkeleton;
 import testbed.entities.trail.Trail;
-import testbed.world.World;
 import utils.Constants;
 import utils.FloatMath;
 import utils.PhysicsException;
@@ -129,7 +128,8 @@ public class DroneHelper {
 		physics[index] = null;
 		trails[index] = null;
 		
-		updateHelper.nextFollowDrone();
+		if (droneIds.get(droneId) == updateHelper.getFollowDrone())
+			updateHelper.nextFollowDrone();
 	}
 
 	public void removeDrone(int droneId, UpdateHelper updateHelper) {

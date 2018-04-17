@@ -6,14 +6,17 @@ import testbed.world.World;
 import utils.FloatMath;
 import org.joml.Vector3f;
 
-import autopilot.Pilot;
-
 public class AirportSetupWorld extends World {
 
     public AirportSetupWorld() {
         super(1, true, 2, 25, 250);
     }
 
+    @Override
+    public void setupAutopilotModule() {
+    	
+    }
+    
     @Override
     public void setupAirports() {
     	addAirport(new Vector3f(0, 0, 0), FloatMath.toRadians(0));
@@ -27,8 +30,6 @@ public class AirportSetupWorld extends World {
 
 	@Override
 	public void setupWorld() {
-        planner = new Pilot(new int[0]);
-
         worldObjects = new WorldObject[0]; 
 
         this.ground = new Ground(50);		
