@@ -6,6 +6,7 @@ import testbed.engine.*;
 import testbed.entities.WorldObject;
 import testbed.entities.airport.Airport;
 import testbed.entities.ground.Ground;
+import testbed.graphics.Hud;
 import testbed.graphics.Renderer;
 import testbed.gui.TestbedGui;
 import testbed.world.helpers.*;
@@ -25,6 +26,7 @@ public abstract class World implements IWorldRules {
 	private CameraHelper cameraHelper;
 
 	private Renderer renderer;
+	private Hud hud;
 	private final int TIME_SLOWDOWN_MULTIPLIER;
 	private KeyboardInput keyboardInput;
 	private TestbedGui testbedGui;
@@ -113,6 +115,8 @@ public abstract class World implements IWorldRules {
     	try {
 			this.renderer = new Renderer();
 		    this.renderer.init(window);
+			this.hud = new Hud();
+			this.hud.init(window);
 		} catch (Exception e) {
 		    System.out.println("Abstract class World (render.init(window)) gave this error: " + e.getMessage());
 		    e.printStackTrace();
@@ -193,6 +197,7 @@ public abstract class World implements IWorldRules {
 	@Override
 	public void render(Window window) {
 		renderer.render(window, cameraHelper, worldObjects, droneHelper, ground, airports);
+		hud.render(window, droneHelper.getDronePhysics(updateHelper.getFollowDrone()), this.time);
 	}
 
 	

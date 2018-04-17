@@ -119,6 +119,7 @@ public class Window {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
     }
 
     public long getWindowHandle() {
@@ -163,6 +164,11 @@ public class Window {
 
     public void setvSync(boolean vSync) {
         this.vSync = vSync;
+    }
+    
+    public void restoreState() {
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
     }
 
     public void update() {
