@@ -2,7 +2,9 @@ package testbed.world.helpers;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import interfaces.AutopilotModule;
 import interfaces.AutopilotOutputs;
@@ -60,6 +62,7 @@ public class UpdateHelper {
 	 */
 	private PackageGenerator generator;
 	private List<Package> packages;
+	private Map<Gate,Package> fromPackages; 
 	
 	public UpdateHelper(DroneHelper droneHelper, int TIME_SLOWDOWN_MULTIPLIER, CameraHelper cameraHelper,
 						AutopilotModule module, TestbedGui testbedGui, PackageGenerator generator) {
@@ -67,11 +70,13 @@ public class UpdateHelper {
         this.cameraHelper = cameraHelper;
         this.followDrone = 0;
         this.autopilotModule = module;
-        this.testbedGui = testbedGui;
+        this.testbedGui = testbedGui;        
         this.time = 0;
         this.droneHelper = droneHelper;
+        this.droneHelper.setRootFrame(testbedGui);
         this.generator = generator;
         this.packages = new ArrayList<>();
+        this.fromPackages = new HashMap<>();
     }
 	
 	public int getFollowDrone() {
@@ -83,13 +88,14 @@ public class UpdateHelper {
 		for (Entry<String, Integer> a : droneHelper.droneIds.entrySet()) {
 			if(found) {
 				this.followDrone = a.getValue();
+				this.testbedGui.setActiveDrone(followDrone);
 				return;
 			}
 			if(a.getValue() == followDrone) found = true;
 		}
 		
 		this.followDrone = droneHelper.droneIds.entrySet().iterator().next().getValue();
-		
+		this.testbedGui.setActiveDrone(followDrone);
 	}
 
 	/**
@@ -107,23 +113,16 @@ public class UpdateHelper {
 		droneHelper.update(interval/TIME_SLOWDOWN_MULTIPLIER, this);
 		
 		if (droneHelper.droneIds.isEmpty()) return;
-			
-		updatePackages();
+		
+		if (generator != null)
+			updatePackages();
 		
 		Vector3f newDronePos = droneHelper.getDronePhysics(followDrone).getPosition();
 		
 		updateCameraPositions(mouseInput, newDronePos, followDrone);
 		
 		updateModule();
-
-		testbedGui.update(droneHelper.getDronePhysics(followDrone).getVelocity(), newDronePos,
-						  droneHelper.getDronePhysics(followDrone).getHeading(),
-						  droneHelper.getDronePhysics(followDrone).getPitch(),
-						  droneHelper.getDronePhysics(followDrone).getRoll());
-		
-//		testbedGui.setDrone(newDronePos, droneHelper.getDronePhysics(followDrone).getHeading());
-//		testbedGui.setCubes(worldObjects);
-	}
+		}
 
 
 
@@ -183,14 +182,82 @@ public class UpdateHelper {
 		int[] newDetails = generator.generatePackage(this.time);
 		if (newDetails != null) {
 			Package newPackage = new Package(newDetails);
-			packages.add(newPackage);
+			Gate fromGate = new Gate(newPackage, true);
 			
-			autopilotModule.deliverPackage(newPackage.getFromAirport(), newPackage.getFromGate(),
-											newPackage.getDestAirport(), newPackage.getDestGate());
+			if (!fromPackages.containsKey(fromGate)) {
+				packages.add(newPackage);
+				fromPackages.put(fromGate, newPackage);
+				
+				testbedGui.addPackage(newPackage);
+				
+				if (autopilotModule != null)
+					autopilotModule.deliverPackage(newPackage.getFromAirport(), newPackage.getFromGate(),
+						newPackage.getDestAirport(), newPackage.getDestGate());
+			}
 		}
 		
+		for (int drone: droneHelper.droneIds.values()) {
+			Physics physics = droneHelper.getDronePhysics(drone);
+			if (FloatMath.norm(physics.getVelocity()) > 1)
+				continue;
+			
+			int loc = physics.getAirportLocation();
+			Gate gate;
+			switch (loc) {
+			case Physics.GATE_0:
+				gate = new Gate(physics.getAirportNb(), 0);
+				if (droneHelper.getDronePackage(drone) == null) {
+					if (fromPackages.containsKey(gate))
+						droneHelper.collectPackage(drone, fromPackages.remove(gate));
+				} else {
+					if (new Gate(droneHelper.getDronePackage(drone),false).equals(gate)) {
+						droneHelper.deliverPackage(drone);
+					}
+				}
+				break;
+			case Physics.GATE_1:
+				gate = new Gate(physics.getAirportNb(), 1);
+				if (droneHelper.getDronePackage(drone) == null) {
+					if (fromPackages.containsKey(gate))
+						droneHelper.collectPackage(drone, fromPackages.remove(gate));
+				} else {
+					if (new Gate(droneHelper.getDronePackage(drone),false).equals(gate))
+						droneHelper.deliverPackage(drone);
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	
+	
+	private class Gate {
 		
+		public final int airportNb, gateNb;
 		
+		public Gate(int airportNb, int gateNb) {
+			this.airportNb = airportNb;
+			this.gateNb = gateNb;
+		}
 		
+		public Gate(Package pack, boolean from) {
+			if (from) {
+				this.airportNb = pack.getFromAirport();
+				this.gateNb = pack.getFromGate();
+			} else {
+				this.airportNb = pack.getDestAirport();
+				this.gateNb = pack.getDestGate();				
+			}
+		}
+		
+		@Override
+		public boolean equals(Object other) {
+			if (other == null)
+				return false;
+			if (!(other instanceof Gate))
+				return false;
+			return (this.airportNb == ((Gate)other).airportNb && this.gateNb == ((Gate)other).gateNb);
+		}
 	}
 }

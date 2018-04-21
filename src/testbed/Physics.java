@@ -17,15 +17,16 @@ public class Physics {
 	/**
 	 * Drone position constants
 	 */
-	public static final int LANE_0 = -1;
-	public static final int LANE_1 = -2;
-	public static final int GATE_0 = 1;
-	public static final int GATE_1 = 2;
 	public static final int NONE = 0;
+	public static final int LANE_0 = 1;
+	public static final int LANE_1 = 2;
+	public static final int GATE_0 = 3;
+	public static final int GATE_1 = 4;
 	
 	private static final String[] WING_NAMES = new String[] {"Left wing", "Right wing","Horizontal Stabilizer", 
 	 "Vertical Stabilizer"};
 	private static final String[] WHEEL_NAMES = new String[] {"Left wheel", "Front wheel", "Right wheel"};
+	private static final String[] LOCATIONS = new String[] {"", "Lane 0", "Lane 1", "Gate 0", "Gate 1"};
 	
 	/**
 	 * in world coordinates
@@ -229,8 +230,16 @@ public class Physics {
 		return lastAirport;
 	}
 	
+	public int getAirportNb() {
+		return airports.indexOf(lastAirport);
+	}
+	
 	public int getAirportLocation() {
 		return airportPos;
+	}
+	
+	public String getAirportLocoationDesc() {
+		return LOCATIONS[airportPos];
 	}
 
 	

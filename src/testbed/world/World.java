@@ -35,7 +35,7 @@ public abstract class World implements IWorldRules {
 	private UpdateHelper updateHelper;
 	private TestbedGui testbedGui;
 	private LogHelper logHelper;
-	private String logDrone;
+	private int logDrone;
 	private float time;
 	private List<Airport> airports;	
 	
@@ -57,12 +57,9 @@ public abstract class World implements IWorldRules {
 
 		this.keyboardInput = new KeyboardInput();
 
-		this.testbedGui = new TestbedGui();
-
-		this.droneHelper = new DroneHelper(wantPhysicsEngine, nbDrones, testbedGui);
+		this.droneHelper = new DroneHelper(wantPhysicsEngine, nbDrones);
 	}
 
-	
 	public World(int tSM, boolean wantPhysicsEngine, int nbDrones) {
 		this(tSM, wantPhysicsEngine, nbDrones, Constants.DEFAULT_AIRPORT_WIDTH, Constants.DEFAULT_AIRPORT_LENGTH);
 	}
@@ -104,6 +101,8 @@ public abstract class World implements IWorldRules {
     		autopilotModule.defineAirportParams(this.airportLength, this.airportWidth);
     	
     	setupAirports();
+    	
+		this.testbedGui = new TestbedGui(droneHelper, airports);
     	
     	if (autopilotModule != null)
     		for (Airport port: airports) {
@@ -165,7 +164,7 @@ public abstract class World implements IWorldRules {
 	}
 	
 	
-	public void initLogging(String droneId) {
+	public void initLogging(int droneId) {
 		this.logHelper = new LogHelper();
 		this.logDrone = droneId;
 	}

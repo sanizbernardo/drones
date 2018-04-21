@@ -2,11 +2,8 @@ package testbed.graphics;
 
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
 
 import org.lwjgl.nanovg.NVGColor;
 
@@ -28,10 +25,8 @@ public class Hud {
     private long vg;
     private NVGColor colour;
     private ByteBuffer fontBuffer;
-    private final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
     private DoubleBuffer posx;
     private DoubleBuffer posy;
-    private int counter;
 
     public void init(Window window) throws Exception {
         this.vg = nvgCreate(NVG_STENCIL_STROKES);
@@ -48,8 +43,6 @@ public class Hud {
 
         posx = MemoryUtil.memAllocDouble(1);
         posy = MemoryUtil.memAllocDouble(1);
-
-        counter = 0;
     }
 
     private void clear(Window window, int x, int y, int textAreaWidth, int textAreaHeight) {

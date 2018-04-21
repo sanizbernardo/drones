@@ -33,10 +33,10 @@ public class DroneHelper {
 	private Trail[] trails;
 	private Package[] packages;
 	
-	private final JFrame rootFrame;
+	private JFrame rootFrame;
 	private final boolean wantPhysics;
 
-	public DroneHelper(boolean wantPhysics, int nbDrones, JFrame rootFrame) {
+	public DroneHelper(boolean wantPhysics, int nbDrones) {
 		this.nbDrones = nbDrones;
 		this.index = -1;
 		this.droneIds = new HashMap<>();
@@ -46,8 +46,17 @@ public class DroneHelper {
 		this.trails = new Trail[nbDrones];
 		this.packages = new Package[nbDrones];
 
-		this.rootFrame = rootFrame;
 		this.wantPhysics = wantPhysics;
+	}
+	
+	
+	public void setRootFrame(JFrame rootFrame) {
+		this.rootFrame = rootFrame;
+	}
+	
+	
+	public int getMaxNbDrones() {
+		return this.nbDrones;
 	}
 	
 	
@@ -154,10 +163,12 @@ public class DroneHelper {
 	
 	
 	public void collectPackage(int droneId, Package pack) {
-		packages[droneId] = pack;  
+		pack.pickUp();
+		packages[droneId] = pack;
 	}
 	
 	public void deliverPackage(int droneId) {
+		packages[droneId].deliver();
 		packages[droneId] = null;
 	}
 	

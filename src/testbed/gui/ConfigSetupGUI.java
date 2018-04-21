@@ -13,7 +13,6 @@ import org.joml.Vector3f;
 import interfaces.AutopilotConfig;
 import testbed.world.World;
 import testbed.world.WorldBuilder;
-import utils.Constants;
 import utils.GuiUtils;
 import utils.Utils;
 
@@ -21,14 +20,6 @@ import utils.Utils;
 public class ConfigSetupGUI extends JDialog {
 
 	private static final long serialVersionUID = 1L;
-
-	private JPanel spinnerPanel;
-	
-	@SuppressWarnings("unused")
-	private JSpinner 	gravitySpinner, wingSizeSpinner, tailSizeSpinner, engineMassSpinner, 
-						wingMassSpinner, tailMassSpinner, maxThrustSpinner, maxAOASpinner, 
-						wingLiftslopeSpinner, verStabLiftslopeSpinner, horStabLiftslopeSpinner,
-						verFOVSpinner, horFOVSpinner, nbColsSpinner, nbRowsSpinner;
 
 	private JComboBox<String> genComboBox;
 
@@ -122,7 +113,7 @@ public class ConfigSetupGUI extends JDialog {
 		String[] genComboLbls = new String[WorldGen.values().length];
 		worldGens = new HashMap<>();
 		int i = 0;
-		for (WorldGen gen: WorldGen.values()) {
+		for (WorldGen gen: new WorldGen[] {WorldGen.premade}) {
 			genCards.add(gen.getContent(), gen.getComboText());
 			genComboLbls[i] = gen.getComboText();
 			worldGens.put(gen.getComboText(), gen);
@@ -158,45 +149,6 @@ public class ConfigSetupGUI extends JDialog {
 		checkPanel.add(logCheck);
 		logCheck.setSelected(true);
 		comboPanel.add(checkPanel, BorderLayout.SOUTH);
-		
-		
-		// create the drone startup tap
-		JPanel dronePanel = new JPanel();
-		tabbedPane.addTab("Drone", dronePanel);
-		dronePanel.setLayout(new BorderLayout(0, 0));
-		
-		JLabel lblDrone = new JLabel("Drone starting position settings");
-		lblDrone.setFont(new Font("Tahoma", Font.BOLD, 13));
-		lblDrone.setHorizontalAlignment(SwingConstants.LEFT);
-		dronePanel.add(lblDrone, BorderLayout.NORTH);
-		
-		JPanel startupPanel = new JPanel();
-		GridBagLayout gbl_drone = new GridBagLayout();
-		gbl_drone.columnWidths = new int[] {150};
-		gbl_drone.columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
-		gbl_drone.rowWeights = new double[] {0.0, 0.0, 0.0, 1.0};
-		startupPanel.setLayout(gbl_drone);
-		dronePanel.add(startupPanel, BorderLayout.CENTER);
-		
-		JLabel lblDroneDesc = new JLabel("<html>Set the starting position, velocity and orientation for the drone. "
-				+ "<br> Note that this will have no effect if you select a predefined world. </html>");
-		GridBagConstraints gbc_lblDroneDesc = GuiUtils.buildGBC(0, 0, GridBagConstraints.NORTHWEST, new Insets(5, 0, 5, 5));
-		gbc_lblDroneDesc.gridwidth = 7;
-		startupPanel.add(lblDroneDesc, gbc_lblDroneDesc);
-		
-		JSeparator separator = new JSeparator();
-		GridBagConstraints gbc_separator = GuiUtils.buildGBC(0, 1, GridBagConstraints.CENTER, new Insets(5, 0, 5, 0));
-		gbc_separator.fill = GridBagConstraints.BOTH;
-		gbc_separator.gridwidth = 7;
-		startupPanel.add(separator, gbc_separator);
-		
-		posSpinners = GuiUtils.buildTripleInputSpinner(startupPanel, "Starting position", "x: ", "y: ", "z: ", 2, 
-						Utils.buildIntArr(-1000, -1000, -1000), Utils.buildIntArr(1000, 1000, 1000), 
-						Utils.buildIntArr(0,0,0), Utils.buildIntArr(1,1,1,1));
-		
-		velSpinners = GuiUtils.buildTripleInputSpinner(startupPanel, "Starting velocity", "x: ", "y: ", "z: ", 3, 
-				Utils.buildIntArr(-1000, -1000, -1000), Utils.buildIntArr(1000, 1000, 1000), 
-				Utils.buildIntArr(0,0,0), Utils.buildIntArr(1,1,1,1));
 	}
 	
 	public World showDialog() throws Exception {
@@ -220,48 +172,12 @@ public class ConfigSetupGUI extends JDialog {
 		}
 		
 		if (logCheck.isSelected())
-			world.initLogging(generateAutoPilotConfig().getDroneID());
+			world.initLogging(0);
 		
-		return world; 
+		return world;
 	}
 	
 	private AutopilotConfig generateAutoPilotConfig() {
 		return Utils.createDefaultConfig("drone1");
 	}
-	
-	
-	@SuppressWarnings("unused")
-	private void buildSpinners() {
-		gravitySpinner = GuiUtils.buildSpinner(spinnerPanel, "Gravity", 0, 0, Constants.DEFAULT_GRAVITY, 0f, 30f, 0.01f);
-
-		wingSizeSpinner = GuiUtils.buildSpinner(spinnerPanel, "Wing size", 0, 1, Constants.DEFAULT_WINGX * 4, 0f, 50f, 0.1f);
-		
-		tailSizeSpinner = GuiUtils.buildSpinner(spinnerPanel, "Tail size", 0, 2, Constants.DEFAULT_TAILSIZE, 0f, 50f, 0.1f);
-
-		engineMassSpinner = GuiUtils.buildSpinner(spinnerPanel, "Engine mass", 0, 3, Constants.DEFAULT_ENGINE_MASS, 0f, 500f, 1f);
-
-		wingMassSpinner = GuiUtils.buildSpinner(spinnerPanel, "Wing mass", 0, 4, Constants.DEFAULT_WING_MASS, 0f, 500f, 1f);
-
-		tailMassSpinner = GuiUtils.buildSpinner(spinnerPanel, "Tail mass", 1, 0, Constants.DEFAULT_TAIL_MASS, 0f, 500f, 1f);
-
-		float defaultMaxThrust = (Constants.DEFAULT_TAIL_MASS + Constants.DEFAULT_ENGINE_MASS + Constants.DEFAULT_WING_MASS * 2f) * 0.35f * 1000f;
-		maxThrustSpinner = GuiUtils.buildSpinner(spinnerPanel, "Maximum thrust", 1, 1, defaultMaxThrust, 0f, 1000000f, 1000f);
-
-		maxAOASpinner = GuiUtils.buildSpinner(spinnerPanel, "Maximum AOA", 1, 2, Constants.DEFAULT_MAX_AOA, 0, 90, 1);
-
-		wingLiftslopeSpinner = GuiUtils.buildSpinner(spinnerPanel, "Wing liftslope", 1, 3, Constants.DEFAULT_WING_LIFTSLOPE, 0f, 20f, 0.01f);
-		
-		verStabLiftslopeSpinner = GuiUtils.buildSpinner(spinnerPanel, "Vertical stabiliser liftslope", 1, 4, Constants.DEFAULT_VER_STAB_LIFTSLOPE, 0f, 20f, 0.01f);
-
-		horStabLiftslopeSpinner = GuiUtils.buildSpinner(spinnerPanel, "Horizontal stabilizer liftslope", 2, 0, Constants.DEFAULT_HOR_STAB_LIFTSLOPE, 0f, 20f, 0.01f);
-
-		verFOVSpinner = GuiUtils.buildSpinner(spinnerPanel, "Drone camera vertical FOV", 2, 1, Constants.DEFAULT_VER_FOV, 0, 180, 1);
-		
-		horFOVSpinner = GuiUtils.buildSpinner(spinnerPanel, "Drone camera horizontal FOV", 2, 2, Constants.DEFAULT_HOR_FOV, 0, 180, 1);		
-		
-		nbColsSpinner = GuiUtils.buildSpinner(spinnerPanel, "# columns in drone camera image", 2, 3, Constants.DEFAULT_NB_COLS, 0, 800, 1);				
-		
-		nbRowsSpinner = GuiUtils.buildSpinner(spinnerPanel, "# rows in drone camera image", 2, 4, Constants.DEFAULT_NB_ROWS, 0, 800, 1);
-	}
-
 }

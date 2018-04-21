@@ -10,9 +10,10 @@ import utils.Utils;
 import org.joml.Vector3f;
 
 public class AirportSetupWorld extends World {
-
+	
     public AirportSetupWorld() {
         super(1, true, 1000, 25, 250);
+
     }
 
     @Override
@@ -26,12 +27,12 @@ public class AirportSetupWorld extends World {
     public void setupAirports() {
     	for(int i = -this.amount/2; i < this.amount/2; i++) {
         	addAirport(new Vector3f(100 * i, 0, 0), FloatMath.toRadians(0));
+
     	}
     }
     
 	@Override
-	public void setupDrones() {
-		
+	public void setupDrones() {		
 		for(int i = 0; i < this.amount; i++) {
 			for(int j = 0; j < 2; j++) {
 				addDrone(String.valueOf(i) + String.valueOf(j), i, j, 0);
@@ -46,7 +47,6 @@ public class AirportSetupWorld extends World {
 				droneHelper.getDronePhysics(i).updateDrone(Utils.buildOutputs(FloatMath.toRadians(10), FloatMath.toRadians(10), 0, 0, 2000, 0, 0, 0));
 			}
 		} catch (PhysicsException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         worldObjects = new WorldObject[0]; 

@@ -106,7 +106,7 @@ public class AutopilotGUI extends JFrame {
 		
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(0, 0, Constants.AUTOPILOT_GUI_WIDTH, Constants.AUTOPILOT_GUI_HEIGHT);
+		setBounds(0, 0, 500, 500);
 		setTitle("Autopilot");
 		
 		
@@ -118,7 +118,7 @@ public class AutopilotGUI extends JFrame {
 		JPanel northPanel = new JPanel();
 		topContentPanel.add(northPanel, BorderLayout.NORTH);
 		GridBagLayout gbl = new GridBagLayout();
-		gbl.columnWidths = new int[] {Constants.AUTOPILOT_GUI_WIDTH/2, Constants.AUTOPILOT_GUI_WIDTH/2}; 
+		gbl.columnWidths = new int[] {250, 250}; 
 		northPanel.setLayout(gbl);
 		
 		

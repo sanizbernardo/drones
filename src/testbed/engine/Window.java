@@ -98,7 +98,7 @@ public class Window {
         // Center our window
         glfwSetWindowPos(
                 windowHandle,
-                System.getProperty("os.name").equals("Linux") ? Constants.AUTOPILOT_GUI_WIDTH + Constants.UBUNTU_SIDEBAR : Constants.AUTOPILOT_GUI_WIDTH,
+                System.getProperty("os.name").equals("Linux") ? Constants.TESTBED_GUI_WIDTH + Constants.UBUNTU_SIDEBAR : Constants.TESTBED_GUI_WIDTH,
                 System.getProperty("os.name").contains("Windows") ? 40 : 0
         );
 
