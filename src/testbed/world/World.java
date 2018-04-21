@@ -6,6 +6,7 @@ import testbed.engine.*;
 import testbed.entities.WorldObject;
 import testbed.entities.airport.Airport;
 import testbed.entities.ground.Ground;
+import testbed.entities.packages.PackageGenerator;
 import testbed.graphics.Hud;
 import testbed.graphics.Renderer;
 import testbed.gui.TestbedGui;
@@ -23,26 +24,27 @@ import org.joml.Vector3f;
 
 public abstract class World implements IWorldRules {
 
-	private CameraHelper cameraHelper;
-
+	private final int TIME_SLOWDOWN_MULTIPLIER;
+	private final float airportWidth, airportLength;
+	
+	private Engine gameEngine;
+	private KeyboardInput keyboardInput;
 	private Renderer renderer;
 	private Hud hud;
-	private final int TIME_SLOWDOWN_MULTIPLIER;
-	private KeyboardInput keyboardInput;
-	private TestbedGui testbedGui;
+	private CameraHelper cameraHelper;
 	private UpdateHelper updateHelper;
+	private TestbedGui testbedGui;
 	private LogHelper logHelper;
 	private String logDrone;
 	private float time;
-	private final float airportWidth, airportLength;
-	private List<Airport> airports;
+	private List<Airport> airports;	
 	
 	/* These are to be directly called in the world classes */
 	protected AutopilotModule autopilotModule;
 	protected WorldObject[] worldObjects;
-	protected Engine gameEngine;
 	protected Ground ground;
 	protected DroneHelper droneHelper;
+	protected PackageGenerator generator;
 
 	
 	public World(int tSM, boolean wantPhysicsEngine, int nbDrones, float airportWidth, float airportLength) {
@@ -125,7 +127,7 @@ public abstract class World implements IWorldRules {
 		testbedGui.showGUI();
 
 		this.updateHelper = new UpdateHelper(droneHelper, TIME_SLOWDOWN_MULTIPLIER, cameraHelper,
-											 worldObjects, autopilotModule, testbedGui);
+											 autopilotModule, testbedGui, generator);
     }
 	
 	public void nextFollowDrone() {

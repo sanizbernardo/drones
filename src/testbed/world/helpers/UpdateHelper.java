@@ -1,11 +1,14 @@
 package testbed.world.helpers;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import interfaces.AutopilotModule;
 import interfaces.AutopilotOutputs;
 import testbed.Physics;
-import testbed.entities.WorldObject;
+import testbed.entities.packages.PackageGenerator;
+import testbed.entities.packages.Package;
 import testbed.gui.TestbedGui;
 
 import org.joml.Vector2f;
@@ -33,11 +36,6 @@ public class UpdateHelper {
 	private int followDrone;
 
 	/**
-	 * World content update (cubes)
-	 */
-	private WorldObject[] worldObjects;
-
-	/**
 	 * Autopilot update
 	 */
 	private AutopilotModule autopilotModule;
@@ -57,18 +55,23 @@ public class UpdateHelper {
 	 */
 	private DroneHelper droneHelper;
 	
+	/**
+	 * Package generation
+	 */
+	private PackageGenerator generator;
+	private List<Package> packages;
 	
 	public UpdateHelper(DroneHelper droneHelper, int TIME_SLOWDOWN_MULTIPLIER, CameraHelper cameraHelper,
-					    WorldObject[] worldObjects, AutopilotModule module, TestbedGui testbedGui) {
-
-    	this.droneHelper = droneHelper;
-        this.TIME_SLOWDOWN_MULTIPLIER = TIME_SLOWDOWN_MULTIPLIER;
+						AutopilotModule module, TestbedGui testbedGui, PackageGenerator generator) {
+		this.TIME_SLOWDOWN_MULTIPLIER = TIME_SLOWDOWN_MULTIPLIER;
         this.cameraHelper = cameraHelper;
-        this.worldObjects = worldObjects;
+        this.followDrone = 0;
         this.autopilotModule = module;
         this.testbedGui = testbedGui;
         this.time = 0;
-        this.followDrone = 0;
+        this.droneHelper = droneHelper;
+        this.generator = generator;
+        this.packages = new ArrayList<>();
     }
 	
 	public int getFollowDrone() {
@@ -105,10 +108,12 @@ public class UpdateHelper {
 		
 		if (droneHelper.droneIds.isEmpty()) return;
 			
+		updatePackages();
+		
 		Vector3f newDronePos = droneHelper.getDronePhysics(followDrone).getPosition();
 		
 		updateCameraPositions(mouseInput, newDronePos, followDrone);
-
+		
 		updateModule();
 
 		testbedGui.update(droneHelper.getDronePhysics(followDrone).getVelocity(), newDronePos,
@@ -116,9 +121,11 @@ public class UpdateHelper {
 						  droneHelper.getDronePhysics(followDrone).getPitch(),
 						  droneHelper.getDronePhysics(followDrone).getRoll());
 		
-		testbedGui.setDrone(newDronePos, droneHelper.getDronePhysics(followDrone).getHeading());
-		testbedGui.setCubes(worldObjects);
+//		testbedGui.setDrone(newDronePos, droneHelper.getDronePhysics(followDrone).getHeading());
+//		testbedGui.setCubes(worldObjects);
 	}
+
+
 
 
 	private void updateCameraPositions(MouseInput mouseInput, Vector3f newDronePos, int followDrone) {
@@ -170,5 +177,20 @@ public class UpdateHelper {
 				droneHelper.removeDrone(droneId, this);
 			}
 		}	
+	}
+	
+	private void updatePackages() {
+		int[] newDetails = generator.generatePackage(this.time);
+		if (newDetails != null) {
+			Package newPackage = new Package(newDetails);
+			packages.add(newPackage);
+			
+			autopilotModule.deliverPackage(newPackage.getFromAirport(), newPackage.getFromGate(),
+											newPackage.getDestAirport(), newPackage.getDestGate());
+		}
+		
+		
+		
+		
 	}
 }
