@@ -125,9 +125,9 @@ public class Hud {
         nvgText(vg, textAreaWidth * 7 / 10, third + 1 * size, "roll:");
         
         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-        nvgText(vg, textAreaWidth * 7 / 10, third - 1 * size, " " + FloatMath.round(physics.getPitch(), 2));
-        nvgText(vg, textAreaWidth * 7 / 10, third - 0 * size, " " + FloatMath.round(physics.getHeading(), 2));
-        nvgText(vg, textAreaWidth * 7 / 10, third + 1 * size, " " + FloatMath.round(physics.getRoll(), 2));
+        nvgText(vg, textAreaWidth * 7 / 10, third - 1 * size, " " + FloatMath.round(FloatMath.toDegrees(physics.getPitch()), 2));
+        nvgText(vg, textAreaWidth * 7 / 10, third - 0 * size, " " + FloatMath.round(FloatMath.toDegrees(physics.getHeading()), 2));
+        nvgText(vg, textAreaWidth * 7 / 10, third + 1 * size, " " + FloatMath.round(FloatMath.toDegrees(physics.getRoll()), 2));
        
         // Gele balk
         nvgBeginPath(vg);
