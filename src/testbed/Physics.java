@@ -335,9 +335,9 @@ public class Physics {
 			else
 				airportPos = GATE_1;
 		} else {
+			lastAirport = null;
 			airportPos = NONE;
 		}
-		
 	}
 	
 	/**

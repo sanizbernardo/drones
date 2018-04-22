@@ -32,7 +32,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 
-import utils.Constants;
 import utils.FloatMath;
 import utils.GuiUtils;
 import utils.Utils;

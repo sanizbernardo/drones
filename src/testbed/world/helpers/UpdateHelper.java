@@ -122,6 +122,8 @@ public class UpdateHelper {
 		updateCameraPositions(mouseInput, newDronePos, followDrone);
 		
 		updateModule();
+		
+		testbedGui.repaint();
 		}
 
 
@@ -249,6 +251,11 @@ public class UpdateHelper {
 				this.airportNb = pack.getDestAirport();
 				this.gateNb = pack.getDestGate();				
 			}
+		}
+		
+		@Override
+		public int hashCode() {
+			return 2048*airportNb + gateNb;
 		}
 		
 		@Override

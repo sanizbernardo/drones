@@ -29,7 +29,7 @@ public class Constants {
     /**
      * GUI
      */    
-    public static final int TESTBED_GUI_HEIGHT = 900;
+    public static final int TESTBED_GUI_HEIGHT = 1000;
     public static final int TESTBED_GUI_WIDTH = 500;
     
     public static final float COLLISION_RANGE = 5f;

@@ -28,17 +28,18 @@ public class PackageTestWorld extends World {
 
 	@Override
 	public void setupDrones() {
-		addDrone("drone1", 0, 1, 0);
+		addDrone("drone1", 0, 0, 0);
 		addDrone("drone2", 1, 1, 1);
 		addDrone("drone3", 2, 0, 1);
 	}
 
 	@Override
 	public void setupWorld() {
-		this.ground = new Ground(150);
+		this.ground = new Ground(50);
 		
 		this.generator = PackageGenerators.initialSpawner(new int[][] {Utils.buildIntArr(0, 1, 1, 0),
-																	   Utils.buildIntArr(1, 1, 2, 1)});
+																	   Utils.buildIntArr(1, 1, 2, 1),
+																	   Utils.buildIntArr(2, 0, 2, 0)});
 	}
 
 	@Override

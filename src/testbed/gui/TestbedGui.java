@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -15,8 +16,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import org.joml.Vector3f;
 
@@ -52,12 +55,31 @@ public class TestbedGui extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		
-		JScrollPane dronePane = new JScrollPane(new JTable(new DroneTable(helper)));
-		dronePane.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3));
+		JTable drones = new JTable(new DroneTable(helper));
+		drones.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		drones.setColumnSelectionAllowed(false);
+		drones.getColumnModel().getColumn(0).setMaxWidth(75);
+		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+		renderer.setHorizontalAlignment(SwingConstants.CENTER);
+		drones.getColumnModel().getColumn(0).setCellRenderer(renderer);
+		drones.getColumnModel().getColumn(3).setMaxWidth(100);
+		drones.getColumnModel().getColumn(3).setCellRenderer(renderer);
+		drones.getTableHeader().setFont(drones.getTableHeader().getFont().deriveFont(Font.BOLD));
+		JScrollPane dronePane = new JScrollPane(drones);
+		dronePane.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3));		
 		contentPane.add(dronePane);
 		
+		
 		packageTable = new PackageTable();
-		JScrollPane packagePane = new JScrollPane(new JTable(packageTable));
+		JTable packages = new JTable(packageTable);
+		packages.setColumnSelectionAllowed(false);
+		packages.setRowSelectionAllowed(false);
+		packages.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		packages.getColumnModel().getColumn(0).setMaxWidth(75);
+		packages.getColumnModel().getColumn(0).setCellRenderer(renderer);
+		packages.getColumnModel().getColumn(3).setMaxWidth(100);
+		packages.getTableHeader().setFont(packages.getTableHeader().getFont().deriveFont(Font.BOLD));
+		JScrollPane packagePane = new JScrollPane(packages);
 		packagePane.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3));
 		contentPane.add(packagePane);
 		
@@ -69,12 +91,8 @@ public class TestbedGui extends JFrame {
 	
 	
 	public void showGUI() {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				pack();
-				setVisible(true);
-			}
-		});
+		pack();
+		setVisible(true);
 	}
 	
 	
@@ -101,7 +119,7 @@ public class TestbedGui extends JFrame {
 		
 		
 		public String getColumnName(int col) {
-			return new String[] {"ID","Drone", "Location","Package"}[col];
+			return new String[] {"ID","DroneId", "Location","Package"}[col];
 		}
 		
 		public int getColumnCount() {
@@ -126,8 +144,8 @@ public class TestbedGui extends JFrame {
 				return physics == null? "": physics.getAirport() == null? "In the air.": "At airport " +
 										    physics.getAirportNb() + ", " + physics.getAirportLocoationDesc(); 
 			case 3:
-				return "TODO";
-				
+				Package pack = helper.getDronePackage(row);
+				return pack == null? "": "" + packageTable.packages.indexOf(pack);				
 			default:
 				return null;
 			}
@@ -150,6 +168,7 @@ public class TestbedGui extends JFrame {
 		
 		public void addPackage(Package pack) {
 			this.packages.add(pack);
+			this.fireTableDataChanged();
 		}
 		
 		public String getColumnName(int col) {
@@ -207,7 +226,6 @@ public class TestbedGui extends JFrame {
 		
 		public void setActiveDrone(int droneId) {
 			this.activeDrone = droneId;
-			this.repaint();
 		}
 		
 		@Override
