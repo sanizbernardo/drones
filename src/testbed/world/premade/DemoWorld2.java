@@ -30,7 +30,7 @@ public class DemoWorld2 extends World {
 
 		addDrone(config, new Vector3f(0, -config.getWheelY() + config.getTyreRadius(), 0), new Vector3f(0,0,0), 0);
 		
-		this.planner = new Pilot(new int[] {Pilot.WAIT_PATH, Pilot.TAKING_OFF, Pilot.FLYING, Pilot.LANDING, Pilot.HANDBRAKE});
+		this.planner = new Pilot(new int[] {/*Pilot.WAIT_PATH,*/ Pilot.TAKING_OFF, Pilot.FLYING, Pilot.LANDING, Pilot.HANDBRAKE});
 	}
 
 	@Override

@@ -389,12 +389,12 @@ public class FlyPilot extends PilotPart {
 	private boolean part1Complete = false;
 	
 	private float getTargetHeading(AutopilotInputs inputs){
-		float[] pointBeforeRunway = {-1500f, 100f, 1500f}; //TODO
-		float headingRunwayToPoint = (float) Math.PI/2; //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180° (centerToRunway1)
+		float[] pointBeforeRunway = {-2500f, 100f, 1500f}; //TODO
+		float headingRunwayToPoint = (float) Math.PI; //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180° (centerToRunway1)
 		if(!part1Complete){
 			Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
 			Vector3f pBR = new Vector3f(pointBeforeRunway[0], pointBeforeRunway[1], pointBeforeRunway[2]);
-			if(pos.distance(pBR) < 10){
+			if(pos.distance(pBR) < 10){//TODO dees is fout
 				part1Complete = true;
 			}
 			return getTargetHeadingPart1(inputs, pointBeforeRunway, headingRunwayToPoint);
@@ -411,10 +411,10 @@ public class FlyPilot extends PilotPart {
 		
 		float temp = 0;
 		if(orientation(pointBeforeRunway, auxLocPlusMinZ(pointBeforeRunway, headingRunwayToPoint, 1), planePosition) == 1){
-			temp = -this.turnRadius;
+			temp = this.turnRadius;
 		}
 		else{
-			temp = this.turnRadius;
+			temp = -this.turnRadius;
 		}
 		
 		float corner = 0;
@@ -427,7 +427,9 @@ public class FlyPilot extends PilotPart {
 			float bigCorner = (float)(2*Math.PI) - (float)Math.acos((dg*dg - dm*dm - mg*mg)/(-2*dm*mg));
 			float smallCorner = (float)Math.acos(turnRadius/mg);
 			corner = bigCorner - smallCorner;
-			System.out.println("test123");
+			System.out.println("big:   " + bigCorner);
+			System.out.println("small: " + smallCorner);
+			System.out.println("BEHIND");
 		}
 		//Plane in front of the pointBeforeRunway
 		else{
@@ -437,15 +439,18 @@ public class FlyPilot extends PilotPart {
 			float bigCorner = (float)Math.acos((dg*dg - dm*dm - mg*mg)/(-2*dm*mg));
 			float smallCorner = (float)Math.acos(turnRadius/mg);
 			corner = bigCorner - smallCorner;
+			System.out.println("IN FRONT");
 		}
 		//Plane to the right of the pointBeforeRunway
 		if(orientation(pointBeforeRunway, auxLocPlusMinZ(pointBeforeRunway, headingRunwayToPoint, 1), planePosition) == 1){
-			return headingRunwayToPoint + corner + (float) Math.PI; //TODO nog iets voor als dit groter is dan 180°
+			System.out.println("RIGHT");
+			return headingRunwayToPoint - corner + (float) Math.PI; //TODO nog iets voor als dit groter is dan 180°
 		}
 		//Plane to the left of the pointBeforeRunway
 		else if(orientation(pointBeforeRunway, auxLocPlusMinZ(pointBeforeRunway, headingRunwayToPoint, 1), planePosition) == 2){
-			System.out.println("test");
-			return headingRunwayToPoint - corner + (float) Math.PI;
+			System.out.println("LEFT");
+			System.out.println((headingRunwayToPoint + "                 " + corner));
+			return headingRunwayToPoint + corner + (float) Math.PI;
 		}
 		
 		return headingRunwayToPoint + (float) Math.PI;
