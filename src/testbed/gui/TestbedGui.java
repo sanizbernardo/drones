@@ -7,17 +7,24 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -27,6 +34,7 @@ import interfaces.AutopilotConfig;
 import testbed.Physics;
 import testbed.entities.airport.Airport;
 import testbed.entities.packages.Package;
+import testbed.world.World;
 import testbed.world.helpers.DroneHelper;
 import utils.Constants;
 
@@ -36,9 +44,13 @@ public class TestbedGui extends JFrame {
 		
 	private PackageTable packageTable;
 	
+	private JTable drones;
+	
 	private MiniMap minimap;
 	
-	public TestbedGui(DroneHelper helper, List<Airport> airports) {		
+	private boolean lock = false;
+	
+	public TestbedGui(World world, DroneHelper helper, List<Airport> airports) {		
 		setTitle("Testbed GUI");
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -55,7 +67,7 @@ public class TestbedGui extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		
-		JTable drones = new JTable(new DroneTable(helper));
+		drones = new JTable(new DroneTable(helper));
 		drones.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		drones.setColumnSelectionAllowed(false);
 		drones.getColumnModel().getColumn(0).setMaxWidth(75);
@@ -65,6 +77,25 @@ public class TestbedGui extends JFrame {
 		drones.getColumnModel().getColumn(3).setMaxWidth(100);
 		drones.getColumnModel().getColumn(3).setCellRenderer(renderer);
 		drones.getTableHeader().setFont(drones.getTableHeader().getFont().deriveFont(Font.BOLD));
+		drones.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			private int lastId;
+			public void valueChanged(ListSelectionEvent e) {
+				if (lock || e.getValueIsAdjusting()) {
+					lock = false;
+					return;
+				}
+				
+				int newId;
+				if (e.getFirstIndex() == lastId)
+					newId = e.getLastIndex();
+				else
+					newId = e.getFirstIndex();
+				world.setFollowDrone(newId);
+				minimap.setActiveDrone(newId);
+				lastId = newId;
+				lock = false;
+			}
+		});
 		JScrollPane dronePane = new JScrollPane(drones);
 		dronePane.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3));		
 		contentPane.add(dronePane);
@@ -80,9 +111,11 @@ public class TestbedGui extends JFrame {
 		packages.getColumnModel().getColumn(3).setMaxWidth(100);
 		packages.getTableHeader().setFont(packages.getTableHeader().getFont().deriveFont(Font.BOLD));
 		JScrollPane packagePane = new JScrollPane(packages);
-		packagePane.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3));
+		packagePane.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3-30));
 		contentPane.add(packagePane);
 		
+		AddPackage addBtn = new AddPackage(airports.size(), world);
+		contentPane.add(addBtn.panel);
 				
 		minimap = new MiniMap(2000, 2000, helper, airports);
 		minimap.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3));
@@ -102,6 +135,8 @@ public class TestbedGui extends JFrame {
 	
 	
 	public void setActiveDrone(int activeDrone) {
+		lock = true;
+		drones.getSelectionModel().setSelectionInterval(activeDrone, activeDrone);
 		minimap.setActiveDrone(activeDrone);
 	}
 	
@@ -200,6 +235,39 @@ public class TestbedGui extends JFrame {
 			default:
 				return null;
 			}
+		}
+	}
+	
+	
+	private class AddPackage {
+		
+		private JPanel panel;
+
+		private JSpinner fromPort, fromGate, destPort, destGate;
+		
+		public AddPackage(int nbPorts, World world) {
+			panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+			
+			JButton btn = new JButton("Add package");
+			btn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					world.addPackage((int)fromPort.getValue(), (int)fromGate.getValue(), (int)destPort.getValue(), (int)destGate.getValue());
+				}
+			});
+			panel.add(btn);
+			
+			fromPort = new JSpinner(new SpinnerNumberModel(0, 0, nbPorts, 1));
+			panel.add(fromPort);
+			
+			fromGate = new JSpinner(new SpinnerNumberModel(0, 0, 1, 1));
+			panel.add(fromGate);
+			
+			destPort = new JSpinner(new SpinnerNumberModel(0, 0, nbPorts, 1));
+			panel.add(destPort);
+			
+			destGate = new JSpinner(new SpinnerNumberModel(0, 0, 1, 1));
+			panel.add(destGate);
 		}
 	}
 	

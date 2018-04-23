@@ -70,7 +70,8 @@ public class UpdateHelper {
         this.cameraHelper = cameraHelper;
         this.followDrone = 0;
         this.autopilotModule = module;
-        this.testbedGui = testbedGui;        
+        this.testbedGui = testbedGui;
+        this.testbedGui.setActiveDrone(followDrone);
         this.time = 0;
         this.droneHelper = droneHelper;
         this.droneHelper.setRootFrame(testbedGui);
@@ -96,6 +97,11 @@ public class UpdateHelper {
 		
 		this.followDrone = droneHelper.droneIds.entrySet().iterator().next().getValue();
 		this.testbedGui.setActiveDrone(followDrone);
+	}
+	
+	public void setFollowDrone(int droneId) {
+		if (this.droneHelper.droneIds.containsValue(droneId))
+			this.followDrone = droneId;
 	}
 
 	/**
@@ -125,8 +131,6 @@ public class UpdateHelper {
 		
 		testbedGui.repaint();
 		}
-
-
 
 
 	private void updateCameraPositions(MouseInput mouseInput, Vector3f newDronePos, int followDrone) {
@@ -180,23 +184,11 @@ public class UpdateHelper {
 		}	
 	}
 	
+	
 	private void updatePackages() {
 		int[] newDetails = generator.generatePackage(this.time);
-		if (newDetails != null) {
-			Package newPackage = new Package(newDetails);
-			Gate fromGate = new Gate(newPackage, true);
-			
-			if (!fromPackages.containsKey(fromGate)) {
-				packages.add(newPackage);
-				fromPackages.put(fromGate, newPackage);
-				
-				testbedGui.addPackage(newPackage);
-				
-				if (autopilotModule != null)
-					autopilotModule.deliverPackage(newPackage.getFromAirport(), newPackage.getFromGate(),
-						newPackage.getDestAirport(), newPackage.getDestGate());
-			}
-		}
+		if (newDetails != null)
+			addPackage(newDetails);
 		
 		for (int drone: droneHelper.droneIds.values()) {
 			Physics physics = droneHelper.getDronePhysics(drone);
@@ -234,6 +226,23 @@ public class UpdateHelper {
 	}
 	
 	
+	public void addPackage(int[] details) {
+		Package newPackage = new Package(details);
+		Gate fromGate = new Gate(newPackage, true);
+		
+		if (!fromPackages.containsKey(fromGate)) {
+			packages.add(newPackage);
+			fromPackages.put(fromGate, newPackage);
+			
+			testbedGui.addPackage(newPackage);
+			
+			if (autopilotModule != null)
+				autopilotModule.deliverPackage(newPackage.getFromAirport(), newPackage.getFromGate(),
+					newPackage.getDestAirport(), newPackage.getDestGate());
+		}
+	}
+	
+	
 	private class Gate {
 		
 		public final int airportNb, gateNb;
@@ -267,4 +276,5 @@ public class UpdateHelper {
 			return (this.airportNb == ((Gate)other).airportNb && this.gateNb == ((Gate)other).gateNb);
 		}
 	}
+
 }

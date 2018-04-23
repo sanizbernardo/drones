@@ -102,7 +102,7 @@ public abstract class World implements IWorldRules {
     	
     	setupAirports();
     	
-		this.testbedGui = new TestbedGui(droneHelper, airports);
+		this.testbedGui = new TestbedGui(this, droneHelper, airports);
     	
     	if (autopilotModule != null)
     		for (Airport port: airports) {
@@ -131,6 +131,10 @@ public abstract class World implements IWorldRules {
 	
 	public void nextFollowDrone() {
 		updateHelper.nextFollowDrone();
+	}
+	
+	public void setFollowDrone(int droneId) {
+		updateHelper.setFollowDrone(droneId);
 	}
 
 	
@@ -163,6 +167,9 @@ public abstract class World implements IWorldRules {
 		this.airports.add(new Airport(airportWidth, airportLength, position, heading));
 	}
 	
+	public void addPackage(int fromPort, int fromGate, int destPort, int destGate) {
+		this.updateHelper.addPackage(new int[] {fromPort, fromGate, destPort, destGate});
+	}
 	
 	public void initLogging(int droneId) {
 		this.logHelper = new LogHelper();
