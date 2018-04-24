@@ -38,8 +38,9 @@ public class VirtualDrone {
         this.heading = heading;
     }
 
-    public void setPilot(int[] tasks) {
-        this.pilot = new Pilot(tasks);
+    public void setPilot(VirtualAirport fromAirport, int fromGate, VirtualAirport toAirport, int toGate) {
+//        this.pilot = new Pilot();
+        pilot.simulationStarted(getConfig(), getInputs());
     }
 
     public AutopilotConfig getConfig() {
