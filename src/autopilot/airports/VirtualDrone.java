@@ -1,7 +1,9 @@
 package autopilot.airports;
 
-import autopilot.pilots.FlyPilot;
+import autopilot.Pilot;
 import interfaces.AutopilotConfig;
+import interfaces.AutopilotInputs;
+import interfaces.AutopilotOutputs;
 import org.joml.Vector3f;
 
 public class VirtualDrone {
@@ -14,7 +16,10 @@ public class VirtualDrone {
 
     private Vector3f position;
     private float heading;
+    private Pilot pilot;
     private AutopilotConfig config;
+    private AutopilotInputs currentinputs;
+    private AutopilotOutputs currentoutputs;
 
     public Vector3f getPosition() {
         return this.position;
@@ -32,7 +37,35 @@ public class VirtualDrone {
         this.heading = heading;
     }
 
+    public void setPilot(int[] tasks) {
+        this.pilot = new Pilot(tasks);
+    }
+
     public AutopilotConfig getConfig() {
         return config;
+    }
+
+    public AutopilotInputs getInputs() {
+        return currentinputs;
+    }
+
+    public void setInputs(AutopilotInputs inputs) {
+        this.currentinputs = inputs;
+    }
+
+    public AutopilotOutputs getOutputs() {
+        return currentoutputs;
+    }
+
+    public void setOutputs(AutopilotOutputs outputs){
+        this.currentoutputs = outputs;
+    }
+
+    public void calcOutputs() {
+        setOutputs(pilot.timePassed(getInputs()));
+    }
+
+    public void endSimulation() {
+        pilot.simulationEnded();
     }
 }

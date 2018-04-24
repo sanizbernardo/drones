@@ -48,22 +48,26 @@ public class AirportManager implements AutopilotModule{
 
     @Override
     public void startTimeHasPassed(int drone, AutopilotInputs inputs) {
-        VirtualDrone current = droneList.get(drone);
+        droneList.get(drone).setInputs(inputs);
+        droneList.get(drone).calcOutputs();
     }
 
     @Override
     public AutopilotOutputs completeTimeHasPassed(int drone) {
-        VirtualDrone current = droneList.get(drone);
-        return null;
+        return droneList.get(drone).getOutputs();
     }
 
     @Override
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
-
+        int[] tasks = defineTasks(fromAirport, fromGate, toAirport, toGate);
+        VirtualDrone drone = choosebestDrone();
+        drone.setPilot(tasks);
     }
 
     @Override
     public void simulationEnded() {
-
+        for (VirtualDrone drone : droneList) {
+            drone.endSimulation();
+        }
     }
 }
