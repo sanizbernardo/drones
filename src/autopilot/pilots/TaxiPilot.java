@@ -108,7 +108,7 @@ public class TaxiPilot extends PilotPart {
 				fBrake = maxBrakeForce;
 			} else {
 				if (input.getHeading() != finalHeading) {
-					Boolean side =  checkTurn(finalHeading, turnaccuracy, headingerror, input);
+					boolean side =  checkTurn(finalHeading, turnaccuracy, headingerror, input);
 
 					thrust = 70f;
 					fBrake = 0;
@@ -126,7 +126,7 @@ public class TaxiPilot extends PilotPart {
 				}
 			}
 		} else {
-			Boolean side = checkTurn(targetHeading, turnaccuracy, headingerror, input);
+			boolean side = checkTurn(targetHeading, turnaccuracy, headingerror, input);
 
 			thrust = 70f;
 			fBrake = 0;
@@ -144,7 +144,7 @@ public class TaxiPilot extends PilotPart {
 	}
 
 	public boolean checkTurn(float target, float turnaccuracy, float headingerror, AutopilotInputs input) {
-		Boolean side = null;
+		boolean side = true;
 		Vector3f result = new Vector3f(FloatMath.cos(input.getHeading()),0,-FloatMath.sin(input.getHeading())).cross(new Vector3f(FloatMath.cos(target),0,-FloatMath.sin(target)), new Vector3f());
 		if (result.normalize().y >= 0 && Math.abs(headingerror) > turnaccuracy)
 			side = true;
@@ -152,12 +152,7 @@ public class TaxiPilot extends PilotPart {
 			side = false;
 		}
 		
-		if(side == null) {
-			return true;
-		}
-		
 		return side;
-
 	}
 
 	@Override

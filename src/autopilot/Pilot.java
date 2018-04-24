@@ -69,24 +69,20 @@ public class Pilot {
 		
 		this.index = 0;
 		
-		int FLY_HEIGHT = 100; //to be given by airportManager
-		
+		int FLY_HEIGHT = 50; //to be given by airportManager
 	
 		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
 		this.pilots[LANDING] = new LandingPilot();
-		this.pilots[FLYING] = new FlyPilot(new Vector3f[] {new Vector3f(0,100,0)});
-		this.pilots[TAXIING] = new TaxiPilot(fromAirport.getGate(fromGate), (fromGate == 0) ? 
-				                                                 fromAirport.getHeading() 
-				                                                 : 
-				                                                 (fromAirport.getHeading() < 0) ? 
-				                                            		                   fromAirport.getHeading() + FloatMath.PI 
-				                                            		                   : 
-				                                            		                   fromAirport.getHeading() - FloatMath.PI);
+		this.pilots[FLYING] = new FlyPilot(new Vector3f[] {new Vector3f(0,FLY_HEIGHT,0)});
+		this.pilots[TAXIING] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
+								                                                 fromAirport.getHeading() 
+								                                                 : 
+								                                                 fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1));
 		this.pilots[HANDBRAKE] = new HandbrakePilot();
 		
 		this.init();
 		
-		this.tasks = new int[] {TAXIING, TAKING_OFF, FLYING};
+		this.tasks = new int[] {TAXIING, TAKING_OFF, FLYING, LANDING};
 	}
 
 	

@@ -320,8 +320,8 @@ public class TestbedGui extends JFrame {
 			g2.setStroke(new BasicStroke(1));
 			
 			for (Vector3f port: this.airports) {
-				int x = (int) (size.width/2 - port.z/this.maxX * size.width/2),
-					y = (int) (size.height/2 + port.x/this.maxY * size.height/2);
+				int x = (int) (size.width/2 + port.x/this.maxX * size.width/2),
+					y = (int) (size.height/2 + port.z/this.maxY * size.height/2);
 				
 				g2.fillRect(x-6, y-6, 12, 12);
 			}
@@ -333,8 +333,8 @@ public class TestbedGui extends JFrame {
 					g2.setColor(Color.RED);
 				
 				Vector3f pos = helper.getDronePhysics(drone).getPosition();
-				int x = (int) (size.width/2 - pos.z/this.maxX * size.width/2),
-					y = (int) (size.height/2 + pos.x/this.maxY * size.height/2);
+				int x = (int) (size.width/2 + pos.x/this.maxX * size.width/2),
+					y = (int) (size.height/2 + pos.z/this.maxY * size.height/2);
 					
 				g2.fillRect(x-3, y-3, 6, 6);
 			}
