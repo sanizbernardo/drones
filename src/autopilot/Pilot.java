@@ -1,8 +1,12 @@
 package autopilot;
 
+import java.util.Arrays;
+
 import org.joml.Vector3f;
 
+import autopilot.airports.VirtualAirport;
 import autopilot.pilots.FlyPilot;
+import autopilot.pilots.HandbrakePilot;
 import autopilot.pilots.LandingPilot;
 import autopilot.pilots.TakeOffPilot;
 import autopilot.pilots.TaxiPilot;
@@ -23,13 +27,9 @@ public class Pilot implements Autopilot {
 							 WAIT_PATH = -1;
 	
 	private int index;
-	private final int[] tasks;
-	
-	private AutopilotGUI gui;
-	
+	private int[] tasks;
+		
 	private PilotPart[] pilots;
-	
-	private Path path;
 	
 	private AutopilotConfig config;
 	
@@ -48,9 +48,6 @@ public class Pilot implements Autopilot {
 		
 	@Override
 	public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
-		this.gui = new AutopilotGUI(config);
-		this.gui.showGUI();
-		this.path = null;
 		this.config = config;
 		
 		for (PilotPart pilot: this.pilots) {
@@ -63,35 +60,10 @@ public class Pilot implements Autopilot {
 
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
-		this.gui.updateImage(inputs.getImage());
-		
-		if (this.gui.manualControl())
-			return this.gui.getOutputs();
 		
 		if (this.index >= this.tasks.length) {
-			this.gui.setTask("Done");
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 		}
-
-		if (state() == WAIT_PATH) {
-			if (this.path != null) {
-				
-				Vector3f[] cubes = pathToCubes(this.path);
-				
-				this.pilots[TAKING_OFF] = new TakeOffPilot(cubes[0].y-10);
-				this.pilots[FLYING] = new FlyPilot(cubes);
-				this.pilots[TAXIING] = new TaxiPilot();
-				
-				this.pilots[TAKING_OFF].initialize(this.config);
-				this.pilots[FLYING].initialize(this.config);
-				this.pilots[TAXIING].initialize(this.config);
-				
-				this.index += 1;
-			}
-			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
-		}
-		
-		this.gui.setTask(currentPilot().taskName());
 		
 		AutopilotOutputs output = currentPilot().timePassed(inputs);
 		
@@ -102,10 +74,19 @@ public class Pilot implements Autopilot {
 			this.index ++;
 		}
 		
-		this.gui.updateOutputs(output);
 		return output;
 	}
 
+	public void fly(AutopilotInputs inputs, VirtualAirport fromAirport, int fromGate, VirtualAirport toAirport, int toGate) {
+		this.index = 0;
+		
+		int FLY_HEIGHT = 100; //to be given by airportManager
+
+		this.pilots[TAXIING] = new TaxiPilot(Arrays.asList(new Vector3f(fromAirport.getGate(fromGate))));
+		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
+		this.pilots[FLYING] = new FlyPilot(new Vector3f[] {new Vector3f(0,100,0)});
+		this.tasks = new int[] {TAXIING, TAKING_OFF, FLYING};
+	}
 
 	@Override
 	public void simulationEnded() {
@@ -114,14 +95,8 @@ public class Pilot implements Autopilot {
 				pilot.close();
 			}
 		}
-		
-		this.gui.dispose();
 	}
-	
-	@Override
-	public void setPath(Path path) {
-		this.path = path;
-	}
+
 	
 	private int state() {
 		return this.tasks[this.index];
@@ -129,17 +104,6 @@ public class Pilot implements Autopilot {
 	
 	private PilotPart currentPilot() {
 		return this.pilots[state()];
-	}
-	
-	
-	private Vector3f[] pathToCubes(Path path) {
-		Vector3f[] cubes = new Vector3f[path.getX().length];
-		
-		for (int i = 0; i < path.getX().length; i++) {
-			cubes[i] = new Vector3f(path.getX()[i], path.getY()[i], path.getZ()[i]);
-		}
-		
-		return cubes;
 	}
 	
 	
@@ -151,40 +115,5 @@ public class Pilot implements Autopilot {
 			return 254.0966f + 3.5519f * height;
 		
 		return Float.NaN;
-	}
-
-	
-	private static class HandbrakePilot extends PilotPart {
-		private float maxR;
-		private boolean ended;
-		private float time;
-
-		@Override
-		public AutopilotOutputs timePassed(AutopilotInputs input) {
-			if (this.time == -1f)
-				this.time = input.getElapsedTime() + 2f;
-			
-			if (input.getElapsedTime() < this.time)
-				return Utils.buildOutputs(0, 0, 0, 0, 0, maxR, maxR, maxR);
-			
-			this.ended = true;
-			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
-		}
-
-		@Override
-		public String taskName() { return "Handbrake"; }
-
-		@Override
-		public void initialize(AutopilotConfig config) {
-			this.maxR = config.getRMax();
-			this.ended = false;
-			this.time = -1f;
-		}
-
-		@Override
-		public boolean ended() { return ended; }
-
-		@Override
-		public void close() { }
 	}
 }

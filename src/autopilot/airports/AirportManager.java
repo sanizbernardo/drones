@@ -28,10 +28,6 @@ public class AirportManager implements AutopilotModule{
         return null;
     }
 
-    public int[] defineTasks(int fromAirport, int fromGate, int toAirport, int toGate) {
-        Path 
-    }
-
     @Override
     public void defineAirportParams(float length, float width) {
         this.length = length;
@@ -68,10 +64,8 @@ public class AirportManager implements AutopilotModule{
 
     @Override
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
-        int[] tasks = defineTasks(fromAirport, fromGate, toAirport, toGate);
         VirtualDrone drone = chooseBestDrone();
-        drone.setPilot(tasks);
-        drone.setActive(true);
+        drone.getPilot().fly(drone.getInputs(), airportlist.get(fromAirport), fromGate, airportlist.get(toAirport), toGate);
     }
 
     @Override

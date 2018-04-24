@@ -38,11 +38,11 @@ public class VirtualDrone {
         this.heading = heading;
     }
 
-    public void setPilot(int[] tasks) {
-        this.pilot = new Pilot(tasks);
-    }
+    public Pilot getPilot() {
+		return pilot;
+	}
 
-    public AutopilotConfig getConfig() {
+	public AutopilotConfig getConfig() {
         return config;
     }
 

@@ -81,11 +81,6 @@ public class TaxiPilot extends PilotPart {
 			speed = 0;
 		}
 
-//		System.out.printf("Current distance: %s\t", distance);
-//		System.out.printf("Current heading: %s\t", Math.toDegrees(input.getHeading()));
-//		System.out.printf("Target heading: %s\t", Math.toDegrees(targetHeading));
-//		System.out.printf("Current speed: %s\t \n", speed);
-
 		float turnaccuracy;
 		if (distance < 15f) {
 			turnaccuracy = FloatMath.toRadians(2);
@@ -117,7 +112,6 @@ public class TaxiPilot extends PilotPart {
 				rBrake = maxBrakeForce;
 				fBrake = maxBrakeForce;
 			} else {
-//				System.out.println("Next position");
 				counter += 1;
 				if (counter < targetlist.size()) {
 					this.targetPos = targetlist.get(counter);
@@ -143,20 +137,20 @@ public class TaxiPilot extends PilotPart {
 				lBrake = 0;
 				rBrake = 0;
 				if (side) {
-//					System.out.println("left");
 					lBrake = 500f;
 				} else {
-//					System.out.println("right");
 					rBrake = 500f;
 				}
 			}
 		}
-
 		this.time = input.getElapsedTime();
 
 		return Utils.buildOutputs(0, 0, 0, 0, thrust, lBrake, fBrake, rBrake);
 	}
-
+	
+	public void setTargetlist(List<Vector3f> targetlist) {
+		this.targetlist = targetlist;
+	}
 
 	@Override
 	public boolean ended() {
