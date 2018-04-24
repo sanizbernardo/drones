@@ -1,9 +1,6 @@
 package autopilot.airports;
 
-import interfaces.AutopilotConfig;
-import interfaces.AutopilotInputs;
-import interfaces.AutopilotModule;
-import interfaces.AutopilotOutputs;
+import interfaces.*;
 import org.joml.Vector3f;
 import utils.FloatMath;
 
@@ -22,6 +19,18 @@ public class AirportManager implements AutopilotModule{
 
     private List<VirtualAirport> airportlist;
     private List<VirtualDrone> droneList;
+
+    public VirtualDrone chooseBestDrone() {
+        for (VirtualDrone drone : droneList) {
+            if (!drone.isActive())
+                return drone;
+        }
+        return null;
+    }
+
+    public int[] defineTasks(int fromAirport, int fromGate, int toAirport, int toGate) {
+        Path 
+    }
 
     @Override
     public void defineAirportParams(float length, float width) {
@@ -60,8 +69,9 @@ public class AirportManager implements AutopilotModule{
     @Override
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
         int[] tasks = defineTasks(fromAirport, fromGate, toAirport, toGate);
-        VirtualDrone drone = choosebestDrone();
+        VirtualDrone drone = chooseBestDrone();
         drone.setPilot(tasks);
+        drone.setActive(true);
     }
 
     @Override

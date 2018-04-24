@@ -20,6 +20,7 @@ public class VirtualDrone {
     private AutopilotConfig config;
     private AutopilotInputs currentinputs;
     private AutopilotOutputs currentoutputs;
+    private boolean active;
 
     public Vector3f getPosition() {
         return this.position;
@@ -63,6 +64,14 @@ public class VirtualDrone {
 
     public void calcOutputs() {
         setOutputs(pilot.timePassed(getInputs()));
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean x) {
+        this.active = x;
     }
 
     public void endSimulation() {
