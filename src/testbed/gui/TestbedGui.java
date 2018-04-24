@@ -4,68 +4,53 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-import org.joml.Vector3f;
-
-import testbed.entities.WorldObject;
-import utils.Constants;
-import utils.FloatMath;
-import utils.GuiUtils;
-
-import javax.swing.JLabel;
-
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+
+import org.joml.Vector3f;
+
+import interfaces.AutopilotConfig;
+import testbed.Physics;
+import testbed.entities.airport.Airport;
+import testbed.entities.packages.Package;
+import testbed.world.World;
+import testbed.world.helpers.DroneHelper;
+import utils.Constants;
 
 public class TestbedGui extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private final int precision;
+		
+	private PackageTable packageTable;
 	
-	private JPanel contentPane;
-	private JLabel[] position, velocity, orientation;
-	private JButton pathBtn;
-	
-	private boolean setPath;
+	private JTable drones;
 	
 	private MiniMap minimap;
 	
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					TestbedGui frame = new TestbedGui();
-					
-					frame.showGUI();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	private boolean lock = false;
 	
-	/**
-	 * Create the frame.
-	 */
-	public TestbedGui() {
-		this.precision = 2;
-		this.setPath = false;
-		
+	public TestbedGui(World world, DroneHelper helper, List<Airport> airports) {		
 		setTitle("Testbed GUI");
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -77,83 +62,64 @@ public class TestbedGui extends JFrame {
         	ubuntuHeader = 44;
         }
         
-		setBounds(ubuntuSiderBar, Constants.AUTOPILOT_GUI_HEIGHT +  2 * ubuntuHeader, Constants.AUTOPILOT_GUI_WIDTH, Constants.AUTOPILOT_GUI_HEIGHT * 2);
-		contentPane = new JPanel();
+		setBounds(ubuntuSiderBar, 2 * ubuntuHeader, Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT);
+		JPanel contentPane = new JPanel();
 		setContentPane(contentPane);
-		GridBagLayout gbl = new GridBagLayout();
-		gbl.columnWeights = new double[] {1,0,0,0,1};
-		contentPane.setLayout(gbl);
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		
-		JLabel title = new JLabel("Drone statistics");
-		GridBagConstraints gbc_title = GuiUtils.buildGBC(1, 0, GridBagConstraints.CENTER);
-		gbc_title.gridwidth = 3;
-		contentPane.add(title, gbc_title);
-		
-		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
-		sep.setPreferredSize(new Dimension(200, 5));
-		GridBagConstraints gbc_sep = GuiUtils.buildGBC(1, 1, GridBagConstraints.CENTER, new Insets(3, 0, 3, 0));
-		gbc_sep.gridwidth = 3;
-		contentPane.add(sep, gbc_sep);
-		
-		
-		position = buildVectorLbl("Position", new String[] {"x", "y", "z"}, 2, false); 
-		
-		velocity = buildVectorLbl("Velocity", new String[] {"x", "y", "z"} , 6, true);
-		
-		orientation = buildVectorLbl("Orientation", new String[] {"pitch", "heading", "roll"}, 11, false);
-		
-		pathBtn = new JButton("Set path");
-		GridBagConstraints gbc_btn = GuiUtils.buildGBC(1, 15, GridBagConstraints.CENTER, new Insets(0, 0, 5, 0));
-		gbc_btn.gridwidth = 3;
-		contentPane.add(pathBtn, gbc_btn);
-		
-		pathBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setPath = true;
+		drones = new JTable(new DroneTable(helper));
+		drones.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		drones.setColumnSelectionAllowed(false);
+		drones.getColumnModel().getColumn(0).setMaxWidth(75);
+		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+		renderer.setHorizontalAlignment(SwingConstants.CENTER);
+		drones.getColumnModel().getColumn(0).setCellRenderer(renderer);
+		drones.getColumnModel().getColumn(3).setMaxWidth(100);
+		drones.getColumnModel().getColumn(3).setCellRenderer(renderer);
+		drones.getTableHeader().setFont(drones.getTableHeader().getFont().deriveFont(Font.BOLD));
+		drones.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			private int lastId;
+			public void valueChanged(ListSelectionEvent e) {
+				if (lock || e.getValueIsAdjusting()) {
+					lock = false;
+					return;
+				}
+				
+				int newId;
+				if (e.getFirstIndex() == lastId)
+					newId = e.getLastIndex();
+				else
+					newId = e.getFirstIndex();
+				world.setFollowDrone(newId);
+				minimap.setActiveDrone(newId);
+				lastId = newId;
+				lock = false;
 			}
 		});
+		JScrollPane dronePane = new JScrollPane(drones);
+		dronePane.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3));		
+		contentPane.add(dronePane);
 		
-		this.minimap = new MiniMap(500, 300, 1500, 2100);
-		GridBagConstraints gbc_mm = GuiUtils.buildGBC(0, 16, GridBagConstraints.CENTER);
-		gbc_mm.gridwidth = 5;
-		contentPane.add(minimap, gbc_mm);
 		
-	}
-	
-	
-	private JLabel[] buildVectorLbl(String title, String[] componentLbl, int y, boolean norm) {
-		JLabel lbl = new JLabel(title);
-		GridBagConstraints gbc_lbl = GuiUtils.buildGBC(1, y, GridBagConstraints.CENTER, new Insets(0, 5, 0, 5));
-		gbc_lbl.gridheight = 3;
-		contentPane.add(lbl, gbc_lbl);
+		packageTable = new PackageTable();
+		JTable packages = new JTable(packageTable);
+		packages.setColumnSelectionAllowed(false);
+		packages.setRowSelectionAllowed(false);
+		packages.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		packages.getColumnModel().getColumn(0).setMaxWidth(75);
+		packages.getColumnModel().getColumn(0).setCellRenderer(renderer);
+		packages.getColumnModel().getColumn(3).setMaxWidth(100);
+		packages.getTableHeader().setFont(packages.getTableHeader().getFont().deriveFont(Font.BOLD));
+		JScrollPane packagePane = new JScrollPane(packages);
+		packagePane.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3-30));
+		contentPane.add(packagePane);
 		
-		JLabel[] numbers = new JLabel[(norm ? 4: 3)];  
-		for (int i = 0; i < 3; i++) {
-			JLabel nbLbl = new JLabel(componentLbl[i] + ": ");
-			contentPane.add(nbLbl, GuiUtils.buildGBC(2, y + i, GridBagConstraints.CENTER, new Insets(0, 10, 0, 10)));
-			numbers[i] = new JLabel("0");
-			contentPane.add(numbers[i], GuiUtils.buildGBC(3, y + i, GridBagConstraints.CENTER));
-		}
-		
-		if (norm) {
-			JLabel normLbl = new JLabel("norm:");
-			contentPane.add(normLbl, GuiUtils.buildGBC(1, y+3, GridBagConstraints.CENTER, new Insets(0, 10, 0, 10)));
-			numbers[3] = new JLabel("0");
-			contentPane.add(numbers[3], GuiUtils.buildGBC(3, y+3, GridBagConstraints.CENTER));
-		}
-		
-		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
-		sep.setPreferredSize(new Dimension(200, 5));
-		GridBagConstraints gbc_sep = GuiUtils.buildGBC(1, y + (norm ? 4 : 3), GridBagConstraints.CENTER);
-		gbc_sep.gridwidth = 3;
-		contentPane.add(sep, gbc_sep);
-		
-		return numbers;
-	}
-	
-	
-	public boolean setPath() {
-		return this.setPath;
+		AddPackage addBtn = new AddPackage(airports.size(), world);
+		contentPane.add(addBtn.panel);
+				
+		minimap = new MiniMap(2000, 2000, helper, airports);
+		minimap.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3));
+		contentPane.add(minimap);
 	}
 	
 	
@@ -162,116 +128,207 @@ public class TestbedGui extends JFrame {
 		setVisible(true);
 	}
 	
-	public void setCubes(WorldObject[] objects) {
-		ArrayList<Vector3f> cubes = new ArrayList<Vector3f>();
+	
+	public void addPackage(Package pack) {
+		packageTable.addPackage(pack);
+	}
+	
+	
+	public void setActiveDrone(int activeDrone) {
+		lock = true;
+		drones.getSelectionModel().setSelectionInterval(activeDrone, activeDrone);
+		minimap.setActiveDrone(activeDrone);
+	}
+	
+	
+	private class DroneTable extends AbstractTableModel {
 		
-		for (WorldObject obj: objects) {
-			if (obj != null)
-				cubes.add(obj.getPosition());
+		private static final long serialVersionUID = 1L;
+		
+		private DroneHelper helper;
+		
+		
+		public DroneTable(DroneHelper helper) {
+			this.helper = helper;
 		}
 		
-		this.minimap.setCubes(cubes.toArray(new Vector3f[0]));
+		
+		public String getColumnName(int col) {
+			return new String[] {"ID","DroneId", "Location","Package"}[col];
+		}
+		
+		public int getColumnCount() {
+				return 4;
+		}
+
+		public int getRowCount() {
+			return this.helper.getMaxNbDrones();
+		}
+		
+		public Object getValueAt(int row, int col) {
+			switch (col) {
+			case 0:
+				return "" + row;
+				
+			case 1:
+				AutopilotConfig config = helper.getDroneConfig(row);
+				return config == null? "": config.getDroneID();
+
+			case 2:
+				Physics physics = helper.getDronePhysics(row);
+				return physics == null? "": physics.getAirport() == null? "In the air.": "At airport " +
+										    physics.getAirportNb() + ", " + physics.getAirportLocoationDesc(); 
+			case 3:
+				Package pack = helper.getDronePackage(row);
+				return pack == null? "": "" + packageTable.packages.indexOf(pack);				
+			default:
+				return null;
+			}
+		}
+		
 	}
 	
-	public void setDrone(Vector3f drone, float heading) {
-		this.minimap.setDrone(drone, heading);
+	
+	private class PackageTable extends AbstractTableModel {
+
+		private static final long serialVersionUID = 1L;
+
+		private List<Package> packages;
+		
+		
+		public PackageTable() {
+			packages = new ArrayList<>();
+		}
+		
+		
+		public void addPackage(Package pack) {
+			this.packages.add(pack);
+			this.fireTableDataChanged();
+		}
+		
+		public String getColumnName(int col) {
+			return new String[] {"Package Nb", "From", "To", "Status"}[col];
+		}
+		
+		public int getColumnCount() {
+			return 4;
+		}
+
+		public int getRowCount() {
+			return packages.size();
+		}
+
+		public Object getValueAt(int row, int col) {
+			switch (col) {
+			case 0:
+				return row;
+				
+			case 1:
+				return "Airport " + packages.get(row).getFromAirport() + ", Gate " + packages.get(row).getFromGate();
+				
+			case 2:
+				return "Airport " + packages.get(row).getDestAirport() + ", Gate " + packages.get(row).getDestGate();
+			
+			case 3:
+				return packages.get(row).getStatusDesc();
+			
+			default:
+				return null;
+			}
+		}
 	}
 	
-	public void update(Vector3f velocity, Vector3f position, float heading, float pitch, float roll) {
-	    this.position[0].setText("" + FloatMath.round(position.x, precision));
-	    this.position[1].setText("" + FloatMath.round(position.y, precision));
-	    this.position[2].setText("" + FloatMath.round(position.z, precision));
+	
+	private class AddPackage {
 		
-	    this.velocity[0].setText("" + FloatMath.round(velocity.x, precision));
-	    this.velocity[1].setText("" + FloatMath.round(velocity.y, precision));
-	    this.velocity[2].setText("" + FloatMath.round(velocity.z, precision));
-	    this.velocity[3].setText("" + FloatMath.round(FloatMath.norm(velocity), precision));
+		private JPanel panel;
+
+		private JSpinner fromPort, fromGate, destPort, destGate;
 		
-	    this.orientation[0].setText("" + FloatMath.round(FloatMath.toDegrees(pitch), precision));
-	    this.orientation[1].setText("" + FloatMath.round(FloatMath.toDegrees(heading), precision));
-	    this.orientation[2].setText("" + FloatMath.round(FloatMath.toDegrees(roll), precision));
+		public AddPackage(int nbPorts, World world) {
+			panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+			
+			JButton btn = new JButton("Add package");
+			btn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					world.addPackage((int)fromPort.getValue(), (int)fromGate.getValue(), (int)destPort.getValue(), (int)destGate.getValue());
+				}
+			});
+			panel.add(btn);
+			
+			fromPort = new JSpinner(new SpinnerNumberModel(0, 0, nbPorts, 1));
+			panel.add(fromPort);
+			
+			fromGate = new JSpinner(new SpinnerNumberModel(0, 0, 1, 1));
+			panel.add(fromGate);
+			
+			destPort = new JSpinner(new SpinnerNumberModel(0, 0, nbPorts, 1));
+			panel.add(destPort);
+			
+			destGate = new JSpinner(new SpinnerNumberModel(0, 0, 1, 1));
+			panel.add(destGate);
+		}
 	}
 	
 	
 	private class MiniMap extends Component {
 		
 		private static final long serialVersionUID = 1L;
-
-		private final Dimension prefSize;
 		
 		private final int maxX;
 		private final int maxY;
 		
-		private Vector3f[] cubes;
+		private int activeDrone;
 		
-		private Vector3f drone; 
-		private float heading;
+		private DroneHelper helper;
+		private List<Vector3f> airports;
 		
-		public MiniMap(int width, int height, int maxX, int maxZ) {
-			this.prefSize = new Dimension(width, height);
-			
+		public MiniMap(int maxX, int maxZ, DroneHelper helper, List<Airport> airports) {			
 			this.maxX = maxZ;
 			this.maxY = maxX;
 			
-			this.cubes = new Vector3f[0];
+			this.helper = helper;
+			this.airports = airports.stream().map(a -> a.getPosition()).collect(Collectors.toList());
 		}
 		
-		public void setCubes(Vector3f[] cubes) {
-			this.cubes = cubes;
-			this.repaint();
-		}
-		
-		public void setDrone(Vector3f drone, float heading) {
-			this.drone = drone;
-			this.heading = heading;
-		}
-		
-		@Override
-		public Dimension getPreferredSize() {
-			return prefSize;
+		public void setActiveDrone(int droneId) {
+			this.activeDrone = droneId;
 		}
 		
 		@Override
 		public void paint(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
 			
+			Dimension size = this.getSize();
+			
 			g2.setColor(Color.BLACK);
 			g2.setStroke(new BasicStroke(2));
 			
-			g2.drawRect(0, 0, prefSize.width-1, prefSize.height-1);
-			
-			int xAxis = 20,
-				yAxis = (int) (xAxis * this.maxY / this.maxX);
-			
-			g2.drawLine(prefSize.width/2 - xAxis, prefSize.height/2, prefSize.width/2 + xAxis, prefSize.height/2);
-			g2.drawLine(prefSize.width/2, prefSize.height/2 - yAxis, prefSize.width/2, prefSize.height/2 + yAxis);
+			g2.drawRect(0, 0, size.width-1, size.height-1);
 			
 			g2.setColor(Color.BLUE);
 			g2.setStroke(new BasicStroke(1));
 			
-			for (Vector3f cube: this.cubes) {
-				int x = (int) (prefSize.width/2 - cube.z/this.maxX * prefSize.width/2),
-					y = (int) (prefSize.height/2 + cube.x/this.maxY * prefSize.height/2);
+			for (Vector3f port: this.airports) {
+				int x = (int) (size.width/2 - port.z/this.maxX * size.width/2),
+					y = (int) (size.height/2 + port.x/this.maxY * size.height/2);
 				
+				g2.fillRect(x-6, y-6, 12, 12);
+			}
+			
+			for (int drone: helper.droneIds.values()) {
+				if (drone == activeDrone) 
+					g2.setColor(Color.GREEN);
+				else
+					g2.setColor(Color.RED);
+				
+				Vector3f pos = helper.getDronePhysics(drone).getPosition();
+				int x = (int) (size.width/2 - pos.z/this.maxX * size.width/2),
+					y = (int) (size.height/2 + pos.x/this.maxY * size.height/2);
+					
 				g2.fillRect(x-3, y-3, 6, 6);
 			}
-			
-			if (this.drone != null) {
-				
-				g2.setColor(Color.RED);
-				g2.setStroke(new BasicStroke(3));
-				
-				float wy = - FloatMath.sin(this.heading) * 35 / this.maxX * prefSize.width/2,
-					  wx = FloatMath.cos(this.heading) * 35 / this.maxX * prefSize.width/2,
-					  x = prefSize.width/2 - drone.z/this.maxX * prefSize.width/2,
-					  y = prefSize.height/2 + drone.x/this.maxY * prefSize.height/2;
-				
-				g2.drawLine((int) (x - wx), (int) (y - wy), (int) (x + wx), (int) (y + wy));
-				
-				g2.drawLine((int) (x + wy/2), (int) (y - wx/2),
-							(int) (x - wy/2), (int) (y + wx/2));
-			}
-			
 		}
 	}
 	

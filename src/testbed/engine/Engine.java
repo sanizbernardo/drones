@@ -46,7 +46,7 @@ public class Engine implements Runnable {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         if (System.getProperty("os.name").equals("Linux")) {ubuntuSiderBar = Constants.UBUNTU_SIDEBAR;}
         if (System.getProperty("os.name").contains("Windows")) {windowsToolBar = 80;}
-        int width = screenSize.width - Constants.AUTOPILOT_GUI_WIDTH - ubuntuSiderBar;
+        int width = screenSize.width - Constants.TESTBED_GUI_WIDTH - ubuntuSiderBar;
         int height = screenSize.height - windowsToolBar;
         
         window = new Window(windowTitle, width, height, vSync);

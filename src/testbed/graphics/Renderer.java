@@ -55,39 +55,39 @@ public class Renderer {
     	glScissor(0,0,window.getWidth(), window.getHeight());
     	glClearColor(1f, 1f, 1f, 0f);
     	
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     	
         
         // background for chase cam
         glScissor(chaseCamX,chaseCamY,chaseCamWidth,chaseCamHeigth);
         glClearColor(.51f, .51f, .51f, 1f);
         
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         
     	// background for droneCam
 //    	glScissor(droneCamX, droneCamY, droneCamWidth, droneCamHeight);
 //    	glClearColor(1f, 1f, 1f, 0f);
     	
-    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     	
     	if(!ortho) {
         	// background for free camera
         	glScissor(freeCamX, freeCamY, freeCamWidth, freeCamHeigth);
         	glClearColor(.41f, .4f, .4f, 1f);
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     	} else {
             // background for top ortho cam
             glScissor(topOrthoCamX,topOrthoCamY,topOrthoCamWidth,topOrthoCamHeigth );
             glClearColor(.30f, .30f, .30f, 1f);
             
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
             // background for right ortho cam
             glScissor(rightOrthoCamX, rightOrthoCamY, rightOrthoCamWidth, rightOrthoCamHeigth);
             glClearColor(0.11f, 0.65f, 0.07f, 1f);
             
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             //end
     	}
     	

@@ -14,6 +14,7 @@ public class Trail {
 
     private Vector3f last = new Vector3f(0,0,0);
     private List<WorldObject> pathObjects;
+    private static int MAX_SIZE = 50;
     
     public Trail() {
     	 pathObjects = new ArrayList<>();
@@ -22,6 +23,7 @@ public class Trail {
     public void leaveTrail(Vector3f pos) {
         if(Utils.euclDistance(last, pos, 5)) {
             makeTrail(pos);
+            if(pathObjects.size() > MAX_SIZE) pathObjects.remove(0);
         }
     }
 
