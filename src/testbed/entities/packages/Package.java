@@ -4,7 +4,8 @@ public class Package {
 
 	public static final int WAITING = 0,
 							IN_PROGRESS = 1,
-							DELIVERED = 2;
+							DELIVERED = 2,
+							CRASHED = 3;
 	
 	private final int from, dest;
 	
@@ -59,6 +60,10 @@ public class Package {
 		this.status = DELIVERED;
 	}
 
+	public void crashed() {
+		this.status = CRASHED;
+	}
+	
 	public String getStatusDesc() {
 		switch (this.status) {
 		case WAITING:
@@ -69,6 +74,9 @@ public class Package {
 			
 		case DELIVERED:
 			return "Delivered";
+			
+		case CRASHED:
+			return "Crashed";
 			
 		default:
 			return "";

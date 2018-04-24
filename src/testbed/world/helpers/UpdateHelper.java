@@ -1,9 +1,7 @@
 package testbed.world.helpers;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import interfaces.AutopilotModule;
@@ -61,7 +59,6 @@ public class UpdateHelper {
 	 * Package generation
 	 */
 	private PackageGenerator generator;
-	private List<Package> packages;
 	private Map<Gate,Package> fromPackages; 
 	
 	public UpdateHelper(DroneHelper droneHelper, int TIME_SLOWDOWN_MULTIPLIER, CameraHelper cameraHelper,
@@ -76,7 +73,6 @@ public class UpdateHelper {
         this.droneHelper = droneHelper;
         this.droneHelper.setRootFrame(testbedGui);
         this.generator = generator;
-        this.packages = new ArrayList<>();
         this.fromPackages = new HashMap<>();
     }
 	
@@ -238,7 +234,6 @@ public class UpdateHelper {
 		Gate fromGate = new Gate(newPackage, true);
 		
 		if (!fromPackages.containsKey(fromGate)) {
-			packages.add(newPackage);
 			fromPackages.put(fromGate, newPackage);
 			
 			testbedGui.addPackage(newPackage);

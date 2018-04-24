@@ -186,14 +186,17 @@ public class DroneHelper {
 		if (!wantPhysics)
 			return;
 		
-		for (String droneId : droneIds.keySet()) {
+		for (int droneId : droneIds.values()) {
 			try {
 				getDronePhysics(droneId).update(interval);
 			} catch (PhysicsException e) {
 				JOptionPane.showMessageDialog(rootFrame,
-						"A physics error occured for drone " + droneId
+						"A physics error occured for drone " + getDronePhysics(droneId).getConfig().getDroneID()
 								+ ": " + e.getMessage(),
 						"Physics Exception", JOptionPane.ERROR_MESSAGE);
+				
+				if (packages[droneId] != null)
+					packages[droneId].crashed();
 				removeDrone(droneId, updateHelper);
 			} catch (NullPointerException e) { }
 		}
@@ -275,6 +278,8 @@ public class DroneHelper {
 		}
 		
 		for (int i: dronesToRemove) {
+			if (packages[i] != null)
+				packages[i].crashed();
 			removeDrone(i, updateHelper);
 		}
 	}
