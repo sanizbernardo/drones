@@ -119,6 +119,7 @@ public class TaxiPilot extends PilotPart {
                     } else {
                         rBrake = 500f;
                     }
+
 				} else {
 					this.ended = true;
 					return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
@@ -137,7 +138,6 @@ public class TaxiPilot extends PilotPart {
                 rBrake = 500f;
             }
 		}
-
 		this.time = input.getElapsedTime();
 
 		return Utils.buildOutputs(0, 0, 0, 0, thrust, lBrake, fBrake, rBrake);
@@ -152,6 +152,7 @@ public class TaxiPilot extends PilotPart {
 			side = false;
 		}
 		return side;
+
 	}
 
 	@Override

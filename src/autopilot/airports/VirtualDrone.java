@@ -12,6 +12,8 @@ public class VirtualDrone {
         this.position = position;
         this.heading = heading;
         this.config = config;
+        this.pilot = new Pilot();
+        pilot.simulationStarted(config, null);
     }
 
     private Vector3f position;
@@ -51,13 +53,19 @@ public class VirtualDrone {
         this.heading = heading;
     }
 
+<<<<<<< HEAD
     public void setPilot(VirtualAirport fromAirport, int fromGate, VirtualAirport toAirport, int toGate) {
         // Hoe gaat Pilot geconstrueerd worden nu?
         //this.pilot = new Pilot();
         pilot.simulationStarted(getConfig(), getInputs());
     }
+=======
+    public Pilot getPilot() {
+		return pilot;
+	}
+>>>>>>> autopilot_up_to_date
 
-    public AutopilotConfig getConfig() {
+	public AutopilotConfig getConfig() {
         return config;
     }
 

@@ -17,6 +17,7 @@ import testbed.entities.WorldObject;
 import testbed.entities.airport.Airport;
 import testbed.entities.drone.DroneSkeleton;
 import testbed.entities.trail.Trail;
+import testbed.entities.packages.Package;
 import utils.Constants;
 import utils.FloatMath;
 import utils.PhysicsException;
@@ -30,11 +31,12 @@ public class DroneHelper {
 	private WorldObject[][] droneModels;
 	private Physics[] physics;
 	private Trail[] trails;
+	private Package[] packages;
 	
-	private final JFrame rootFrame;
+	private JFrame rootFrame;
 	private final boolean wantPhysics;
 
-	public DroneHelper(boolean wantPhysics, int nbDrones, JFrame rootFrame) {
+	public DroneHelper(boolean wantPhysics, int nbDrones) {
 		this.nbDrones = nbDrones;
 		this.index = -1;
 		this.droneIds = new HashMap<>();
@@ -42,9 +44,19 @@ public class DroneHelper {
 		this.droneModels = new WorldObject[nbDrones][];
 		this.physics = new Physics[nbDrones];
 		this.trails = new Trail[nbDrones];
+		this.packages = new Package[nbDrones];
 
-		this.rootFrame = rootFrame;
 		this.wantPhysics = wantPhysics;
+	}
+	
+	
+	public void setRootFrame(JFrame rootFrame) {
+		this.rootFrame = rootFrame;
+	}
+	
+	
+	public int getMaxNbDrones() {
+		return this.nbDrones;
 	}
 	
 	
@@ -63,6 +75,15 @@ public class DroneHelper {
 
 	public Trail getDroneTrail(int droneId) {
 		return droneIds.containsValue(droneId) ? trails[droneId]: null;
+	}
+	
+	
+	public Package getDronePackage(String droneId) {
+		return droneIds.containsKey(droneId) ? packages[droneIds.get(droneId)]: null;
+	}
+	
+	public Package getDronePackage(int droneId) {
+		return droneIds.containsValue(droneId) ? packages[droneId]: null;
 	}
 	
 	
@@ -85,6 +106,9 @@ public class DroneHelper {
 	
 
 	public void addDrone(AutopilotConfig config, Vector3f startPos, Vector3f startVel, float startHeading, List<Airport> airports) {
+		if (droneIds.containsKey(config.getDroneID()))
+			throw new IllegalArgumentException("No duplicate drone names allowed");
+		
 		this.index ++;
 		
 		if (index == nbDrones)
@@ -115,7 +139,7 @@ public class DroneHelper {
 	}
 
 	
-	public void removeDrone(String droneId) {
+	public void removeDrone(String droneId, UpdateHelper updateHelper) {
 		int index = droneIds.remove(droneId);
 
 		WorldObject[] droneItems = droneModels[index];
@@ -127,15 +151,30 @@ public class DroneHelper {
 		droneModels[index] = null;
 		physics[index] = null;
 		trails[index] = null;
+		packages[index] = null;
+		
+		if (droneIds.get(droneId) == updateHelper.getFollowDrone())
+			updateHelper.nextFollowDrone();
 	}
 
-	public void removeDrone(int droneId) {
-		removeDrone(physics[droneId].getConfig().getDroneID());
+	public void removeDrone(int droneId, UpdateHelper updateHelper) {
+		removeDrone(physics[droneId].getConfig().getDroneID(), updateHelper);
 	}
 	
 	
-	public void update(float interval) {
-		updatePhysics(interval);
+	public void collectPackage(int droneId, Package pack) {
+		pack.pickUp();
+		packages[droneId] = pack;
+	}
+	
+	public void deliverPackage(int droneId) {
+		packages[droneId].deliver();
+		packages[droneId] = null;
+	}
+	
+	
+	public void update(float interval, UpdateHelper updateHelper) {
+		updatePhysics(interval, updateHelper);
 
 		updateTrails();
 
@@ -143,7 +182,7 @@ public class DroneHelper {
 	}
 
 	
-	private void updatePhysics(float interval) {
+	private void updatePhysics(float interval, UpdateHelper updateHelper) {
 		if (!wantPhysics)
 			return;
 		
@@ -155,10 +194,10 @@ public class DroneHelper {
 						"A physics error occured for drone " + droneId
 								+ ": " + e.getMessage(),
 						"Physics Exception", JOptionPane.ERROR_MESSAGE);
-				removeDrone(droneId);
+				removeDrone(droneId, updateHelper);
 			} catch (NullPointerException e) { }
 		}
-		checkCollision();
+		checkCollision(updateHelper);
 	}
 
 	private void updateTrails() {
@@ -218,7 +257,7 @@ public class DroneHelper {
 	}
 
 	
-	private void checkCollision() {
+	private void checkCollision(UpdateHelper updateHelper) {
 		Set<Integer> dronesToRemove = new HashSet<>();
 		for (int i: droneIds.values()) {
 			for (int j: droneIds.values()) {
@@ -236,7 +275,7 @@ public class DroneHelper {
 		}
 		
 		for (int i: dronesToRemove) {
-			removeDrone(i);
+			removeDrone(i, updateHelper);
 		}
 	}
 }
