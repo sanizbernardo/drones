@@ -8,6 +8,7 @@ public class VirtualAirport {
 
     public VirtualAirport(Vector3f position, float heading, float width) {
         this.position = position;
+        this.heading = heading;
 
         Vector3f direction = new Vector3f(-FloatMath.sin(heading), 0, -FloatMath.cos(heading));
         Vector3f directionPerp = new Vector3f(-FloatMath.cos(heading), 0, FloatMath.sin(heading));

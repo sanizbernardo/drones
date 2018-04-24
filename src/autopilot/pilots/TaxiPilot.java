@@ -21,7 +21,9 @@ public class TaxiPilot extends PilotPart {
 
 	private boolean ended;
 
-	private float time, maxThrust, maxBrakeForce, finalHeading;
+	private float time;
+	private float maxBrakeForce;
+	private float finalHeading;
 
 	private Vector3f oldPos = new Vector3f(0, 0, 0);
 
@@ -48,7 +50,7 @@ public class TaxiPilot extends PilotPart {
 
 	@Override
 	public void initialize(AutopilotConfig config) {
-		this.maxThrust = config.getMaxThrust();
+		float maxThrust = config.getMaxThrust();
 		this.maxBrakeForce = config.getRMax();
 
 		thrustPID.setOutputLimits(0, maxThrust);
@@ -108,17 +110,15 @@ public class TaxiPilot extends PilotPart {
 				if (input.getHeading() != finalHeading) {
 					Boolean side =  checkTurn(finalHeading, turnaccuracy, headingerror, input);
 
-					if (side != null) {
-						thrust = 70f;
-						fBrake = 0;
-						lBrake = 0;
-						rBrake = 0;
-						if (side) {
-							lBrake = 500f;
-						} else {
-							rBrake = 500f;
-						}
-					}
+					thrust = 70f;
+					fBrake = 0;
+					lBrake = 0;
+					rBrake = 0;
+					if (side) {
+                        lBrake = 500f;
+                    } else {
+                        rBrake = 500f;
+                    }
 				} else {
 					this.ended = true;
 					return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
@@ -127,17 +127,15 @@ public class TaxiPilot extends PilotPart {
 		} else {
 			Boolean side = checkTurn(targetHeading, turnaccuracy, headingerror, input);
 
-			if (side != null) {
-				thrust = 70f;
-				fBrake = 0;
-				lBrake = 0;
-				rBrake = 0;
-				if (side) {
-					lBrake = 500f;
-				} else {
-					rBrake = 500f;
-				}
-			}
+			thrust = 70f;
+			fBrake = 0;
+			lBrake = 0;
+			rBrake = 0;
+			if (side) {
+                lBrake = 500f;
+            } else {
+                rBrake = 500f;
+            }
 		}
 
 		this.time = input.getElapsedTime();

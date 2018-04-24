@@ -10,8 +10,9 @@ import java.util.List;
 public class AirportManager implements AutopilotModule{
 
     public AirportManager() {
-        airportlist = new ArrayList<VirtualAirport>();
-        droneList = new ArrayList<VirtualDrone>();
+        airportlist = new ArrayList<>();
+        droneList = new ArrayList<>();
+        packagelist = new ArrayList<>();
     }
 
     private float length;
