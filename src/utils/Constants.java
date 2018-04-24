@@ -11,10 +11,7 @@ public class Constants {
     /**
      * Premade worlds that should show in the gui.
      */
-	public static final String[] PREMADE_WORLDS = new String[] {"CubeWorld", "TestWorldFlyStraight", "OrthoTestWorld",
-																"LandingWorld", "TakeOffWorld", "AirportSetupWorld", 
-																"DemoWorld1", "DemoWorld2", "DemoWorld3",  "TestWorldPitch",
-																"TaxiWorld"};
+	public static final String[] PREMADE_WORLDS = new String[] {"LandingWorld", "AirportSetupWorld", "PackageTestWorld"};
 
 	/**
 	 * Autopilot constants
@@ -32,8 +29,8 @@ public class Constants {
     /**
      * GUI
      */    
-    public static final int AUTOPILOT_GUI_HEIGHT = 450;
-    public static final int AUTOPILOT_GUI_WIDTH = 500;
+    public static final int TESTBED_GUI_HEIGHT = 1000;
+    public static final int TESTBED_GUI_WIDTH = 500;
     
     public static final float COLLISION_RANGE = 5f;
     public static final float PATH_ACCURACY = 0f;

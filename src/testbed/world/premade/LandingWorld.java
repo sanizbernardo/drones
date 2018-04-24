@@ -2,7 +2,6 @@ package testbed.world.premade;
 
 import org.joml.Vector3f;
 
-import autopilot.Pilot;
 import interfaces.AutopilotConfig;
 import testbed.entities.WorldObject;
 import testbed.entities.ground.Ground;
@@ -17,6 +16,11 @@ public class LandingWorld extends World{
 	}
 
 	@Override
+    public void setupAutopilotModule() {
+    	
+    }
+	
+	@Override
 	public void setupAirports() {
 		addAirport(new Vector3f(0, 0, -400), 0);
 	}
@@ -27,8 +31,6 @@ public class LandingWorld extends World{
 		AutopilotConfig config = Utils.createDefaultConfig("drone1");
 		
 		addDrone(config, new Vector3f(0, 200, 0), new Vector3f(0,0,-45), 0);
-		
-		this.planner = new Pilot(new int[] {Pilot.LANDING});
 	}
 
 	@Override
