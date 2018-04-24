@@ -14,7 +14,6 @@ import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
-import interfaces.Path;
 import utils.Utils;
 
 public class Pilot implements Autopilot {
@@ -23,8 +22,7 @@ public class Pilot implements Autopilot {
 							 LANDING = 1,
 							 FLYING = 2,
 							 TAXIING = 3,
-							 HANDBRAKE = 4,
-							 WAIT_PATH = -1;
+							 HANDBRAKE = 4;
 	
 	private int index;
 	private int[] tasks;
@@ -32,31 +30,25 @@ public class Pilot implements Autopilot {
 	private PilotPart[] pilots;
 	
 	private AutopilotConfig config;
-	
-	public Pilot(int[] tasks) {
-		this.pilots = new PilotPart[5];
 		
-		this.pilots[TAKING_OFF] = new TakeOffPilot(100);
-		this.pilots[FLYING] = new FlyPilot(null);
-		this.pilots[LANDING] = new LandingPilot();
-		this.pilots[TAXIING] = new TaxiPilot();
-		this.pilots[HANDBRAKE] = new HandbrakePilot();  
-		
-		this.tasks = tasks;
-		this.index = 0;
+	public Pilot() {
+		this.tasks = new int[] {};
 	}
-		
+	
 	@Override
 	public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 		this.config = config;
 		
-		for (PilotPart pilot: this.pilots) {
-			pilot.initialize(config);
-		}
+		this.init();
 		
 		return timePassed(inputs);
 	}
 	
+	private void init() {
+		for (PilotPart pilot: this.pilots) {
+			pilot.initialize(config);
+		}
+	}
 
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
@@ -78,13 +70,22 @@ public class Pilot implements Autopilot {
 	}
 
 	public void fly(AutopilotInputs inputs, VirtualAirport fromAirport, int fromGate, VirtualAirport toAirport, int toGate) {
+		
+		if(config == null) throw new RuntimeException("Access before sim started");
+		
 		this.index = 0;
 		
 		int FLY_HEIGHT = 100; //to be given by airportManager
-
-		this.pilots[TAXIING] = new TaxiPilot(Arrays.asList(new Vector3f(fromAirport.getGate(fromGate))));
+		
+		this.pilots = new PilotPart[5];
 		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
+		this.pilots[LANDING] = new LandingPilot();
 		this.pilots[FLYING] = new FlyPilot(new Vector3f[] {new Vector3f(0,100,0)});
+		this.pilots[TAXIING] = new TaxiPilot();
+		this.pilots[HANDBRAKE] = new HandbrakePilot();
+		
+		this.init();
+		
 		this.tasks = new int[] {TAXIING, TAKING_OFF, FLYING};
 	}
 
