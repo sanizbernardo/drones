@@ -46,9 +46,11 @@ public class FlyPilot extends PilotPart {
 	private ThrustPID thrustPID;
 	private RollPID rollPID;
 	
+	boolean check = true;
 	
 	public FlyPilot(Vector3f[] cubes) {
 		this.cubes = cubes;
+		pointBR = new Vector3f(-this.turnRadius, 100f, -this.turnRadius - 700f);
 	}
 	
 	
@@ -70,6 +72,7 @@ public class FlyPilot extends PilotPart {
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
 		
+		System.out.println(part1Complete);
 		Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
 		
 		float dt = inputs.getElapsedTime() - this.time;
@@ -77,6 +80,17 @@ public class FlyPilot extends PilotPart {
 		if (dt != 0)
 			this.approxVel = pos.sub(this.timePassedOldPos, new Vector3f()).mul(1/dt);
 		this.timePassedOldPos = pos;
+		
+		if(!part1Complete && pos.distance(pointBR) < this.turnRadius+100 && check){
+			setCurrentState(State.Stable);
+			control(inputs, currentState);
+			return Utils.buildOutputs(leftWingInclination,
+					rightWingInclination, verStabInclination, horStabInclination,
+					newThrust, rMax, rMax, rMax);
+		}
+		
+		
+		check = false;
 		
 		if (this.stableTime > 0) {
 			setCurrentState(State.Stable);
@@ -362,10 +376,12 @@ public class FlyPilot extends PilotPart {
 	
 	private boolean part1Complete = false;
 	private State part2Direction = State.Stable;
+
+	private Vector3f pointBR;
 	
 	private float getTargetHeading(AutopilotInputs inputs){
-		float[] pointBeforeRunway = {1000f, 100f, -1500f}; //TODO
-		float headingRunwayToPoint = (float) (3*Math.PI/4); //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180° (centerToRunway1)
+		float[] pointBeforeRunway = {pointBR.x, pointBR.y, pointBR.z}; //TODO
+		float headingRunwayToPoint = (float) (Math.PI); //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180° (centerToRunway1)
 		if(!part1Complete){
 			return getTargetHeadingPart1(inputs, pointBeforeRunway, headingRunwayToPoint);
 
@@ -395,8 +411,8 @@ public class FlyPilot extends PilotPart {
 		
 		Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
 		float[] aux = auxLocPlusX(pointBeforeRunway, headingRunwayToPoint, temp);
-		Vector3f pBR = new Vector3f(aux[0], aux[1], aux[2]);
-		if(pos.distance(pBR) < this.turnRadius + 10 && pos.distance(pBR) > this.turnRadius - 10){
+		Vector3f pBRPaux = new Vector3f(aux[0], aux[1], aux[2]);
+		if(pos.distance(pBRPaux) < this.turnRadius + 10 && pos.distance(pBRPaux) > this.turnRadius - 10 && pos.distance(pointBR) < this.turnRadius + 50){
 			part1Complete = true;
 		}
 		
