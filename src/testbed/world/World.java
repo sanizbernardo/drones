@@ -37,7 +37,7 @@ public abstract class World implements IWorldRules {
 	private LogHelper logHelper;
 	private int logDrone;
 	private float time;
-	private List<Airport> airports;	
+	private List<Airport> airports;
 	
 	/* These are to be directly called in the world classes */
 	protected AutopilotModule autopilotModule;
@@ -167,9 +167,6 @@ public abstract class World implements IWorldRules {
 		this.airports.add(new Airport(airportWidth, airportLength, position, heading));
 	}
 	
-	public void addPackage(int fromPort, int fromGate, int destPort, int destGate) {
-		this.updateHelper.addPackage(new int[] {fromPort, fromGate, destPort, destGate});
-	}
 	
 	public void initLogging(int droneId) {
 		this.logHelper = new LogHelper();

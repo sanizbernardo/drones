@@ -50,6 +50,8 @@ public class TestbedGui extends JFrame {
 	
 	private boolean lock = false;
 	
+	private int[] packageDetails;
+	
 	public TestbedGui(World world, DroneHelper helper, List<Airport> airports) {		
 		setTitle("Testbed GUI");
 		
@@ -140,6 +142,13 @@ public class TestbedGui extends JFrame {
 		minimap.setActiveDrone(activeDrone);
 	}
 	
+	public int[] getNewPackage() {
+		return packageDetails;
+	}
+	
+	public void removePackage() {
+		packageDetails = null;
+	}
 	
 	private class DroneTable extends AbstractTableModel {
 		
@@ -252,9 +261,9 @@ public class TestbedGui extends JFrame {
 			JButton btn = new JButton("Add package");
 			btn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					world.addPackage((int)fromPort.getValue(), (int)fromGate.getValue(), (int)destPort.getValue(), (int)destGate.getValue());
-				}
-			});
+					packageDetails = new int[] {(int)fromPort.getValue(), (int)fromGate.getValue(),
+												(int)destPort.getValue(), (int)destGate.getValue()};
+				}});
 			panel.add(btn);
 			
 			fromPort = new JSpinner(new SpinnerNumberModel(0, 0, nbPorts, 1));
