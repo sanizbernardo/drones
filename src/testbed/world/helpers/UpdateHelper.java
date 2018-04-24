@@ -190,6 +190,12 @@ public class UpdateHelper {
 		if (newDetails != null)
 			addPackage(newDetails);
 		
+		newDetails = testbedGui.getNewPackage();
+		testbedGui.removePackage();
+		if (newDetails != null)
+			addPackage(newDetails);
+		
+		
 		for (int drone: droneHelper.droneIds.values()) {
 			Physics physics = droneHelper.getDronePhysics(drone);
 			if (FloatMath.norm(physics.getVelocity()) > 1)
@@ -226,7 +232,7 @@ public class UpdateHelper {
 	}
 	
 	
-	public void addPackage(int[] details) {
+	private void addPackage(int[] details) {
 		Package newPackage = new Package(details);
 		Gate fromGate = new Gate(newPackage, true);
 		

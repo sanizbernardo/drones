@@ -77,6 +77,12 @@ public class Hud {
         nvgFillColor(vg, rgba(30, 30, 30, 255, colour));
         nvgText(vg, textAreaWidth / 2, 15, "Drone statistics");
         
+        // drone name
+        nvgFontFace(vg, FONT_NAME);
+        nvgFontSize(vg, 25.0f);
+        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+        nvgText(vg, textAreaWidth / 2, 75, physics.getConfig().getDroneID());
+        
         // categories
         nvgFontFace(vg, FONT_NAME);
         int size = 25;
@@ -96,7 +102,6 @@ public class Hud {
         nvgText(vg, textAreaWidth * 7 / 10, first + 1 * size, " " + FloatMath.round(physics.getPosition().z, 2));
         
         
-        
         int second = textAreaHeight * 2 / 4;
         nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
         nvgText(vg, textAreaWidth / 5, second, "Vel (m/s)");
@@ -114,7 +119,6 @@ public class Hud {
         nvgText(vg, textAreaWidth * 7 / 10, second + 1 * size, " " + FloatMath.round(physics.getVelocity().z, 2));
         nvgText(vg, textAreaWidth * 7 / 10, second + 2 * size, " " + FloatMath.round(FloatMath.norm(physics.getVelocity()), 2));
 
-        
         
         int third = textAreaHeight * 3 / 4;
         nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
@@ -141,7 +145,7 @@ public class Hud {
         nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
         nvgFillColor(vg, rgba(30, 30, 30, 255, colour));
         nvgText(vg, textAreaWidth*1/4, textAreaHeight - 25, "Team Geel");
-
+        
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
         nvgText(vg, textAreaWidth*3/4, textAreaHeight - 25, "" +  df.format(new Date((int) (time * 1000 ) + (23 * 60 * 60 * 1000))));
 
