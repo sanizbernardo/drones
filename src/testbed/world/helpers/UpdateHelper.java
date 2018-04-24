@@ -120,8 +120,7 @@ public class UpdateHelper {
 		
 		if (droneHelper.droneIds.isEmpty()) return;
 		
-		if (generator != null)
-			updatePackages();
+		updatePackages();
 		
 		Vector3f newDronePos = droneHelper.getDronePhysics(followDrone).getPosition();
 		
@@ -186,11 +185,13 @@ public class UpdateHelper {
 	
 	
 	private void updatePackages() {
-		int[] newDetails = generator.generatePackage(this.time);
-		if (newDetails != null)
-			addPackage(newDetails);
+		if (generator != null) {
+			int[] newDetails = generator.generatePackage(this.time);
+			if (newDetails != null)
+				addPackage(newDetails);
+		}
 		
-		newDetails = testbedGui.getNewPackage();
+		int[] newDetails = testbedGui.getNewPackage();
 		testbedGui.removePackage();
 		if (newDetails != null)
 			addPackage(newDetails);
