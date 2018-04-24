@@ -165,7 +165,9 @@ public class FlyPilot extends PilotPart {
 				setCurrentState(State.Stable);
 			}
 		}
-		
+		if(part1Complete){
+			setCurrentState(part2Direction);
+		}
 		control(inputs, currentState);
 
 		return Utils.buildOutputs(leftWingInclination,
@@ -387,16 +389,12 @@ public class FlyPilot extends PilotPart {
 	
 	
 	private boolean part1Complete = false;
+	private State part2Direction = State.Stable;
 	
 	private float getTargetHeading(AutopilotInputs inputs){
-		float[] pointBeforeRunway = {-2500f, 100f, 1500f}; //TODO
+		float[] pointBeforeRunway = {-1500f, 100f, 1500f}; //TODO
 		float headingRunwayToPoint = (float) Math.PI; //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180° (centerToRunway1)
 		if(!part1Complete){
-			Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
-			Vector3f pBR = new Vector3f(pointBeforeRunway[0], pointBeforeRunway[1], pointBeforeRunway[2]);
-			if(pos.distance(pBR) < 10){//TODO dees is fout
-				part1Complete = true;
-			}
 			return getTargetHeadingPart1(inputs, pointBeforeRunway, headingRunwayToPoint);
 
 		}
@@ -412,9 +410,20 @@ public class FlyPilot extends PilotPart {
 		float temp = 0;
 		if(orientation(pointBeforeRunway, auxLocPlusMinZ(pointBeforeRunway, headingRunwayToPoint, 1), planePosition) == 1){
 			temp = this.turnRadius;
+			part2Direction = State.Left;
 		}
 		else{
 			temp = -this.turnRadius;
+			part2Direction = State.Right;
+		}
+		
+		Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
+		float[] aux = auxLocPlusX(pointBeforeRunway, headingRunwayToPoint, temp);
+		Vector3f pBR = new Vector3f(aux[0], aux[1], aux[2]);
+		System.out.println(pos.distance(pBR));
+		if(pos.distance(pBR) < this.turnRadius + 10 && pos.distance(pBR) > this.turnRadius - 10){
+			System.out.println(pos.distance(pBR));
+			part1Complete = true;
 		}
 		
 		float corner = 0;
@@ -458,7 +467,7 @@ public class FlyPilot extends PilotPart {
 	
 	private float getTargetHeadingPart2(AutopilotInputs inputs, float[] pointBeforeRunway, float headingRunwayToPoint){
 		//TODO
-		return headingRunwayToPoint;
+		return headingRunwayToPoint + (float) Math.PI;
 		
 	}
 	
