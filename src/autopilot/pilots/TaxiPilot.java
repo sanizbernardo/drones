@@ -100,58 +100,78 @@ public class TaxiPilot extends PilotPart {
 			thrust = 0f;
 		}
 
-		if (distance < 3f) {
+		System.out.println(distance);
+
+		if (distance < 12.5f) {
 			if (speed > 1f) {
 				thrust = 0f;
 				lBrake = maxBrakeForce;
 				rBrake = maxBrakeForce;
 				fBrake = maxBrakeForce;
 			} else {
-				if (input.getHeading() != finalHeading) {
-					boolean side =  checkTurn(finalHeading, turnaccuracy, headingerror, input);
+				if (Math.abs(finalHeading - input.getHeading()) > turnaccuracy) {
+					Boolean side =  checkTurn(finalHeading, input);
 
-					thrust = 70f;
-					fBrake = 0;
-					lBrake = 0;
-					rBrake = 0;
-					if (side) {
-                        lBrake = 500f;
-                    } else {
-                        rBrake = 500f;
-                    }
+					System.out.println("target");
+					System.out.println(FloatMath.toDegrees(finalHeading));
+					System.out.println("current");
+					System.out.println(FloatMath.toDegrees(input.getHeading()));
+					System.out.println("error");
+					System.out.println(FloatMath.toDegrees(Math.abs(finalHeading - input.getHeading())));
+
+					if (side != null){
+						thrust = 70f;
+						fBrake = 0;
+						lBrake = 0;
+						rBrake = 0;
+						if (side) {
+                    	    lBrake = maxBrakeForce;
+						} else {
+                        	rBrake = maxBrakeForce;
+                    	}
+					}
 
 				} else {
 					this.ended = true;
 					return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 				}
 			}
-		} else {
-			boolean side = checkTurn(targetHeading, turnaccuracy, headingerror, input);
+		} else if (Math.abs(headingerror) > turnaccuracy) {
+			Boolean side = checkTurn(targetHeading, input);
 
-			thrust = 70f;
-			fBrake = 0;
-			lBrake = 0;
-			rBrake = 0;
-			if (side) {
-                lBrake = 500f;
-            } else {
-                rBrake = 500f;
-            }
+			System.out.println("target");
+			System.out.println(FloatMath.toDegrees(targetHeading));
+			System.out.println("current");
+			System.out.println(FloatMath.toDegrees(input.getHeading()));
+			System.out.println("error");
+			System.out.println(FloatMath.toDegrees(headingerror));
+
+			if (side != null) {
+				thrust = 70f;
+				fBrake = 0;
+				lBrake = 0;
+				rBrake = 0;
+				if (side) {
+            	    lBrake = 500f;
+            	} else {
+                	rBrake = 500f;
+	            }
+			}
 		}
 		this.time = input.getElapsedTime();
 
 		return Utils.buildOutputs(0, 0, 0, 0, thrust, lBrake, fBrake, rBrake);
 	}
 
-	public boolean checkTurn(float target, float turnaccuracy, float headingerror, AutopilotInputs input) {
-		boolean side = true;
+	public Boolean checkTurn(float target, AutopilotInputs input) {
+		Boolean side = null;
 		Vector3f result = new Vector3f(FloatMath.cos(input.getHeading()),0,-FloatMath.sin(input.getHeading())).cross(new Vector3f(FloatMath.cos(target),0,-FloatMath.sin(target)), new Vector3f());
-		if (result.normalize().y >= 0 && Math.abs(headingerror) > turnaccuracy)
+		if (result.normalize().y >= 0)
 			side = true;
-		else if (result.normalize().y < 0 && Math.abs(headingerror) > turnaccuracy) {;
+		else if (result.normalize().y < 0) {;
 			side = false;
 		}
-		
+
 		return side;
 	}
 

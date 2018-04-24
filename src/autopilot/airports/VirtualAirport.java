@@ -18,10 +18,8 @@ public class VirtualAirport {
                 position.sub(direction.mul(width/2f, new Vector3f()), new Vector3f())};
 
         this.gates = new Vector3f[] {
-                position.add(directionPerp.mul(width/2f, new Vector3f())
-                .sub(direction.mul(width/2f, new Vector3f()), new Vector3f()), new Vector3f()),
-                position.sub(directionPerp.mul(width/2f, new Vector3f())
-                .add(direction.mul(width/2f, new Vector3f()), new Vector3f()), new Vector3f())};
+                position.add(directionPerp.mul(width/2f, new Vector3f()), new Vector3f()),
+                position.sub(directionPerp.mul(width/2f, new Vector3f()), new Vector3f())};
     }
 
     private Vector3f position;
