@@ -513,4 +513,12 @@ public class FlyPilot extends PilotPart {
 		}
 		return ret;
 	}
+	
+	private Vector3f getTargetPos(Vector3f airportPos, float heading, float distance) {
+		Vector3f targetPos = new Vector3f();
+		targetPos.x = (float) (airportPos.x + Math.sin(Math.PI-heading)*distance);
+		targetPos.y = airportPos.y;
+		targetPos.z = (float) (airportPos.z + Math.cos(Math.PI-heading)*distance);
+		return targetPos;
+	}
 }
