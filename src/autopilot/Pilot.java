@@ -1,7 +1,5 @@
 package autopilot;
 
-import java.util.Arrays;
-
 import org.joml.Vector3f;
 
 import autopilot.airports.VirtualAirport;
@@ -10,13 +8,12 @@ import autopilot.pilots.HandbrakePilot;
 import autopilot.pilots.LandingPilot;
 import autopilot.pilots.TakeOffPilot;
 import autopilot.pilots.TaxiPilot;
-import interfaces.Autopilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
 import utils.Utils;
 
-public class Pilot implements Autopilot {
+public class Pilot {
 	
 	public static final int TAKING_OFF = 0, 
 							 LANDING = 1,
@@ -33,15 +30,11 @@ public class Pilot implements Autopilot {
 		
 	public Pilot() {
 		this.tasks = new int[] {};
+		this.pilots = new PilotPart[5];
 	}
 	
-	@Override
-	public AutopilotOutputs simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
+	public void simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 		this.config = config;
-		
-		this.init();
-		
-		return timePassed(inputs);
 	}
 	
 	private void init() {
@@ -50,7 +43,7 @@ public class Pilot implements Autopilot {
 		}
 	}
 
-	@Override
+	
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
 		
 		if (this.index >= this.tasks.length) {
@@ -77,7 +70,7 @@ public class Pilot implements Autopilot {
 		
 		int FLY_HEIGHT = 100; //to be given by airportManager
 		
-		this.pilots = new PilotPart[5];
+	
 		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
 		this.pilots[LANDING] = new LandingPilot();
 		this.pilots[FLYING] = new FlyPilot(new Vector3f[] {new Vector3f(0,100,0)});
@@ -89,7 +82,7 @@ public class Pilot implements Autopilot {
 		this.tasks = new int[] {TAXIING, TAKING_OFF, FLYING};
 	}
 
-	@Override
+	
 	public void simulationEnded() {
 		for (PilotPart pilot: this.pilots) {
 			if (pilot != null) {

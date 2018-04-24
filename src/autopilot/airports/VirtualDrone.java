@@ -13,6 +13,7 @@ public class VirtualDrone {
         this.heading = heading;
         this.config = config;
         this.pilot = new Pilot();
+        pilot.simulationStarted(config, null);
     }
 
     private Vector3f position;
