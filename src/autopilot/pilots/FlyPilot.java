@@ -57,7 +57,7 @@ public class FlyPilot extends PilotPart {
 		this.climbAngle = Constants.climbAngle;
 		this.rMax = config.getRMax();
 		this.maxThrust = config.getMaxThrust();
-		this.turnRadius = 675f;
+		this.turnRadius = 576f;
 		
 		this.pitchPID = new PitchPID(this);
 		this.thrustPID = new ThrustPID(this);
@@ -84,7 +84,7 @@ public class FlyPilot extends PilotPart {
 
 			control(inputs, currentState);
 
-			if(stableTime <= 0 && this.cubeNb == this.cubes.length) {
+			if(stableTime <= 0) {
 				this.ended = true;
 			}
 			
@@ -148,9 +148,9 @@ public class FlyPilot extends PilotPart {
 			Boolean side = null;
 			// null: nee, true: links, false: rechts
 			Vector3f result = new Vector3f(FloatMath.cos(inputs.getHeading()),0,-FloatMath.sin(inputs.getHeading())).cross(new Vector3f(FloatMath.cos(targetHeading),0,-FloatMath.sin(targetHeading)), new Vector3f());
-			if (result.normalize().y >= 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(2))
+			if (result.normalize().y >= 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(2f))
 				side = true;
-			else if (result.normalize().y < 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(2)) {;
+			else if (result.normalize().y < 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(2f)) {;
 				side = false;
 			}
 			
@@ -169,7 +169,9 @@ public class FlyPilot extends PilotPart {
 			setCurrentState(part2Direction);
 		}
 		control(inputs, currentState);
-
+		if(stableTime > 0){
+			setCurrentState(State.Stable);
+		}
 		return Utils.buildOutputs(leftWingInclination,
 				rightWingInclination, verStabInclination, horStabInclination,
 				newThrust, rMax, rMax, rMax);
@@ -392,14 +394,18 @@ public class FlyPilot extends PilotPart {
 	private State part2Direction = State.Stable;
 	
 	private float getTargetHeading(AutopilotInputs inputs){
-		float[] pointBeforeRunway = {-1500f, 100f, 1500f}; //TODO
-		float headingRunwayToPoint = (float) Math.PI; //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180° (centerToRunway1)
+		float[] pointBeforeRunway = {1500f, 100f, -1500f}; //TODO
+		float headingRunwayToPoint = (float) (2*Math.PI/3); //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180° (centerToRunway1)
 		if(!part1Complete){
 			return getTargetHeadingPart1(inputs, pointBeforeRunway, headingRunwayToPoint);
 
 		}
 		else{
-			return getTargetHeadingPart2(inputs, pointBeforeRunway, headingRunwayToPoint);
+			float heading = makeNormal(getTargetHeadingPart2(inputs, pointBeforeRunway, headingRunwayToPoint));
+//			if(Math.toDegrees(inputs.getHeading()) < heading + 5 && Math.toDegrees(inputs.getHeading()) > heading - 5){
+//				this.stableTime = 1.5f;
+//			}
+			return heading;
 		}
 	}
 	
