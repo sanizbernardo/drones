@@ -151,6 +151,11 @@ public class TaxiPilot extends PilotPart {
 		else if (result.normalize().y < 0 && Math.abs(headingerror) > turnaccuracy) {;
 			side = false;
 		}
+		
+		if(side == null) {
+			return true;
+		}
+		
 		return side;
 
 	}

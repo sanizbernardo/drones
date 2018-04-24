@@ -11,6 +11,7 @@ import autopilot.pilots.TaxiPilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
+import utils.FloatMath;
 import utils.Utils;
 
 public class Pilot {
@@ -74,7 +75,13 @@ public class Pilot {
 		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
 		this.pilots[LANDING] = new LandingPilot();
 		this.pilots[FLYING] = new FlyPilot(new Vector3f[] {new Vector3f(0,100,0)});
-		this.pilots[TAXIING] = new TaxiPilot();
+		this.pilots[TAXIING] = new TaxiPilot(fromAirport.getGate(fromGate), (fromGate == 0) ? 
+				                                                 fromAirport.getHeading() 
+				                                                 : 
+				                                                 (fromAirport.getHeading() < 0) ? 
+				                                            		                   fromAirport.getHeading() + FloatMath.PI 
+				                                            		                   : 
+				                                            		                   fromAirport.getHeading() - FloatMath.PI);
 		this.pilots[HANDBRAKE] = new HandbrakePilot();
 		
 		this.init();

@@ -66,20 +66,8 @@ public class AirportManager implements AutopilotModule{
 
     @Override
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
-<<<<<<< HEAD
-        VirtualAirport start = airportlist.get(fromAirport);
-        VirtualAirport end = airportlist.get(toAirport);
-
-        VirtualPackage vpackage = new VirtualPackage(start.getGate(fromGate));
-        packagelist.add(vpackage);
-
-        VirtualDrone drone = chooseBestDrone();
-        drone.setPilot(start, fromGate, end, toGate);
-        drone.setActive(true);
-=======
         VirtualDrone drone = chooseBestDrone();
         drone.getPilot().fly(drone.getInputs(), airportlist.get(fromAirport), fromGate, airportlist.get(toAirport), toGate);
->>>>>>> autopilot_up_to_date
     }
 
     @Override

@@ -53,17 +53,9 @@ public class VirtualDrone {
         this.heading = heading;
     }
 
-<<<<<<< HEAD
-    public void setPilot(VirtualAirport fromAirport, int fromGate, VirtualAirport toAirport, int toGate) {
-        // Hoe gaat Pilot geconstrueerd worden nu?
-        //this.pilot = new Pilot();
-        pilot.simulationStarted(getConfig(), getInputs());
-    }
-=======
     public Pilot getPilot() {
 		return pilot;
 	}
->>>>>>> autopilot_up_to_date
 
 	public AutopilotConfig getConfig() {
         return config;
