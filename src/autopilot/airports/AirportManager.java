@@ -1,6 +1,5 @@
 package autopilot.airports;
 
-import autopilot.Pilot;
 import interfaces.*;
 import org.joml.Vector3f;
 import utils.FloatMath;
@@ -20,6 +19,7 @@ public class AirportManager implements AutopilotModule{
 
     private List<VirtualAirport> airportlist;
     private List<VirtualDrone> droneList;
+    private List<VirtualPackage> packagelist;
 
     public VirtualDrone chooseBestDrone() {
         for (VirtualDrone drone : droneList) {
@@ -67,6 +67,10 @@ public class AirportManager implements AutopilotModule{
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
         VirtualAirport start = airportlist.get(fromAirport);
         VirtualAirport end = airportlist.get(toAirport);
+
+        VirtualPackage vpackage = new VirtualPackage(start.getGate(fromGate));
+        packagelist.add(vpackage);
+
         VirtualDrone drone = chooseBestDrone();
         drone.setPilot(start, fromGate, end, toGate);
         drone.setActive(true);

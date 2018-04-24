@@ -16,11 +16,14 @@ public class VirtualDrone {
 
     private Vector3f position;
     private float heading;
+
     private Pilot pilot;
     private AutopilotConfig config;
     private AutopilotInputs currentinputs;
     private AutopilotOutputs currentoutputs;
+
     private boolean active;
+    private VirtualPackage vpackage;
 
     public Vector3f getPosition() {
         return this.position;
@@ -29,6 +32,16 @@ public class VirtualDrone {
     public float getHeading() {
         return  this.heading;
     }
+
+    public VirtualPackage getPackage() {
+        return this.vpackage;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+
 
     public void setPosition(Vector3f position) {
         this.position = position;
@@ -39,7 +52,8 @@ public class VirtualDrone {
     }
 
     public void setPilot(VirtualAirport fromAirport, int fromGate, VirtualAirport toAirport, int toGate) {
-//        this.pilot = new Pilot();
+        // Hoe gaat Pilot geconstrueerd worden nu?
+        //this.pilot = new Pilot();
         pilot.simulationStarted(getConfig(), getInputs());
     }
 
@@ -52,6 +66,12 @@ public class VirtualDrone {
     }
 
     public void setInputs(AutopilotInputs inputs) {
+        this.position = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
+        this.heading = inputs.getHeading();
+        if (getPackage() != null) {
+            getPackage().setPosition(this.position);
+        }
+
         this.currentinputs = inputs;
     }
 
@@ -67,8 +87,8 @@ public class VirtualDrone {
         setOutputs(pilot.timePassed(getInputs()));
     }
 
-    public boolean isActive() {
-        return active;
+    public void setPackage(VirtualPackage vpackage){
+        this.vpackage = vpackage;
     }
 
     public void setActive(boolean x) {
