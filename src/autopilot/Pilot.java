@@ -43,7 +43,6 @@ public class Pilot {
 			pilot.initialize(config);
 		}
 	}
-
 	
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
 		
