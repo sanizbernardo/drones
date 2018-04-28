@@ -42,6 +42,9 @@ public class DroneControlUI {
 	
 	private JLabel stateLabel, lblAutopilotGui;
 	
+	private JToggleButton manualToggle;
+	
+	
 	public DroneControlUI(List<VirtualDrone> drones) {
 		this.drones = drones;
 		this.selectedDrone = 0;
@@ -50,12 +53,51 @@ public class DroneControlUI {
 		buildContent(drones.get(selectedDrone).getConfig());
 	}
 	
+	
 	public void setSelected(int droneId) {
 		this.selectedDrone = droneId;
+		this.manual = false;
+		this.manualToggle.setSelected(false);
 		
 		updateContent(drones.get(selectedDrone).getConfig());
+		updateOutputs();
+	}
+	
+	public void setTask(String task) {
+		this.stateLabel.setText("Current Task: " + task);
+	}
+	
+	
+	public boolean getManual(int droneId) {
+		return droneId == this.selectedDrone && this.manual;
+	}
+	
+	public AutopilotOutputs getOutputs() {
+		return Utils.buildOutputs(FloatMath.toRadians(lwSlider.getValue()),
+								  FloatMath.toRadians(rwSlider.getValue()),
+								  FloatMath.toRadians(verStabSlider.getValue()),
+								  FloatMath.toRadians(horStabSlider.getValue()),
+								  thrustSlider.getValue(),
+								  lbSlider.getValue(),
+								  fbSlider.getValue(),
+								  rbSlider.getValue());
+	}
+	
+	
+	public void updateOutputs() {
+		if (manual)
+			return;
 		
-		updateOutputs(drones.get(selectedDrone).getOutputs());
+		AutopilotOutputs output = drones.get(selectedDrone).getOutputs(); 
+		
+		lwSlider.setValue((int) Math.toDegrees(output.getLeftWingInclination()));
+		rwSlider.setValue((int) Math.toDegrees(output.getRightWingInclination()));
+		horStabSlider.setValue((int) Math.toDegrees(output.getHorStabInclination()));
+		verStabSlider.setValue((int) Math.toDegrees(output.getVerStabInclination()));
+		thrustSlider.setValue((int) output.getThrust());
+		lbSlider.setValue((int) output.getLeftBrakeForce());
+		fbSlider.setValue((int) output.getFrontBrakeForce());
+		rbSlider.setValue((int) output.getRightBrakeForce());		
 	}
 	
 	
@@ -83,7 +125,7 @@ public class DroneControlUI {
 		stateLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		northPanel.add(stateLabel, GuiUtils.buildGBC(0, 1, GridBagConstraints.WEST, new Insets(5, 40, 5, 0)));
 		
-		JToggleButton manualToggle = new JToggleButton("Manual Control");
+		manualToggle = new JToggleButton("Manual Control");
 		manualToggle.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -231,37 +273,6 @@ public class DroneControlUI {
 		thrustSlider.update(0, (int) maxThrust, thrustTable);
 	}
 	
-	public void updateOutputs(AutopilotOutputs output) {
-		lwSlider.setValue((int) Math.toDegrees(output.getLeftWingInclination()));
-		rwSlider.setValue((int) Math.toDegrees(output.getRightWingInclination()));
-		horStabSlider.setValue((int) Math.toDegrees(output.getHorStabInclination()));
-		verStabSlider.setValue((int) Math.toDegrees(output.getVerStabInclination()));
-		thrustSlider.setValue((int) output.getThrust());
-		lbSlider.setValue((int) output.getLeftBrakeForce());
-		fbSlider.setValue((int) output.getFrontBrakeForce());
-		rbSlider.setValue((int) output.getRightBrakeForce());		
-	}
-	
-	public void setTask(String task) {
-		this.stateLabel.setText("Current Task: " + task);
-	}
-	
-	
-	public boolean getManual() {
-		return this.manual;
-	}
-	
-	public AutopilotOutputs getOutputs() {
-		return Utils.buildOutputs(FloatMath.toRadians(lwSlider.getValue()),
-								  FloatMath.toRadians(rwSlider.getValue()),
-								  FloatMath.toRadians(verStabSlider.getValue()),
-								  FloatMath.toRadians(horStabSlider.getValue()),
-								  thrustSlider.getValue(),
-								  lbSlider.getValue(),
-								  fbSlider.getValue(),
-								  rbSlider.getValue());
-	}
-	
 	
 	private SliderHandler buildSlider(String title, int orientation, int min, int val, int max, int majorSpacing, int minorSpacing, Hashtable<Integer, JLabel> lblTable, boolean hasBar) {
 		JPanel panel = new JPanel();
@@ -314,7 +325,7 @@ public class DroneControlUI {
 		}
 		
 		public void setValue(int val) {
-			boolean oldLock = !manual;
+			boolean oldLock = manual;
 			manual = true;
 			slider.setValue(val);
 			manual = oldLock;

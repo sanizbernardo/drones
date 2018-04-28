@@ -1,7 +1,10 @@
 package autopilot.airports;
 
 import interfaces.*;
+
 import org.joml.Vector3f;
+
+import autopilot.gui.AutopilotGUI;
 import utils.FloatMath;
 
 import java.util.ArrayList;
@@ -9,19 +12,22 @@ import java.util.List;
 
 public class AirportManager implements AutopilotModule{
 
-    public AirportManager() {
-        airportlist = new ArrayList<>();
-        droneList = new ArrayList<>();
-        packagelist = new ArrayList<>();
-    }
-
     private float length;
     private float width;
 
     private List<VirtualAirport> airportlist;
     private List<VirtualDrone> droneList;
     private List<VirtualPackage> packagelist;
+    
+    private AutopilotGUI gui;
+	
+    public AirportManager() {
+        airportlist = new ArrayList<>();
+        droneList = new ArrayList<>();
+        packagelist = new ArrayList<>();
+    }
 
+    
     public VirtualDrone chooseBestDrone() {
         for (VirtualDrone drone : droneList) {
             if (!drone.isActive())
@@ -51,6 +57,11 @@ public class AirportManager implements AutopilotModule{
         heading += (pointingToRunway == 0? 0: FloatMath.PI * (heading > 0? -1: 1));
 
         droneList.add(new VirtualDrone(position, heading, config));
+        if (droneList.size() == 1) {
+        	gui = new AutopilotGUI(droneList);
+        	gui.showGUI();
+        } else
+        	gui.updateDrones();
     }
 
     @Override
@@ -61,7 +72,12 @@ public class AirportManager implements AutopilotModule{
 
     @Override
     public AutopilotOutputs completeTimeHasPassed(int drone) {
-        return droneList.get(drone).getOutputs();
+        if (drone ==  droneList.size() - 1)
+        	gui.updateOutputs();
+    	if (gui.manualControl(drone))
+        	return gui.getOutputs();
+        else
+        	return droneList.get(drone).getOutputs();
     }
 
     @Override
@@ -76,5 +92,6 @@ public class AirportManager implements AutopilotModule{
         for (VirtualDrone drone : droneList) {
             drone.endSimulation();
         }
+        gui.dispose();
     }
 }

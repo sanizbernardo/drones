@@ -72,9 +72,9 @@ public class TestbedGui extends JFrame {
 		drones = new JTable(new DroneTable(helper));
 		drones.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		drones.setColumnSelectionAllowed(false);
-		drones.getColumnModel().getColumn(0).setMaxWidth(75);
 		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
 		renderer.setHorizontalAlignment(SwingConstants.CENTER);
+		drones.getColumnModel().getColumn(0).setMaxWidth(75);
 		drones.getColumnModel().getColumn(0).setCellRenderer(renderer);
 		drones.getColumnModel().getColumn(3).setMaxWidth(100);
 		drones.getColumnModel().getColumn(3).setCellRenderer(renderer);
