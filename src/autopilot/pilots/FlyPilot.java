@@ -50,7 +50,6 @@ public class FlyPilot extends PilotPart {
 	
 	public FlyPilot(Vector3f[] cubes) {
 		this.cubes = cubes;
-		pointBR = new Vector3f(-this.turnRadius, 100f, -this.turnRadius - 700f);
 	}
 	
 	
@@ -60,6 +59,7 @@ public class FlyPilot extends PilotPart {
 		this.rMax = config.getRMax();
 		this.maxThrust = config.getMaxThrust();
 		this.turnRadius = 576f;
+		pointBR = new Vector3f(-this.turnRadius, 100f, -this.turnRadius - 700f);
 		
 		this.pitchPID = new PitchPID(this);
 		this.thrustPID = new ThrustPID(this);
