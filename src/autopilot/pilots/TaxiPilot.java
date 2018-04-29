@@ -26,6 +26,7 @@ public class TaxiPilot extends PilotPart {
 	private float finalHeading;
 
 	private Vector3f oldPos = new Vector3f(0, 0, 0);
+	private float oldheading;
 
 	public TaxiPilot() {
 		thrustPID = new MiniPID(100, 0.1, 0.1);
@@ -62,30 +63,29 @@ public class TaxiPilot extends PilotPart {
 		float dt = input.getElapsedTime() - this.time;
 
 		Vector3f pos = new Vector3f(input.getX(), 0, input.getZ());
-
 		Vector3f vel = pos.sub(this.oldPos, new Vector3f()).mul(1/dt);
 		this.oldPos = pos;
+
+		float heading = input.getHeading();
+		float angVel = (heading - oldheading)/dt;
+		oldheading = heading;
 
 		float fBrake = 0, lBrake = 0 , rBrake = 0, thrust, taxispeed;
 		float speed = FloatMath.norm(vel);
 		float distance = pos.distance(getTarget());
 		float targetHeading = FloatMath.atan2(pos.x() - getTarget().x(), pos.z() - getTarget().z());
-		float headingerror = targetHeading - input.getHeading();
 
 		if (Float.isNaN(speed)) {
 			speed = 0;
 		}
+		if (Float.isNaN(angVel)) {
+			angVel = 0;
+		}
 
-		float turnaccuracy;
-		if (distance < 15f) {
-			turnaccuracy = FloatMath.toRadians(2);
+		if (distance < 25f) {
 			taxispeed = 3f;
-		} else if (distance < 120f) {
-			turnaccuracy = FloatMath.toRadians(4);
-			taxispeed = 10f;
 		} else {
-			turnaccuracy = FloatMath.toRadians(4);
-			taxispeed = 30f;
+			taxispeed = 10f;
 		}
 
 		thrustPID.setSetpoint(taxispeed);
@@ -108,53 +108,37 @@ public class TaxiPilot extends PilotPart {
 				lBrake = maxBrakeForce;
 				rBrake = maxBrakeForce;
 				fBrake = maxBrakeForce;
-			} else {
-				if (Math.abs(finalHeading - input.getHeading()) > turnaccuracy) {
-					Boolean side =  checkTurn(finalHeading, input);
-
-					System.out.println("target");
-					System.out.println(FloatMath.toDegrees(finalHeading));
-					System.out.println("current");
-					System.out.println(FloatMath.toDegrees(input.getHeading()));
-					System.out.println("error");
-					System.out.println(FloatMath.toDegrees(Math.abs(finalHeading - input.getHeading())));
-
-					if (side != null){
-						thrust = 70f;
-						fBrake = 0;
-						lBrake = 0;
-						rBrake = 0;
-						if (side) {
-                    	    lBrake = maxBrakeForce;
-						} else {
-                        	rBrake = maxBrakeForce;
-                    	}
+			} else if (Math.abs(finalHeading - input.getHeading()) > FloatMath.toRadians(0.5f)) {
+				Boolean side =  checkTurn(finalHeading, input);
+				if (side != null){
+					thrust = 50f;
+					fBrake = 0;
+					lBrake = 0;
+					rBrake = 0;
+					if (side) {
+						lBrake = maxBrakeForce;
+					} else {
+						rBrake = maxBrakeForce;
 					}
-
-				} else {
-					this.ended = true;
-					return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 				}
+			} else if (Math.abs(angVel) > FloatMath.toRadians(0.1f)) {
+				return Utils.buildOutputs(0, 0, 0, 0, 0, maxBrakeForce, maxBrakeForce, maxBrakeForce);
+			} else {
+				System.out.println("Exiting taxi");
+				this.ended = true;
+				return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 			}
-		} else if (Math.abs(headingerror) > turnaccuracy) {
+		} else if (Math.abs(targetHeading - heading) > FloatMath.toRadians(2f)) {
 			Boolean side = checkTurn(targetHeading, input);
-
-			System.out.println("target");
-			System.out.println(FloatMath.toDegrees(targetHeading));
-			System.out.println("current");
-			System.out.println(FloatMath.toDegrees(input.getHeading()));
-			System.out.println("error");
-			System.out.println(FloatMath.toDegrees(headingerror));
-
 			if (side != null) {
-				thrust = 70f;
+				thrust = 50f;
 				fBrake = 0;
 				lBrake = 0;
 				rBrake = 0;
 				if (side) {
-            	    lBrake = 500f;
+            	    lBrake = maxBrakeForce;
             	} else {
-                	rBrake = 500f;
+                	rBrake = maxBrakeForce;
 	            }
 			}
 		}
