@@ -4,6 +4,7 @@ import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
 import autopilot.PilotPart;
+import autopilot.airports.VirtualAirport;
 import autopilot.pilots.FlyPilot.State;
 import autopilot.pilots.fly.pid.PitchPID;
 import autopilot.pilots.fly.pid.RollPID;
@@ -20,8 +21,7 @@ public class FlyPilot extends PilotPart {
 
 	private boolean ended;
 
-	private int cubeNb;
-	private Vector3f[] cubes;
+	private VirtualAirport currentDestionationAirport;
 	
 	public static enum State{Left, Right, Stable, Up, Down, StrongUp, StrongDown, SlowDown};
 	private State currentState;
@@ -48,8 +48,8 @@ public class FlyPilot extends PilotPart {
 	
 	boolean check = true;
 	
-	public FlyPilot(Vector3f[] cubes) {
-		this.cubes = cubes;
+	public FlyPilot(VirtualAirport destinationAirport) {
+		this.currentDestionationAirport = destinationAirport;
 	}
 	
 	
@@ -59,13 +59,15 @@ public class FlyPilot extends PilotPart {
 		this.rMax = config.getRMax();
 		this.maxThrust = config.getMaxThrust();
 		this.turnRadius = 576f;
-		pointBR = new Vector3f(-this.turnRadius, 100f, -this.turnRadius - 700f);
-		
+//		pointBR = new Vector3f(-this.turnRadius, 100f, -this.turnRadius - 700f);
+		pointBR = getTargetPos(currentDestionationAirport.getPosition(), currentDestionationAirport.getHeading(), 1200);
+		System.out.println(pointBR.x + "   " + pointBR.y + "   " + pointBR.z);
+		System.out.println(currentDestionationAirport.getHeading());
 		this.pitchPID = new PitchPID(this);
 		this.thrustPID = new ThrustPID(this);
 		this.rollPID = new RollPID(this);
-				
-		this.cubeNb = 0;
+		
+		
 	}
 	
 
@@ -172,10 +174,6 @@ public class FlyPilot extends PilotPart {
 		return currentState;
 	}
 
-
-	private Vector3f getCurrentCube() {
-		return this.cubes[this.cubeNb];
-	}
 	
 	
 	private void control(AutopilotInputs input, State state) {
@@ -381,7 +379,7 @@ public class FlyPilot extends PilotPart {
 	
 	private float getTargetHeading(AutopilotInputs inputs){
 		float[] pointBeforeRunway = {pointBR.x, pointBR.y, pointBR.z}; //TODO
-		float headingRunwayToPoint = (float) (Math.PI); //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180° (centerToRunway1)
+		float headingRunwayToPoint = currentDestionationAirport.getHeading(); //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180° (centerToRunway1)
 		if(!part1Complete){
 			return getTargetHeadingPart1(inputs, pointBeforeRunway, headingRunwayToPoint);
 
@@ -426,6 +424,7 @@ public class FlyPilot extends PilotPart {
 			float bigCorner = (float)(2*Math.PI) - (float)Math.acos((dg*dg - dm*dm - mg*mg)/(-2*dm*mg));
 			float smallCorner = (float)Math.acos(turnRadius/mg);
 			corner = bigCorner - smallCorner;
+			System.out.println("BEHIND");
 		}
 		//Plane in front of the pointBeforeRunway
 		else{
@@ -435,13 +434,16 @@ public class FlyPilot extends PilotPart {
 			float bigCorner = (float)Math.acos((dg*dg - dm*dm - mg*mg)/(-2*dm*mg));
 			float smallCorner = (float)Math.acos(turnRadius/mg);
 			corner = bigCorner - smallCorner;
+			System.out.println("FRONT");
 		}
 		//Plane to the right of the pointBeforeRunway
 		if(orientation(pointBeforeRunway, auxLocPlusMinZ(pointBeforeRunway, headingRunwayToPoint, 1), planePosition) == 1){
+			System.out.println("RIGHT");
 			return headingRunwayToPoint - corner + (float) Math.PI; //TODO nog iets voor als dit groter is dan 180°
 		}
 		//Plane to the left of the pointBeforeRunway
 		else if(orientation(pointBeforeRunway, auxLocPlusMinZ(pointBeforeRunway, headingRunwayToPoint, 1), planePosition) == 2){
+			System.out.println("LEFT");
 			return headingRunwayToPoint + corner + (float) Math.PI;
 		}
 		
@@ -493,9 +495,9 @@ public class FlyPilot extends PilotPart {
 	
 	private Vector3f getTargetPos(Vector3f airportPos, float heading, float distance) {
 		Vector3f targetPos = new Vector3f();
-		targetPos.x = (float) (airportPos.x + Math.sin(Math.PI-heading)*distance);
+		targetPos.x = (float) (airportPos.x + Math.sin(Math.PI+heading)*distance);
 		targetPos.y = airportPos.y;
-		targetPos.z = (float) (airportPos.z + Math.cos(Math.PI-heading)*distance);
+		targetPos.z = (float) (airportPos.z + Math.cos(Math.PI+heading)*distance);
 		return targetPos;
 	}
 }

@@ -72,7 +72,7 @@ public class Pilot {
 	
 		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
 		this.pilots[LANDING] = new LandingPilot();
-		this.pilots[FLYING] = new FlyPilot(new Vector3f[] {new Vector3f(0,FLY_HEIGHT,0)});
+		this.pilots[FLYING] = new FlyPilot(toAirport);
 		this.pilots[TAXIING] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
 								                                                 fromAirport.getHeading() 
 								                                                 : 
