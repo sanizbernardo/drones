@@ -153,7 +153,7 @@ public class DroneHelper {
 		trails[index] = null;
 		packages[index] = null;
 		
-		if (droneIds.get(droneId) == updateHelper.getFollowDrone())
+		if (index == updateHelper.getFollowDrone())
 			updateHelper.nextFollowDrone();
 	}
 

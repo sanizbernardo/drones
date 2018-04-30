@@ -54,11 +54,4 @@ public class LogPilot implements Autopilot {
 		}
 	}
 
-
-
-	@Override
-	public void setPath(Path path) {
-		// TODO Auto-generated method stub
-		
-	}
 }
