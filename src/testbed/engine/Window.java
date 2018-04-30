@@ -98,7 +98,7 @@ public class Window {
         // Center our window
         glfwSetWindowPos(
                 windowHandle,
-                System.getProperty("os.name").equals("Linux") ? Constants.AUTOPILOT_GUI_WIDTH + Constants.UBUNTU_SIDEBAR : Constants.AUTOPILOT_GUI_WIDTH,
+                System.getProperty("os.name").equals("Linux") ? Constants.TESTBED_GUI_WIDTH + Constants.UBUNTU_SIDEBAR : Constants.TESTBED_GUI_WIDTH,
                 System.getProperty("os.name").contains("Windows") ? 40 : 0
         );
 
@@ -119,6 +119,7 @@ public class Window {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
     }
 
     public long getWindowHandle() {
@@ -163,6 +164,11 @@ public class Window {
 
     public void setvSync(boolean vSync) {
         this.vSync = vSync;
+    }
+    
+    public void restoreState() {
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
     }
 
     public void update() {

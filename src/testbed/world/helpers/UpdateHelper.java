@@ -1,9 +1,14 @@
 package testbed.world.helpers;
 
-import interfaces.Autopilot;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import interfaces.AutopilotModule;
 import interfaces.AutopilotOutputs;
 import testbed.Physics;
-import testbed.entities.WorldObject;
+import testbed.entities.packages.PackageGenerator;
+import testbed.entities.packages.Package;
 import testbed.gui.TestbedGui;
 
 import org.joml.Vector2f;
@@ -31,14 +36,9 @@ public class UpdateHelper {
 	private int followDrone;
 
 	/**
-	 * World content update (cubes)
-	 */
-	private WorldObject[] worldObjects;
-
-	/**
 	 * Autopilot update
 	 */
-	private Autopilot planner;
+	private AutopilotModule autopilotModule;
 
 	/**
 	 * TestbedGUI update
@@ -55,19 +55,50 @@ public class UpdateHelper {
 	 */
 	private DroneHelper droneHelper;
 	
+	/**
+	 * Package generation
+	 */
+	private PackageGenerator generator;
+	private Map<Gate,Package> fromPackages; 
 	
 	public UpdateHelper(DroneHelper droneHelper, int TIME_SLOWDOWN_MULTIPLIER, CameraHelper cameraHelper,
-					    WorldObject[] worldObjects, Autopilot planner, TestbedGui testbedGui) {
-
-    	this.droneHelper = droneHelper;
-        this.TIME_SLOWDOWN_MULTIPLIER = TIME_SLOWDOWN_MULTIPLIER;
+						AutopilotModule module, TestbedGui testbedGui, PackageGenerator generator) {
+		this.TIME_SLOWDOWN_MULTIPLIER = TIME_SLOWDOWN_MULTIPLIER;
         this.cameraHelper = cameraHelper;
-        this.worldObjects = worldObjects;
-        this.planner = planner;
-        this.testbedGui = testbedGui;
-        this.time = 0;
         this.followDrone = 0;
+        this.autopilotModule = module;
+        this.testbedGui = testbedGui;
+        this.testbedGui.setActiveDrone(followDrone);
+        this.time = 0;
+        this.droneHelper = droneHelper;
+        this.droneHelper.setRootFrame(testbedGui);
+        this.generator = generator;
+        this.fromPackages = new HashMap<>();
     }
+	
+	public int getFollowDrone() {
+		return this.followDrone;
+	}
+	
+	public void nextFollowDrone() {
+		boolean found = false;
+		for (Entry<String, Integer> a : droneHelper.droneIds.entrySet()) {
+			if(found) {
+				this.followDrone = a.getValue();
+				this.testbedGui.setActiveDrone(followDrone);
+				return;
+			}
+			if(a.getValue() == followDrone) found = true;
+		}
+		
+		this.followDrone = droneHelper.droneIds.entrySet().iterator().next().getValue();
+		this.testbedGui.setActiveDrone(followDrone);
+	}
+	
+	public void setFollowDrone(int droneId) {
+		if (this.droneHelper.droneIds.containsValue(droneId))
+			this.followDrone = droneId;
+	}
 
 	/**
 	 * This function will cycle through all the to update variables
@@ -75,31 +106,26 @@ public class UpdateHelper {
 	 * @param interval
 	 *            The passed time (delta time)
 	 * @param mouseInput
-	 *            This is an artefact of how we set up the update classes at the
+	 *            This is an artifact of how we set up the update classes at the
 	 *            start
 	 */
 	public void updateCycle(float interval, MouseInput mouseInput) {
 		this.time += interval / TIME_SLOWDOWN_MULTIPLIER;
 
-		droneHelper.update(interval/TIME_SLOWDOWN_MULTIPLIER);
+		droneHelper.update(interval/TIME_SLOWDOWN_MULTIPLIER, this);
 		
-		if (droneHelper.droneIds.isEmpty())
-			return;
+		if (droneHelper.droneIds.isEmpty()) return;
 		
-		Vector3f newDronePos = droneHelper.getDronePhysics(0).getPosition();
+		updatePackages();
+		
+		Vector3f newDronePos = droneHelper.getDronePhysics(followDrone).getPosition();
 		
 		updateCameraPositions(mouseInput, newDronePos, followDrone);
-
-		updatePlanner(newDronePos);
-
-		testbedGui.update(droneHelper.getDronePhysics(followDrone).getVelocity(), newDronePos,
-						  droneHelper.getDronePhysics(followDrone).getHeading(),
-						  droneHelper.getDronePhysics(followDrone).getPitch(),
-						  droneHelper.getDronePhysics(followDrone).getRoll());
 		
-		testbedGui.setDrone(newDronePos, droneHelper.getDronePhysics(followDrone).getHeading());
-		testbedGui.setCubes(worldObjects);
-	}
+		updateModule();
+		
+		testbedGui.repaint();
+		}
 
 
 	private void updateCameraPositions(MouseInput mouseInput, Vector3f newDronePos, int followDrone) {
@@ -114,7 +140,7 @@ public class UpdateHelper {
 		}
 		
 		
-		Physics physics = droneHelper.getDronePhysics(0);
+		Physics physics = droneHelper.getDronePhysics(followDrone);
 
 		cameraHelper.droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
 		cameraHelper.droneCamera.setRotation(-physics.getPitch(),-physics.getHeading(),-physics.getRoll());
@@ -129,28 +155,127 @@ public class UpdateHelper {
 	}
 
 
-	private void updatePlanner(Vector3f newDronePos) {
-		if (planner != null)
-			plannerUpdate(newDronePos);
+	private void updateModule() {
+		if (autopilotModule == null)
+			return;
+		
+		for (int droneId: droneHelper.droneIds.values()) {
+			Physics physics = droneHelper.getDronePhysics(droneId);
+			autopilotModule.startTimeHasPassed(droneId, Utils.buildInputs(null, physics.getPosition(),
+												physics.getHeading(), physics.getPitch(), physics.getRoll(), this.time));
+		}
+		
+		for (int droneId: droneHelper.droneIds.values()) {
+			AutopilotOutputs output = autopilotModule.completeTimeHasPassed(droneId);
+			
+			try {
+				droneHelper.getDronePhysics(droneId).updateDrone(output);
+			} catch (PhysicsException e) {
+				JOptionPane.showMessageDialog(testbedGui, "An illegal force was entered for drone " + 
+						droneHelper.getDroneConfig(droneId).getDroneID() + ": " + e.getMessage(),
+						"Physics Exception", JOptionPane.ERROR_MESSAGE);
+				droneHelper.removeDrone(droneId, this);
+			}
+		}	
 	}
-
-
-	/**
-	 * This line is only triggered if the specified world does indeed want a
-	 * motion planner
-	 */
-	private void plannerUpdate(Vector3f newDronePos) {
-		Physics physics = droneHelper.getDronePhysics(0);
-
-		AutopilotOutputs out = planner.timePassed(Utils.buildInputs(null, newDronePos.x,
-				newDronePos.y, newDronePos.z, physics.getHeading(), physics.getPitch(), physics.getRoll(), time));
-
-		try {
-			physics.updateDrone(out);
-		} catch (PhysicsException e) {
-			JOptionPane.showMessageDialog(testbedGui, "An illegal force was entered for the drone: " + e.getMessage(), "Physics Exception",
-					JOptionPane.ERROR_MESSAGE);
-			droneHelper.removeDrone(0);
+	
+	
+	private void updatePackages() {
+		if (generator != null) {
+			int[] newDetails = generator.generatePackage(this.time);
+			if (newDetails != null)
+				addPackage(newDetails);
+		}
+		
+		int[] newDetails = testbedGui.getNewPackage();
+		testbedGui.removePackage();
+		if (newDetails != null)
+			addPackage(newDetails);
+		
+		
+		for (int drone: droneHelper.droneIds.values()) {
+			Physics physics = droneHelper.getDronePhysics(drone);
+			if (FloatMath.norm(physics.getVelocity()) > 1)
+				continue;
+			
+			int loc = physics.getAirportLocation();
+			Gate gate;
+			switch (loc) {
+			case Physics.GATE_0:
+				gate = new Gate(physics.getAirportNb(), 0);
+				if (droneHelper.getDronePackage(drone) == null) {
+					if (fromPackages.containsKey(gate))
+						droneHelper.collectPackage(drone, fromPackages.remove(gate));
+				} else {
+					if (new Gate(droneHelper.getDronePackage(drone),false).equals(gate)) {
+						droneHelper.deliverPackage(drone);
+					}
+				}
+				break;
+			case Physics.GATE_1:
+				gate = new Gate(physics.getAirportNb(), 1);
+				if (droneHelper.getDronePackage(drone) == null) {
+					if (fromPackages.containsKey(gate))
+						droneHelper.collectPackage(drone, fromPackages.remove(gate));
+				} else {
+					if (new Gate(droneHelper.getDronePackage(drone),false).equals(gate))
+						droneHelper.deliverPackage(drone);
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	
+	
+	private void addPackage(int[] details) {
+		Package newPackage = new Package(details);
+		Gate fromGate = new Gate(newPackage, true);
+		
+		if (!fromPackages.containsKey(fromGate)) {
+			fromPackages.put(fromGate, newPackage);
+			
+			testbedGui.addPackage(newPackage);
+			
+			if (autopilotModule != null)
+				autopilotModule.deliverPackage(newPackage.getFromAirport(), newPackage.getFromGate(),
+					newPackage.getDestAirport(), newPackage.getDestGate());
+		}
+	}
+	
+	
+	private class Gate {
+		
+		public final int airportNb, gateNb;
+		
+		public Gate(int airportNb, int gateNb) {
+			this.airportNb = airportNb;
+			this.gateNb = gateNb;
+		}
+		
+		public Gate(Package pack, boolean from) {
+			if (from) {
+				this.airportNb = pack.getFromAirport();
+				this.gateNb = pack.getFromGate();
+			} else {
+				this.airportNb = pack.getDestAirport();
+				this.gateNb = pack.getDestGate();				
+			}
+		}
+		
+		@Override
+		public int hashCode() {
+			return 2048*airportNb + gateNb;
+		}
+		
+		@Override
+		public boolean equals(Object other) {
+			if (other == null)
+				return false;
+			if (!(other instanceof Gate))
+				return false;
+			return (this.airportNb == ((Gate)other).airportNb && this.gateNb == ((Gate)other).gateNb);
 		}
 	}
 
