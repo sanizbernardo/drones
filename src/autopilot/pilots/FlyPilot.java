@@ -110,27 +110,28 @@ public class FlyPilot extends PilotPart {
 		}
 
 		// moeten we omhoog?
-		if ((100 - pos.y) > 5) {//TODO magic number
+		if ((60 - pos.y) > 5) {//TODO magic number
 			if (inputs.getRoll() > FloatMath.toRadians(5))
 				setCurrentState(State.Stable);
 			else
 				setCurrentState(State.StrongUp);
 		}
 		// moeten we omlaag?
-		else if (pos.y - 100 > 5) {
+		else if (pos.y - 60 > 5) {
 			if (inputs.getRoll() > FloatMath.toRadians(5))
 				setCurrentState(State.Stable);
 			else
 				setCurrentState(State.StrongDown);
 		}
 		// iets meer stijgen
-		else if (getCurrentState() == State.StrongUp && (100 - pos.y) > 2) {
+		else if (getCurrentState() == State.StrongUp && (60 - pos.y) > 2) {
 			
 		}
 		else {
 			// draaien nodig?
 			//Vector3f diff = getCurrentCube().sub(pos, new Vector3f());
 			float targetHeading = makeNormal(getTargetHeading(inputs));
+			System.out.println("target heading: " + targetHeading);
 			Boolean side = null;
 			// null: nee, true: links, false: rechts
 			Vector3f result = new Vector3f(FloatMath.cos(inputs.getHeading()),0,-FloatMath.sin(inputs.getHeading())).cross(new Vector3f(FloatMath.cos(targetHeading),0,-FloatMath.sin(targetHeading)), new Vector3f());
@@ -393,6 +394,8 @@ public class FlyPilot extends PilotPart {
 		}
 	}
 	
+	private float headingChecker = 0f;
+	
 	private float getTargetHeadingPart1(AutopilotInputs inputs, float[] pointBeforeRunway, float headingRunwayToPoint){
 		float[] planePosition = {inputs.getX(), inputs.getY(), inputs.getZ()};
 		
@@ -410,7 +413,9 @@ public class FlyPilot extends PilotPart {
 		Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
 		float[] aux = auxLocPlusX(pointBeforeRunway, headingRunwayToPoint, temp);
 		Vector3f pBRPaux = new Vector3f(aux[0], aux[1], aux[2]);
-		if(pos.distance(pBRPaux) < this.turnRadius + 10 && pos.distance(pBRPaux) > this.turnRadius - 10 && pos.distance(pointBR) < this.turnRadius + 50){
+		System.out.println("ch: " + headingChecker);
+		System.out.println("he: " + inputs.getHeading());
+		if(pos.distance(pBRPaux) < this.turnRadius + 10 && pos.distance(pBRPaux) > this.turnRadius - 10 && pos.distance(pointBR) < this.turnRadius + 50 && Math.abs(headingChecker - inputs.getHeading()) < 0.1){
 			part1Complete = true;
 		}
 		
@@ -436,18 +441,30 @@ public class FlyPilot extends PilotPart {
 			corner = bigCorner - smallCorner;
 			System.out.println("FRONT");
 		}
+		float retval =0f;
 		//Plane to the right of the pointBeforeRunway
 		if(orientation(pointBeforeRunway, auxLocPlusMinZ(pointBeforeRunway, headingRunwayToPoint, 1), planePosition) == 1){
 			System.out.println("RIGHT");
-			return headingRunwayToPoint - corner + (float) Math.PI; //TODO nog iets voor als dit groter is dan 180°
+			retval = headingRunwayToPoint - corner + (float) Math.PI;
+			if(!Float.isNaN(retval)){
+				headingChecker = makeNormal(retval);
+			}
+			return retval;
 		}
 		//Plane to the left of the pointBeforeRunway
 		else if(orientation(pointBeforeRunway, auxLocPlusMinZ(pointBeforeRunway, headingRunwayToPoint, 1), planePosition) == 2){
 			System.out.println("LEFT");
-			return headingRunwayToPoint + corner + (float) Math.PI;
+			retval = headingRunwayToPoint + corner + (float) Math.PI;
+			if(!Float.isNaN(retval)){
+				headingChecker = makeNormal(retval);
+			}
+			return retval;
 		}
-		
-		return headingRunwayToPoint + (float) Math.PI;
+		retval = headingRunwayToPoint + (float) Math.PI;
+		if(!Float.isNaN(retval)){
+			headingChecker = makeNormal(retval);
+		}
+		return retval;
 	}
 	
 	private float getTargetHeadingPart2(AutopilotInputs inputs, float[] pointBeforeRunway, float headingRunwayToPoint){
