@@ -186,6 +186,7 @@ public class DroneHelper {
 		if (!wantPhysics)
 			return;
 		
+		Set<Integer> dronesToRemove = new HashSet<>();
 		for (int droneId : droneIds.values()) {
 			try {
 				getDronePhysics(droneId).update(interval);
@@ -195,11 +196,16 @@ public class DroneHelper {
 								+ ": " + e.getMessage(),
 						"Physics Exception", JOptionPane.ERROR_MESSAGE);
 				
-				if (packages[droneId] != null)
-					packages[droneId].crashed();
-				removeDrone(droneId, updateHelper);
+				dronesToRemove.add(droneId);
 			} catch (NullPointerException e) { }
 		}
+		
+		for (Integer droneId: dronesToRemove) {
+			if (packages[droneId] != null)
+				packages[droneId].crashed();
+			removeDrone(droneId, updateHelper);
+		}
+		
 		checkCollision(updateHelper);
 	}
 
