@@ -26,8 +26,8 @@ public class VirtualAirport {
     private Vector3f position;
     private Vector3f[] tarmacs, gates;
     private float width;
+    private float heading;  
 
-    private float heading;
 
     public Vector3f getTarmac(int i) {
         return tarmacs[i];

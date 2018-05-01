@@ -94,7 +94,7 @@ public class Pilot {
 		
 		//first flight
 		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
-		this.pilots[LANDING] = new LandingPilot();
+		this.pilots[LANDING] = new LandingPilot(toAirport);
 		this.pilots[FLYING] = new FlyPilot(fromAirport);
 		
 		int OOOOKKKK = 0; //TODO: remove
@@ -111,7 +111,7 @@ public class Pilot {
 		
 		//second flight
 		this.pilots[TAKING_OFF_2] = new TakeOffPilot(FLY_HEIGHT);
-		this.pilots[LANDING_2] = new LandingPilot();
+		this.pilots[LANDING_2] = new LandingPilot(toAirport);
 		this.pilots[FLYING_2] = new FlyPilot(toAirport);
 		this.pilots[TAXIING_2] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
                                              fromAirport.getHeading() 
@@ -130,7 +130,7 @@ public class Pilot {
 	private void flyLocal(VirtualAirport fromAirport, int fromGate,
 			VirtualAirport toAirport, int toGate, int FLY_HEIGHT) {
 		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
-		this.pilots[LANDING] = new LandingPilot();
+		this.pilots[LANDING] = new LandingPilot(toAirport);
 		this.pilots[FLYING] = new FlyPilot(toAirport);
 		this.pilots[TAXIING] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
                                              fromAirport.getHeading() 
