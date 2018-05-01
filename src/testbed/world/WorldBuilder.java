@@ -35,14 +35,7 @@ public class WorldBuilder extends World implements IWorldRules {
 
 	@Override
 	public void setupWorld() {
-		this.worldObjects = new WorldObject[cubes.size()];	
-		int i = 0;		
-		for (Vector3f pos: cubes.keySet()) {
-			Cube cube = cubes.get(pos).setup();
-			this.worldObjects[i] = new WorldObject(cube.getMesh());
-			this.worldObjects[i].setPosition(pos);
-			i++;
-		}
+		
 	}
 	
 	@Override

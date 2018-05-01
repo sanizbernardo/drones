@@ -3,10 +3,10 @@ package testbed.world;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotModule;
 import testbed.engine.*;
-import testbed.entities.WorldObject;
 import testbed.entities.airport.Airport;
 import testbed.entities.ground.Ground;
 import testbed.entities.packages.PackageGenerator;
+import testbed.entities.packages.Package;
 import testbed.graphics.Hud;
 import testbed.graphics.Renderer;
 import testbed.gui.TestbedGui;
@@ -18,7 +18,9 @@ import utils.IO.KeyboardInput;
 import utils.IO.MouseInput;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.joml.Vector3f;
 
@@ -38,10 +40,10 @@ public abstract class World implements IWorldRules {
 	private int logDrone;
 	private float time;
 	private List<Airport> airports;
+	private Set<Package> packages;
 	
 	/* These are to be directly called in the world classes */
 	protected AutopilotModule autopilotModule;
-	protected WorldObject[] worldObjects;
 	protected Ground ground;
 	protected DroneHelper droneHelper;
 	protected PackageGenerator generator;
@@ -93,7 +95,7 @@ public abstract class World implements IWorldRules {
     	this.time = 0;
     	
     	this.airports = new ArrayList<Airport>();
-    	this.worldObjects = new WorldObject[0]; 
+    	this.packages = new HashSet<>();
     	
     	setupAutopilotModule();
     	
@@ -125,8 +127,8 @@ public abstract class World implements IWorldRules {
     	
 		testbedGui.showGUI();
 
-		this.updateHelper = new UpdateHelper(droneHelper, TIME_SLOWDOWN_MULTIPLIER, cameraHelper,
-											 autopilotModule, testbedGui, generator);
+		this.updateHelper = new UpdateHelper(droneHelper, TIME_SLOWDOWN_MULTIPLIER, cameraHelper, airports,
+											 autopilotModule, testbedGui, packages, generator);
     }
 	
 	public void nextFollowDrone() {
@@ -201,7 +203,7 @@ public abstract class World implements IWorldRules {
 	
 	@Override
 	public void render(Window window) {
-		renderer.render(window, cameraHelper, worldObjects, droneHelper, ground, airports);
+		renderer.render(window, cameraHelper, droneHelper, packages, ground, airports);
 		hud.render(window, droneHelper.getDronePhysics(updateHelper.getFollowDrone()), this.time);
 	}
 
@@ -212,9 +214,8 @@ public abstract class World implements IWorldRules {
 	@Override
 	public void cleanup() {
 		renderer.cleanup();
-		for (WorldObject gameItem : worldObjects) {
-			if (gameItem != null)
-				gameItem.getMesh().cleanUp();
+		for (Package pack: packages) {
+			pack.cleanup();
 		}
 	}
 
