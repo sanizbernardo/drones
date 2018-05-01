@@ -71,7 +71,7 @@ public class Pilot {
 		int FLY_HEIGHT = 50; //to be given by airportManager
 	
 		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
-		this.pilots[LANDING] = new LandingPilot();
+		this.pilots[LANDING] = new LandingPilot(toAirport);
 		this.pilots[FLYING] = new FlyPilot(toAirport);
 		this.pilots[TAXIING] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
 								                                                 fromAirport.getHeading() 
