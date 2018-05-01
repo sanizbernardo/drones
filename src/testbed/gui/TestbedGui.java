@@ -52,7 +52,7 @@ public class TestbedGui extends JFrame {
 	
 	private int[] packageDetails;
 	
-	public TestbedGui(World world, DroneHelper helper, List<Airport> airports) {		
+	public TestbedGui(World world, DroneHelper helper, List<Airport> airports) {
 		setTitle("Testbed GUI");
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,6 +72,7 @@ public class TestbedGui extends JFrame {
 		drones = new JTable(new DroneTable(helper));
 		drones.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		drones.setColumnSelectionAllowed(false);
+		drones.setRowSelectionAllowed(true);
 		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
 		renderer.setHorizontalAlignment(SwingConstants.CENTER);
 		drones.getColumnModel().getColumn(0).setMaxWidth(75);
@@ -87,12 +88,10 @@ public class TestbedGui extends JFrame {
 					return;
 				}
 				
-				int newId;
-				if (e.getFirstIndex() == lastId)
-					newId = e.getLastIndex();
-				else
-					newId = e.getFirstIndex();
+				int newId = (e.getFirstIndex() == lastId) ? e.getLastIndex() : e.getFirstIndex();
+				
 				world.setFollowDrone(newId);
+				world.setFreeCamPos(helper.getDronePhysics(newId).getPosition().add(new Vector3f(0, 5, 0), new Vector3f()));
 				minimap.setActiveDrone(newId);
 				lastId = newId;
 				lock = false;
@@ -106,12 +105,26 @@ public class TestbedGui extends JFrame {
 		packageTable = new PackageTable();
 		JTable packages = new JTable(packageTable);
 		packages.setColumnSelectionAllowed(false);
-		packages.setRowSelectionAllowed(false);
+		packages.setRowSelectionAllowed(true);
 		packages.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		packages.getColumnModel().getColumn(0).setMaxWidth(75);
 		packages.getColumnModel().getColumn(0).setCellRenderer(renderer);
 		packages.getColumnModel().getColumn(3).setMaxWidth(100);
 		packages.getTableHeader().setFont(packages.getTableHeader().getFont().deriveFont(Font.BOLD));
+		packages.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			private int lastId;
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting())
+					return;
+				
+				int newId = (e.getFirstIndex() == lastId) ? e.getLastIndex() : e.getFirstIndex();
+				lastId = newId;
+				
+				Package pack = packageTable.packages.get(newId);
+				if (pack.isAlive())
+					world.setFreeCamPos(pack.getCube().getPosition().add(new Vector3f(0, 5.85f, 0), new Vector3f()));
+			}
+		});
 		JScrollPane packagePane = new JScrollPane(packages);
 		packagePane.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3-30));
 		contentPane.add(packagePane);
