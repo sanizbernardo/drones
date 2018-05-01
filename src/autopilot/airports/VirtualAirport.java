@@ -9,6 +9,7 @@ public class VirtualAirport {
     public VirtualAirport(Vector3f position, float heading, float width) {
         this.position = position;
         this.heading = heading;
+        this.width = width;
 
         Vector3f direction = new Vector3f(-FloatMath.sin(heading), 0, -FloatMath.cos(heading));
         Vector3f directionPerp = new Vector3f(-FloatMath.cos(heading), 0, FloatMath.sin(heading));
@@ -24,6 +25,7 @@ public class VirtualAirport {
 
     private Vector3f position;
     private Vector3f[] tarmacs, gates;
+    private float width;
 
     private float heading;
 
@@ -42,4 +44,9 @@ public class VirtualAirport {
     public float getHeading() {
         return  heading;
     }
+
+	public float getWidth() {
+		return width;
+	}
+    
 }

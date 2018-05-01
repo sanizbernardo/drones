@@ -4,11 +4,16 @@ import interfaces.*;
 
 import org.joml.Vector3f;
 
+import autopilot.Pilot;
 import autopilot.gui.AutopilotGUI;
 import utils.FloatMath;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class AirportManager implements AutopilotModule{
 
@@ -83,7 +88,10 @@ public class AirportManager implements AutopilotModule{
     @Override
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
         VirtualDrone drone = chooseBestDrone();
-        drone.getPilot().fly(drone.getInputs(), airportlist.get(fromAirport), fromGate, airportlist.get(toAirport), toGate);
+        VirtualAirport currentAirport = airportlist.stream()
+        		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
+        		                                   .collect(Collectors.toList()).get(0);
+        drone.getPilot().fly(drone.getInputs(), currentAirport, airportlist.get(fromAirport), fromGate, airportlist.get(toAirport), toGate);
         drone.setActive(true);
     }
 

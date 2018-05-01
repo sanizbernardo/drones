@@ -21,8 +21,8 @@ public class AutoPilotModuleWorld extends World{
 	@Override
 	public void setupAirports() {
 		addAirport(new Vector3f(-100, 0, 0), 0);
-		addAirport(new Vector3f(1000, 0, 1000), FloatMath.toRadians(45));
-		addAirport(new Vector3f(-1000, 0, -1000), FloatMath.toRadians(-45));
+		addAirport(new Vector3f(750, 0, 1000), FloatMath.toRadians(45));
+		addAirport(new Vector3f(-750, 0, -1000), FloatMath.toRadians(-45));
 	}
 
 	@Override
