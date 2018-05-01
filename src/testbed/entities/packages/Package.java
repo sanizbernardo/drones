@@ -90,6 +90,10 @@ public class Package {
 		}
 	}
 	
+	public boolean isAlive() {
+		return this.status == WAITING || this.status == IN_PROGRESS;
+	}
+	
 	
 	public void setPosition(Vector3f pos) {
 		this.cube.setPosition(pos);
@@ -103,4 +107,6 @@ public class Package {
 	public void cleanup() {
 		this.cube.getMesh().cleanUp();
 	}
+
+	
 }

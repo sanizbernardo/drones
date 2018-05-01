@@ -138,6 +138,10 @@ public abstract class World implements IWorldRules {
 	public void setFollowDrone(int droneId) {
 		updateHelper.setFollowDrone(droneId);
 	}
+	
+	public void setFreeCamPos(Vector3f position) {
+		cameraHelper.freeCamera.setPosition(position.x, position.y, position.z);
+	}
 
 	
 	public void addDrone(String droneId, int airportId, int gate, int facing) {
