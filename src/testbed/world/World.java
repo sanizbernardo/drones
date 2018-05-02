@@ -63,7 +63,7 @@ public abstract class World implements IWorldRules {
 	}
 
 	public World(int tSM, boolean wantPhysicsEngine, int nbDrones) {
-		this(tSM, wantPhysicsEngine, nbDrones, Constants.DEFAULT_AIRPORT_WIDTH, Constants.DEFAULT_AIRPORT_LENGTH);
+		this(tSM, wantPhysicsEngine, nbDrones, Constants.DEFAULT_AIRPORT_WIDTH, Constants.DEFAULT_AIRPORT_LENGTH * 50);
 	}
 	
 	/**

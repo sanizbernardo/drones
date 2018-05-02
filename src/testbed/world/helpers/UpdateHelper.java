@@ -141,10 +141,14 @@ public class UpdateHelper {
 
 
 	private void updateCameraPositions(MouseInput mouseInput, Vector3f newDronePos, int followDrone) {
+		
+		Physics physics = droneHelper.getDronePhysics(followDrone);
+		
 		// Update camera based on mouse
 		cameraHelper.freeCamera.movePosition(cameraHelper.getCameraInc().x * Constants.CAMERA_POS_STEP,
 				cameraHelper.getCameraInc().y * Constants.CAMERA_POS_STEP,
-				cameraHelper.getCameraInc().z * Constants.CAMERA_POS_STEP);
+				cameraHelper.getCameraInc().z * Constants.CAMERA_POS_STEP,
+				physics);
 		if (mouseInput.isRightButtonPressed()) {
 			Vector2f rotVec = mouseInput.getDisplVec();
 			cameraHelper.freeCamera.moveRotation(FloatMath.toRadians(rotVec.x * Constants.MOUSE_SENSITIVITY),
@@ -152,8 +156,6 @@ public class UpdateHelper {
 		}
 		
 		
-		Physics physics = droneHelper.getDronePhysics(followDrone);
-
 		cameraHelper.droneCamera.setPosition(newDronePos.x, newDronePos.y, newDronePos.z);
 		cameraHelper.droneCamera.setRotation(-physics.getPitch(),-physics.getHeading(),-physics.getRoll());
 

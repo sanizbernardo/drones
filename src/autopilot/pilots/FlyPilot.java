@@ -380,7 +380,7 @@ public class FlyPilot extends PilotPart {
 	
 	private float getTargetHeading(AutopilotInputs inputs){
 		float[] pointBeforeRunway = {pointBR.x, pointBR.y, pointBR.z}; //TODO
-		float headingRunwayToPoint = currentDestionationAirport.getHeading(); //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180° (centerToRunway1)
+		float headingRunwayToPoint = currentDestionationAirport.getHeading(); //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180ï¿½ (centerToRunway1)
 		if(!part1Complete){
 			return getTargetHeadingPart1(inputs, pointBeforeRunway, headingRunwayToPoint);
 
