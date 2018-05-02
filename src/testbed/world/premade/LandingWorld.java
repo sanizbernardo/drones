@@ -34,18 +34,7 @@ public class LandingWorld extends World{
 	}
 
 	@Override
-	public void setupWorld() {
-		
-		this.worldObjects = new WorldObject[500];
-		
-		for (int i = 0; i < this.worldObjects.length; i++) {
-			WorldObject cube = new WorldObject(Cubes.getPinkCube().getMesh());
-			cube.setScale(1);
-			cube.setPosition(0, -0.5f, i*-25);
-			
-			this.worldObjects[i] = cube;
-		}
-		
+	public void setupWorld() {		
 		this.ground = new Ground(50);		
 	}
 	

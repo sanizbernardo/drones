@@ -229,6 +229,10 @@ public class DroneHelper {
 
 			translateWheels(droneId);
 			rotateWings(droneId);
+			
+			Package pack = getDronePackage(droneId);
+			if (pack != null)
+				pack.setPosition(dronePos.add(new Vector3f(0, -0.85f, 0), new Vector3f()));
 		}
 	}
 

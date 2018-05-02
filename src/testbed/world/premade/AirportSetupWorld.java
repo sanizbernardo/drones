@@ -1,6 +1,5 @@
 package testbed.world.premade;
 
-import testbed.entities.WorldObject;
 import testbed.entities.ground.Ground;
 import testbed.world.World;
 import utils.FloatMath;
@@ -48,8 +47,7 @@ public class AirportSetupWorld extends World {
 			}
 		} catch (PhysicsException e) {
 			e.printStackTrace();
-		}
-        worldObjects = new WorldObject[0]; 
+		} 
 
         this.ground = new Ground(50);		
 	}

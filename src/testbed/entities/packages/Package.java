@@ -1,5 +1,10 @@
 package testbed.entities.packages;
 
+import org.joml.Vector3f;
+
+import testbed.entities.WorldObject;
+import utils.Cubes;
+
 public class Package {
 
 	public static final int WAITING = 0,
@@ -13,6 +18,8 @@ public class Package {
 	
 	private int status;
 	
+	private WorldObject cube;
+	
 	public Package(int from, int dest, int fromGate, int destGate) {
 		this.from = from;
 		this.dest = dest;
@@ -21,14 +28,13 @@ public class Package {
 		this.destGate = destGate;
 		
 		this.status = WAITING;
+		
+		this.cube = new WorldObject(Cubes.getPinkCube().getMesh());
+		this.cube.setScale(1);
 	}
 	
 	public Package(int[] details) {
-		this.from = details[0];
-		this.dest = details[2];
-		
-		this.fromGate = details[1];
-		this.destGate = details[3];
+		this(details[0], details[2], details[1], details[3]);
 	}
 	
 	
@@ -51,6 +57,7 @@ public class Package {
 	public int getStatus() {
 		return this.status;
 	}
+	
 	
 	public void pickUp() {
 		this.status = IN_PROGRESS;
@@ -82,4 +89,24 @@ public class Package {
 			return "";
 		}
 	}
+	
+	public boolean isAlive() {
+		return this.status == WAITING || this.status == IN_PROGRESS;
+	}
+	
+	
+	public void setPosition(Vector3f pos) {
+		this.cube.setPosition(pos);
+	}
+	
+	public WorldObject getCube() {
+		return this.cube;
+	}
+	
+	
+	public void cleanup() {
+		this.cube.getMesh().cleanUp();
+	}
+
+	
 }

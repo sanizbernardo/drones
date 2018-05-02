@@ -2,12 +2,16 @@ package testbed.world.helpers;
 
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+
 import interfaces.AutopilotModule;
 import interfaces.AutopilotOutputs;
 import testbed.Physics;
 import testbed.entities.packages.PackageGenerator;
+import testbed.entities.airport.Airport;
 import testbed.entities.packages.Package;
 import testbed.gui.TestbedGui;
 
@@ -34,7 +38,12 @@ public class UpdateHelper {
 	 */
 	private CameraHelper cameraHelper;
 	private int followDrone;
-
+	
+	/**
+	 * Airports
+	 */
+	private List<Airport> airports;
+	
 	/**
 	 * Autopilot update
 	 */
@@ -58,13 +67,15 @@ public class UpdateHelper {
 	/**
 	 * Package generation
 	 */
+	private Set<Package> packages;
 	private PackageGenerator generator;
-	private Map<Gate,Package> fromPackages; 
+	private Map<Gate,Package> fromPackages;
 	
-	public UpdateHelper(DroneHelper droneHelper, int TIME_SLOWDOWN_MULTIPLIER, CameraHelper cameraHelper,
-						AutopilotModule module, TestbedGui testbedGui, PackageGenerator generator) {
+	public UpdateHelper(DroneHelper droneHelper, int TIME_SLOWDOWN_MULTIPLIER, CameraHelper cameraHelper, List<Airport> airports,
+						AutopilotModule module, TestbedGui testbedGui, Set<Package> packages, PackageGenerator generator) {
 		this.TIME_SLOWDOWN_MULTIPLIER = TIME_SLOWDOWN_MULTIPLIER;
         this.cameraHelper = cameraHelper;
+        this.airports = airports;
         this.followDrone = 0;
         this.autopilotModule = module;
         this.testbedGui = testbedGui;
@@ -72,6 +83,7 @@ public class UpdateHelper {
         this.time = 0;
         this.droneHelper = droneHelper;
         this.droneHelper.setRootFrame(testbedGui);
+        this.packages = packages;
         this.generator = generator;
         this.fromPackages = new HashMap<>();
     }
@@ -200,26 +212,32 @@ public class UpdateHelper {
 			
 			int loc = physics.getAirportLocation();
 			Gate gate;
+			Package pack = droneHelper.getDronePackage(drone);
 			switch (loc) {
 			case Physics.GATE_0:
 				gate = new Gate(physics.getAirportNb(), 0);
-				if (droneHelper.getDronePackage(drone) == null) {
+				if (pack == null) {
 					if (fromPackages.containsKey(gate))
 						droneHelper.collectPackage(drone, fromPackages.remove(gate));
 				} else {
-					if (new Gate(droneHelper.getDronePackage(drone),false).equals(gate)) {
+					if (new Gate(pack,false).equals(gate)) {
+						packages.remove(pack);
+						pack.cleanup();
 						droneHelper.deliverPackage(drone);
 					}
 				}
 				break;
 			case Physics.GATE_1:
 				gate = new Gate(physics.getAirportNb(), 1);
-				if (droneHelper.getDronePackage(drone) == null) {
+				if (pack == null) {
 					if (fromPackages.containsKey(gate))
 						droneHelper.collectPackage(drone, fromPackages.remove(gate));
 				} else {
-					if (new Gate(droneHelper.getDronePackage(drone),false).equals(gate))
+					if (new Gate(pack,false).equals(gate)) {
 						droneHelper.deliverPackage(drone);
+						pack.cleanup();
+						packages.remove(pack);
+					}
 				}
 				break;
 			default:
@@ -235,6 +253,12 @@ public class UpdateHelper {
 		
 		if (!fromPackages.containsKey(fromGate)) {
 			fromPackages.put(fromGate, newPackage);
+			packages.add(newPackage);
+			
+			Airport port = airports.get(fromGate.airportNb);
+			Vector3f pos = new Vector3f(port.getPosition());
+			pos.add(port.getPerpDirection().mul(port.getWidth()/2f * (fromGate.gateNb == 0? 1: -1), new Vector3f()));
+			newPackage.setPosition(pos.add(new Vector3f(0,1,0)));
 			
 			testbedGui.addPackage(newPackage);
 			

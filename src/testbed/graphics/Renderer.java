@@ -9,10 +9,12 @@ import testbed.engine.Window;
 import testbed.entities.WorldObject;
 import testbed.entities.airport.Airport;
 import testbed.entities.ground.Ground;
+import testbed.entities.packages.Package;
 import testbed.world.helpers.CameraHelper;
 import testbed.world.helpers.DroneHelper;
 
 import java.util.List;
+import java.util.Set;
 
 public class Renderer {
         
@@ -88,26 +90,26 @@ public class Renderer {
         glDisable(GL_SCISSOR_TEST);
     }
 
-    public void render(Window window, CameraHelper cameraHelper, WorldObject[] gameItems,
-    				   DroneHelper droneHelper, Ground ground, List<Airport> airports) {
+    public void render(Window window, CameraHelper cameraHelper, DroneHelper droneHelper,
+    					Set<Package> packages, Ground ground, List<Airport> airports) {
 		clear(window);
 		
-        drawChaseCam(window, cameraHelper, gameItems, droneHelper, ground, airports);
+        drawChaseCam(window, cameraHelper, droneHelper, packages, ground, airports);
 				
         if(!ortho) {
-            drawFreeCam(window, cameraHelper, gameItems, droneHelper, ground, airports);
+            drawFreeCam(window, cameraHelper, droneHelper, packages, ground, airports);
         } else {
         	int size = 160;
         	
-            drawTopOrthoCam(window, cameraHelper, gameItems, droneHelper, size, ground, airports);
+            drawTopOrthoCam(window, cameraHelper, droneHelper, packages, size, ground, airports);
             
-            drawRightOrthCam(window, cameraHelper, gameItems, droneHelper, size, ground, airports);
+            drawRightOrthCam(window, cameraHelper, droneHelper, packages, size, ground, airports);
         }
     }
 
     
-	private void drawChaseCam(Window window, CameraHelper cameraHelper, WorldObject[] gameItems,
-			DroneHelper droneHelper, Ground ground, List<Airport> airports) {
+	private void drawChaseCam(Window window, CameraHelper cameraHelper,
+			DroneHelper droneHelper, Set<Package> packages, Ground ground, List<Airport> airports) {
 		Matrix4f projectionMatrix;
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
@@ -124,14 +126,14 @@ public class Renderer {
 
 		renderAirports(airports, viewMatrix);
 		renderGround(ground, viewMatrix, false);
-		renderWorldItems(gameItems, viewMatrix);
+		renderPackages(packages, viewMatrix);
 		renderDroneItems(droneHelper, viewMatrix, 1);
         shaderProgram.unbind();
 	}
 
 
-	private void drawFreeCam(Window window, CameraHelper cameraHelper, WorldObject[] gameItems,
-			DroneHelper droneHelper, Ground ground, List<Airport> airports) {
+	private void drawFreeCam(Window window, CameraHelper cameraHelper,
+			DroneHelper droneHelper, Set<Package> packages, Ground ground, List<Airport> airports) {
 		Matrix4f projectionMatrix;
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
@@ -150,13 +152,13 @@ public class Renderer {
 		renderAirports(airports, viewMatrix);
 		renderGround(ground, viewMatrix, false);
 		renderTrail(droneHelper, viewMatrix);
-		renderWorldItems(gameItems, viewMatrix);
+		renderPackages(packages, viewMatrix);
 		renderDroneItems(droneHelper, viewMatrix, 1);
 		shaderProgram.unbind();
 	}
 	
-	private void drawTopOrthoCam(Window window, CameraHelper cameraHelper, WorldObject[] gameItems,
-			DroneHelper droneHelper, int size, Ground ground, List<Airport> airports) {
+	private void drawTopOrthoCam(Window window, CameraHelper cameraHelper,
+			DroneHelper droneHelper, Set<Package> packages, int size, Ground ground, List<Airport> airports) {
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
 		topOrthoCamX = chaseCamWidth;     
@@ -176,13 +178,13 @@ public class Renderer {
 		renderAirports(airports, viewMatrix);
 		renderGround(ground, viewMatrix, false);
 		renderTrail(droneHelper, viewMatrix);
-		renderWorldItems(gameItems, viewMatrix);
+		renderPackages(packages, viewMatrix);
 		renderDroneItems(droneHelper, viewMatrix, 1);
 		shaderProgram.unbind();
 	}
 	
-	private void drawRightOrthCam(Window window, CameraHelper cameraHelper, WorldObject[] gameItems,
-			DroneHelper droneHelper, int size, Ground ground, List<Airport> airports) {
+	private void drawRightOrthCam(Window window, CameraHelper cameraHelper,
+			DroneHelper droneHelper, Set<Package> packages, int size, Ground ground, List<Airport> airports) {
 		Matrix4f viewMatrix;
 		shaderProgram.bind();
 
@@ -202,7 +204,7 @@ public class Renderer {
 		renderAirports(airports, viewMatrix);
 		renderGround(ground, viewMatrix, true);
 		renderTrail(droneHelper, viewMatrix);
-		renderWorldItems(gameItems, viewMatrix);
+		renderPackages(packages, viewMatrix);
 		renderDroneItems(droneHelper, viewMatrix, 1);
 		shaderProgram.unbind();
 	}
@@ -250,13 +252,13 @@ public class Renderer {
     	}
     }
     
-    private void renderWorldItems(WorldObject[] gameItems, Matrix4f viewMatrix) {
-        for (WorldObject gameItem : gameItems) {
-            if (gameItem == null) continue;
-            Matrix4f modelViewMatrix = Transformation.getModelViewMatrix(gameItem, viewMatrix);
+    private void renderPackages(Set<Package> packages, Matrix4f viewMatrix) {
+        for (Package pack : packages) {
+            if (pack == null) continue;
+            Matrix4f modelViewMatrix = Transformation.getModelViewMatrix(pack.getCube(), viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
             // Render the mesh for this game item
-            gameItem.getMesh().render();
+            pack.getCube().getMesh().render();
         }
     }
     
