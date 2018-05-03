@@ -48,14 +48,18 @@ public class LandingPilot extends PilotPart {
 
 	@Override
 	public AutopilotOutputs timePassed(AutopilotInputs input) {
+
+		boolean firstStep = false;
+		if(this.time == 0) firstStep = true;
+		
 		Vector3f pos = new Vector3f(input.getX(), input.getY(), input.getZ());
 		
 		float dt = input.getElapsedTime() - this.time;
 		this.time = input.getElapsedTime();
 		
 		Vector3f vel = pos.sub(this.oldPos, new Vector3f()).mul(1/dt);
+		if(firstStep) vel.z = -35;
 		this.oldPos = pos;
-		
 		if (FloatMath.norm(vel) < 1) {
 			hasEnded = true;
 		}
@@ -90,7 +94,7 @@ public class LandingPilot extends PilotPart {
 //		lwIncl -= output;
 //		rwIncl += output;
 		
-		float airportHeading = currentDestionationAirport.getHeading();//TODO is deze heading veranderd in 1 vd laatste commits?
+		float airportHeading = currentDestionationAirport.getHeading();
 		
 		Vector3f center = currentDestionationAirport.getPosition();
 		Vector3f centerRight = auxLocPlusX(center, airportHeading, currentDestionationAirport.getWidth());
@@ -105,10 +109,6 @@ public class LandingPilot extends PilotPart {
 			
 			lwIncl -= output;
 			rwIncl += output;
-			System.out.println("TOO LEFT");
-			System.out.println("center: " + center.x + "  " + center.z);
-			System.out.println("centerRight: " + centerRight.x + "  " + centerRight.z);
-			System.out.println("centerRightPlus: " + centerRightPlus.x + "  " + centerRightPlus.z);
 		}
 		//too much right
 		else if(orientation(centerLeft, centerLeftPlus, pos) == 2){
@@ -117,7 +117,6 @@ public class LandingPilot extends PilotPart {
 			
 			lwIncl -= output;
 			rwIncl += output;
-			System.out.println("TOO RIGHT");
 		}
 		//on course
 		else{
@@ -128,7 +127,6 @@ public class LandingPilot extends PilotPart {
 				
 				lwIncl -= output;
 				rwIncl += output;
-				System.out.println("HEADING TOO LEFT");
 			}
 			//heading too much right
 			else if(makeNormal(input.getHeading() - (airportHeading + (float)Math.PI)) < Math.toRadians(-1)){
@@ -137,7 +135,6 @@ public class LandingPilot extends PilotPart {
 				
 				lwIncl -= output;
 				rwIncl += output;
-				System.out.println("HEADING TOO LEFT");
 			}
 			else{
 				rollPID.setSetpoint(Math.toRadians(0));
