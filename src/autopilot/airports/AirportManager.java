@@ -32,6 +32,9 @@ public class AirportManager implements AutopilotModule{
         packagelist = new ArrayList<>();
     }
 
+    private enum Loc {
+    	GATE_0, GATE_1, LANE_0, LANE_1;
+    }
     
     public VirtualDrone chooseBestDrone() {
         for (VirtualDrone drone : droneList) {
@@ -91,9 +94,38 @@ public class AirportManager implements AutopilotModule{
         VirtualAirport currentAirport = airportlist.stream()
         		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
         		                                   .collect(Collectors.toList()).get(0);
-        drone.getPilot().fly(drone.getInputs(), currentAirport, airportlist.get(fromAirport), fromGate, airportlist.get(toAirport), toGate);
+        
+        int dispatchHeight = 50;
+        
+        if(onAirport(drone.getPosition(), currentAirport) == Loc.GATE_0) {
+            drone.getPilot().fly(drone.getInputs(), currentAirport, 0, 
+            		                                airportlist.get(fromAirport), fromGate, 
+            		                                airportlist.get(toAirport), toGate,
+            		                                dispatchHeight);
+        } else {
+            drone.getPilot().fly(drone.getInputs(), currentAirport, 1, 
+            		                                airportlist.get(fromAirport), fromGate, 
+            		                                airportlist.get(toAirport), toGate,
+            		                                dispatchHeight);
+        }
+        
         drone.setActive(true);
     }
+    
+	private Loc onAirport(Vector3f pos, VirtualAirport airport) {
+		Vector3f diff = pos.sub(airport.getPosition(), new Vector3f());
+		float len = diff.dot(new Vector3f(-FloatMath.sin(airport.getHeading()), 0, -FloatMath.cos(airport.getHeading())));
+		float wid = diff.dot(new Vector3f(-FloatMath.cos(airport.getHeading()), 0, FloatMath.sin(airport.getHeading())));
+		
+		if (len > airport.getWidth() / 2)
+			return Loc.LANE_0;
+		else if (len < - airport.getWidth() / 2)
+			return Loc.LANE_1;
+		else if (wid > 0)
+			return Loc.GATE_0;
+		else
+			return Loc.GATE_1;
+	}
 
     @Override
     public void simulationEnded() {

@@ -48,7 +48,7 @@ public class Pilot {
 	
 	private void init() {
 		for (PilotPart pilot: this.pilots) {
-			pilot.initialize(config);
+			if (pilot != null) pilot.initialize(config);
 		}
 	}
 	
@@ -74,22 +74,24 @@ public class Pilot {
 		return output;
 	}
 
-	public void fly(AutopilotInputs inputs, VirtualAirport currentAirport, VirtualAirport fromAirport, int fromGate, VirtualAirport toAirport, int toGate) {
+	public void fly(AutopilotInputs inputs, VirtualAirport currentAirport, int currentGate, 
+			                                VirtualAirport fromAirport, int fromGate, 
+			                                VirtualAirport toAirport, int toGate,
+			                                int flyHeight) {
 		
 		if(config == null) throw new RuntimeException("Access before sim started");
 		this.index = 0;
-		int FLY_HEIGHT = 50; //to be given by airportManager
 
 		Vector3f pos = new Vector3f(inputs.getX(),inputs.getY(),inputs.getZ());
 		
 		if(onAirport(pos, fromAirport)) {
-			flyLocal(fromAirport, fromGate, toAirport, toGate, FLY_HEIGHT);
+			flyLocal(fromAirport, fromGate, toAirport, toGate, flyHeight);
 		} else {
-			flyRemote(currentAirport, fromAirport, fromGate, toAirport, toGate, FLY_HEIGHT);
+			flyRemote(currentAirport, currentGate, fromAirport, fromGate, toAirport, toGate, flyHeight);
 		}
 	}
 	
-	private void flyRemote(VirtualAirport currentAirport, VirtualAirport fromAirport, int fromGate,
+	private void flyRemote(VirtualAirport currentAirport, int currentGate, VirtualAirport fromAirport, int fromGate,
 			VirtualAirport toAirport, int toGate, int FLY_HEIGHT) {
 		
 		//first flight
@@ -97,8 +99,7 @@ public class Pilot {
 		this.pilots[LANDING] = new LandingPilot(fromAirport);
 		this.pilots[FLYING] = new FlyPilot(fromAirport);
 		
-		int OOOOKKKK = 0; //TODO: remove
-		this.pilots[TAXIING] = new TaxiPilot(currentAirport.getGate(OOOOKKKK), fromGate == 0 ? 
+		this.pilots[TAXIING] = new TaxiPilot(currentAirport.getGate(currentGate), currentGate == 0 ? 
 											 currentAirport.getHeading() 
                                              : 
                                              currentAirport.getHeading() + FloatMath.PI * (currentAirport.getHeading() < 0 ? 1 : -1));
