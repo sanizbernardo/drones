@@ -94,7 +94,7 @@ public class Pilot {
 		
 		//first flight
 		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
-		this.pilots[LANDING] = new LandingPilot(toAirport);
+		this.pilots[LANDING] = new LandingPilot(fromAirport);
 		this.pilots[FLYING] = new FlyPilot(fromAirport);
 		
 		int OOOOKKKK = 0; //TODO: remove
