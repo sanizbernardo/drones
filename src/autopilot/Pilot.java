@@ -54,10 +54,6 @@ public class Pilot {
 	
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
 		
-		for(int task : tasks) {
-			System.out.println(task);
-		}
-		
 		if (this.index >= this.tasks.length) {
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 		}
@@ -153,7 +149,7 @@ public class Pilot {
 		float len = diff.dot(new Vector3f(-FloatMath.sin(airport.getHeading()), 0, -FloatMath.cos(airport.getHeading())));
 		float wid = diff.dot(new Vector3f(-FloatMath.cos(airport.getHeading()), 0, FloatMath.sin(airport.getHeading())));
 		
-		if (Math.abs(len) > airport.getWidth() / 2) {
+		if (Math.abs(len) > airport.getWidth() / 2) {	
 			return false;
 		} else if (Math.abs(wid) > airport.getWidth()) {
 			return false;
