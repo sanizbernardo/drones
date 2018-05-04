@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import autopilot.airports.VirtualDrone;
+import autopilot.airports.VirtualPackage;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
@@ -41,6 +42,7 @@ public class AutopilotGUI extends JFrame {
 		setContentPane(contentPanel);
 		
 		droneUI = new DroneControlUI(drones);
+		droneUI.setSelected(0);
 		contentPanel.add(droneUI.content);
 		
 		droneTable = new JTable(new DroneTable(drones));
@@ -50,9 +52,11 @@ public class AutopilotGUI extends JFrame {
 		renderer.setHorizontalAlignment(SwingConstants.CENTER);
 		droneTable.getColumnModel().getColumn(0).setCellRenderer(renderer);
 		droneTable.getColumnModel().getColumn(0).setMaxWidth(35);
-		droneTable.getColumnModel().getColumn(3).setMaxWidth(100);
-		droneTable.getColumnModel().getColumn(3).setCellRenderer(renderer);
+		droneTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
+		droneTable.getColumnModel().getColumn(4).setMaxWidth(100);
+		droneTable.getColumnModel().getColumn(4).setCellRenderer(renderer);
 		droneTable.getTableHeader().setFont(droneTable.getTableHeader().getFont().deriveFont(Font.BOLD));
+		droneTable.addRowSelectionInterval(0, 0);
 		droneTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			private int lastId;
 			public void valueChanged(ListSelectionEvent e) {
@@ -102,6 +106,7 @@ public class AutopilotGUI extends JFrame {
 		
 		for (int i = 0; i < droneTable.getRowCount(); i++) {
 			((DroneTable) droneTable.getModel()).fireTableCellUpdated(i, 2);
+			((DroneTable) droneTable.getModel()).fireTableCellUpdated(i, 3);
 		}
 	}
 	
@@ -119,11 +124,11 @@ public class AutopilotGUI extends JFrame {
 		
 		
 		public String getColumnName(int col) {
-			return new String[] {"ID", "DroneId", "Location","Package"}[col];
+			return new String[] {"ID", "DroneId", "Location", "Task", "Target", "Package"}[col];
 		}
 		
 		public int getColumnCount() {
-				return 4;
+				return 6;
 		}
 
 		public int getRowCount() {
@@ -141,16 +146,72 @@ public class AutopilotGUI extends JFrame {
 
 			case 2:
 				AutopilotInputs inputs = drones.get(row).getInputs();
-				return inputs == null? "": FloatMath.round(inputs.getX(), 2) + ", " +
-										   FloatMath.round(inputs.getY(), 2) + ", " +
-										   FloatMath.round(inputs.getZ(), 2);
+				return inputs == null? "": (int) inputs.getX() + ", " +
+										   (int) inputs.getY() + ", " +
+										   (int) inputs.getZ();
 					
 			case 3:
+				return drones.get(row).getTask();
+			
+			case 4:
+				return "TODO";
+
+			case 5:
 				return "TODO";
 				
 			default:
 				return null;
 			}
 		}
+	}
+	
+	
+	private class PackageTable extends AbstractTableModel {
+		
+		private static final long serialVersionUID = 1L;
+		
+		private List<VirtualPackage> packages;
+		
+		public PackageTable(List<VirtualPackage> packages) {
+			this.packages = packages;
+		}
+		
+		public String getColumnName(int col) {
+			return new String[] {"ID", "From", "To", "Status", "Assigned To"}[col];
+		}
+		
+		public int getColumnCount() {
+			return 5;
+		}
+
+		public int getRowCount() {
+			return packages.size();
+		}
+
+		@Override
+		public String getValueAt(int row, int col) {
+			switch (col) {
+			case 0:
+				return "" + row;
+				
+			case 1:
+				return "Airport " + packages.get(row).getFromAirport() + ", "
+								  + packages.get(row).getFromGate();
+			
+			case 2:
+				return "Airport " + packages.get(row).getToAirport() + ", "
+				  				  + packages.get(row).getToGate();
+			
+			case 3:
+				return packages.get(row).getStatus();
+			
+			case 4:
+				return "TODO";
+				
+			default:
+				return "";
+			}
+		}
+		
 	}
 }

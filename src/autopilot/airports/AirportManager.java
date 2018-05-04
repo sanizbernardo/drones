@@ -82,6 +82,7 @@ public class AirportManager implements AutopilotModule{
     public AutopilotOutputs completeTimeHasPassed(int drone) {
         if (drone ==  droneList.size() - 1)
         	gui.updateOutputs();
+        	
     	if (gui.manualControl(drone))
         	return gui.getOutputs();
         else
@@ -90,7 +91,12 @@ public class AirportManager implements AutopilotModule{
 
     @Override
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
-        VirtualDrone drone = chooseBestDrone();
+        VirtualPackage pack = new VirtualPackage(fromAirport, fromGate, toAirport, toGate);
+    	packagelist.add(pack);
+    	pack.setStatus("Waiting");
+    	
+    	VirtualDrone drone = chooseBestDrone();
+    	
         VirtualAirport currentAirport = airportlist.stream()
         		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
         		                                   .collect(Collectors.toList()).get(0);
@@ -109,6 +115,7 @@ public class AirportManager implements AutopilotModule{
             		                                dispatchHeight);
         }
         
+        pack.setStatus("In progress");
         drone.setActive(true);
     }
     

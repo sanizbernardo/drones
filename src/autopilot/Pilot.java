@@ -186,4 +186,10 @@ public class Pilot {
 		
 		return Float.NaN;
 	}
+
+	public String getTask() {
+		if (this.tasks == null || this.index >= this.tasks.length) 
+			return "Idle";
+		return currentPilot().taskName();
+	}
 }

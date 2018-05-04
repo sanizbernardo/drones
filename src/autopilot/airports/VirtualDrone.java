@@ -43,7 +43,9 @@ public class VirtualDrone {
         return active;
     }
 
-
+    public String getTask() {
+    	return this.pilot.getTask();
+    }
 
     public void setPosition(Vector3f position) {
         this.position = position;
@@ -68,9 +70,6 @@ public class VirtualDrone {
     public void setInputs(AutopilotInputs inputs) {
         this.position = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
         this.heading = inputs.getHeading();
-        if (getPackage() != null) {
-            getPackage().setPosition(this.position);
-        }
 
         this.currentinputs = inputs;
     }
