@@ -246,10 +246,10 @@ public class TestbedGui extends JFrame {
 				return row;
 				
 			case 1:
-				return "Airport " + packages.get(row).getFromAirport() + ", Gate " + packages.get(row).getFromGate();
+				return "Airport " + packages.get(row).getFromAirport() + ", gate " + packages.get(row).getFromGate();
 				
 			case 2:
-				return "Airport " + packages.get(row).getDestAirport() + ", Gate " + packages.get(row).getDestGate();
+				return "Airport " + packages.get(row).getDestAirport() + ", gate " + packages.get(row).getDestGate();
 			
 			case 3:
 				return packages.get(row).getStatusDesc();

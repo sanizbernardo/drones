@@ -22,14 +22,12 @@ public class AirportManager implements AutopilotModule{
 
     private List<VirtualAirport> airportlist;
     private List<VirtualDrone> droneList;
-    private List<VirtualPackage> packagelist;
     
     private AutopilotGUI gui;
 	
     public AirportManager() {
         airportlist = new ArrayList<>();
         droneList = new ArrayList<>();
-        packagelist = new ArrayList<>();
     }
 
     private enum Loc {
@@ -92,11 +90,10 @@ public class AirportManager implements AutopilotModule{
     @Override
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
         VirtualPackage pack = new VirtualPackage(fromAirport, fromGate, toAirport, toGate);
-    	packagelist.add(pack);
-    	pack.setStatus("Waiting");
+    	gui.addPackage(pack);
     	
     	VirtualDrone drone = chooseBestDrone();
-    	
+    	pack.assignDrone(drone);
         VirtualAirport currentAirport = airportlist.stream()
         		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
         		                                   .collect(Collectors.toList()).get(0);
@@ -115,7 +112,6 @@ public class AirportManager implements AutopilotModule{
             		                                dispatchHeight);
         }
         
-        pack.setStatus("In progress");
         drone.setActive(true);
     }
     

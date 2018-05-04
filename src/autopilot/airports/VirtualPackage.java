@@ -7,6 +7,7 @@ public class VirtualPackage {
 	
 	private String status;
 	
+	private VirtualDrone assignedDrone;
 	
     public VirtualPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
     	this.fromAirport = fromAirport;
@@ -37,7 +38,15 @@ public class VirtualPackage {
 	}
 	
 	public String getStatus() {
-		return this.status;
+		return status;
+	}
+	
+	public void assignDrone(VirtualDrone drone) {
+		this.assignedDrone = drone;
+	}
+	
+	public VirtualDrone getAssignedDrone() {
+		return assignedDrone;
 	}
 
 }
