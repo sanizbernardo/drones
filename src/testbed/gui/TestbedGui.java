@@ -332,13 +332,17 @@ public class TestbedGui extends JFrame {
 			g2.setColor(Color.BLUE);
 			g2.setStroke(new BasicStroke(1));
 			
+			int i = 0;
 			for (Vector3f port: this.airports) {
 				int x = (int) (size.width/2 + port.x/this.maxX * size.width/2),
 					y = (int) (size.height/2 + port.z/this.maxY * size.height/2);
 				
 				g2.fillRect(x-6, y-6, 12, 12);
+				g2.drawString("A" + i, x-7, y-6);
+				i++;
 			}
 			
+			i = 0;
 			for (int drone: helper.droneIds.values()) {
 				if (drone == activeDrone) 
 					g2.setColor(Color.GREEN);
@@ -350,6 +354,8 @@ public class TestbedGui extends JFrame {
 					y = (int) (size.height/2 + pos.z/this.maxY * size.height/2);
 					
 				g2.fillRect(x-3, y-3, 6, 6);
+				g2.drawString("D"+i, x+3, y+5);
+				i++;
 			}
 		}
 	}
