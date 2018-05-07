@@ -36,7 +36,15 @@ public class AirportManager implements AutopilotModule{
     	GATE_0, GATE_1, LANE_0, LANE_1;
     }
     
-    public VirtualDrone chooseBestDrone() {
+    public VirtualDrone chooseBestDrone(int airport) {
+    	//choose a drone that is not active AND is on the same gate/airport
+        for (VirtualDrone drone : droneList) {
+        	System.out.println(Pilot.onAirport(drone.getPosition(), airportlist.get(airport)));
+            if (!drone.isActive() && Pilot.onAirport(drone.getPosition(), airportlist.get(airport)))
+                return drone;
+        }
+    	
+    	//if we can't find a drone that is already on that airport, pick a random non-active one
         for (VirtualDrone drone : droneList) {
             if (!drone.isActive())
                 return drone;
@@ -90,7 +98,7 @@ public class AirportManager implements AutopilotModule{
 
     @Override
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
-        VirtualDrone drone = chooseBestDrone();
+        VirtualDrone drone = chooseBestDrone(fromAirport);
         VirtualAirport currentAirport = airportlist.stream()
         		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
         		                                   .collect(Collectors.toList()).get(0);
