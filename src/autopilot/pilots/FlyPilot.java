@@ -297,7 +297,6 @@ public class FlyPilot extends PilotPart {
 	}  
 	
 	private void turnSoftRight(AutopilotInputs input) {
-		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk");
 		rollPID.adjustRoll(input, FloatMath.toRadians(-10), State.Right);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));

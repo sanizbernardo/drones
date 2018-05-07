@@ -59,9 +59,7 @@ public class Pilot {
 		}
 		
 		AutopilotOutputs output = currentPilot().timePassed(inputs);
-		
-		System.out.println(index);
-		
+				
 		if (currentPilot().ended()) {
 			currentPilot().close();
 			this.pilots[state()] = null;
