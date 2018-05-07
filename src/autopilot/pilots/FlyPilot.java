@@ -23,7 +23,7 @@ public class FlyPilot extends PilotPart {
 
 	private VirtualAirport currentDestionationAirport;
 	
-	public static enum State{Left, Right, Stable, Up, Down, StrongUp, StrongDown, SlowDown};
+	public static enum State{Left, SoftLeft, VerySoftLeft, Right, SoftRight, VerySoftRight, Stable, Up, Down, StrongUp, StrongDown, SlowDown};
 	private State currentState;
 	
 	private float climbAngle;
@@ -128,12 +128,24 @@ public class FlyPilot extends PilotPart {
 			//Vector3f diff = getCurrentCube().sub(pos, new Vector3f());
 			float targetHeading = makeNormal(getTargetHeading(inputs));
 			Boolean side = null;
+			Boolean sideSmall = null;
+			Boolean sideVerySmall = null;
 			// null: nee, true: links, false: rechts
 			Vector3f result = new Vector3f(FloatMath.cos(inputs.getHeading()),0,-FloatMath.sin(inputs.getHeading())).cross(new Vector3f(FloatMath.cos(targetHeading),0,-FloatMath.sin(targetHeading)), new Vector3f());
-			if (result.normalize().y >= 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(2f))
+			if (result.normalize().y >= 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(8f))
 				side = true;
-			else if (result.normalize().y < 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(2f)) {;
+			else if (result.normalize().y < 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(8f)) {;
 				side = false;
+			}
+			if (result.normalize().y >= 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(5f))
+				sideSmall = true;
+			else if (result.normalize().y < 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(5f)) {;
+				sideSmall = false;
+			}
+			if (result.normalize().y >= 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(2f))
+				sideVerySmall = true;
+			else if (result.normalize().y < 0 && Math.abs(targetHeading - inputs.getHeading()) > FloatMath.toRadians(2f)) {;
+				sideVerySmall = false;
 			}
 			
 			// bocht haalbaar?
@@ -143,7 +155,13 @@ public class FlyPilot extends PilotPart {
 //				} else
 //				// bocht niet haalbaar, rechtdoor gaan. 
 //				setCurrentState(State.Stable);
-			} else {
+			}
+			else if(side == null && sideSmall != null){
+				setCurrentState(sideSmall? State.SoftLeft: State.SoftRight);
+			}else if(sideSmall == null && sideVerySmall != null){
+				setCurrentState(sideVerySmall? State.VerySoftLeft: State.VerySoftRight);
+			}
+			else {
 				setCurrentState(State.Stable);
 			}
 		}
@@ -194,6 +212,18 @@ public class FlyPilot extends PilotPart {
 				break;
 			case Right:
 				turnRight(input);
+				break;
+			case SoftLeft:
+				turnSoftLeft(input);
+				break;
+			case VerySoftLeft:
+				turnVerySoftLeft(input);
+				break;
+			case SoftRight:
+				turnSoftRight(input);
+				break;	
+			case VerySoftRight:
+				turnVerySoftRight(input);
 				break;
 			case SlowDown:
 				slowDown(input);
@@ -265,6 +295,34 @@ public class FlyPilot extends PilotPart {
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}  
+	
+	private void turnSoftRight(AutopilotInputs input) {
+		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk");
+		rollPID.adjustRoll(input, FloatMath.toRadians(-10), State.Right);
+		thrustPID.adjustThrustUp(input, 0.37f);
+		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
+	}
+	
+	private void turnSoftLeft(AutopilotInputs input) {
+		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk2");
+		rollPID.adjustRoll(input, FloatMath.toRadians(10), State.Left);
+		thrustPID.adjustThrustUp(input, 0.37f);
+		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
+	}
+	
+	private void turnVerySoftRight(AutopilotInputs input) {
+		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk");
+		rollPID.adjustRoll(input, FloatMath.toRadians(-4), State.Right);
+		thrustPID.adjustThrustUp(input, 0.37f);
+		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
+	}
+	
+	private void turnVerySoftLeft(AutopilotInputs input) {
+		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk2");
+		rollPID.adjustRoll(input, FloatMath.toRadians(4), State.Left);
+		thrustPID.adjustThrustUp(input, 0.37f);
+		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
+	}
 
 	
 	public Vector3f horProjVel(AutopilotInputs inputs) {
