@@ -12,7 +12,7 @@ public class VirtualDrone {
         this.position = position;
         this.heading = heading;
         this.config = config;
-        this.pilot = new Pilot();
+        this.pilot = new Pilot(this);
         pilot.simulationStarted(config, null);
     }
 
