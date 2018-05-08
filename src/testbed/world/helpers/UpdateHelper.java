@@ -253,7 +253,7 @@ public class UpdateHelper {
 		Package newPackage = new Package(details);
 		Gate fromGate = new Gate(newPackage, true);
 		
-		if (!fromPackages.containsKey(fromGate)) {
+		if (!fromPackages.containsKey(fromGate) && newPackage.getFromAirport() != newPackage.getDestAirport()) {
 			fromPackages.put(fromGate, newPackage);
 			packages.add(newPackage);
 			
