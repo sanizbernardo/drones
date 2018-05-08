@@ -9,12 +9,9 @@ import autopilot.gui.AutopilotGUI;
 import utils.FloatMath;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AirportManager implements AutopilotModule{
@@ -25,18 +22,13 @@ public class AirportManager implements AutopilotModule{
 
     private List<VirtualAirport> airportlist;
     private List<VirtualDrone> droneList;
-    private List<VirtualPackage> packagelist;
-    private Set<Integer> airSlices;
     private Queue<TransportEvent> transportQueue;
     
     private AutopilotGUI gui;
-    private int droneAmount = 0;
 	
     public AirportManager() {
         airportlist = new ArrayList<>();
         droneList = new ArrayList<>();
-        packagelist = new ArrayList<>();
-        airSlices = new HashSet<>();
         transportQueue = new LinkedList<TransportEvent>();
     }
 
@@ -63,10 +55,7 @@ public class AirportManager implements AutopilotModule{
         Vector3f position = chosen.getGate(gate);
         float heading = chosen.getHeading();
         heading += (pointingToRunway == 0? 0: FloatMath.PI * (heading > 0? -1: 1));
-        
-        airSlices.add(MIN_HEIGHT + droneAmount * 10);
-        droneAmount++;
-        
+                
         droneList.add(new VirtualDrone(position, heading, config));
         
         if (droneList.size() == 1) {
@@ -110,25 +99,14 @@ public class AirportManager implements AutopilotModule{
 			VirtualAirport currentAirport = airportlist.stream()
 			 		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
 			 		                                   .collect(Collectors.toList()).get(0);
-	
-			
-			//reset all slices
-			for(VirtualDrone vDrone : droneList)  {
-				int indivSlice = (droneList.indexOf(vDrone)*10)+MIN_HEIGHT;
-			 	if(!vDrone.isActive() && !airSlices.contains(indivSlice)) {
-			 		airSlices.add(indivSlice);
-			 	}
-			}
+
 			//get a slice from the set
-			int currentSlice = airSlices.iterator().next(); 
+			int currentSlice = (droneList.indexOf(drone)*10)+MIN_HEIGHT; 
 			
 			// when a drone has a pilot, it is considered active
 			drone.setPilot(new Pilot(drone));
 			drone.getPilot().simulationStarted(drone.getConfig(), drone.getInputs());	
 			
-			//make sure no other airplane will take it
-			airSlices.remove(currentSlice); 
-			 
 			if(onAirport(drone.getPosition(), currentAirport) == Loc.GATE_0) {
 			     drone.getPilot().fly(drone.getInputs(), currentAirport, 0, 
 			     		                                airportlist.get(event.getFromAirport()), event.getFromGate(), 

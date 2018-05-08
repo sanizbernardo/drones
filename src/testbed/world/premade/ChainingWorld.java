@@ -35,7 +35,7 @@ public class ChainingWorld extends World{
 	public void setupWorld() {
 		this.ground = new Ground(50);
 		
-		this.generator = PackageGenerators.random(0.005f, 2);
+		this.generator = null;
 	}
 
 	@Override
