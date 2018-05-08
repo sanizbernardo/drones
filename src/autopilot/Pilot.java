@@ -3,6 +3,7 @@ package autopilot;
 import org.joml.Vector3f;
 
 import autopilot.airports.VirtualAirport;
+import autopilot.airports.VirtualDrone;
 import autopilot.pilots.FlyPilot;
 import autopilot.pilots.HandbrakePilot;
 import autopilot.pilots.LandingPilot;
@@ -15,7 +16,7 @@ import utils.FloatMath;
 import utils.Utils;
 
 public class Pilot {
-	
+		
 	public static final int TAKING_OFF = 0, 
 							 LANDING = 1,
 							 FLYING = 2,
@@ -36,10 +37,13 @@ public class Pilot {
 	private PilotPart[] pilots;
 	
 	private AutopilotConfig config;
+	
+	private VirtualDrone vDrone;
 		
-	public Pilot() {
+	public Pilot(VirtualDrone vDrone) {
 		this.tasks = new int[] {};
-		this.pilots = new PilotPart[12];
+		this.pilots = new PilotPart[13];
+		this.vDrone = vDrone;
 	}
 	
 	public void simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
@@ -55,6 +59,7 @@ public class Pilot {
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
 		
 		if (this.index >= this.tasks.length) {
+			vDrone.setPilot(null);
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 		}
 		
@@ -62,8 +67,15 @@ public class Pilot {
 		
 		if (currentPilot().ended()) {
 			currentPilot().close();
-			this.pilots[state()] = null;
 			
+			if (state() == HANDBRAKE || state() == HANDBRAKE_2)
+				vDrone.nextTarget();		
+			if (state() == TAXIING_2) 
+				vDrone.pickUp();
+			if ((state() == PICKUP_TAXI && pilots[PICKUP_TAXI_2] == null) || state() == PICKUP_TAXI_2)
+				vDrone.deliver();
+			
+			this.pilots[state()] = null;
 			this.index ++;
 		}
 		
@@ -75,15 +87,18 @@ public class Pilot {
 			                                VirtualAirport toAirport, int toGate,
 			                                int flyHeight) {
 		
-		if(config == null) throw new RuntimeException("Access before sim started");
 		this.index = 0;
-
+		
 		Vector3f pos = new Vector3f(inputs.getX(),inputs.getY(),inputs.getZ());
 		
 		if(onAirport(pos, fromAirport)) {
 			flyLocal(fromAirport, fromGate, toAirport, toGate, flyHeight);
+			vDrone.setTargets(toAirport, null);
+			vDrone.pickUp();
 		} else {
 			flyRemote(currentAirport, currentGate, fromAirport, fromGate, toAirport, toGate, flyHeight);
+			vDrone.setTargets(fromAirport, toAirport);
+			vDrone.getPackage().setStatus("Awaiting pickup");
 		}
 	}
 	

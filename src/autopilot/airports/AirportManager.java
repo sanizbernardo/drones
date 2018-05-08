@@ -9,37 +9,36 @@ import autopilot.gui.AutopilotGUI;
 import utils.FloatMath;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collector;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AirportManager implements AutopilotModule{
 
     private float length;
     private float width;
+    private int MIN_HEIGHT = 50;
 
     private List<VirtualAirport> airportlist;
     private List<VirtualDrone> droneList;
+    private Set<Integer> airSlices;
+    private Queue<VirtualPackage> transportQueue;
     
     private AutopilotGUI gui;
+    private int droneAmount = 0;
 	
     public AirportManager() {
         airportlist = new ArrayList<>();
         droneList = new ArrayList<>();
+        airSlices = new HashSet<>();
+        transportQueue = new PriorityQueue<VirtualPackage>();
     }
 
     private enum Loc {
     	GATE_0, GATE_1, LANE_0, LANE_1;
-    }
-    
-    public VirtualDrone chooseBestDrone() {
-        for (VirtualDrone drone : droneList) {
-            if (!drone.isActive())
-                return drone;
-        }
-        return null;
     }
 
     @Override
@@ -52,7 +51,7 @@ public class AirportManager implements AutopilotModule{
     public void defineAirport(float centerX, float centerZ, float centerToRunway0X, float centerToRunway0Z) {
         Vector3f position = new Vector3f(centerX, 0, centerZ);
         float heading = FloatMath.atan2(-centerToRunway0X, -centerToRunway0Z);
-        airportlist.add(new VirtualAirport(position, heading, width));
+        airportlist.add(new VirtualAirport(airportlist.size(), position, heading, width));
     }
 
     @Override
@@ -61,8 +60,12 @@ public class AirportManager implements AutopilotModule{
         Vector3f position = chosen.getGate(gate);
         float heading = chosen.getHeading();
         heading += (pointingToRunway == 0? 0: FloatMath.PI * (heading > 0? -1: 1));
-
+        
+        airSlices.add(MIN_HEIGHT + droneAmount * 10);
+        droneAmount++;
+        
         droneList.add(new VirtualDrone(position, heading, config));
+        
         if (droneList.size() == 1) {
         	gui = new AutopilotGUI(droneList);
         	gui.showGUI();
@@ -74,6 +77,7 @@ public class AirportManager implements AutopilotModule{
     public void startTimeHasPassed(int drone, AutopilotInputs inputs) {
         droneList.get(drone).setInputs(inputs);
         droneList.get(drone).calcOutputs();
+        handleTransportEvents();
     }
 
     @Override
@@ -89,30 +93,68 @@ public class AirportManager implements AutopilotModule{
 
     @Override
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
-        VirtualPackage pack = new VirtualPackage(fromAirport, fromGate, toAirport, toGate);
+    	VirtualPackage pack = new VirtualPackage(fromAirport, fromGate, toAirport, toGate);
+    	pack.setStatus("In queue");
     	gui.addPackage(pack);
-    	
-    	VirtualDrone drone = chooseBestDrone();
-    	pack.assignDrone(drone);
-        VirtualAirport currentAirport = airportlist.stream()
-        		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
-        		                                   .collect(Collectors.toList()).get(0);
-        
-        int dispatchHeight = 50;
-        
-        if(onAirport(drone.getPosition(), currentAirport) == Loc.GATE_0) {
-            drone.getPilot().fly(drone.getInputs(), currentAirport, 0, 
-            		                                airportlist.get(fromAirport), fromGate, 
-            		                                airportlist.get(toAirport), toGate,
-            		                                dispatchHeight);
-        } else {
-            drone.getPilot().fly(drone.getInputs(), currentAirport, 1, 
-            		                                airportlist.get(fromAirport), fromGate, 
-            		                                airportlist.get(toAirport), toGate,
-            		                                dispatchHeight);
+    	transportQueue.add(pack);
+    }
+    
+    private void handleTransportEvents() {
+    	if(!transportQueue.isEmpty()) {
+    		VirtualPackage pack = transportQueue.poll();
+	    	VirtualDrone drone = chooseBestDrone(pack.getFromAirport());
+	    	if(drone == null) return;
+	    	pack.assignDrone(drone);
+	    	drone.setPackage(pack);
+			VirtualAirport currentAirport = airportlist.stream()
+			 		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
+			 		                                   .collect(Collectors.toList()).get(0);
+			
+			Pilot illegaal = new Pilot(drone);
+			illegaal.simulationStarted(drone.getConfig(), drone.getInputs());
+			drone.setPilot(illegaal);
+			
+			//get a slice from the set
+			int currentSlice = airSlices.iterator().next(); 
+			//reset all slices
+			for(VirtualDrone vDrone : droneList)  {
+				int indivSlice = (droneList.indexOf(vDrone)*10)+MIN_HEIGHT;
+			 	if(!vDrone.isActive() && !airSlices.contains(indivSlice)) {
+			 		airSlices.add(indivSlice);
+			 	}
+			}
+			//make sure no other airplane will take it
+			airSlices.remove(currentSlice); 
+			 
+			if(onAirport(drone.getPosition(), currentAirport) == Loc.GATE_0) {
+			     drone.getPilot().fly(drone.getInputs(), currentAirport, 0, 
+			     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
+			     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
+			     		                                currentSlice);
+		    } else {
+			     drone.getPilot().fly(drone.getInputs(), currentAirport, 1, 
+			     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
+			     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
+			     		                                currentSlice);
+			 }
+			 
+    	}
+    }
+    
+    public VirtualDrone chooseBestDrone(int airport) {
+    	//choose a drone that is not active AND is on the same gate/airport
+        for (VirtualDrone drone : droneList) {
+        	System.out.println(Pilot.onAirport(drone.getPosition(), airportlist.get(airport)));
+            if (!drone.isActive() && Pilot.onAirport(drone.getPosition(), airportlist.get(airport)))
+                return drone;
         }
-        
-        drone.setActive(true);
+    	
+    	//if we can't find a drone that is already on that airport, pick a random non-active one
+        for (VirtualDrone drone : droneList) {
+            if (!drone.isActive())
+                return drone;
+        }
+        return null;
     }
     
 	private Loc onAirport(Vector3f pos, VirtualAirport airport) {
@@ -137,4 +179,5 @@ public class AirportManager implements AutopilotModule{
         }
         gui.dispose();
     }
+   
 }

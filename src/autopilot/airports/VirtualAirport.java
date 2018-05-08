@@ -6,8 +6,9 @@ import utils.FloatMath;
 
 public class VirtualAirport {
 
-    public VirtualAirport(Vector3f position, float heading, float width) {
-        this.position = position;
+    public VirtualAirport(int id, Vector3f position, float heading, float width) {
+        this.id = id;
+    	this.position = position;
         this.heading = heading;
         this.width = width;
 
@@ -26,8 +27,12 @@ public class VirtualAirport {
     private Vector3f position;
     private Vector3f[] tarmacs, gates;
     private float width;
-    private float heading;  
+    private float heading;
+    private int id;
 
+    public int getId() {
+    	return this.id;
+    }
 
     public Vector3f getTarmac(int i) {
         return tarmacs[i];

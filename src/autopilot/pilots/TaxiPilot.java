@@ -19,6 +19,7 @@ public class TaxiPilot extends PilotPart {
 
 	private MiniPID thrustPID;
 
+	private boolean firstCheck;
 	private boolean goalReached;
 	private boolean ended;
 
@@ -34,6 +35,7 @@ public class TaxiPilot extends PilotPart {
 		targetPos = new Vector3f(0,0,0);
 		finalHeading = 0;
 
+		this.firstCheck = true;
 		this.goalReached = false;
 		this.ended = false;
 	}
@@ -43,6 +45,7 @@ public class TaxiPilot extends PilotPart {
 		this.targetPos = targetPos;
 		this.finalHeading = heading;
 
+		this.firstCheck = true;
 		this.goalReached = false;
 		this.ended = false;
 	}
@@ -93,6 +96,16 @@ public class TaxiPilot extends PilotPart {
 		}
 		thrustPID.setSetpoint(taxispeed);
 
+		if (firstCheck) {
+			if (distance <= 12.5) {
+				goalReached = true;
+			}
+			firstCheck = false;
+		}
+		if (distance < 3){
+			goalReached = true;
+		}
+
 		float targetHeading;
 		if (goalReached) {
 			targetHeading = finalHeading;
@@ -100,10 +113,20 @@ public class TaxiPilot extends PilotPart {
 			targetHeading = toGoal;
 		}
 
+		//System.out.println("Goal reached: " + goalReached);
+		//System.out.println("Final: " + finalHeading);
+		//System.out.println("Target: " + targetHeading);
+		//System.out.println("Current: " + heading);
+		//System.out.println("Distance: " + distance);
+
 		float thrust = 0, fBrake = 0, lBrake = 0, rBrake = 0;
 
-		if (Math.abs(targetHeading - input.getHeading()) > FloatMath.toRadians(0.75f)) {
+		float headingerror = Math.abs(targetHeading - heading);
+		if (headingerror > FloatMath.toRadians(0.75f) ) {
 			Boolean side = checkTurn(targetHeading, input);
+			if (headingerror == FloatMath.PI) {
+				side = true;
+			}
 			if (side != null) {
 				thrust = 70f;
 				if (side) {
@@ -118,7 +141,7 @@ public class TaxiPilot extends PilotPart {
 			lBrake = maxBrakeForce;
 			rBrake = maxBrakeForce;
 
-		} else if (distance > 10 && !goalReached) {
+		} else if (!goalReached) {
 			if (speed <= taxispeed) {
 				thrust = (float)thrustPID.getOutput(speed);
 			} else {
@@ -128,12 +151,8 @@ public class TaxiPilot extends PilotPart {
 			}
 
 		} else {
-			if (!goalReached) {
-				goalReached = true;
-				System.out.println("GoalReached");
-			} else {
-				ended = true;
-			}
+			System.out.println("Goal reached");
+			ended = true;
 		}
 
 		this.time = input.getElapsedTime();

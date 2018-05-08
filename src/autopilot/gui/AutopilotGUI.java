@@ -17,6 +17,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import autopilot.airports.VirtualAirport;
 import autopilot.airports.VirtualDrone;
 import autopilot.airports.VirtualPackage;
 import interfaces.AutopilotConfig;
@@ -101,10 +103,6 @@ public class AutopilotGUI extends JFrame {
 		setVisible(true);
 	}
 	
-	public void setTask(String task) {
-		droneUI.setTask(task);
-	}
-	
 	public boolean manualControl(int droneId) {
 		return droneUI.getManual(droneId);
 	}
@@ -114,16 +112,15 @@ public class AutopilotGUI extends JFrame {
 	}
 	
 	public void updateDrones() {
-		droneTable.fireTableDataChanged();;
+		droneTable.fireTableDataChanged();
 	}
 	
 	public void updateOutputs() {
 		droneUI.updateOutputs();
+		droneUI.setTask(droneTable.drones.get(droneUI.selectedDrone).getTask());
 		
-		for (int i = 0; i < droneTable.getRowCount(); i++) {
-			droneTable.fireTableCellUpdated(i, 2);
-			droneTable.fireTableCellUpdated(i, 3);
-		}
+		droneTable.fireTableRowsUpdated(0, droneTable.getRowCount()-1);
+		packageTable.fireTableDataChanged();
 	}
 	
 	public void addPackage(VirtualPackage pack) {
@@ -175,11 +172,12 @@ public class AutopilotGUI extends JFrame {
 				return drones.get(row).getTask();
 			
 			case 4:
-				return "TODO";
+				VirtualAirport port = drones.get(row).getTarget();
+				return port == null ? "None": "Airport " + port.getId();
 
 			case 5:
 				VirtualPackage pack = drones.get(row).getPackage();
-				return pack == null? "None": "" + packageTable.packages.indexOf(pack);
+				return drones.get(row).pickedUp() ? "" + packageTable.packages.indexOf(pack): "None";
 				
 			default:
 				return "";
@@ -235,6 +233,5 @@ public class AutopilotGUI extends JFrame {
 				return "";
 			}
 		}
-		
 	}
 }

@@ -132,7 +132,7 @@ public class TestbedGui extends JFrame {
 		AddPackage addBtn = new AddPackage(airports.size(), world);
 		contentPane.add(addBtn.panel);
 				
-		minimap = new MiniMap(2000, 2000, helper, airports);
+		minimap = new MiniMap(3000, 3000, helper, airports);
 		minimap.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3));
 		contentPane.add(minimap);
 	}

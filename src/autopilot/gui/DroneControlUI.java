@@ -31,7 +31,7 @@ public class DroneControlUI {
 
 	private List<VirtualDrone> drones;
 	
-	private int selectedDrone;
+	int selectedDrone;
 	
 	private boolean manual;
 	
