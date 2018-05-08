@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,9 +24,8 @@ public class AirportManager implements AutopilotModule{
 
     private List<VirtualAirport> airportlist;
     private List<VirtualDrone> droneList;
-    private List<VirtualPackage> packagelist;
     private Set<Integer> airSlices;
-    private Queue<TransportEvent> transportQueue;
+    private Queue<VirtualPackage> transportQueue;
     
     private AutopilotGUI gui;
     private int droneAmount = 0;
@@ -35,9 +33,8 @@ public class AirportManager implements AutopilotModule{
     public AirportManager() {
         airportlist = new ArrayList<>();
         droneList = new ArrayList<>();
-        packagelist = new ArrayList<>();
         airSlices = new HashSet<>();
-        transportQueue = new LinkedList<TransportEvent>();
+        transportQueue = new LinkedList<VirtualPackage>();
     }
 
     private enum Loc {
@@ -54,7 +51,8 @@ public class AirportManager implements AutopilotModule{
     public void defineAirport(float centerX, float centerZ, float centerToRunway0X, float centerToRunway0Z) {
         Vector3f position = new Vector3f(centerX, 0, centerZ);
         float heading = FloatMath.atan2(-centerToRunway0X, -centerToRunway0Z);
-        airportlist.add(new VirtualAirport(position, heading, width, length));
+
+        airportlist.add(new VirtualAirport(airportlist.size(), position, heading, width, length));
     }
 
     @Override
@@ -87,6 +85,7 @@ public class AirportManager implements AutopilotModule{
     public AutopilotOutputs completeTimeHasPassed(int drone) {
         if (drone ==  droneList.size() - 1)
         	gui.updateOutputs();
+        	
     	if (gui.manualControl(drone))
         	return gui.getOutputs();
         else
@@ -95,17 +94,21 @@ public class AirportManager implements AutopilotModule{
 
     @Override
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
-    	transportQueue.add(new TransportEvent(fromAirport, fromGate, toAirport, toGate));
+    	VirtualPackage pack = new VirtualPackage(fromAirport, fromGate, toAirport, toGate);
+    	pack.setStatus("In queue");
+    	gui.addPackage(pack);
+    	transportQueue.add(pack);
     }
     
     private void handleTransportEvents() {
     	if(!transportQueue.isEmpty()) {
-    		TransportEvent event = transportQueue.peek();
-	    	VirtualDrone drone = chooseBestDrone(event.getFromAirport());
-	    	
+    		VirtualPackage pack = transportQueue.peek();
+	    	VirtualDrone drone = chooseBestDrone(pack.getFromAirport());
 	    	if(drone == null) return;
 	    	
 	    	transportQueue.poll();
+	    	pack.assignDrone(drone);
+	    	drone.setPackage(pack);
 	    	
 			VirtualAirport currentAirport = airportlist.stream()
 			 		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
@@ -131,13 +134,13 @@ public class AirportManager implements AutopilotModule{
 			 
 			if(onAirport(drone.getPosition(), currentAirport) == Loc.GATE_0) {
 			     drone.getPilot().fly(drone.getInputs(), currentAirport, 0, 
-			     		                                airportlist.get(event.getFromAirport()), event.getFromGate(), 
-			     		                                airportlist.get(event.getToAirport()), event.getToGate(),
+			     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
+			     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
 			     		                                currentSlice);
 		    } else {
 			     drone.getPilot().fly(drone.getInputs(), currentAirport, 1, 
-			     		                                airportlist.get(event.getFromAirport()), event.getFromGate(), 
-			     		                                airportlist.get(event.getToAirport()), event.getToGate(),
+			     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
+			     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
 			     		                                currentSlice);
 			 }
 			 
