@@ -95,7 +95,7 @@ public class AirportManager implements AutopilotModule{
     private void handleTransportEvents() {
     	if(!transportQueue.isEmpty()) {
     		VirtualPackage pack = transportQueue.peek();
-	    	VirtualDrone drone = chooseBestDrone(pack.getFromAirport());
+	    	VirtualDrone drone = chooseBestDrone(pack.getFromAirport(), pack.getFromGate());
 	    	if(drone == null) return;
 	    	
 	    	transportQueue.poll();
@@ -113,7 +113,7 @@ public class AirportManager implements AutopilotModule{
 			drone.setPilot(new Pilot(drone));
 			drone.getPilot().simulationStarted(drone.getConfig(), drone.getInputs());	
 			
-			if(onAirport(drone.getPosition(), currentAirport) == Loc.GATE_0) {
+			if(whereOnAirport(drone.getPosition(), currentAirport) == Loc.GATE_0) {
 			     drone.getPilot().fly(drone.getInputs(), currentAirport, 0, 
 			     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
 			     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
@@ -128,8 +128,18 @@ public class AirportManager implements AutopilotModule{
     	}
     }
     
-    public VirtualDrone chooseBestDrone(int airport) {
-    	//choose a drone that is not active AND is on the same gate/airport
+    public VirtualDrone chooseBestDrone(int airport, int gate) {
+    	//choose a drone that is not active AND is on the same gate
+    	Loc gateLoc = (gate == 0) ? Loc.GATE_0 : Loc.GATE_1;
+        for (VirtualDrone drone : droneList) {
+            if (!drone.isActive() 
+            		&& Pilot.onAirport(drone.getPosition(), airportlist.get(airport)) 
+            		&& this.whereOnAirport(drone.getPosition(), airportlist.get(airport)) == gateLoc)
+                return drone;
+        }
+    	
+    	
+    	//choose a drone that is not active AND is on the same airport
         for (VirtualDrone drone : droneList) {
             if (!drone.isActive() && Pilot.onAirport(drone.getPosition(), airportlist.get(airport)))
                 return drone;
@@ -143,7 +153,7 @@ public class AirportManager implements AutopilotModule{
         return null;
     }
     
-	private Loc onAirport(Vector3f pos, VirtualAirport airport) {
+	private Loc whereOnAirport(Vector3f pos, VirtualAirport airport) {
 		Vector3f diff = pos.sub(airport.getPosition(), new Vector3f());
 		float len = diff.dot(new Vector3f(-FloatMath.sin(airport.getHeading()), 0, -FloatMath.cos(airport.getHeading())));
 		float wid = diff.dot(new Vector3f(-FloatMath.cos(airport.getHeading()), 0, FloatMath.sin(airport.getHeading())));
