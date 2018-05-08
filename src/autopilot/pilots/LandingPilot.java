@@ -97,8 +97,8 @@ public class LandingPilot extends PilotPart {
 		float airportHeading = currentDestionationAirport.getHeading();
 		
 		Vector3f center = currentDestionationAirport.getPosition();
-		Vector3f centerRight = auxLocPlusX(center, airportHeading, currentDestionationAirport.getWidth());
-		Vector3f centerLeft = auxLocPlusX(center, airportHeading, -currentDestionationAirport.getWidth());
+		Vector3f centerRight = auxLocPlusX(center, airportHeading, currentDestionationAirport.getWidth()*2/3);
+		Vector3f centerLeft = auxLocPlusX(center, airportHeading, -currentDestionationAirport.getWidth()*2/3);
 		Vector3f centerRightPlus = auxLocPlusMinZ(centerRight, airportHeading, 1);
 		Vector3f centerLeftPlus = auxLocPlusMinZ(centerLeft, airportHeading, 1);
 		
