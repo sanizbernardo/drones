@@ -151,7 +151,7 @@ public class TaxiPilot extends PilotPart {
 			}
 
 		} else {
-			System.out.println("Goal reached");
+			//System.out.println("Goal reached");
 			ended = true;
 		}
 
