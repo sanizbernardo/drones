@@ -4,6 +4,7 @@ import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
 import autopilot.PilotPart;
+import autopilot.airports.AirportManager;
 import autopilot.airports.VirtualAirport;
 import autopilot.pilots.FlyPilot.State;
 import autopilot.pilots.fly.pid.PitchPID;
@@ -49,9 +50,14 @@ public class FlyPilot extends PilotPart {
 	
 	boolean check = true;
 	
-	public FlyPilot(VirtualAirport destinationAirport, int fly_height) {
+	private AirportManager airportManager;
+	private int destinationGate;
+	
+	public FlyPilot(VirtualAirport destinationAirport, int fly_height, AirportManager airportManager, int destinationGate) {
 		this.currentDestionationAirport = destinationAirport;
 		this.fly_height = fly_height;
+		this.airportManager = airportManager;
+		this.destinationGate = destinationGate;
 	}
 	
 	
@@ -430,7 +436,13 @@ public class FlyPilot extends PilotPart {
 
 	private Vector3f pointBR;
 	
+	private float counter = -1;
+	private float prevHeading = -1;
+	
 	private float getTargetHeading(AutopilotInputs inputs){
+		System.out.println(counter);
+		counter -= Math.abs(prevHeading) - inputs.getHeading();
+		prevHeading = inputs.getHeading();
 		float[] pointBeforeRunway = {pointBR.x, pointBR.y, pointBR.z}; //TODO
 		float headingRunwayToPoint = currentDestionationAirport.getHeading(); //TODO: dit zou hetzelfde moeten zijn als centerToRunway0 of + 180� (centerToRunway1)
 		if(!part1Complete){
@@ -440,7 +452,10 @@ public class FlyPilot extends PilotPart {
 		else{
 			float heading = makeNormal(getTargetHeadingPart2(inputs, pointBeforeRunway, headingRunwayToPoint));
 			if(Math.abs(Math.toDegrees(inputs.getHeading() - heading)) < 3.3){
-				this.stableTime = 1.5f;
+				if(airportManager.checkAirport(this.currentDestionationAirport, destinationGate) && counter <= 0){
+					this.stableTime = 1.5f;					
+				}
+				counter = 10;
 			}
 			return heading;
 		}

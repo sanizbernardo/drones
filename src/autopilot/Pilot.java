@@ -13,7 +13,6 @@ import autopilot.pilots.TaxiPilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
-import testbed.Drone;
 import utils.FloatMath;
 import utils.Utils;
 
@@ -41,11 +40,14 @@ public class Pilot {
 	private AutopilotConfig config;
 	
 	private VirtualDrone vDrone;
+	
+	private AirportManager airportManager;
 		
-	public Pilot(VirtualDrone vDrone) {
+	public Pilot(VirtualDrone vDrone, AirportManager airportManager) {
 		this.tasks = new int[] {};
 		this.pilots = new PilotPart[13];
 		this.vDrone = vDrone;
+		this.airportManager = airportManager;
 	}
 	
 	public void simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
@@ -99,7 +101,7 @@ public class Pilot {
 		//first flight
 		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
 		this.pilots[LANDING] = new LandingPilot(fromAirport);
-		this.pilots[FLYING] = new FlyPilot(fromAirport, FLY_HEIGHT);
+		this.pilots[FLYING] = new FlyPilot(fromAirport, FLY_HEIGHT, this.airportManager, fromGate);
 		
 		this.pilots[TAXIING] = new TaxiPilot(currentAirport.getGate(currentGate), currentGate == 0 ? 
 											 currentAirport.getHeading() 
@@ -115,7 +117,7 @@ public class Pilot {
 		//second flight
 		this.pilots[TAKING_OFF_2] = new TakeOffPilot(FLY_HEIGHT);
 		this.pilots[LANDING_2] = new LandingPilot(toAirport);
-		this.pilots[FLYING_2] = new FlyPilot(toAirport, FLY_HEIGHT);
+		this.pilots[FLYING_2] = new FlyPilot(toAirport, FLY_HEIGHT, this.airportManager, toGate);
 		this.pilots[TAXIING_2] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
                                              fromAirport.getHeading() 
                                              : 
@@ -134,7 +136,7 @@ public class Pilot {
 			VirtualAirport toAirport, int toGate, int FLY_HEIGHT) {
 		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
 		this.pilots[LANDING] = new LandingPilot(toAirport);
-		this.pilots[FLYING] = new FlyPilot(toAirport, FLY_HEIGHT);
+		this.pilots[FLYING] = new FlyPilot(toAirport, FLY_HEIGHT, this.airportManager, toGate);
 		this.pilots[TAXIING] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
                                              fromAirport.getHeading() 
                                              : 
@@ -163,6 +165,7 @@ public class Pilot {
 		else return true;
 		
 	}
+	
 
 	
 	public void simulationEnded() {
@@ -178,7 +181,7 @@ public class Pilot {
 		return this.tasks[this.index];
 	}
 	
-	private PilotPart currentPilot() {
+	public PilotPart currentPilot() {
 		return this.pilots[state()];
 	}
 	

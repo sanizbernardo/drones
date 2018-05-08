@@ -6,6 +6,7 @@ import org.joml.Vector3f;
 
 import autopilot.Pilot;
 import autopilot.gui.AutopilotGUI;
+import autopilot.pilots.LandingPilot;
 import utils.FloatMath;
 
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class AirportManager implements AutopilotModule{
         airSlices.add(MIN_HEIGHT + droneAmount * 10);
         droneAmount++;
         
-        droneList.add(new VirtualDrone(position, heading, config));
+        droneList.add(new VirtualDrone(position, heading, config, this));
         
         if (droneList.size() == 1) {
         	gui = new AutopilotGUI(droneList);
@@ -123,7 +124,7 @@ public class AirportManager implements AutopilotModule{
 			int currentSlice = airSlices.iterator().next(); 
 			
 			// when a drone has a pilot, it is considered active
-			drone.setPilot(new Pilot(drone));
+			drone.setPilot(new Pilot(drone, this));
 			drone.getPilot().simulationStarted(drone.getConfig(), drone.getInputs());	
 			
 			//make sure no other airplane will take it
@@ -173,6 +174,38 @@ public class AirportManager implements AutopilotModule{
 			return Loc.GATE_0;
 		else
 			return Loc.GATE_1;
+	}
+	
+	public boolean onFullAirport(Vector3f pos, VirtualAirport airport) {
+		Vector3f diff = pos.sub(airport.getPosition(), new Vector3f());
+		float len = diff.dot(new Vector3f(-FloatMath.sin(airport.getHeading()), 0, -FloatMath.cos(airport.getHeading())));
+		float wid = diff.dot(new Vector3f(-FloatMath.cos(airport.getHeading()), 0, FloatMath.sin(airport.getHeading())));
+		
+		if (Math.abs(len) > airport.getWidth() / 2 + airport.getLength()) {	
+			return false;
+		} else if (Math.abs(wid) > airport.getWidth()) {
+			return false;
+		}
+		else return true;
+		
+	}
+	
+	public boolean checkAirport(VirtualAirport airport, int gate){
+		Loc loc;
+		if(gate == 0) loc = Loc.GATE_0;
+		else loc = Loc.GATE_1;
+		for(VirtualDrone drone : droneList){
+			Pilot dronePilot = drone.getPilot();
+			Vector3f dronePos = drone.getPosition();
+			if(onFullAirport(dronePos, airport) && (onAirport(dronePos, airport) == loc || onAirport(dronePos, airport) == Loc.LANE_0 || onAirport(dronePos, airport) == Loc.LANE_1)){
+				return false;
+			}
+			else if(dronePilot != null && dronePilot.currentPilot() instanceof LandingPilot && ((LandingPilot) dronePilot.currentPilot()).getCurrentDestionationAirport() == airport){
+				return false;
+			}
+			
+		}
+		return true;
 	}
 
     @Override

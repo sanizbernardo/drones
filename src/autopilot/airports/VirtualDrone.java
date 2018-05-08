@@ -8,11 +8,11 @@ import org.joml.Vector3f;
 
 public class VirtualDrone {
 
-    public VirtualDrone(Vector3f position, float heading, AutopilotConfig config) {
+    public VirtualDrone(Vector3f position, float heading, AutopilotConfig config, AirportManager airPortManager) {
         this.position = position;
         this.heading = heading;
         this.config = config;
-        this.pilot = new Pilot(this);
+        this.pilot = new Pilot(this, airPortManager);
         pilot.simulationStarted(config, null);
     }
 

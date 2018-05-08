@@ -201,6 +201,10 @@ public class LandingPilot extends PilotPart {
 		return ret;
 	}
 	
+	public VirtualAirport getCurrentDestionationAirport() {
+		return currentDestionationAirport;
+	}
+
 	private boolean onAirport(Vector3f pos, VirtualAirport airport) {
 		Vector3f diff = pos.sub(airport.getPosition(), new Vector3f());
 		float len = diff.dot(new Vector3f(-FloatMath.sin(airport.getHeading()), 0, -FloatMath.cos(airport.getHeading())));
