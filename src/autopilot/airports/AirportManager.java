@@ -106,6 +106,10 @@ public class AirportManager implements AutopilotModule{
 			 		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
 			 		                                   .collect(Collectors.toList()).get(0);
 			
+			Pilot illegaal = new Pilot(drone);
+			illegaal.simulationStarted(drone.getConfig(), drone.getInputs());
+			drone.setPilot(illegaal);
+			
 			//get a slice from the set
 			int currentSlice = airSlices.iterator().next(); 
 			//reset all slices
@@ -130,7 +134,6 @@ public class AirportManager implements AutopilotModule{
 			     		                                currentSlice);
 			 }
 			 
-			 drone.setActive(true);
     	}
     }
     

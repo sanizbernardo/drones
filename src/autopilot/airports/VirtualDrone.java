@@ -24,7 +24,6 @@ public class VirtualDrone {
     private AutopilotInputs currentinputs;
     private AutopilotOutputs currentoutputs;
 
-    private boolean active;
     private VirtualPackage vpackage;
 
     public Vector3f getPosition() {
@@ -40,7 +39,7 @@ public class VirtualDrone {
     }
 
     public boolean isActive() {
-        return active;
+        return this.pilot != null;
     }
 
 
@@ -84,15 +83,17 @@ public class VirtualDrone {
     }
 
     public void calcOutputs() {
-        setOutputs(pilot.timePassed(getInputs()));
+    	if(pilot != null) {
+            setOutputs(pilot.timePassed(getInputs()));
+    	}
     }
 
     public void setPackage(VirtualPackage vpackage){
         this.vpackage = vpackage;
     }
-
-    public void setActive(boolean x) {
-        this.active = x;
+    
+    public void setPilot(Pilot pilot) {
+    	this.pilot = pilot;
     }
 
     public void endSimulation() {

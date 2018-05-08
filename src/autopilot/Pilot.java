@@ -61,6 +61,7 @@ public class Pilot {
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
 		
 		if (this.index >= this.tasks.length) {
+			vDrone.setPilot(null);
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 		}
 		
@@ -81,7 +82,6 @@ public class Pilot {
 			                                VirtualAirport toAirport, int toGate,
 			                                int flyHeight) {
 		
-		if(config == null) throw new RuntimeException("Access before sim started");
 		this.index = 0;
 
 		Vector3f pos = new Vector3f(inputs.getX(),inputs.getY(),inputs.getZ());
