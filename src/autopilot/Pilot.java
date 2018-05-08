@@ -67,8 +67,15 @@ public class Pilot {
 		
 		if (currentPilot().ended()) {
 			currentPilot().close();
-			this.pilots[state()] = null;
 			
+			if (state() == HANDBRAKE || state() == HANDBRAKE_2)
+				vDrone.nextTarget();		
+			if (state() == TAXIING_2) 
+				vDrone.pickUp();
+			if ((state() == PICKUP_TAXI && pilots[PICKUP_TAXI_2] == null) || state() == PICKUP_TAXI_2)
+				vDrone.deliver();
+			
+			this.pilots[state()] = null;
 			this.index ++;
 		}
 		
@@ -81,13 +88,17 @@ public class Pilot {
 			                                int flyHeight) {
 		
 		this.index = 0;
-
+		
 		Vector3f pos = new Vector3f(inputs.getX(),inputs.getY(),inputs.getZ());
 		
 		if(onAirport(pos, fromAirport)) {
 			flyLocal(fromAirport, fromGate, toAirport, toGate, flyHeight);
+			vDrone.setTargets(toAirport, null);
+			vDrone.pickUp();
 		} else {
 			flyRemote(currentAirport, currentGate, fromAirport, fromGate, toAirport, toGate, flyHeight);
+			vDrone.setTargets(fromAirport, toAirport);
+			vDrone.getPackage().setStatus("Awaiting pickup");
 		}
 	}
 	
@@ -189,5 +200,11 @@ public class Pilot {
 			return 254.0966f + 3.5519f * height;
 		
 		return Float.NaN;
+	}
+
+	public String getTask() {
+		if (this.tasks == null || this.index >= this.tasks.length) 
+			return "Idle";
+		return currentPilot().taskName();
 	}
 }
