@@ -297,28 +297,24 @@ public class FlyPilot extends PilotPart {
 	}  
 	
 	private void turnSoftRight(AutopilotInputs input) {
-		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk");
 		rollPID.adjustRoll(input, FloatMath.toRadians(-10), State.Right);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
 	
 	private void turnSoftLeft(AutopilotInputs input) {
-		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk2");
 		rollPID.adjustRoll(input, FloatMath.toRadians(10), State.Left);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
 	
 	private void turnVerySoftRight(AutopilotInputs input) {
-		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk");
 		rollPID.adjustRoll(input, FloatMath.toRadians(-4), State.Right);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
 	
 	private void turnVerySoftLeft(AutopilotInputs input) {
-		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk2");
 		rollPID.adjustRoll(input, FloatMath.toRadians(4), State.Left);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
