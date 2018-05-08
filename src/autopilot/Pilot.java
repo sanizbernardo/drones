@@ -2,7 +2,6 @@ package autopilot;
 
 import org.joml.Vector3f;
 
-import autopilot.airports.AirportManager;
 import autopilot.airports.VirtualAirport;
 import autopilot.airports.VirtualDrone;
 import autopilot.pilots.FlyPilot;
@@ -13,7 +12,6 @@ import autopilot.pilots.TaxiPilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
-import testbed.Drone;
 import utils.FloatMath;
 import utils.Utils;
 
