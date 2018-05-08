@@ -1,13 +1,13 @@
 package autopilot.airports;
 
-import org.jfree.data.xy.Vector;
 import org.joml.Vector3f;
 import utils.FloatMath;
 
 public class VirtualAirport {
 
-    public VirtualAirport(Vector3f position, float heading, float width, float length) {
-        this.position = position;
+    public VirtualAirport(int id, Vector3f position, float heading, float width, float length) {
+        this.id = id;
+    	this.position = position;
         this.heading = heading;
         this.width = width;
         this.length = length;
@@ -26,9 +26,13 @@ public class VirtualAirport {
 
     private Vector3f position;
     private Vector3f[] tarmacs, gates;
-    private float width, length;;
     private float heading;  
+    private float width, length;
+    private int id;
 
+    public int getId() {
+    	return this.id;
+    }
 
     public Vector3f getTarmac(int i) {
         return tarmacs[i];

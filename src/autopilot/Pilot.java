@@ -71,8 +71,15 @@ public class Pilot {
 		
 		if (currentPilot().ended()) {
 			currentPilot().close();
-			this.pilots[state()] = null;
 			
+			if (state() == HANDBRAKE || state() == HANDBRAKE_2)
+				vDrone.nextTarget();		
+			if (state() == TAXIING_2) 
+				vDrone.pickUp();
+			if ((state() == PICKUP_TAXI && pilots[PICKUP_TAXI_2] == null) || state() == PICKUP_TAXI_2)
+				vDrone.deliver();
+			
+			this.pilots[state()] = null;
 			this.index ++;
 		}
 		
@@ -85,68 +92,80 @@ public class Pilot {
 			                                int flyHeight) {
 		
 		this.index = 0;
-
+		
 		Vector3f pos = new Vector3f(inputs.getX(),inputs.getY(),inputs.getZ());
 		
 		if(onAirport(pos, fromAirport)) {
 			flyLocal(fromAirport, fromGate, toAirport, toGate, flyHeight);
+			vDrone.setTargets(toAirport, null);
+			vDrone.pickUp();
 		} else {
 			flyRemote(currentAirport, currentGate, fromAirport, fromGate, toAirport, toGate, flyHeight);
+			vDrone.setTargets(fromAirport, toAirport);
+			vDrone.getPackage().setStatus("Awaiting pickup");
 		}
 	}
 	
 	private void flyRemote(VirtualAirport currentAirport, int currentGate, VirtualAirport fromAirport, int fromGate,
-			VirtualAirport toAirport, int toGate, int FLY_HEIGHT) {
+			VirtualAirport toAirport, int toGate, int flyHeight) {
 		
 		//first flight
-		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
-		this.pilots[LANDING] = new LandingPilot(fromAirport);
-		this.pilots[FLYING] = new FlyPilot(fromAirport, FLY_HEIGHT, this.airportManager, fromGate);
-		
 		this.pilots[TAXIING] = new TaxiPilot(currentAirport.getGate(currentGate), currentGate == 0 ? 
-											 currentAirport.getHeading() 
-                                             : 
-                                             currentAirport.getHeading() + FloatMath.PI * (currentAirport.getHeading() < 0 ? 1 : -1));
-		this.pilots[HANDBRAKE] = new HandbrakePilot();
+				currentAirport.getHeading() 
+                : 
+                currentAirport.getHeading() + FloatMath.PI * (currentAirport.getHeading() < 0 ? 1 : -1));
+		
+		this.pilots[TAKING_OFF] = new TakeOffPilot(flyHeight);
+		this.pilots[FLYING] = new FlyPilot(fromAirport, flyHeight, airportManager, fromGate);
+		this.pilots[LANDING] = new LandingPilot(fromAirport);
 		this.pilots[PICKUP_TAXI] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
-							                 fromAirport.getHeading() 
-							                 : 
-							                 fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1));
+                fromAirport.getHeading() 
+                : 
+                fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1));
+		
+		this.pilots[HANDBRAKE] = new HandbrakePilot();
+
 		
 		
 		//second flight
-		this.pilots[TAKING_OFF_2] = new TakeOffPilot(FLY_HEIGHT);
-		this.pilots[LANDING_2] = new LandingPilot(toAirport);
-		this.pilots[FLYING_2] = new FlyPilot(toAirport, FLY_HEIGHT, this.airportManager, toGate);
+
 		this.pilots[TAXIING_2] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
-                                             fromAirport.getHeading() 
-                                             : 
-                                             fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1));
-		this.pilots[HANDBRAKE_2] = new HandbrakePilot();
+                fromAirport.getHeading() 
+                : 
+                fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1));
+		
+		this.pilots[TAKING_OFF_2] = new TakeOffPilot(flyHeight);
+		this.pilots[FLYING_2] = new FlyPilot(toAirport, flyHeight, airportManager, toGate);
+		this.pilots[LANDING_2] = new LandingPilot(toAirport);
 		this.pilots[PICKUP_TAXI_2] = new TaxiPilot(toAirport.getGate(toGate), toGate == 0 ? 
-							                 toAirport.getHeading() 
-							                 : 
-							                 toAirport.getHeading() + FloatMath.PI * (toAirport.getHeading() < 0 ? 1 : -1));
+                toAirport.getHeading() 
+                : 
+                toAirport.getHeading() + FloatMath.PI * (toAirport.getHeading() < 0 ? 1 : -1));
+		
+		this.pilots[HANDBRAKE_2] = new HandbrakePilot();
+
 		this.init();
 		
 		this.tasks = new int[] {TAXIING, TAKING_OFF, FLYING, LANDING, PICKUP_TAXI, HANDBRAKE, TAXIING_2, TAKING_OFF_2, FLYING_2, LANDING_2, PICKUP_TAXI_2, HANDBRAKE_2};
 	}
 	
 	private void flyLocal(VirtualAirport fromAirport, int fromGate,
-			VirtualAirport toAirport, int toGate, int FLY_HEIGHT) {
-		this.pilots[TAKING_OFF] = new TakeOffPilot(FLY_HEIGHT);
-		this.pilots[LANDING] = new LandingPilot(toAirport);
-		this.pilots[FLYING] = new FlyPilot(toAirport, FLY_HEIGHT, this.airportManager, toGate);
+			VirtualAirport toAirport, int toGate, int flyHeight) {
 		this.pilots[TAXIING] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
-                                             fromAirport.getHeading() 
-                                             : 
-                                             fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1));
-		this.pilots[HANDBRAKE] = new HandbrakePilot();
-		this.pilots[PICKUP_TAXI] = new TaxiPilot(toAirport.getGate(toGate), toGate == 0 ? 
-							                 toAirport.getHeading() 
-							                 : 
-							                 toAirport.getHeading() + FloatMath.PI * (toAirport.getHeading() < 0 ? 1 : -1));
+                fromAirport.getHeading() 
+                : 
+                fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1));
 		
+		this.pilots[TAKING_OFF] = new TakeOffPilot(flyHeight);
+		this.pilots[FLYING] = new FlyPilot(toAirport, flyHeight, airportManager, toGate);
+		this.pilots[LANDING] = new LandingPilot(toAirport);
+		this.pilots[PICKUP_TAXI] = new TaxiPilot(toAirport.getGate(toGate), toGate == 0 ? 
+                toAirport.getHeading() 
+                : 
+                toAirport.getHeading() + FloatMath.PI * (toAirport.getHeading() < 0 ? 1 : -1));
+
+		this.pilots[HANDBRAKE] = new HandbrakePilot();
+
 		this.init();
 		
 		this.tasks = new int[] {TAXIING, TAKING_OFF, FLYING, LANDING, PICKUP_TAXI, HANDBRAKE};
@@ -194,5 +213,11 @@ public class Pilot {
 			return 254.0966f + 3.5519f * height;
 		
 		return Float.NaN;
+	}
+
+	public String getTask() {
+		if (this.tasks == null || this.index >= this.tasks.length) 
+			return "Idle";
+		return currentPilot().taskName();
 	}
 }

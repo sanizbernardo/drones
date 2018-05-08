@@ -113,19 +113,13 @@ public class TaxiPilot extends PilotPart {
 			targetHeading = toGoal;
 		}
 
-		//System.out.println("Goal reached: " + goalReached);
-		//System.out.println("Final: " + finalHeading);
-		//System.out.println("Target: " + targetHeading);
-		//System.out.println("Current: " + heading);
-		//System.out.println("Distance: " + distance);
-
 		float thrust = 0, fBrake = 0, lBrake = 0, rBrake = 0;
 
 		float headingerror = Math.abs(targetHeading - heading);
 		if (headingerror > FloatMath.toRadians(0.75f) ) {
 			Boolean side = checkTurn(targetHeading, input);
 			if (headingerror == FloatMath.PI) {
-				side = true;
+				side = false;
 			}
 			if (side != null) {
 				thrust = 70f;
@@ -151,7 +145,6 @@ public class TaxiPilot extends PilotPart {
 			}
 
 		} else {
-			System.out.println("Goal reached");
 			ended = true;
 		}
 
