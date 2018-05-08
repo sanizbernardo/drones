@@ -2,7 +2,9 @@ package autopilot;
 
 import org.joml.Vector3f;
 
+import autopilot.airports.AirportManager;
 import autopilot.airports.VirtualAirport;
+import autopilot.airports.VirtualDrone;
 import autopilot.pilots.FlyPilot;
 import autopilot.pilots.HandbrakePilot;
 import autopilot.pilots.LandingPilot;
@@ -11,11 +13,12 @@ import autopilot.pilots.TaxiPilot;
 import interfaces.AutopilotConfig;
 import interfaces.AutopilotInputs;
 import interfaces.AutopilotOutputs;
+import testbed.Drone;
 import utils.FloatMath;
 import utils.Utils;
 
 public class Pilot {
-	
+		
 	public static final int TAKING_OFF = 0, 
 							 LANDING = 1,
 							 FLYING = 2,
@@ -36,10 +39,13 @@ public class Pilot {
 	private PilotPart[] pilots;
 	
 	private AutopilotConfig config;
+	
+	private VirtualDrone vDrone;
 		
-	public Pilot() {
+	public Pilot(VirtualDrone vDrone) {
 		this.tasks = new int[] {};
-		this.pilots = new PilotPart[12];
+		this.pilots = new PilotPart[13];
+		this.vDrone = vDrone;
 	}
 	
 	public void simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
@@ -55,6 +61,7 @@ public class Pilot {
 	public AutopilotOutputs timePassed(AutopilotInputs inputs) {
 		
 		if (this.index >= this.tasks.length) {
+			vDrone.setPilot(null);
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 		}
 		
@@ -75,7 +82,6 @@ public class Pilot {
 			                                VirtualAirport toAirport, int toGate,
 			                                int flyHeight) {
 		
-		if(config == null) throw new RuntimeException("Access before sim started");
 		this.index = 0;
 
 		Vector3f pos = new Vector3f(inputs.getX(),inputs.getY(),inputs.getZ());
