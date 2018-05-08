@@ -80,7 +80,10 @@ public class LandingPilot extends PilotPart {
 		else if(vel.y < -2 && pos.y > 7 && pos.y < 13){
 			thrust = maxThrust;
 		}
-		else if(vel.y < -1 && pos.y > 2.5 && pos.y < 7){
+		else if(vel.y < -1 && pos.y > 4 && pos.y < 7){
+			thrust = maxThrust;
+		}
+		else if(!onAirport(pos, currentDestionationAirport) && vel.y < 0 && pos.y < 4){
 			thrust = maxThrust;
 		}
 		if(vel.y > 0 && pos.y < 2) braking = true;
@@ -97,8 +100,8 @@ public class LandingPilot extends PilotPart {
 		float airportHeading = currentDestionationAirport.getHeading();
 		
 		Vector3f center = currentDestionationAirport.getPosition();
-		Vector3f centerRight = auxLocPlusX(center, airportHeading, currentDestionationAirport.getWidth());
-		Vector3f centerLeft = auxLocPlusX(center, airportHeading, -currentDestionationAirport.getWidth());
+		Vector3f centerRight = auxLocPlusX(center, airportHeading, currentDestionationAirport.getWidth()*2/3);
+		Vector3f centerLeft = auxLocPlusX(center, airportHeading, -currentDestionationAirport.getWidth()*2/3);
 		Vector3f centerRightPlus = auxLocPlusMinZ(centerRight, airportHeading, 1);
 		Vector3f centerLeftPlus = auxLocPlusMinZ(centerLeft, airportHeading, 1);
 		
@@ -196,5 +199,19 @@ public class LandingPilot extends PilotPart {
 			ret += (float) Math.PI * 2;
 		}
 		return ret;
+	}
+	
+	private boolean onAirport(Vector3f pos, VirtualAirport airport) {
+		Vector3f diff = pos.sub(airport.getPosition(), new Vector3f());
+		float len = diff.dot(new Vector3f(-FloatMath.sin(airport.getHeading()), 0, -FloatMath.cos(airport.getHeading())));
+		float wid = diff.dot(new Vector3f(-FloatMath.cos(airport.getHeading()), 0, FloatMath.sin(airport.getHeading())));
+		
+		if (Math.abs(len) > airport.getWidth() / 2 + airport.getLength() + 125) {	
+			return false;
+		} else if (Math.abs(wid) > airport.getWidth()) {
+			return false;
+		}
+		else return true;
+		
 	}
 }

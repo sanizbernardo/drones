@@ -54,7 +54,7 @@ public class AirportManager implements AutopilotModule{
     public void defineAirport(float centerX, float centerZ, float centerToRunway0X, float centerToRunway0Z) {
         Vector3f position = new Vector3f(centerX, 0, centerZ);
         float heading = FloatMath.atan2(-centerToRunway0X, -centerToRunway0Z);
-        airportlist.add(new VirtualAirport(position, heading, width));
+        airportlist.add(new VirtualAirport(position, heading, width, length));
     }
 
     @Override

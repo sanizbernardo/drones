@@ -30,6 +30,7 @@ public class FlyPilot extends PilotPart {
 	private float rMax;
 	private float maxThrust;
 	private float turnRadius;
+	private float fly_height;
 	
 	private float leftWingInclination;
 	private float rightWingInclination;
@@ -48,8 +49,9 @@ public class FlyPilot extends PilotPart {
 	
 	boolean check = true;
 	
-	public FlyPilot(VirtualAirport destinationAirport) {
+	public FlyPilot(VirtualAirport destinationAirport, int fly_height) {
 		this.currentDestionationAirport = destinationAirport;
+		this.fly_height = fly_height;
 	}
 	
 	
@@ -60,7 +62,8 @@ public class FlyPilot extends PilotPart {
 		this.maxThrust = config.getMaxThrust();
 		this.turnRadius = 576f;
 //		pointBR = new Vector3f(-this.turnRadius, 100f, -this.turnRadius - 700f);
-		pointBR = getTargetPos(currentDestionationAirport.getPosition(), currentDestionationAirport.getHeading(), 1200);
+		float distance = 1300 + (fly_height-50)*10; 
+		pointBR = getTargetPos(currentDestionationAirport.getPosition(), currentDestionationAirport.getHeading(), distance);
 		this.pitchPID = new PitchPID(this);
 		this.thrustPID = new ThrustPID(this);
 		this.rollPID = new RollPID(this);
@@ -106,21 +109,21 @@ public class FlyPilot extends PilotPart {
 		}
 
 		// moeten we omhoog?
-		if ((60 - pos.y) > 5) {//TODO magic number
+		if ((this.fly_height - pos.y) > 5) {
 			if (inputs.getRoll() > FloatMath.toRadians(5))
 				setCurrentState(State.Stable);
 			else
 				setCurrentState(State.StrongUp);
 		}
 		// moeten we omlaag?
-		else if (pos.y - 60 > 5) {
+		else if (pos.y - this.fly_height > 5) {
 			if (inputs.getRoll() > FloatMath.toRadians(5))
 				setCurrentState(State.Stable);
 			else
 				setCurrentState(State.StrongDown);
 		}
 		// iets meer stijgen
-		else if (getCurrentState() == State.StrongUp && (60 - pos.y) > 2) {
+		else if (getCurrentState() == State.StrongUp && (this.fly_height - pos.y) > 2) {
 			
 		}
 		else {
@@ -297,28 +300,24 @@ public class FlyPilot extends PilotPart {
 	}  
 	
 	private void turnSoftRight(AutopilotInputs input) {
-		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk");
 		rollPID.adjustRoll(input, FloatMath.toRadians(-10), State.Right);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
 	
 	private void turnSoftLeft(AutopilotInputs input) {
-		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk2");
 		rollPID.adjustRoll(input, FloatMath.toRadians(10), State.Left);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
 	
 	private void turnVerySoftRight(AutopilotInputs input) {
-		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk");
 		rollPID.adjustRoll(input, FloatMath.toRadians(-4), State.Right);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
 	}
 	
 	private void turnVerySoftLeft(AutopilotInputs input) {
-		System.out.println("skhjflhgflsqdhgflqshkjdgfhlk2");
 		rollPID.adjustRoll(input, FloatMath.toRadians(4), State.Left);
 		thrustPID.adjustThrustUp(input, 0.37f);
 		pitchPID.adjustPitchTurn(input, FloatMath.toRadians(0));
@@ -466,7 +465,7 @@ public class FlyPilot extends PilotPart {
 		Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
 		float[] aux = auxLocPlusX(pointBeforeRunway, headingRunwayToPoint, temp);
 		Vector3f pBRPaux = new Vector3f(aux[0], aux[1], aux[2]);
-		if(pos.distance(pBRPaux) < this.turnRadius + 10 && pos.distance(pBRPaux) > this.turnRadius - 10 && /*pos.distance(pointBR) < this.turnRadius + 100 && */ Math.abs(headingChecker - inputs.getHeading()) < 0.1){ //TODO deze condities nog is nakijken
+		if(pos.distance(pBRPaux) < this.turnRadius + 10 && pos.distance(pBRPaux) > this.turnRadius - 10 && Math.abs(headingChecker - inputs.getHeading()) < 0.1){ //TODO deze condities nog is nakijken
 			part1Complete = true;
 		}
 		
