@@ -2,6 +2,8 @@ package testbed.graphics;
 
 import org.joml.Vector3f;
 
+import testbed.Physics;
+
 public class Camera {
 
     /**
@@ -45,7 +47,7 @@ public class Camera {
         position.z = z;
     }
 
-    public void movePosition(float offsetX, float offsetY, float offsetZ) {
+    public void movePosition(float offsetX, float offsetY, float offsetZ, Physics physics) {
         if ( offsetZ != 0 ) {
             position.x += (float)Math.sin(Math.toRadians(rotation.y)) * -offsetZ;
             position.z += (float)Math.cos(Math.toRadians(rotation.y)) * offsetZ;

@@ -20,7 +20,7 @@ public class LandingWorld extends World{
 	
 	@Override
 	public void setupAirports() {
-		addAirport(new Vector3f(0, 0, -400), 0);
+		addAirport(new Vector3f(20, 0, -500), 0);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -28,7 +28,7 @@ public class LandingWorld extends World{
 	public void setupDrones() {
 		AutopilotConfig config = Utils.createDefaultConfig("drone1");
 		
-		addDrone(config, new Vector3f(0, 200, 0), new Vector3f(0,0,-45), 0);
+		addDrone(config, new Vector3f(0, 25, 0), new Vector3f(0,0,-40), 0);
 	}
 
 	@Override

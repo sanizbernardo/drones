@@ -4,12 +4,14 @@ import org.joml.Vector3f;
 
 import autopilot.airports.AirportManager;
 import testbed.entities.ground.Ground;
+import testbed.entities.packages.PackageGenerator;
+import testbed.entities.packages.PackageGenerators;
 import testbed.world.World;
 import utils.FloatMath;
 
-public class AutoPilotModuleWorld extends World{
+public class RandomWorld extends World{
 
-	public AutoPilotModuleWorld() {
+	public RandomWorld() {
 		super(1, true, 3);
 	}
 
@@ -36,7 +38,7 @@ public class AutoPilotModuleWorld extends World{
 	public void setupWorld() {
 		this.ground = new Ground(50);
 		
-		this.generator = null;
+		this.generator = PackageGenerators.random(0.0005f, 3);
 	}
 
 	@Override

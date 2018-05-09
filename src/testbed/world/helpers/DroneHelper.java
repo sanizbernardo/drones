@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
 import interfaces.AutopilotConfig;
@@ -186,6 +187,7 @@ public class DroneHelper {
 		if (!wantPhysics)
 			return;
 		
+		Set<Integer> dronesToRemove = new HashSet<>();
 		for (int droneId : droneIds.values()) {
 			try {
 				getDronePhysics(droneId).update(interval);
@@ -195,11 +197,16 @@ public class DroneHelper {
 								+ ": " + e.getMessage(),
 						"Physics Exception", JOptionPane.ERROR_MESSAGE);
 				
-				if (packages[droneId] != null)
-					packages[droneId].crashed();
-				removeDrone(droneId, updateHelper);
+				dronesToRemove.add(droneId);
 			} catch (NullPointerException e) { }
 		}
+		
+		for (Integer droneId: dronesToRemove) {
+			if (packages[droneId] != null)
+				packages[droneId].crashed();
+			removeDrone(droneId, updateHelper);
+		}
+		
 		checkCollision(updateHelper);
 	}
 
@@ -230,14 +237,13 @@ public class DroneHelper {
 		}
 	}
 
+	int i = 0;
 	private void rotateWings(String droneId) {
-//		Physics physics = getDronePhysics(droneId);
-//		Vector3f orientation = new Vector3f(-physics.getPitch(),-physics.getHeading(), -physics.getRoll());
-//		Vector3f droneOrientation = FloatMath.transform(physics.getTransMat(), orientation);
-//		Matrix3f rot = new Matrix3f().rotate(FloatMath.toRadians(45), droneOrientation);
-//		Vector3f rotatedDroneOrientation = FloatMath.transform(rot, droneOrientation);
-//		Vector3f r = FloatMath.transform(physics.getTransMatInv(), droneOrientation);
-//		drones[droneIds.get(droneId)][Constants.DRONE_LEFT_WING].setRotation(r.x, r.y, r.z);
+		Physics physics = getDronePhysics(droneId);
+		
+		droneModels[droneIds.get(droneId)][Constants.DRONE_LEFT_WING].setRotation(-physics.getPitch() - physics.getLWInclination(), -physics.getHeading(), -physics.getRoll());
+		droneModels[droneIds.get(droneId)][Constants.DRONE_RIGHT_WING].setRotation(-physics.getPitch() - physics.getRWInclination(), -physics.getHeading(), -physics.getRoll());
+
 	}
 
 	private void translateWheels(String droneId) {

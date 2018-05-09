@@ -132,7 +132,7 @@ public class TestbedGui extends JFrame {
 		AddPackage addBtn = new AddPackage(airports.size(), world);
 		contentPane.add(addBtn.panel);
 				
-		minimap = new MiniMap(2000, 2000, helper, airports);
+		minimap = new MiniMap(3000, 3000, helper, airports);
 		minimap.setPreferredSize(new Dimension(Constants.TESTBED_GUI_WIDTH, Constants.TESTBED_GUI_HEIGHT/3));
 		contentPane.add(minimap);
 	}
@@ -246,10 +246,10 @@ public class TestbedGui extends JFrame {
 				return row;
 				
 			case 1:
-				return "Airport " + packages.get(row).getFromAirport() + ", Gate " + packages.get(row).getFromGate();
+				return "Airport " + packages.get(row).getFromAirport() + ", gate " + packages.get(row).getFromGate();
 				
 			case 2:
-				return "Airport " + packages.get(row).getDestAirport() + ", Gate " + packages.get(row).getDestGate();
+				return "Airport " + packages.get(row).getDestAirport() + ", gate " + packages.get(row).getDestGate();
 			
 			case 3:
 				return packages.get(row).getStatusDesc();

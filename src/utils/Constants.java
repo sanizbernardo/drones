@@ -11,7 +11,7 @@ public class Constants {
     /**
      * Premade worlds that should show in the gui.
      */
-	public static final String[] PREMADE_WORLDS = new String[] {"LandingWorld", "AirportSetupWorld", "PackageTestWorld", "AutoPilotModuleWorld"};
+	public static final String[] PREMADE_WORLDS = new String[] {"LandingWorld", "AirportSetupWorld", "PackageTestWorld", "AutoPilotModuleWorld", "RandomWorld", "ChainWorld"};
 
 	/**
 	 * Autopilot constants

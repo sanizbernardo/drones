@@ -7,10 +7,10 @@ import testbed.entities.ground.Ground;
 import testbed.world.World;
 import utils.FloatMath;
 
-public class AutoPilotModuleWorld extends World{
+public class ChainWorld extends World{
 
-	public AutoPilotModuleWorld() {
-		super(1, true, 3);
+	public ChainWorld() {
+		super(1, true, 2);
 	}
 
 	@Override
@@ -22,14 +22,11 @@ public class AutoPilotModuleWorld extends World{
 	public void setupAirports() {
 		addAirport(new Vector3f(-200, 0, -11), 0);
 		addAirport(new Vector3f(1015, 0, 1089), FloatMath.toRadians(45));
-		addAirport(new Vector3f(-1000, 0, -1000), FloatMath.toRadians(-45));
 	}
 
 	@Override
 	public void setupDrones() {
 		addDrone("drone1", 0, 0, 0);
-		addDrone("drone2", 1, 1, 1);
-		addDrone("drone3", 2, 0, 1);
 	}
 
 	@Override
