@@ -88,65 +88,91 @@ public class AirportManager implements AutopilotModule{
     @Override
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
     	VirtualPackage pack = new VirtualPackage(fromAirport, fromGate, toAirport, toGate);
-    	pack.setStatus("In queue");
     	gui.addPackage(pack);
-    	transportQueue.add(pack);
-    }
-    
-    private void handleTransportEvents() {
-    	// fetch all the active drones
-    	ArrayList<VirtualDrone> ready = new ArrayList<>();
+    	
+    	boolean override = false;
+    	
+    	// pilot override check, again a loop over all drones, but this doesn't have to
+    	// be run that often (not every delta) so it's not that bad
     	for(VirtualDrone vDrone : droneList) {
-    		if(!vDrone.isActive()) {
-    			ready.add(vDrone);
-    		}
-    	}
-    	
-    	ArrayList<VirtualPackage> deletionList = new ArrayList<>();
-    	
-    	// assign the package to a drone that already picked it up
-    	for(VirtualPackage pack : transportQueue) {
-    		for(VirtualDrone vDrone : ready) {
-    			//where is this drone?
-    			ArrayList<VirtualAirport> currentAirports = (ArrayList<VirtualAirport>) airportlist.stream()
-                         .filter((a) -> Pilot.onAirport(vDrone.getPosition(), a))
-                         .collect(Collectors.toList());
-    			if(currentAirports.size() == 0) continue;
+    		if(getDroneAirports(vDrone).size() == 0 ) continue;
+    		if(vDrone.getPilot() != null && vDrone.getPilot().approximateVelocity(vDrone.getInputs()) != null && FloatMath.norm(vDrone.getPilot().approximateVelocity(vDrone.getInputs())) > 1) continue;
+    		
+    		VirtualAirport currentAirport = getDroneAirports(vDrone).get(0);
+    		
+    		if(currentAirport == airportlist.get(fromAirport)) {
+    			// the newly spawned packet is on the same airport as a drone
+    			Loc location = (fromGate == 0) ? Loc.GATE_0 : Loc.GATE_1;
     			
-    			VirtualAirport currentAirport = currentAirports.get(0);
-    			
-    			Loc location = whereOnAirport(vDrone.getPosition(), currentAirport);
-    			int gate = location == Loc.GATE_0 ? 0 : 1;
-    			
-    			if(currentAirport == null) continue;
-    			
-    			if(airportlist.indexOf(currentAirport) == pack.getFromAirport() && pack.getFromGate() == gate) {
+    			if (whereOnAirport(vDrone.getPosition(), currentAirport) == location) {
+    				// the newly spawned packet is also on the same gate as the drone!
+    				// if this drone now is not carrying a packet but going to a remote
+    				// airport it will take the package but our scheduler won't think it
+    				// it is handling it. We must manually override the pilot with a new one
+    				// also adding his current task to the queue again
     				
-    				pack.assignDrone(vDrone);
-    				vDrone.setPackage(pack);
+    				if(vDrone.getPackage() == null) continue;
     				
-    				
-    				vDrone.setPilot(new Pilot(vDrone));
-    				vDrone.getPilot().simulationStarted(vDrone.getConfig(), vDrone.getInputs());
-    				
-    				int currentSlice = (droneList.indexOf(vDrone)*10)+MIN_HEIGHT; 
-    				
-    				vDrone.getPilot().fly(vDrone.getInputs(), currentAirport, 0, 
-                             airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
-                             airportlist.get(pack.getToAirport()), pack.getToGate(),
-                             currentSlice);
-    				
-    				deletionList.add(pack);
+    				if(airportlist.get(vDrone.getPackage().getFromAirport()) != currentAirport) {
+    					// the package the drone has to pickup was on another airport
+    					// this means he is not currently carrying a package and he will
+    					// pick up this new package!
+    					
+    					override = true;
+    					
+    					// make sure the old package is not lost
+    					VirtualPackage oldPack = vDrone.getPackage();
+    					transportQueue.add(oldPack);
+    					oldPack.setStatus("Forced to queue");
+    					oldPack.assignDrone(null);
+    					
+    					// override the pilot
+    					vDrone.setPilot(new Pilot(vDrone, this));
+    					vDrone.getPilot().simulationStarted(vDrone.getConfig(), vDrone.getInputs());	
+    					vDrone.setPackage(pack);
+    					pack.assignDrone(vDrone);
+    					
+    					int currentSlice = (droneList.indexOf(vDrone)*10)+MIN_HEIGHT; 
+    					
+    					if(location == Loc.GATE_0) {
+    					     vDrone.getPilot().fly(vDrone.getInputs(), currentAirport, 0, 
+    					     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
+    					     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
+    					     		                                currentSlice);
+    				    } else {
+    				    	vDrone.getPilot().fly(vDrone.getInputs(), currentAirport, 1, 
+    					     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
+    					     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
+    					     		                                currentSlice);
+    					 }
+    					
+    				} 
     			}
     		}
     	}
     	
-    	// these packages shouldn't be scheduled normally and need to be handled first
-    	for(VirtualPackage pack : deletionList) {
-    		transportQueue.remove(pack);
+    	if(!override) {
+    		transportQueue.add(pack);
+        	pack.setStatus("In queue");
     	}
     	
-    	// if there wasn't a drone that picked up a package already, do a simple schedule
+    	
+    }
+    
+    /**
+     * Checks if we need to assign a drone that is idling or
+     * if a drone picked up a packet.
+     */
+    private void handleTransportEvents() {
+    	forcedPickupSchedule();
+    	regularSchedule();
+    }
+
+    /**
+     * A regular schedule cycle should do this
+     */
+	private void regularSchedule() {
+		// if there wasn't a drone that picked up a package already, do a simple schedule
     	if(!transportQueue.isEmpty()) {
     		VirtualPackage pack = transportQueue.peek();
 	    	VirtualDrone drone = chooseBestDrone(pack.getFromAirport(), pack.getFromGate());
@@ -180,6 +206,78 @@ public class AirportManager implements AutopilotModule{
 			 }
 			 
     	}
+	}
+
+	/**
+	 * When a drone is forced to pickup a packet that was already 
+	 * present on the airport it will need the this schedule so our
+	 * system remains consistent with the testbed.
+	 */
+	private void forcedPickupSchedule() {
+    	ArrayList<VirtualPackage> deletionList = new ArrayList<>();
+    	
+    	// assign the package to a drone that already picked it up
+    	for(VirtualPackage pack : transportQueue) {
+    		for(VirtualDrone vDrone : droneList) {
+    			if(vDrone.isActive()) continue;
+    			//where is this drone?
+    			ArrayList<VirtualAirport> currentAirports = getDroneAirports(vDrone);
+    			if(currentAirports.size() == 0) continue;
+    			
+    			VirtualAirport currentAirport = currentAirports.get(0);
+    			if(currentAirport == null) continue;
+
+    			Loc location = whereOnAirport(vDrone.getPosition(), currentAirport);
+    			int gate = location == Loc.GATE_0 ? 0 : 1;
+    			
+    			if(airportlist.indexOf(currentAirport) == pack.getFromAirport() && pack.getFromGate() == gate) {
+    				
+    				pack.assignDrone(vDrone);
+    				vDrone.setPackage(pack);
+    				
+    				
+    				vDrone.setPilot(new Pilot(vDrone, this));
+    				vDrone.getPilot().simulationStarted(vDrone.getConfig(), vDrone.getInputs());
+    				
+    				int currentSlice = (droneList.indexOf(vDrone)*10)+MIN_HEIGHT; 
+    				
+    				vDrone.getPilot().fly(vDrone.getInputs(), currentAirport, 0, 
+                             airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
+                             airportlist.get(pack.getToAirport()), pack.getToGate(),
+                             currentSlice);
+    				
+    				deletionList.add(pack);
+    			}
+    		}
+    	}
+    	
+    	// these packages shouldn't be scheduled normally and need to be handled first
+    	for(VirtualPackage pack : deletionList) {
+    		transportQueue.remove(pack);
+    	}
+	}
+    
+    /**
+     * Returns a list of VirtualDrones that are ready for a new task.
+     * In our current logic that means they do not have a Pilot assigned
+     * to them.
+     */
+    private ArrayList<VirtualDrone> getReadyDrones() {
+    	return (ArrayList<VirtualDrone>) droneList.stream()
+    			                                  .filter(d -> !d.isActive())
+    			                                  .collect(Collectors.toList());
+    }
+    
+    /**
+     * Returns the airports* that the drone is currently on. This is returned
+     * as a list because theoretically this could be multiple airports.
+     * @param vDrone the drone we're searching airports for
+     * @return an ArrayList of airports the drone is on
+     */
+    private ArrayList<VirtualAirport> getDroneAirports(VirtualDrone vDrone) {
+    	return (ArrayList<VirtualAirport>) airportlist.stream()
+                									  .filter((a) -> Pilot.onAirport(vDrone.getPosition(), a))
+                                                      .collect(Collectors.toList());
     }
     
     public VirtualDrone chooseBestDrone(int airport, int gate) {
