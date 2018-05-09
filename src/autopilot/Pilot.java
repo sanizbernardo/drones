@@ -35,6 +35,9 @@ public class Pilot {
 	private int index;
 	private int[] tasks;
 		
+	private float time;
+	private Vector3f timePassedOldPos;
+	
 	private PilotPart[] pilots;
 	
 	private AutopilotConfig config;
@@ -53,6 +56,23 @@ public class Pilot {
 	public void simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 		this.config = config;
 	}
+	
+	public Vector3f approximateVelocity(AutopilotInputs inputs) {
+		if(timePassedOldPos == null) return null;
+		Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
+		
+		float dt = inputs.getElapsedTime() - this.time;
+		this.time = inputs.getElapsedTime();
+		Vector3f approxVel = null;
+		if (dt != 0){ 
+			approxVel = pos.sub(this.timePassedOldPos, new Vector3f()).mul(1/dt);
+		}
+		this.timePassedOldPos = pos;
+		
+		return approxVel;
+	}
+
+
 	
 	private void init() {
 		for (PilotPart pilot: this.pilots) {

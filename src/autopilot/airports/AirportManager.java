@@ -96,6 +96,8 @@ public class AirportManager implements AutopilotModule{
     	// be run that often (not every delta) so it's not that bad
     	for(VirtualDrone vDrone : droneList) {
     		if(getDroneAirports(vDrone).size() == 0 ) continue;
+    		if(vDrone.getPilot() != null && vDrone.getPilot().approximateVelocity(vDrone.getInputs()) != null && FloatMath.norm(vDrone.getPilot().approximateVelocity(vDrone.getInputs())) > 1) continue;
+    		
     		VirtualAirport currentAirport = getDroneAirports(vDrone).get(0);
     		
     		if(currentAirport == airportlist.get(fromAirport)) {
@@ -108,6 +110,8 @@ public class AirportManager implements AutopilotModule{
     				// airport it will take the package but our scheduler won't think it
     				// it is handling it. We must manually override the pilot with a new one
     				// also adding his current task to the queue again
+    				
+    				if(vDrone.getPackage() == null) continue;
     				
     				if(airportlist.get(vDrone.getPackage().getFromAirport()) != currentAirport) {
     					// the package the drone has to pickup was on another airport
@@ -210,14 +214,12 @@ public class AirportManager implements AutopilotModule{
 	 * system remains consistent with the testbed.
 	 */
 	private void forcedPickupSchedule() {
-		// fetch all the active drones
-    	ArrayList<VirtualDrone> ready = getReadyDrones();
-    	
     	ArrayList<VirtualPackage> deletionList = new ArrayList<>();
     	
     	// assign the package to a drone that already picked it up
     	for(VirtualPackage pack : transportQueue) {
-    		for(VirtualDrone vDrone : ready) {
+    		for(VirtualDrone vDrone : droneList) {
+    			if(vDrone.isActive()) continue;
     			//where is this drone?
     			ArrayList<VirtualAirport> currentAirports = getDroneAirports(vDrone);
     			if(currentAirports.size() == 0) continue;
