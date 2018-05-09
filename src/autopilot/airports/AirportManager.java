@@ -94,6 +94,59 @@ public class AirportManager implements AutopilotModule{
     }
     
     private void handleTransportEvents() {
+    	// fetch all the active drones
+    	ArrayList<VirtualDrone> ready = new ArrayList<>();
+    	for(VirtualDrone vDrone : droneList) {
+    		if(!vDrone.isActive()) {
+    			ready.add(vDrone);
+    		}
+    	}
+    	
+    	ArrayList<VirtualPackage> deletionList = new ArrayList<>();
+    	
+    	// assign the package to a drone that already picked it up
+    	for(VirtualPackage pack : transportQueue) {
+    		for(VirtualDrone vDrone : ready) {
+    			//where is this drone?
+    			ArrayList<VirtualAirport> currentAirports = (ArrayList<VirtualAirport>) airportlist.stream()
+                         .filter((a) -> Pilot.onAirport(vDrone.getPosition(), a))
+                         .collect(Collectors.toList());
+    			if(currentAirports.size() == 0) continue;
+    			
+    			VirtualAirport currentAirport = currentAirports.get(0);
+    			
+    			Loc location = whereOnAirport(vDrone.getPosition(), currentAirport);
+    			int gate = location == Loc.GATE_0 ? 0 : 1;
+    			
+    			if(currentAirport == null) continue;
+    			
+    			if(airportlist.indexOf(currentAirport) == pack.getFromAirport() && pack.getFromGate() == gate) {
+    				
+    				pack.assignDrone(vDrone);
+    				vDrone.setPackage(pack);
+    				
+    				
+    				vDrone.setPilot(new Pilot(vDrone));
+    				vDrone.getPilot().simulationStarted(vDrone.getConfig(), vDrone.getInputs());
+    				
+    				int currentSlice = (droneList.indexOf(vDrone)*10)+MIN_HEIGHT; 
+    				
+    				vDrone.getPilot().fly(vDrone.getInputs(), currentAirport, 0, 
+                             airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
+                             airportlist.get(pack.getToAirport()), pack.getToGate(),
+                             currentSlice);
+    				
+    				deletionList.add(pack);
+    			}
+    		}
+    	}
+    	
+    	// these packages shouldn't be scheduled normally and need to be handled first
+    	for(VirtualPackage pack : deletionList) {
+    		transportQueue.remove(pack);
+    	}
+    	
+    	// if there wasn't a drone that picked up a package already, do a simple schedule
     	if(!transportQueue.isEmpty()) {
     		VirtualPackage pack = transportQueue.peek();
 	    	VirtualDrone drone = chooseBestDrone(pack.getFromAirport(), pack.getFromGate());
