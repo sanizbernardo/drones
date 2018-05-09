@@ -9,9 +9,9 @@ import testbed.entities.packages.PackageGenerators;
 import testbed.world.World;
 import utils.FloatMath;
 
-public class ChainingWorld extends World{
+public class RandomWorld extends World{
 
-	public ChainingWorld() {
+	public RandomWorld() {
 		super(1, true, 3);
 	}
 

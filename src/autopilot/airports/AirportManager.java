@@ -94,10 +94,10 @@ public class AirportManager implements AutopilotModule{
     
     private void handleTransportEvents() {
     	// fetch all the active drones
-    	ArrayList<VirtualDrone> actives = new ArrayList<>();
+    	ArrayList<VirtualDrone> ready = new ArrayList<>();
     	for(VirtualDrone vDrone : droneList) {
-    		if(vDrone.isActive()) {
-    			actives.add(vDrone);
+    		if(!vDrone.isActive()) {
+    			ready.add(vDrone);
     		}
     	}
     	
@@ -105,11 +105,14 @@ public class AirportManager implements AutopilotModule{
     	
     	// assign the package to a drone that already picked it up
     	for(VirtualPackage pack : transportQueue) {
-    		for(VirtualDrone vDrone : actives) {
+    		for(VirtualDrone vDrone : ready) {
     			//where is this drone?
-    			VirtualAirport currentAirport = airportlist.stream()
+    			ArrayList<VirtualAirport> currentAirports = (ArrayList<VirtualAirport>) airportlist.stream()
                          .filter((a) -> Pilot.onAirport(vDrone.getPosition(), a))
-                         .collect(Collectors.toList()).get(0);
+                         .collect(Collectors.toList());
+    			if(currentAirports.size() == 0) continue;
+    			
+    			VirtualAirport currentAirport = currentAirports.get(0);
     			
     			Loc location = whereOnAirport(vDrone.getPosition(), currentAirport);
     			int gate = location == Loc.GATE_0 ? 0 : 1;
