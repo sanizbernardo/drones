@@ -13,7 +13,6 @@ public class PhysicsException extends Exception {
 		this.message = message;
 	}
 	
-	
 	public String getMessage() {
 		return this.message;
 	}

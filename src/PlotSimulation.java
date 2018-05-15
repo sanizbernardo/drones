@@ -14,8 +14,8 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.ui.ApplicationFrame;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import gui.GuiUtils;
 import utils.FloatMath;
+import utils.GuiUtils;
 
 public class PlotSimulation {
 	

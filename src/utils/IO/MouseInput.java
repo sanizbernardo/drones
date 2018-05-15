@@ -1,8 +1,10 @@
 package utils.IO;
 
-import engine.Window;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
+
+import testbed.engine.Window;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class MouseInput {
