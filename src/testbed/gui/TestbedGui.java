@@ -341,8 +341,6 @@ public class TestbedGui extends JFrame {
 				g2.drawString("A" + i, x-7, y-6);
 				i++;
 			}
-			
-			i = 0;
 			for (int drone: helper.droneIds.values()) {
 				if (drone == activeDrone) 
 					g2.setColor(Color.GREEN);
@@ -354,8 +352,7 @@ public class TestbedGui extends JFrame {
 					y = (int) (size.height/2 + pos.z/this.maxY * size.height/2);
 					
 				g2.fillRect(x-3, y-3, 6, 6);
-				g2.drawString("D"+i, x+3, y+5);
-				i++;
+				g2.drawString("D"+drone, x+3, y+5);
 			}
 		}
 	}

@@ -107,47 +107,51 @@ public class AirportManager implements AutopilotModule{
      */
 	private void regularSchedule() {
 		// if there wasn't a drone that picked up a package already, do a simple schedule
-    	if(!transportQueue.isEmpty()) {
-    		VirtualPackage pack = transportQueue.peek();
-	    	VirtualDrone drone = chooseBestDrone(pack.getFromAirport(), pack.getFromGate());
-	    	if(drone == null) return;
-	    	
-	    	transportQueue.poll();
-	    	pack.assignDrone(drone);
-	    	drone.setPackage(pack);
-	    	
-			ArrayList<VirtualAirport> currentAirportList = (ArrayList<VirtualAirport>) airportlist.stream()
-			 		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
-			 		                                   .collect(Collectors.toList());
+    	if(!transportQueue.isEmpty() && getReadyDrones().size() > 0) {
+    		ArrayList<VirtualPackage> schedPack = new ArrayList<>();
+    		
+    		for(VirtualPackage pack : transportQueue) {
+    			VirtualDrone drone = chooseBestDrone(pack.getFromAirport(), pack.getFromGate());
+    	    	if(drone == null) continue;
+    	    	
+    	    	schedPack.add(pack);
+    	    	pack.assignDrone(drone);
+    	    	drone.setPackage(pack);
+    	    	
+    			ArrayList<VirtualAirport> currentAirportList = (ArrayList<VirtualAirport>) airportlist.stream()
+    			 		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
+    			 		                                   .collect(Collectors.toList());
 
-			if(currentAirportList.size() >= 1) {
-				VirtualAirport currentAirport = currentAirportList.get(0);
-				
-				//get a slice from the set
-				int currentSlice = (droneList.indexOf(drone)*10)+MIN_HEIGHT; 
-				
-				// when a drone has a pilot, it is considered active
-				drone.setPilot(new Pilot(drone, this));
-				drone.getPilot().simulationStarted(drone.getConfig(), drone.getInputs());	
-				
-				if(whereOnAirport(drone.getPosition(), currentAirport) == Loc.GATE_0) {
-				     drone.getPilot().fly(drone.getInputs(), currentAirport, 0, 
-				     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
-				     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
-				     		                                currentSlice);
-			    } else {
-				     drone.getPilot().fly(drone.getInputs(), currentAirport, 1, 
-				     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
-				     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
-				     		                                currentSlice);
-				 }
-			} else { //this is a big time error case but I'm brute force checking it because it randomly rarely happens
-				transportQueue.add(pack);
-				drone.setPackage(null);
-				pack.setStatus("In queue*");
-			}
-			
-			 
+    			if(currentAirportList.size() >= 1) {
+    				VirtualAirport currentAirport = currentAirportList.get(0);
+    				
+    				//get a slice from the set
+    				int currentSlice = (droneList.indexOf(drone)*10)+MIN_HEIGHT; 
+    				
+    				// when a drone has a pilot, it is considered active
+    				drone.setPilot(new Pilot(drone, this));
+    				drone.getPilot().simulationStarted(drone.getConfig(), drone.getInputs());	
+    				
+    				if(whereOnAirport(drone.getPosition(), currentAirport) == Loc.GATE_0) {
+    				     drone.getPilot().fly(drone.getInputs(), currentAirport, 0, 
+    				     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
+    				     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
+    				     		                                currentSlice);
+    			    } else {
+    				     drone.getPilot().fly(drone.getInputs(), currentAirport, 1, 
+    				     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
+    				     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
+    				     		                                currentSlice);
+    				 }
+    			} else { //this is a big time error case but I'm brute force checking it because it randomly rarely happens
+    				transportQueue.add(pack);
+    				drone.setPackage(null);
+    				pack.setStatus("In queue*");
+    			}
+    		}
+    		
+    		transportQueue.removeAll(schedPack);
+    		
     	}
 	}
 
@@ -224,6 +228,17 @@ public class AirportManager implements AutopilotModule{
     }
     
     public VirtualDrone chooseBestDrone(int airport, int gate) {
+    	
+    	// is there already a drone going there? fok off
+    	for(VirtualDrone vDrone : droneList) {
+    		if(vDrone.getPackage() == null) continue;
+    		if(vDrone.getPackage().getToAirport() == airport 
+    		   && vDrone.getPackage().getToGate() == gate) {
+    			return null;
+    		}
+    	}
+    	
+    	
     	//choose a drone that is not active AND is on the same gate
     	Loc gateLoc = (gate == 0) ? Loc.GATE_0 : Loc.GATE_1;
         for (VirtualDrone drone : droneList) {

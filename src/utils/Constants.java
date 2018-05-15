@@ -39,7 +39,7 @@ public class Constants {
      * Renderer constants
      */
     public static final float FOV = FloatMath.toRadians(90);
-    public static final float Z_NEAR = 0.7f;
+    public static final float Z_NEAR = 1.2f;
     public static final float Z_FAR = 10000.f;
     public static final float DRONE_THICKNESS = 0.35f;  //in meters
     public static final float DRONE_WHEEL_THICKNESS = 0.08f;
