@@ -115,6 +115,7 @@ public class AirportManager implements AutopilotModule{
     	    	if(drone == null) continue;
     	    	
     	    	schedPack.add(pack);
+    	    	
     	    	pack.assignDrone(drone);
     	    	drone.setPackage(pack);
     	    	
@@ -144,9 +145,11 @@ public class AirportManager implements AutopilotModule{
     				     		                                currentSlice);
     				 }
     			} else { //this is a big time error case but I'm brute force checking it because it randomly rarely happens
+    				System.out.println("dikke error fest");
     				transportQueue.add(pack);
     				drone.setPackage(null);
     				pack.setStatus("In queue*");
+    				schedPack.remove(pack);
     			}
     		}
     		
@@ -177,18 +180,18 @@ public class AirportManager implements AutopilotModule{
     			Loc location = whereOnAirport(vDrone.getPosition(), currentAirport);
     			int gate = location == Loc.GATE_0 ? 0 : 1;
     			
-    			if(airportlist.indexOf(currentAirport) == pack.getFromAirport() && pack.getFromGate() == gate) {
+    			if(currentAirport.getId() == pack.getFromAirport() && pack.getFromGate() == gate) {
     				
     				pack.assignDrone(vDrone);
     				vDrone.setPackage(pack);
-    				
+    				System.out.println("ok ik ben er geraakt");
     				
     				vDrone.setPilot(new Pilot(vDrone, this));
     				vDrone.getPilot().simulationStarted(vDrone.getConfig(), vDrone.getInputs());
     				
     				int currentSlice = (droneList.indexOf(vDrone)*10)+MIN_HEIGHT; 
     				
-    				vDrone.getPilot().fly(vDrone.getInputs(), currentAirport, 0, 
+    				vDrone.getPilot().fly(vDrone.getInputs(), currentAirport, 1, 
                              airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
                              airportlist.get(pack.getToAirport()), pack.getToGate(),
                              currentSlice);
@@ -302,7 +305,7 @@ public class AirportManager implements AutopilotModule{
 			if(onFullAirport(dronePos, airport) && (whereOnAirport(dronePos, airport) == loc || whereOnAirport(dronePos, airport) == Loc.LANE_0 || whereOnAirport(dronePos, airport) == Loc.LANE_1)){
 				return false;
 			}
-			else if(dronePilot != null && dronePilot.currentPilot() instanceof LandingPilot && ((LandingPilot) dronePilot.currentPilot()).getCurrentDestionationAirport() == airport){
+			else if(dronePilot != null && !dronePilot.getEnded() && dronePilot.currentPilot() instanceof LandingPilot && ((LandingPilot) dronePilot.currentPilot()).getCurrentDestionationAirport() == airport){
 				return false;
 			}
 			

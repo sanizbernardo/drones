@@ -143,18 +143,12 @@ public class Pilot {
 		
 		//second flight
 
-		this.pilots[TAXIING_2] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
-                fromAirport.getHeading() 
-                : 
-                fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1));
+		this.pilots[TAXIING_2] = new TaxiPilot(fromAirport.getGate(fromGate), fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1));
 		
 		this.pilots[TAKING_OFF_2] = new TakeOffPilot(flyHeight);
 		this.pilots[FLYING_2] = new FlyPilot(toAirport, flyHeight, airportManager, toGate);
 		this.pilots[LANDING_2] = new LandingPilot(toAirport);
-		this.pilots[PICKUP_TAXI_2] = new TaxiPilot(toAirport.getGate(toGate), toGate == 0 ? 
-                toAirport.getHeading() 
-                : 
-                toAirport.getHeading() + FloatMath.PI * (toAirport.getHeading() < 0 ? 1 : -1));
+		this.pilots[PICKUP_TAXI_2] = new TaxiPilot(toAirport.getGate(toGate), toAirport.getHeading() + FloatMath.PI * (toAirport.getHeading() < 0 ? 1 : -1));
 		
 		this.pilots[HANDBRAKE_2] = new HandbrakePilot();
 
@@ -227,5 +221,9 @@ public class Pilot {
 		if (this.tasks == null || this.index >= this.tasks.length) 
 			return "Idle";
 		return currentPilot().taskName();
+	}
+	
+	public boolean getEnded() {
+		return tasks.length == state();
 	}
 }
