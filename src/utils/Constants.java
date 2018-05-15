@@ -57,7 +57,7 @@ public class Constants {
      */
     public static final int TARGET_FPS = 75;
     public static final int TARGET_UPS = 100;
-    public static final float SPEED = 10f;
+    public static final float SPEED = 5f;
 
     /**
      * Camera constants
@@ -87,5 +87,5 @@ public class Constants {
     public static final int DEFAULT_NB_ROWS = 200;
     
     public static final float DEFAULT_AIRPORT_LENGTH = 250f;
-    public static final float DEFAULT_AIRPORT_WIDTH = 25f;
+    public static final float DEFAULT_AIRPORT_WIDTH = 30f;
 }

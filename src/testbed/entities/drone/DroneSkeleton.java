@@ -16,8 +16,8 @@ public class DroneSkeleton {
     private Wheel wheel;
 
     public DroneSkeleton(AutopilotConfig config){
-        left  = new LeftWing(config, Constants.DRONE_THICKNESS);
-        right = new RightWing(config, Constants.DRONE_THICKNESS);
+        left  = new LeftWing(config, Constants.DRONE_THICKNESS/2);
+        right = new RightWing(config, Constants.DRONE_THICKNESS/2);
         body  = new Body(config, Constants.DRONE_THICKNESS);
         wheel = new Wheel(config, Constants.DRONE_WHEEL_THICKNESS);
     }
