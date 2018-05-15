@@ -253,7 +253,11 @@ public class UpdateHelper {
 		Package newPackage = new Package(details);
 		Gate fromGate = new Gate(newPackage, true);
 		
-		if (!fromPackages.containsKey(fromGate) && newPackage.getFromAirport() != newPackage.getDestAirport()) {
+		if (newPackage.getFromAirport() != newPackage.getDestAirport()
+				&& !fromPackages.containsKey(fromGate)) {
+
+			if(packages.size() > 1 && droneCarryingPresent(fromGate)) return;
+			
 			fromPackages.put(fromGate, newPackage);
 			packages.add(newPackage);
 			
@@ -268,6 +272,20 @@ public class UpdateHelper {
 				autopilotModule.deliverPackage(newPackage.getFromAirport(), newPackage.getFromGate(),
 					newPackage.getDestAirport(), newPackage.getDestGate());
 		}
+	}
+
+	private boolean droneCarryingPresent(Gate fromGate) {
+		boolean found = false;
+		for(int id : droneHelper.droneIds.values()) {
+			if(droneHelper.getDronePhysics(id).getAirportNb() == fromGate.airportNb) {
+				int gateId = droneHelper.getDronePhysics(id).getAirportNb() - Physics.GATE_0;
+				if(gateId == fromGate.gateNb) {
+					found = true;
+				}
+			}
+		}
+		
+		return found;
 	}
 	
 	

@@ -89,75 +89,8 @@ public class AirportManager implements AutopilotModule{
     public void deliverPackage(int fromAirport, int fromGate, int toAirport, int toGate) {
     	VirtualPackage pack = new VirtualPackage(fromAirport, fromGate, toAirport, toGate);
     	gui.addPackage(pack);
-    	
-    	boolean override = false;
-    	
-    	// pilot override check, again a loop over all drones, but this doesn't have to
-    	// be run that often (not every delta) so it's not that bad
-    	for(VirtualDrone vDrone : droneList) {
-    		if(getDroneAirports(vDrone).size() == 0 ) continue;
-    		if(vDrone.getPilot() == null) continue;
-    		if(vDrone.getPilot().approximateVelocity(vDrone.getInputs()) != null && FloatMath.norm(vDrone.getPilot().approximateVelocity(vDrone.getInputs())) > 1) continue;
-    		
-    		VirtualAirport currentAirport = getDroneAirports(vDrone).get(0);
-    		
-    		if(currentAirport == airportlist.get(fromAirport)) {
-    			// the newly spawned packet is on the same airport as a drone
-    			Loc location = (fromGate == 0) ? Loc.GATE_0 : Loc.GATE_1;
-    			
-    			if (whereOnAirport(vDrone.getPosition(), currentAirport) == location) {
-    				// the newly spawned packet is also on the same gate as the drone!
-    				// if this drone now is not carrying a packet but going to a remote
-    				// airport it will take the package but our scheduler won't think it
-    				// it is handling it. We must manually override the pilot with a new one
-    				// also adding his current task to the queue again
-    				
-    				if(vDrone.getPackage() == null) continue;
-    				
-    				if(airportlist.get(vDrone.getPackage().getFromAirport()) != currentAirport) {
-    					// the package the drone has to pickup was on another airport
-    					// this means he is not currently carrying a package and he will
-    					// pick up this new package!
-    					
-    					override = true;
-    					
-    					// make sure the old package is not lost
-    					VirtualPackage oldPack = vDrone.getPackage();
-    					transportQueue.add(oldPack);
-    					oldPack.setStatus("Forced to queue");
-    					oldPack.assignDrone(null);
-    					
-    					// override the pilot
-    					vDrone.setPilot(new Pilot(vDrone, this));
-    					vDrone.getPilot().simulationStarted(vDrone.getConfig(), vDrone.getInputs());	
-    					vDrone.setPackage(pack);
-    					pack.assignDrone(vDrone);
-    					
-    					int currentSlice = (droneList.indexOf(vDrone)*10)+MIN_HEIGHT; 
-    					
-    					if(location == Loc.GATE_0) {
-    					     vDrone.getPilot().fly(vDrone.getInputs(), currentAirport, 0, 
-    					     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
-    					     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
-    					     		                                currentSlice);
-    				    } else {
-    				    	vDrone.getPilot().fly(vDrone.getInputs(), currentAirport, 1, 
-    					     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
-    					     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
-    					     		                                currentSlice);
-    					 }
-    					
-    				} 
-    			}
-    		}
-    	}
-    	
-    	if(!override) {
-    		transportQueue.add(pack);
-        	pack.setStatus("In queue");
-    	}
-    	
-    	
+		transportQueue.add(pack);
+    	pack.setStatus("In queue");
     }
     
     /**
