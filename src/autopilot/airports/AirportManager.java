@@ -96,7 +96,8 @@ public class AirportManager implements AutopilotModule{
     	// be run that often (not every delta) so it's not that bad
     	for(VirtualDrone vDrone : droneList) {
     		if(getDroneAirports(vDrone).size() == 0 ) continue;
-    		if(vDrone.getPilot() != null && vDrone.getPilot().approximateVelocity(vDrone.getInputs()) != null && FloatMath.norm(vDrone.getPilot().approximateVelocity(vDrone.getInputs())) > 1) continue;
+    		if(vDrone.getPilot() == null) continue;
+    		if(vDrone.getPilot().approximateVelocity(vDrone.getInputs()) != null && FloatMath.norm(vDrone.getPilot().approximateVelocity(vDrone.getInputs())) > 1) continue;
     		
     		VirtualAirport currentAirport = getDroneAirports(vDrone).get(0);
     		
@@ -182,28 +183,37 @@ public class AirportManager implements AutopilotModule{
 	    	pack.assignDrone(drone);
 	    	drone.setPackage(pack);
 	    	
-			VirtualAirport currentAirport = airportlist.stream()
+			ArrayList<VirtualAirport> currentAirportList = (ArrayList<VirtualAirport>) airportlist.stream()
 			 		                                   .filter((a) -> Pilot.onAirport(drone.getPosition(), a))
-			 		                                   .collect(Collectors.toList()).get(0);
+			 		                                   .collect(Collectors.toList());
 
-			//get a slice from the set
-			int currentSlice = (droneList.indexOf(drone)*10)+MIN_HEIGHT; 
+			if(currentAirportList.size() >= 1) {
+				VirtualAirport currentAirport = currentAirportList.get(0);
+				
+				//get a slice from the set
+				int currentSlice = (droneList.indexOf(drone)*10)+MIN_HEIGHT; 
+				
+				// when a drone has a pilot, it is considered active
+				drone.setPilot(new Pilot(drone, this));
+				drone.getPilot().simulationStarted(drone.getConfig(), drone.getInputs());	
+				
+				if(whereOnAirport(drone.getPosition(), currentAirport) == Loc.GATE_0) {
+				     drone.getPilot().fly(drone.getInputs(), currentAirport, 0, 
+				     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
+				     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
+				     		                                currentSlice);
+			    } else {
+				     drone.getPilot().fly(drone.getInputs(), currentAirport, 1, 
+				     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
+				     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
+				     		                                currentSlice);
+				 }
+			} else { //this is a big time error case but I'm brute force checking it because it randomly rarely happens
+				transportQueue.add(pack);
+				drone.setPackage(null);
+				pack.setStatus("In queue*");
+			}
 			
-			// when a drone has a pilot, it is considered active
-			drone.setPilot(new Pilot(drone, this));
-			drone.getPilot().simulationStarted(drone.getConfig(), drone.getInputs());	
-			
-			if(whereOnAirport(drone.getPosition(), currentAirport) == Loc.GATE_0) {
-			     drone.getPilot().fly(drone.getInputs(), currentAirport, 0, 
-			     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
-			     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
-			     		                                currentSlice);
-		    } else {
-			     drone.getPilot().fly(drone.getInputs(), currentAirport, 1, 
-			     		                                airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
-			     		                                airportlist.get(pack.getToAirport()), pack.getToGate(),
-			     		                                currentSlice);
-			 }
 			 
     	}
 	}
