@@ -11,9 +11,9 @@ public class ImageRecognitionTest {
         	x = 3f;
         	y = 3f;
         	z = -3f;
-        	dx = 0f;
-        	dy = 0f;
-        	dz = 0f;
+        	dx = 0.03f;
+        	dy = 0.03f;
+        	dz = -0.03f;
             IWorldRules worldRules = new ImgRecogWorld(x, y, z, dx, dy, dz);
         	
             //IWorldRules worldRules = new TestWorld();

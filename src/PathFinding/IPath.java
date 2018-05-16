@@ -50,7 +50,6 @@ public class IPath implements Path{
 	 * Generate the path.
 	 */
 	private void setPath() {
-		System.out.println(turningRadius);
 		ArrayList<float[]> cubesInPath = new ArrayList<>();
 		addLiftOffPoint();
 		for(int i = 0; i<cubeLocations.size(); i++){
