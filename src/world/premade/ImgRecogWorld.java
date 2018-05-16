@@ -28,7 +28,7 @@ public class ImgRecogWorld extends World {
 	public void setup() {
 		config = Utils.createDefaultConfig();
 		
-		addDrone(config, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
+		addDrone(config, new Vector3f(0, 2, 0), new Vector3f(0, 0, 0));
 		
 		planner = new ImgRecogPlanner(x, y, z, dx, dy, dz);
 		
@@ -38,8 +38,7 @@ public class ImgRecogWorld extends World {
 		
 		worldObjects[0].setPosition(x, y, z);
 		//worldObjects[1].setPosition(3, 4, -4);
-		
-		
+
 	}
 	
 	private float x, y, z;
