@@ -66,7 +66,7 @@ public class FlyPilot extends PilotPart {
 		this.climbAngle = Constants.climbAngle;
 		this.rMax = config.getRMax();
 		this.maxThrust = config.getMaxThrust();
-		this.turnRadius = 576f;
+		this.turnRadius = 556f;
 //		pointBR = new Vector3f(-this.turnRadius, 100f, -this.turnRadius - 700f);
 		float distance = 1300 + (fly_height-50)*10; 
 		pointBR = getTargetPos(currentDestionationAirport.getPosition(), currentDestionationAirport.getHeading(), distance);
@@ -573,7 +573,7 @@ public class FlyPilot extends PilotPart {
 	private Vector3f getTargetPos(Vector3f airportPos, float heading, float distance) {
 		Vector3f targetPos = new Vector3f();
 		targetPos.x = (float) (airportPos.x + Math.sin(Math.PI+heading)*distance);
-		targetPos.y = airportPos.y;
+		targetPos.y = fly_height;
 		targetPos.z = (float) (airportPos.z + Math.cos(Math.PI+heading)*distance);
 		return targetPos;
 	}
