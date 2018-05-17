@@ -479,7 +479,7 @@ public class FlyPilot extends PilotPart {
 		Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
 		float[] aux = auxLocPlusX(pointBeforeRunway, headingRunwayToPoint, temp);
 		Vector3f pBRPaux = new Vector3f(aux[0], aux[1], aux[2]);
-		if(pos.distance(pBRPaux) < this.turnRadius + 10 && pos.distance(pBRPaux) > this.turnRadius - 10 && Math.abs(headingChecker - inputs.getHeading()) < 0.1){ //TODO deze condities nog is nakijken
+		if(pos.distance(pBRPaux) < this.turnRadius + 5 && pos.distance(pBRPaux) > this.turnRadius - 5 && Math.abs(headingChecker - inputs.getHeading()) < 0.1){ //TODO deze condities nog is nakijken
 			part1Complete = true;
 		}
 		

@@ -107,7 +107,7 @@ public class LandingPilot extends PilotPart {
 		
 		//plane is too much left
 		if(orientation(centerRight, centerRightPlus, pos) == 1){
-			rollPID.setSetpoint(Math.toRadians(-2));
+			rollPID.setSetpoint(Math.toRadians(-3));
 			float output = (float) rollPID.getOutput(input.getRoll());
 			
 			lwIncl -= output;
@@ -115,7 +115,7 @@ public class LandingPilot extends PilotPart {
 		}
 		//too much right
 		else if(orientation(centerLeft, centerLeftPlus, pos) == 2){
-			rollPID.setSetpoint(Math.toRadians(2));
+			rollPID.setSetpoint(Math.toRadians(3));
 			float output = (float) rollPID.getOutput(input.getRoll());
 			
 			lwIncl -= output;
@@ -125,7 +125,7 @@ public class LandingPilot extends PilotPart {
 		else{
 			//heading too much left
 			if(makeNormal(input.getHeading() - (airportHeading + (float)Math.PI)) > Math.toRadians(1)){
-				rollPID.setSetpoint(Math.toRadians(-3.5));
+				rollPID.setSetpoint(Math.toRadians(-10));
 				float output = (float) rollPID.getOutput(input.getRoll());
 				
 				lwIncl -= output;
@@ -133,7 +133,7 @@ public class LandingPilot extends PilotPart {
 			}
 			//heading too much right
 			else if(makeNormal(input.getHeading() - (airportHeading + (float)Math.PI)) < Math.toRadians(-1)){
-				rollPID.setSetpoint(Math.toRadians(3.5));
+				rollPID.setSetpoint(Math.toRadians(10));
 				float output = (float) rollPID.getOutput(input.getRoll());
 				
 				lwIncl -= output;
