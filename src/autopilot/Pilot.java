@@ -224,6 +224,6 @@ public class Pilot {
 	}
 	
 	public boolean getEnded() {
-		return tasks.length == state();
+		return tasks.length == index;
 	}
 }

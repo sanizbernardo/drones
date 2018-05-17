@@ -22,11 +22,14 @@ public class ChainWorld extends World{
 	public void setupAirports() {
 		addAirport(new Vector3f(-200, 0, -11), 0);
 		addAirport(new Vector3f(1015, 0, 1089), FloatMath.toRadians(45));
+		addAirport(new Vector3f(-1000, 0, -1000), FloatMath.toRadians(-45));
 	}
 
 	@Override
 	public void setupDrones() {
-		addDrone("drone1", 0, 0, 0);
+		addDrone("drone0", 0, 0, 0);
+		addDrone("drone1", 1, 0, 0);
+
 	}
 
 	@Override

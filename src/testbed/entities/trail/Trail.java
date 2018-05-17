@@ -24,10 +24,10 @@ public class Trail {
     }
     
     public void leaveTrail(Vector3f pos) {
-        if(Utils.euclDistance(last, pos, 5)) {
-            makeTrail(pos);
-            if(pathObjects.size() > MAX_SIZE) pathObjects.remove(0);
-        }
+//        if(Utils.euclDistance(last, pos, 5)) {
+//            makeTrail(pos);
+//            if(pathObjects.size() > MAX_SIZE) pathObjects.remove(0);
+//        }
     }
 
     private void makeTrail(Vector3f pos) {
