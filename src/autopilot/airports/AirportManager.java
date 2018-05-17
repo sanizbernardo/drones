@@ -10,6 +10,7 @@ import autopilot.pilots.LandingPilot;
 import utils.FloatMath;
 
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -19,7 +20,7 @@ public class AirportManager implements AutopilotModule{
 
     private float length;
     private float width;
-    private int MIN_HEIGHT = 50;
+    private int MIN_HEIGHT = 50, SLICE_THICKNESS = 7;
 
     private List<VirtualAirport> airportlist;
     private List<VirtualDrone> droneList;
@@ -71,9 +72,9 @@ public class AirportManager implements AutopilotModule{
     public void startTimeHasPassed(int drone, AutopilotInputs inputs) {
         droneList.get(drone).setInputs(inputs);
         droneList.get(drone).calcOutputs();
-        handleTransportEvents();
+        if (drone ==  droneList.size() - 1) handleTransportEvents(inputs.getElapsedTime());
     }
-;
+
     @Override
     public AutopilotOutputs completeTimeHasPassed(int drone) {
         if (drone ==  droneList.size() - 1)
@@ -97,18 +98,31 @@ public class AirportManager implements AutopilotModule{
      * Checks if we need to assign a drone that is idling or
      * if a drone picked up a packet.
      */
-    private void handleTransportEvents() {
-    	forcedPickupSchedule();
-    	regularSchedule();
+    private void handleTransportEvents(float time) {
+    	
+    	
+    	float dt = time - this.oldTimeHandleTransport;
+    	oldTimeBuffer += dt;
+    	
+    	if(oldTimeBuffer > 1) {
+        	forcedPickupSchedule();
+        	regularSchedule();
+        	oldTimeBuffer = 0;
+    	}
+    	
+    	this.oldTimeHandleTransport = time;
     }
-
+    float oldTimeHandleTransport;
+    float oldTimeBuffer;
+    
     /**
      * A regular schedule cycle should do this
      */
 	private void regularSchedule() {
 		// if there wasn't a drone that picked up a package already, do a simple schedule
-    	if(!transportQueue.isEmpty() && getReadyDrones().size() > 0) {
+    	if(!transportQueue.isEmpty()) {
     		ArrayList<VirtualPackage> schedPack = new ArrayList<>();
+    		ArrayList<VirtualPackage> reAddPack = new ArrayList<>();
     		
     		for(VirtualPackage pack : transportQueue) {
     			VirtualDrone drone = chooseBestDrone(pack.getFromAirport(), pack.getFromGate());
@@ -127,7 +141,7 @@ public class AirportManager implements AutopilotModule{
     				VirtualAirport currentAirport = currentAirportList.get(0);
     				
     				//get a slice from the set
-    				int currentSlice = (droneList.indexOf(drone)*10)+MIN_HEIGHT; 
+    				int currentSlice = (droneList.indexOf(drone)*SLICE_THICKNESS)+MIN_HEIGHT; 
     				
     				// when a drone has a pilot, it is considered active
     				drone.setPilot(new Pilot(drone, this));
@@ -146,13 +160,14 @@ public class AirportManager implements AutopilotModule{
     				 }
     			} else { //this is a big time error case but I'm brute force checking it because it randomly rarely happens
     				System.out.println("dikke error fest");
-    				transportQueue.add(pack);
+    				reAddPack.add(pack);
     				drone.setPackage(null);
     				pack.setStatus("In queue*");
     				schedPack.remove(pack);
     			}
     		}
     		
+    		transportQueue.addAll(reAddPack);
     		transportQueue.removeAll(schedPack);
     		
     	}
@@ -164,6 +179,9 @@ public class AirportManager implements AutopilotModule{
 	 * system remains consistent with the testbed.
 	 */
 	private void forcedPickupSchedule() {
+		
+		if(transportQueue.isEmpty()) return;
+		
     	ArrayList<VirtualPackage> deletionList = new ArrayList<>();
     	
     	// assign the package to a drone that already picked it up
@@ -184,12 +202,11 @@ public class AirportManager implements AutopilotModule{
     				
     				pack.assignDrone(vDrone);
     				vDrone.setPackage(pack);
-    				System.out.println("ok ik ben er geraakt");
     				
     				vDrone.setPilot(new Pilot(vDrone, this));
     				vDrone.getPilot().simulationStarted(vDrone.getConfig(), vDrone.getInputs());
     				
-    				int currentSlice = (droneList.indexOf(vDrone)*10)+MIN_HEIGHT; 
+    				int currentSlice = (droneList.indexOf(vDrone)*SLICE_THICKNESS)+MIN_HEIGHT; 
     				
     				vDrone.getPilot().fly(vDrone.getInputs(), currentAirport, 1, 
                              airportlist.get(pack.getFromAirport()), pack.getFromGate(), 
@@ -232,37 +249,38 @@ public class AirportManager implements AutopilotModule{
     
     public VirtualDrone chooseBestDrone(int airport, int gate) {
     	
-    	// is there already a drone going there? fok off
-    	for(VirtualDrone vDrone : droneList) {
-    		if(vDrone.getPackage() == null) continue;
-    		if(vDrone.getPackage().getToAirport() == airport 
-    		   && vDrone.getPackage().getToGate() == gate) {
+    	
+    	for(VirtualDrone drone : droneList) {
+    		// is there already a drone going there? fok off
+    		if(drone.getPackage() != null 
+    		   && drone.getPackage().getToAirport() == airport 
+    		   && drone.getPackage().getToGate() == gate) {
     			return null;
     		}
     	}
-    	
-    	
-    	//choose a drone that is not active AND is on the same gate
-    	Loc gateLoc = (gate == 0) ? Loc.GATE_0 : Loc.GATE_1;
-        for (VirtualDrone drone : droneList) {
+    		
+    	for(VirtualDrone drone : droneList) {
+        	//choose a drone that is not active AND is on the same gate
+        	Loc gateLoc = (gate == 0) ? Loc.GATE_0 : Loc.GATE_1;
             if (!drone.isActive() 
             		&& Pilot.onAirport(drone.getPosition(), airportlist.get(airport)) 
-            		&& this.whereOnAirport(drone.getPosition(), airportlist.get(airport)) == gateLoc)
-                return drone;
-        }
+            		&& this.whereOnAirport(drone.getPosition(), airportlist.get(airport)) == gateLoc) {
+            	return drone;
+            }
+            
+            //choose a drone that is not active AND is on the same airport
+            if (!drone.isActive() && Pilot.onAirport(drone.getPosition(), airportlist.get(airport))){
+            	return drone;
+            }
+            
+        	//if we can't find a drone that is already on that airport, pick a random non-active one
+            if (!drone.isActive()){
+            	return drone;
+            }
+            
+    	}
     	
     	
-    	//choose a drone that is not active AND is on the same airport
-        for (VirtualDrone drone : droneList) {
-            if (!drone.isActive() && Pilot.onAirport(drone.getPosition(), airportlist.get(airport)))
-                return drone;
-        }
-    	
-    	//if we can't find a drone that is already on that airport, pick a random non-active one
-        for (VirtualDrone drone : droneList) {
-            if (!drone.isActive())
-                return drone;
-        }
         return null;
     }
     

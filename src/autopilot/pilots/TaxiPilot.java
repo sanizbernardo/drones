@@ -88,7 +88,7 @@ public class TaxiPilot extends PilotPart {
 
 		float taxispeed;
 		if (distance < 12.5) {
-			taxispeed = 0.9f;
+			taxispeed = 1f;
 		} else if (distance < 25f) {
 			taxispeed = 3f;
 		} else {
