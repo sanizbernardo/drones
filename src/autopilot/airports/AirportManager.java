@@ -257,8 +257,9 @@ public class AirportManager implements AutopilotModule{
     		   && drone.getPackage().getToGate() == gate) {
     			return null;
     		}
+    	}
     		
-    		
+    	for(VirtualDrone drone : droneList) {
         	//choose a drone that is not active AND is on the same gate
         	Loc gateLoc = (gate == 0) ? Loc.GATE_0 : Loc.GATE_1;
             if (!drone.isActive() 

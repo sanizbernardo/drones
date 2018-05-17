@@ -16,12 +16,12 @@ public class Gate {
 
     private float UP_DELTA = 0.05f;
 
-    public Gate(Vector3f position, float width, float rotation) {
+    public Gate(Vector3f position, float width, float rotation, float[] color) {
         this.position = position;
         this.width = width;
         this.rotation = rotation;
 
-        this.colorGate.set(Utils.toRGB(250, 0.1f, 0.9f));
+        this.colorGate.set(color);
 
         this.object = new WorldObject(new GateMesh(width, UP_DELTA, colorGate).getMesh());
         this.object.setPosition(position);
