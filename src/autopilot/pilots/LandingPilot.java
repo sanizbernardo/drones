@@ -210,7 +210,7 @@ public class LandingPilot extends PilotPart {
 		float len = diff.dot(new Vector3f(-FloatMath.sin(airport.getHeading()), 0, -FloatMath.cos(airport.getHeading())));
 		float wid = diff.dot(new Vector3f(-FloatMath.cos(airport.getHeading()), 0, FloatMath.sin(airport.getHeading())));
 		
-		if (Math.abs(len) > airport.getWidth() / 2 + airport.getLength() + 125) {	
+		if (Math.abs(len) > airport.getWidth() / 2 + airport.getLength() + 75) {	
 			return false;
 		} else if (Math.abs(wid) > airport.getWidth()) {
 			return false;
