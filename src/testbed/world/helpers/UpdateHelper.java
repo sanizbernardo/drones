@@ -248,6 +248,7 @@ public class UpdateHelper {
 		}
 	}
 	
+	boolean started = false;
 	
 	private void addPackage(int[] details) {
 		Package newPackage = new Package(details);
@@ -256,7 +257,8 @@ public class UpdateHelper {
 		if (newPackage.getFromAirport() != newPackage.getDestAirport()
 				&& !fromPackages.containsKey(fromGate)) {
 
-			if(packages.size() > 1 && droneCarryingPresent(fromGate)) return;
+			if(started && droneCarryingPresent(fromGate)) return;
+			started = true;
 			
 			fromPackages.put(fromGate, newPackage);
 			packages.add(newPackage);
@@ -275,17 +277,15 @@ public class UpdateHelper {
 	}
 
 	private boolean droneCarryingPresent(Gate fromGate) {
-		boolean found = false;
 		for(int id : droneHelper.droneIds.values()) {
 			if(droneHelper.getDronePhysics(id).getAirportNb() == fromGate.airportNb) {
-				int gateId = droneHelper.getDronePhysics(id).getAirportNb() - Physics.GATE_0;
+				int gateId = droneHelper.getDronePhysics(id).getAirportLocation() - Physics.GATE_0;
 				if(gateId == fromGate.gateNb) {
-					found = true;
+					return true;
 				}
 			}
 		}
-		
-		return found;
+		return false;
 	}
 	
 	

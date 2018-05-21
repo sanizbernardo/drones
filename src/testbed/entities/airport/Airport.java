@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 
 import testbed.entities.WorldObject;
 import utils.FloatMath;
+import utils.Utils;
 
 public class Airport {
 	
@@ -40,9 +41,9 @@ public class Airport {
 																	 heading > 0 ? heading - FloatMath.PI: heading + FloatMath.PI);
 		
 		this.gate0 = new Gate(position.add(directionPerp.mul(width/2f, new Vector3f())
-									  .sub(direction.mul(width/2f, new Vector3f()), new Vector3f()), new Vector3f()), width, heading);
+									  .sub(direction.mul(width/2f, new Vector3f()), new Vector3f()), new Vector3f()), width, heading, Utils.toRGB(250, 0.1f, 0.9f));
 		this.gate1 = new Gate(position.sub(directionPerp.mul(width/2f, new Vector3f())
-									  .add(direction.mul(width/2f, new Vector3f()), new Vector3f()), new Vector3f()), width, heading);
+									  .add(direction.mul(width/2f, new Vector3f()), new Vector3f()), new Vector3f()), width, heading, Utils.toRGB(250, 0.1f, 0.6f));
 	}
 	
 	

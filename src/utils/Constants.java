@@ -39,7 +39,7 @@ public class Constants {
      * Renderer constants
      */
     public static final float FOV = FloatMath.toRadians(90);
-    public static final float Z_NEAR = 0.7f;
+    public static final float Z_NEAR = 1.2f;
     public static final float Z_FAR = 10000.f;
     public static final float DRONE_THICKNESS = 0.35f;  //in meters
     public static final float DRONE_WHEEL_THICKNESS = 0.08f;
@@ -57,7 +57,7 @@ public class Constants {
      */
     public static final int TARGET_FPS = 75;
     public static final int TARGET_UPS = 100;
-    public static final float SPEED = 5f;
+    public static final float SPEED = 10f;
 
     /**
      * Camera constants
@@ -87,5 +87,5 @@ public class Constants {
     public static final int DEFAULT_NB_ROWS = 200;
     
     public static final float DEFAULT_AIRPORT_LENGTH = 250f;
-    public static final float DEFAULT_AIRPORT_WIDTH = 30f;
+    public static final float DEFAULT_AIRPORT_WIDTH = 50f;
 }

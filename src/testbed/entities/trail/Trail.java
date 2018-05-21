@@ -1,6 +1,7 @@
 package testbed.entities.trail;
 
 import testbed.entities.WorldObject;
+import testbed.graphics.meshes.Mesh;
 import testbed.graphics.meshes.cube.TrailCube;
 
 import org.joml.Vector3f;
@@ -8,6 +9,7 @@ import org.joml.Vector3f;
 import utils.Utils;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Trail {
@@ -15,9 +17,10 @@ public class Trail {
     private Vector3f last = new Vector3f(0,0,0);
     private List<WorldObject> pathObjects;
     private static int MAX_SIZE = 50;
+    private Mesh trailCube = new TrailCube().getMesh();
     
     public Trail() {
-    	 pathObjects = new ArrayList<>();
+    	 pathObjects = new LinkedList<>();
     }
     
     public void leaveTrail(Vector3f pos) {
@@ -28,7 +31,7 @@ public class Trail {
     }
 
     private void makeTrail(Vector3f pos) {
-        WorldObject cube = new WorldObject(new TrailCube().getMesh());
+        WorldObject cube = new WorldObject(trailCube);
         cube.setPosition(pos);
         cube.setScale(0.8f);
         cube.setRotation(45, 45, 0);

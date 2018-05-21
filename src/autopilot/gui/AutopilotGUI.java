@@ -48,9 +48,6 @@ public class AutopilotGUI extends JFrame {
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 		
-		droneUI = new DroneControlUI(drones);
-		contentPanel.add(droneUI.content);
-		
 		droneTable = new DroneTable(drones);
 		JTable droneJTable = new JTable(droneTable);
 		droneJTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -96,6 +93,9 @@ public class AutopilotGUI extends JFrame {
 		JScrollPane packagePane = new JScrollPane(packageJTable);
 		packagePane.setPreferredSize(new Dimension(500, 250));
 		contentPanel.add(packagePane);
+		
+		droneUI = new DroneControlUI(drones);
+		contentPanel.add(droneUI.content);
 	}
 	
 	
