@@ -27,18 +27,12 @@ public class HandbrakePilot extends PilotPart {
 			speed = 0;
 		}
 
-		/*
 		if (speed < 0.005) {
 			System.out.println("Finished handbrake");
 			this.ended = true;
 			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 		} else if (speed == Math.min(previousspeed, oldspeed)) {
 			maxR = 0.5f*maxR;
-		}*/
-
-		if (speed == Math.min(previousspeed, oldspeed)) {
-			this.ended = true;
-			return Utils.buildOutputs(0, 0, 0, 0, 0, 0, 0, 0);
 		}
 
 		this.oldPos = pos;

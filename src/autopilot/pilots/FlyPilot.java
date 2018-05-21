@@ -440,6 +440,7 @@ public class FlyPilot extends PilotPart {
 	private float prevHeading = -1;
 	
 	private float getTargetHeading(AutopilotInputs inputs){
+		System.out.println(counter);
 		counter -= Math.abs(prevHeading) - inputs.getHeading();
 		prevHeading = inputs.getHeading();
 		float[] pointBeforeRunway = {pointBR.x, pointBR.y, pointBR.z}; //TODO

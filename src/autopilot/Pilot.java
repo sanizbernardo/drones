@@ -25,15 +25,12 @@ public class Pilot {
 							 HANDBRAKE = 4,
 							 PICKUP_TAXI = 5,
 							 
-							 TAKING_OFF_2 = 6,
+							 TAKING_OFF_2 = 6, 
 							 LANDING_2 = 7,
 							 FLYING_2 = 8,
 							 TAXIING_2 = 9,
 							 HANDBRAKE_2 = 10,
-							 PICKUP_TAXI_2 = 11,
-
-							 CONTROL_TAXI = 12,
-							 CONTROL_TAXI_2 = 13;
+							 PICKUP_TAXI_2 = 11;
 	
 	private int index;
 	private int[] tasks;
@@ -59,11 +56,7 @@ public class Pilot {
 	public void simulationStarted(AutopilotConfig config, AutopilotInputs inputs) {
 		this.config = config;
 	}
-
-	public AirportManager getAirportManager() {
-		return airportManager;
-	}
-
+	
 	public Vector3f approximateVelocity(AutopilotInputs inputs) {
 		if(timePassedOldPos == null) return null;
 		Vector3f pos = new Vector3f(inputs.getX(), inputs.getY(), inputs.getZ());
@@ -140,25 +133,15 @@ public class Pilot {
 		this.pilots[TAXIING] = new TaxiPilot(currentAirport.getGate(currentGate), currentGate == 0 ? 
 				currentAirport.getHeading() 
                 : 
-                currentAirport.getHeading() + FloatMath.PI * (currentAirport.getHeading() < 0 ? 1 : -1), getAirportManager().getWidth());
+                currentAirport.getHeading() + FloatMath.PI * (currentAirport.getHeading() < 0 ? 1 : -1));
 		
 		this.pilots[TAKING_OFF] = new TakeOffPilot(flyHeight);
 		this.pilots[FLYING] = new FlyPilot(fromAirport, flyHeight, airportManager, fromGate);
 		this.pilots[LANDING] = new LandingPilot(fromAirport);
-
-		float taxiheading = fromGate == 0 ?
-				fromAirport.getHeading()
-				:
-				fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1);
-
-		this.pilots[CONTROL_TAXI] = new TaxiPilot(fromAirport.getGate(fromGate)
-										.add(new Vector3f(
-												-this.getAirportManager().getWidth()*FloatMath.sin(taxiheading),
-												0,
-												-this.getAirportManager().getWidth()*FloatMath.cos(taxiheading))
-										), getAirportManager().getWidth());
-		this.pilots[PICKUP_TAXI] = new TaxiPilot(fromAirport.getGate(fromGate), taxiheading, getAirportManager().getWidth());
-
+		this.pilots[PICKUP_TAXI] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
+                fromAirport.getHeading() 
+                : 
+                fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1));
 		
 		this.pilots[HANDBRAKE] = new HandbrakePilot();
 
@@ -166,31 +149,24 @@ public class Pilot {
 		
 		//second flight
 
-		this.pilots[TAXIING_2] = new TaxiPilot(fromAirport.getGate(fromGate), taxiheading, getAirportManager().getWidth());
+		this.pilots[TAXIING_2] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
+                fromAirport.getHeading() 
+                : 
+                fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1));
 		
 		this.pilots[TAKING_OFF_2] = new TakeOffPilot(flyHeight);
 		this.pilots[FLYING_2] = new FlyPilot(toAirport, flyHeight, airportManager, toGate);
 		this.pilots[LANDING_2] = new LandingPilot(toAirport);
-
-		float taxiheading2 = toGate == 0 ?
-				toAirport.getHeading()
-				:
-				toAirport.getHeading() + FloatMath.PI * (toAirport.getHeading() < 0 ? 1 : -1);
-
-		this.pilots[CONTROL_TAXI_2] = new TaxiPilot(fromAirport.getGate(toGate)
-				.add(new Vector3f(
-						-this.getAirportManager().getWidth()*FloatMath.sin(taxiheading2),
-						0,
-						-this.getAirportManager().getWidth()*FloatMath.cos(taxiheading2))
-				), getAirportManager().getWidth());
-
-		this.pilots[PICKUP_TAXI_2] = new TaxiPilot(toAirport.getGate(toGate), taxiheading2, getAirportManager().getWidth());
+		this.pilots[PICKUP_TAXI_2] = new TaxiPilot(toAirport.getGate(toGate), toGate == 0 ? 
+                toAirport.getHeading() 
+                : 
+                toAirport.getHeading() + FloatMath.PI * (toAirport.getHeading() < 0 ? 1 : -1));
 		
 		this.pilots[HANDBRAKE_2] = new HandbrakePilot();
 
 		this.init();
 		
-		this.tasks = new int[] {TAXIING, TAKING_OFF, FLYING, LANDING, CONTROL_TAXI,PICKUP_TAXI, HANDBRAKE, TAXIING_2, TAKING_OFF_2, FLYING_2, LANDING_2,CONTROL_TAXI_2, PICKUP_TAXI_2, HANDBRAKE_2};
+		this.tasks = new int[] {TAXIING, TAKING_OFF, FLYING, LANDING, PICKUP_TAXI, HANDBRAKE, TAXIING_2, TAKING_OFF_2, FLYING_2, LANDING_2, PICKUP_TAXI_2, HANDBRAKE_2};
 	}
 	
 	private void flyLocal(VirtualAirport fromAirport, int fromGate,
@@ -198,40 +174,35 @@ public class Pilot {
 		this.pilots[TAXIING] = new TaxiPilot(fromAirport.getGate(fromGate), fromGate == 0 ? 
                 fromAirport.getHeading() 
                 : 
-                fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1), getAirportManager().getWidth());
+                fromAirport.getHeading() + FloatMath.PI * (fromAirport.getHeading() < 0 ? 1 : -1));
 		
 		this.pilots[TAKING_OFF] = new TakeOffPilot(flyHeight);
 		this.pilots[FLYING] = new FlyPilot(toAirport, flyHeight, airportManager, toGate);
 		this.pilots[LANDING] = new LandingPilot(toAirport);
-
-		float taxiheading = toGate == 0 ?
-				toAirport.getHeading()
-				:
-				toAirport.getHeading() + FloatMath.PI * (toAirport.getHeading() < 0 ? 1 : -1);
-
-		this.pilots[CONTROL_TAXI] = new TaxiPilot(toAirport.getGate(toGate)
-				.add(new Vector3f(
-					-this.getAirportManager().getWidth()*FloatMath.sin(taxiheading),
-					0,
-					-this.getAirportManager().getWidth()*FloatMath.cos(taxiheading))
-				), getAirportManager().getWidth());
-
-		this.pilots[PICKUP_TAXI] = new TaxiPilot(toAirport.getGate(toGate), taxiheading, getAirportManager().getWidth());
+		this.pilots[PICKUP_TAXI] = new TaxiPilot(toAirport.getGate(toGate), toGate == 0 ? 
+                toAirport.getHeading() 
+                : 
+                toAirport.getHeading() + FloatMath.PI * (toAirport.getHeading() < 0 ? 1 : -1));
 
 		this.pilots[HANDBRAKE] = new HandbrakePilot();
 
 		this.init();
 		
-		this.tasks = new int[] {TAXIING, TAKING_OFF, FLYING, LANDING, CONTROL_TAXI, PICKUP_TAXI, HANDBRAKE};
+		this.tasks = new int[] {TAXIING, TAKING_OFF, FLYING, LANDING, PICKUP_TAXI, HANDBRAKE};
 	}
 	
 	public static boolean onAirport(Vector3f pos, VirtualAirport airport) {
 		Vector3f diff = pos.sub(airport.getPosition(), new Vector3f());
 		float len = diff.dot(new Vector3f(-FloatMath.sin(airport.getHeading()), 0, -FloatMath.cos(airport.getHeading())));
 		float wid = diff.dot(new Vector3f(-FloatMath.cos(airport.getHeading()), 0, FloatMath.sin(airport.getHeading())));
-
-		return !(Math.abs(len) > airport.getWidth() / 2) && !(Math.abs(wid) > airport.getWidth());
-
+		
+		if (Math.abs(len) > airport.getWidth() / 2) {	
+			return false;
+		} else if (Math.abs(wid) > airport.getWidth()) {
+			return false;
+		}
+		else return true;
+		
 	}
 	
 

@@ -43,15 +43,7 @@ public class AirportManager implements AutopilotModule{
         this.width = width;
     }
 
-	public float getLength() {
-		return length;
-	}
-
-	public float getWidth() {
-		return width;
-	}
-
-	@Override
+    @Override
     public void defineAirport(float centerX, float centerZ, float centerToRunway0X, float centerToRunway0Z) {
         Vector3f position = new Vector3f(centerX, 0, centerZ);
         float heading = FloatMath.atan2(-centerToRunway0X, -centerToRunway0Z);
@@ -132,7 +124,7 @@ public class AirportManager implements AutopilotModule{
 				VirtualAirport currentAirport = currentAirportList.get(0);
 				
 				//get a slice from the set
-				int currentSlice = (droneList.indexOf(drone)*10) + MIN_HEIGHT;
+				int currentSlice = (droneList.indexOf(drone)*10)+MIN_HEIGHT; 
 				
 				// when a drone has a pilot, it is considered active
 				drone.setPilot(new Pilot(drone, this));
@@ -261,9 +253,9 @@ public class AirportManager implements AutopilotModule{
 		float len = diff.dot(new Vector3f(-FloatMath.sin(airport.getHeading()), 0, -FloatMath.cos(airport.getHeading())));
 		float wid = diff.dot(new Vector3f(-FloatMath.cos(airport.getHeading()), 0, FloatMath.sin(airport.getHeading())));
 		
-		if (len > getWidth() / 2)
+		if (len > airport.getWidth() / 2)
 			return Loc.LANE_0;
-		else if (len < - getWidth() / 2)
+		else if (len < - airport.getWidth() / 2)
 			return Loc.LANE_1;
 		else if (wid > 0)
 			return Loc.GATE_0;
@@ -276,9 +268,9 @@ public class AirportManager implements AutopilotModule{
 		float len = diff.dot(new Vector3f(-FloatMath.sin(airport.getHeading()), 0, -FloatMath.cos(airport.getHeading())));
 		float wid = diff.dot(new Vector3f(-FloatMath.cos(airport.getHeading()), 0, FloatMath.sin(airport.getHeading())));
 		
-		if (Math.abs(len) > getWidth() / 2 + airport.getLength()) {
+		if (Math.abs(len) > airport.getWidth() / 2 + airport.getLength()) {	
 			return false;
-		} else if (Math.abs(wid) > getWidth()) {
+		} else if (Math.abs(wid) > airport.getWidth()) {
 			return false;
 		}
 		else return true;

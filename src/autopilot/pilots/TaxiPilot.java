@@ -26,26 +26,21 @@ public class TaxiPilot extends PilotPart {
 	private float time;
 	private float maxBrakeForce;
 	private float finalHeading;
-	private float airportWidth;
 
 	private Vector3f oldPos = new Vector3f(0, 0, 0);
 	private float oldheading;
 
-	public TaxiPilot(Vector3f targetPos, float width) {
-		airportWidth = width;
-
+	public TaxiPilot() {
 		thrustPID = new MiniPID(100, 0.1, 0.1);
-		this.targetPos = targetPos;
-		this.finalHeading = Float.NaN;
+		targetPos = new Vector3f(0,0,0);
+		finalHeading = 0;
 
 		this.firstCheck = true;
 		this.goalReached = false;
 		this.ended = false;
 	}
 
-	public TaxiPilot(Vector3f targetPos, float heading, float width) {
-		airportWidth = width;
-
+	public TaxiPilot(Vector3f targetPos, float heading) {
 		thrustPID = new MiniPID(100, 0.1, 0.1);
 		this.targetPos = targetPos;
 		this.finalHeading = heading;
@@ -92,9 +87,9 @@ public class TaxiPilot extends PilotPart {
 		}
 
 		float taxispeed;
-		if (distance < 0.5*airportWidth) {
+		if (distance < 12.5) {
 			taxispeed = 1f;
-		} else if (distance < airportWidth) {
+		} else if (distance < 25f) {
 			taxispeed = 3f;
 		} else {
 			taxispeed = 10f;
@@ -102,7 +97,7 @@ public class TaxiPilot extends PilotPart {
 		thrustPID.setSetpoint(taxispeed);
 
 		if (firstCheck) {
-			if (distance <= 0.25*airportWidth) {
+			if (distance <= 12.5) {
 				goalReached = true;
 			}
 			firstCheck = false;
@@ -113,16 +108,10 @@ public class TaxiPilot extends PilotPart {
 
 		float targetHeading;
 		if (goalReached) {
-			if (Float.isNaN(finalHeading)) {
-				finalHeading = heading;
-			}
 			targetHeading = finalHeading;
 		} else {
 			targetHeading = toGoal;
 		}
-
-		System.out.println("Current position: " + input.getX() + " " + input.getZ());
-		System.out.println("Target position: " + targetPos.x() + " " + targetPos.z());
 
 		float thrust = 0, fBrake = 0, lBrake = 0, rBrake = 0;
 
@@ -157,10 +146,6 @@ public class TaxiPilot extends PilotPart {
 
 		} else {
 			ended = true;
-		}
-
-		if (Math.abs(angVel) > FloatMath.toRadians(5f)){
-			fBrake = maxBrakeForce;
 		}
 
 		this.time = input.getElapsedTime();
