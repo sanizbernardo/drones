@@ -47,22 +47,22 @@ public class RandomWorld extends World{
 		addDrone("drone7", 7, 0, 1);
 		addDrone("drone8", 8, 0, 1);	
 		
-		addDrone("drone0d", 0, 1, 1);
-		addDrone("drone1d", 1, 1, 1);
-		addDrone("drone2d", 2, 1, 1);
-		addDrone("drone3d", 3, 1, 1);
-		addDrone("droned4", 4, 1, 1);
-		addDrone("dronde5", 5, 1, 1);
-		addDrone("drode6", 6, 1, 1);
-		addDrone("drodne7", 7, 1, 1);
-		addDrone("dronde8", 8, 1, 1);	
+//		addDrone("drone0d", 0, 1, 1);
+//		addDrone("drone1d", 1, 1, 1);
+//		addDrone("drone2d", 2, 1, 1);
+//		addDrone("drone3d", 3, 1, 1);
+//		addDrone("droned4", 4, 1, 1);
+//		addDrone("dronde5", 5, 1, 1);
+//		addDrone("drode6", 6, 1, 1);
+//		addDrone("drodne7", 7, 1, 1);
+//		addDrone("dronde8", 8, 1, 1);	
 	}
 
 	@Override
 	public void setupWorld() {
 		this.ground = new Ground(50);
 		
-		this.generator = PackageGenerators.random(0.005f, 9);
+		this.generator = PackageGenerators.random(0.005f, 9, 1337);
 	}
 
 	@Override
