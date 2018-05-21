@@ -1,7 +1,7 @@
 package utils;
 
-import meshes.cube.BufferedCube;
-import meshes.cube.Cube;
+import testbed.graphics.meshes.cube.BufferedCube;
+import testbed.graphics.meshes.cube.Cube;
 
 public class Cubes {
 
